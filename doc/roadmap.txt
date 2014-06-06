@@ -1,0 +1,7 @@
+Implement Gauss-solver
+
+Learn to calculate the difference
+
+Present the difference as a series of numbers
+
+Ask for help
