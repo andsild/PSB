@@ -10,7 +10,7 @@ CC = g++
 
 # define any compile-time flags
 # CFLAGS = -Wall -g
-CFLAGS =
+CFLAGS = -g
 
 # define any directories containing header files other than /usr/include
 #
