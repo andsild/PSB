@@ -1,0 +1,6 @@
+The mask is my laplacian operator
+
+A is given as a 
+
+D = tri-diag av masken
+I = Identity matrix
