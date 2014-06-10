@@ -21,19 +21,25 @@ d1 iterate(CImg<double> image, const d1 solution,
     d1 mySecondArr = guess;
 
     // 1 iteration
-    for (double iPos = 0; iPos < image.width(); iPos++) 
+    for (int iPos = 0; iPos < image.width(); iPos++) 
     {
-        double sum = solution[iPos];
-        for (double jPos = 0; jPos < image.height(); jPos++) 
+        double sum = 0;
+        for (int jPos = 0; jPos < image.height(); jPos++) 
         {
-            int a = 1;
             if (iPos != jPos) 
             {
-                sum -= image(iPos, jPos) * guess[jPos];
+                sum += (double)image(iPos, jPos, 0, 0);// * guess[jPos];
             }
         }
-        if(image(iPos, iPos) == 0) { guess[iPos] = 0; continue; }
-        guess[iPos] = sum / image(iPos, iPos);
+        // if((double)image(iPos, iPos, 0, 0) == 0) 
+        // { 
+        //     guess[iPos] = 0;
+        //     continue;
+        // }
+        guess[iPos] = (solution[iPos] - sum) 
+                            / 
+                    ( (double)image(iPos, iPos, 0, 0));
+        //guess[iPos] = sum / (double)image(iPos, iPos, 0, 0);
     }
     return guess;
 }
@@ -50,7 +56,7 @@ matrix_type test(CImg<double> inmatrix, const d1 solution,
         d1 newGuess = iterate(inmatrix, solution, old_guess);
 
         // getting the errors
-        d1 errorLine(3);
+        d1 errorLine(inmatrix.width());
         for(int iPos = 0; iPos < newGuess.size(); iPos++)
         {
             errorLine[iPos] = calculateError(old_guess[iPos],

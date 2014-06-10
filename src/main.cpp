@@ -224,48 +224,55 @@ void addnoise(CImg<double> &image, int percent)
 	return;
 }
 
+CImg<double> inputkernel(double entries[], int iNewDim)
+{
+    CImg<double> image(entries, iNewDim, iNewDim, 1, 1, false);
+    return image;
+}
+
+
+vector<double> poisson2d(int iSize)
+{
+    int iDim = iSize * iSize;
+
+
+    for(int iPos = 0; iPos < iDim; iPos++)
+    {
+        for(int jPos = 0; jPos < iDim; jPos++)
+        {
+            k = iPos + iDim * jPos;
+            
+
+}
+
+
 int main() {
     CImg<unsigned char> image("./media/image.jpg"),  visu(500, 400, 1, 3, 0);
 
 
-    // CImg<double> greyimage=getframe(image, 1);
-//     CImg<double> greyimage=image;
-//     addnoise(greyimage, 2);
-//     CImgDisplay grey_disp (greyimage, "Image with noise,  Green frame", 0);
-//
-//     CImg<double> newu=greyimage;
-//     CImg<double> new2u=greyimage; //for isotropic denoising
-//     CImg<double> temp2x=greyimage;
-//     CImg<double> temp2y=greyimage;
-//     CImg<double> tempx=greyimage;
-//     CImg<double> tempy=greyimage;
-//     CImg<double> ones(greyimage.width(), greyimage.height(), greyimage.depth(),
-//                       greyimage.spectrum(), 1.0);
-//     CImg<double> denom=greyimage;
-//     double dt=.25;
-//     for (double t=0; t<10; t+=dt)
-// {
-//         tempx=Dxplus(newu);
-//         tempy=Dyplus(newu);
-//         denom= ones + gradsq(newu);
-//         denom.sqrt();
-//         tempx.div(denom);
-//         tempy.div(denom);
-//         temp2x=Dxminus(tempx);
-//         temp2y=Dyminus(tempy);
-//         newu = newu + dt*(temp2x + temp2y);
-//         new2u = new2u + dt*(DoubleDx(new2u) + DoubleDy(new2u) ); //isotropic
-//     }
-//     CImgDisplay iso_disp (new2u, "Image denoised isotropically", 0);
-//     CImgDisplay anis_disp (newu, "Image denoised anisotropically", 0);
-//
-    CImgDisplay main_disp(image,  "Image",  0);
+    //TODO: histogram cimg
+    //    : normaliz in cimg..
+    //TODO: get column
     double max_error = .9;
-    // vector<double> sol(3, 3);
-    vector<double> sol {1, 28, 76};
-    vector<double> initGuess {1, 0, 1};
+    double entries[9] = {0,1,0, 0,-4,1, 0,1,0};
+    CImg<double> mask = inputkernel(entries, 3);
+    CImg<double> masked = image.get_convolve(mask);
+    CImg<double> reshaped = masked.get_vector();
 
-    matrix_type x2 = test(image, sol, initGuess, max_error);
+     // Estimate gradient (uses forward finite difference scheme).
+    const CImgList<> gradient = image.get_gradient("xy",1);
+
+    // Remember average value for each channel 
+    // (needed for normalizing the reconstruction).
+    const CImg<> average = image.get_resize(1,1,1,3,2);
+
+    // vector<double> sol(3, 3);
+    // vector<double> sol {1, 28, 76};
+    // vector<double> initGuess(image.width(), 0);
+
+    // matrix_type x2 = test(image, sol, initGuess, max_error);
+	CImgDisplay main_disp(image,"Image",0);	
+	CImgDisplay mask_disp(masked,"Image",0);	
 
     while(!main_disp.is_closed())
     {
