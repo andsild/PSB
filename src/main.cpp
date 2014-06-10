@@ -1,165 +1,275 @@
 #include "../lib/CImg-1.5.8/CImg.h"
+#include "solvers/GS/gauss_image.cpp"
 #include <iostream>
 
 using namespace cimg_library;
+using namespace pe_solver;
 using namespace std;
 
-
-CImg<double> expand_matrix(CImg<double>image, int iDegree)
+//returns the forward 2nd derivative w.r.t x and y (d2u/dxdy)
+CImg<double> Dxyplus(const CImg<double> &image)
 {
+    CImg<double> newimage(image.width(), image.height(), image.depth(),
+            image.spectrum(), 0);
 
-    return image;
+    for (int iPos=0; iPos<image.width()-1; iPos++)
+    {
+        for (int kPos=0; kPos<image.depth(); kPos++)
+        {
+            for (int lPos=0; lPos<image.spectrum(); lPos++)
+            {
+                // Get the difference between raster x-wise neighbour
+                // and CUR
+                newimage(iPos, image.height() - 1, kPos, lPos)
+                    = image(iPos + 1, image.height() - 1, kPos, lPos)
+                      - image(iPos, image.height() - 1, kPos, lPos);
+                for (int jPos=0; jPos<image.height() - 1; jPos++)
+                    // Set the pixel as diff between raster x-wise neighbour
+                    // and y-wise neighbour and the combined in CUR
+                    newimage(iPos, jPos, kPos, lPos) = 
+                        image(iPos + 1, jPos, kPos, lPos)
+                        + image(iPos, jPos + 1, kPos, lPos)
+                        - 2*image(iPos, jPos, kPos, lPos);
+            }
+        }
+    }
+    for (int kPos=0; kPos<image.depth(); kPos++)
+    {
+        for (int lPos=0; lPos<image.spectrum(); lPos++)
+        {
+            //
+            newimage(image.width() - 1, image.height() - 1, kPos, lPos)
+                = image(image.width() - 2, image.height() - 2, kPos, lPos)
+                  - image(image.width() - 1, image.height() - 1, kPos, lPos);
+            for (int jPos=0; jPos<image.height()-1; jPos++)
+            {
+                newimage(image.width()-1, jPos, kPos, lPos)
+                    = image(image.width() - 1, jPos + 1, kPos, lPos)
+                      - image(image.width() - 1, jPos, kPos, lPos);
+            }
+        }
+    }
+
+    return newimage;
 }
-
-CImg<double> borders(const CImg<double> &image,int degree){
-    //copy image to temp newim with black border
-    CImg<double> newim(image.width()  + (2*degree),
-                       image.height() + (2*degree),
-                       image.depth(), image.spectrum());
+//returns the 2nd derivative w.r.t x
+CImg<double> DoubleDx(const CImg<double> &image)
+{
+    CImg<double> newimage(image.width(), image.height(), image.depth(),
+                          image.spectrum(), 0);
+    for (int jPos=0; jPos < image.height(); jPos++)
+        for (int kPos=0; kPos < image.depth(); kPos++)
+            for (int lPos=0; lPos < image.spectrum(); lPos++)
+            {
+                for (int iPos=1; iPos < image.width()-1; iPos++)
+                    newimage(iPos, jPos, kPos, lPos)
+                        = image(iPos + 1, jPos, kPos, lPos)
+                          + image(iPos - 1, jPos, kPos, lPos)
+                          - 2*image(iPos, jPos, kPos, lPos);
+                newimage(0, jPos, kPos, lPos)
+                    = image(1, jPos, kPos, lPos)-image(0, jPos, kPos, lPos);
+                newimage(newimage.width() - 1, jPos, kPos, lPos)
+                    = image(newimage.width() - 2, jPos, kPos, lPos)
+                      - image(newimage.width() - 1, jPos, kPos, lPos);
+            }
+    return newimage;
+}
+//returns the 2nd derivative w.r.t y
+CImg<double> DoubleDy(const CImg<double> &image)
+{
+    CImg<double> newimage(image.width(), image.height(), image.depth(),
+                          image.spectrum(), 0);
     for (int iPos=0; iPos<image.width(); iPos++)
-        for (int jPos=0; jPos<image.height(); jPos++)
-            for (int kPos=0; kPos<3; kPos++)
-                newim(iPos+degree, jPos+degree, 0, kPos) =
-                    image(iPos,jPos,0,kPos);
+        for (int kPos=0; kPos<image.depth(); kPos++)
+            for (int lPos=0; lPos<image.spectrum(); lPos++)
+            {
+                for (int jPos=1; jPos<image.height()-1; jPos++)
+                    newimage(iPos, jPos, kPos, lPos) =
+                        image(iPos, jPos+1, kPos, lPos) 
+                        + image(iPos, jPos-1, kPos, lPos)-2
+                        * image(iPos, jPos, kPos, lPos);
 
-    //copy 1st and last rows of image onto remaining rows of newim repectively(creates top/bottom borders)
-    for (int iPos=0; iPos<newim.width(); iPos++)
-    {
-        for (int jPos=0; jPos<3; jPos++)
-        {
-            for (int kPos=0; kPos<=degree; kPos++)
-            {
-                newim(iPos,kPos,0,jPos) = newim(iPos,degree,0,jPos);
-                newim(iPos, newim.height()-kPos-1, 0, jPos) = 
-                    newim(iPos, image.height() - 1 + degree, 0, jPos);   
+                newimage(iPos, 0, kPos, lPos) = 
+                    image(iPos, 1, kPos, lPos) - image(iPos, 0, kPos, lPos);
+
+                newimage(iPos, newimage.height()-1, kPos, lPos) = 
+                    image(iPos, newimage.height()-2, kPos, lPos)
+                    - image(iPos, newimage.height()-1, kPos, lPos);
+
             }
-        }
-    }
-    //copy 1st and last cols onto 1st and last repectively(creates left/right borders
-    for (int iPos=0; iPos < newim.height(); iPos++)
-    {
-        for (int jPos=0; jPos<3; jPos++)
-        {
-            for (int kPos=0; kPos<=degree; kPos++)
-            {
-                newim(kPos,iPos,0,jPos) = newim(degree, iPos, 0, jPos);
-                newim(newim.width() - kPos - 1, iPos, 0, jPos) =
-                    newim(image.width() - 1 + degree, iPos, 0, jPos);
-            }
-        }
-    }
-    return newim;
+    return newimage;
+
 }
 
-CImg<double> convolve(const CImg<double> &image,const CImg<double> &kernel)
+
+//returns the forward x derivative
+CImg<double> Dxplus(const CImg<double> &image)
 {
-    CImg<double> expand=borders(image,(kernel.width()-1)/2);
-    // all values to last parameter (0)
-    CImg<double> filtered(image.width(),image.height(),image.depth(),
-                          image.spectrum(),0); 
- 
-    for (int iPos=0;iPos<filtered.width();iPos++)
-    {
-        for (int jPos=0;jPos<filtered.height();jPos++)
-        {
-            for (int kPos=0;kPos<3;kPos++)
+	CImg<double> newimage(image.width(), image.height(), image.depth(),
+                          image.spectrum(), 0);
+	for (int jPos=0; jPos<image.height(); jPos++)
+		for (int kPos=0; kPos<image.depth(); kPos++)
+			for (int lPos=0; lPos<image.spectrum(); lPos++)
             {
-                for(int lPos=0;lPos<kernel.width();lPos++)
+                newimage(image.width()-1, jPos, kPos, lPos) = 
+                    (image.width()-2, jPos, kPos, lPos)
+                    - (image.width()-1, jPos, kPos, lPos);
+                for (int iPos=0; iPos<image.width()-1; iPos++)
+                    newimage(iPos, jPos, kPos, lPos) = 
+                        image(iPos+1, jPos, kPos, lPos)
+                        - image(iPos, jPos, kPos, lPos);
+            }
+    return newimage;
+
+}
+//returns the backward x derivative
+CImg<double> Dxminus(const CImg<double> &image)
+{
+	CImg<double> newimage(image.width(), image.height(), image.depth(), image.spectrum(), 0);
+	for (int jPos=0; jPos<image.height(); jPos++)
+		for (int kPos=0; kPos<image.depth(); kPos++)
+			for (int lPos=0; lPos<image.spectrum(); lPos++)
+            {
+                newimage(0, jPos, kPos, lPos) = 
+                    (1, jPos, kPos, lPos) - (0, jPos, kPos, lPos);
+                for (int iPos=1; iPos<image.width(); iPos++)
+                    newimage(iPos, jPos, kPos, lPos) = 
+                        image(iPos, jPos, kPos, lPos)
+                        - image(iPos-1, jPos, kPos, lPos);
+            }
+    return newimage;
+
+}
+//returns the forward y derivative
+CImg<double> Dyplus(const CImg<double> &image)
+{
+	CImg<double> newimage(image.width(), image.height(), image.depth(),
+                          image.spectrum(), 0);
+	for (int kPos=0; kPos<image.depth(); kPos++)
+		for (int lPos=0; lPos<image.spectrum(); lPos++)
+			for (int iPos=0; iPos<image.width(); iPos++)
+            {
+                newimage(iPos, image.height()-1, kPos, lPos) = 
+                    image(iPos, image.height()-2, kPos, lPos)
+                    - image(iPos, image.height()-1, kPos, lPos);
+                for (int jPos=0; jPos<image.height()-1; jPos++)
+                    newimage(iPos, jPos, kPos, lPos) = 
+                        image(iPos, jPos+1, kPos, lPos)
+                        - image(iPos, jPos, kPos, lPos);
+            }
+
+    return newimage;
+
+}
+//returns the backward y derivative
+CImg<double> Dyminus(const CImg<double> &image)
+{
+    CImg<double> newimage(image.width(), image.height(), image.depth(), image.spectrum(), 0);
+    for (int iPos=0; iPos<image.width(); iPos++)
+        for (int kPos=0; kPos<image.depth(); kPos++)
+            for (int lPos=0; lPos<image.spectrum(); lPos++)
+            {
+                newimage(iPos, 0, kPos, lPos) = 
+                    image(iPos, 1, kPos, lPos)
+                    - image(iPos, 0, kPos, lPos);
+                for (int jPos=1; jPos<image.height(); jPos++)
+                    newimage(iPos, jPos, kPos, lPos) = 
+                        image(iPos, jPos, kPos, lPos)
+                        - image(iPos, jPos-1, kPos, lPos);
+            }
+    return newimage;
+
+}
+
+//returns the square of the gradient of the image
+CImg<double> gradsq(const CImg<double> &image)
+{
+	CImg<double> newimage(image.width(), image.height(), image.depth(),
+                          image.spectrum(), 0);
+	CImg<double> ux=Dxplus(image);
+	CImg<double> uy=Dyplus(image);
+    for (int iPos=0; iPos<image.width(); iPos++)
+		for (int jPos=0; jPos<image.height(); jPos++)
+			for (int kPos=0; kPos<image.depth(); kPos++)
+				for (int lPos=0; lPos<image.spectrum(); lPos++)
+					newimage(iPos, jPos, kPos, lPos) = 
+                        (ux(iPos, jPos, kPos, lPos)*ux(iPos, jPos, kPos, lPos)
+                         + uy(iPos, jPos, kPos, lPos)*uy(iPos, jPos, kPos, lPos));
+	return newimage;
+}
+
+//extracts the specific frame of an image, eg for an RGB image, frame 1 is green
+CImg<double> getframe(const CImg<double> &image, int frame)
+{
+	CImg<double> newframe(image.width(), image.height(), image.depth(), 1);
+	for (int iPos=0; iPos<image.width(); iPos++)
+		for (int jPos=0; jPos<image.height(); jPos++)
+			for (int kPos=0; kPos<image.depth(); kPos++)
+				newframe(iPos, jPos, kPos, 0)
+                    = image(iPos, jPos, kPos, frame);
+	return newframe;
+}
+
+//randomizes a specific percentage of the image
+void addnoise(CImg<double> &image, int percent)
+{
+	for (int iPos=0; iPos<image.width(); iPos++)
+		for (int jPos=0; jPos<image.height(); jPos++)
+			for (int kPos=0; kPos<image.depth(); kPos++)
+				for (int lPos=0; lPos<image.spectrum(); lPos++)
                 {
-                    for (int mPos=0;mPos<kernel.height();mPos++)
-                    {
-                        filtered(iPos,jPos,0,kPos)+=
-                            (expand(iPos + lPos, jPos + mPos, 0, kPos))
-                            *kernel(lPos, mPos, 0, kPos);
-                    }
-                }
-            }
-        }
-    }
-
-    return filtered;
+					if (rand()%(100/percent)==0)
+						image(iPos, jPos, kPos, lPos) = (double)(rand() % 255);
+				}
+	return;
 }
-
-template <typename T>
-CImg< T > convolute(CImg< T > image,  CImg<double> kernel, int iDegree)
-{
-    CImg<double> expand = expand_matrix(image, (iDegree - 1) /2);
-
-    return expand;
-}
-
-void normalize(CImg<double> &input)
-{
-    double dTotal[3] = {0, 0, 0};
-
-    for(int iPos = 0; iPos < input.width(); iPos++)
-    {
-        for(int jPos = 0; jPos < input.height(); jPos++)
-        {
-            for(int kPos = 0; kPos < 3; kPos++)
-            {
-                dTotal[kPos] += input(iPos, jPos, 0, kPos);
-            }
-        }
-    }
-
-    for(int iPos = 0; iPos < input.width(); iPos++)
-    {
-        for(int jPos = 0; jPos < input.height(); jPos++)
-        {
-            for(int kPos = 0; kPos < 3; kPos++)
-            {
-                input(iPos, jPos, 0, kPos) /= dTotal[kPos];
-            }
-        }
-    }
-}
-
-// CImg<double> normalize(CImg<double> kernel, int iDim)
-// {
-//     for (int iPos = 0; iPos < kernel.width(); iPos++) 
-//     {
-//         double dRowSum = 0;
-//         for (int jPos = 0; jPos < kernel.height(); jPos++) 
-//         {
-//              dRowSum += kernel(iPos, jPos, 0, iDim);
-//         }
-//         for (int jPos = 0; jPos < kernel.height(); jPos++) 
-//         {
-//             kernel(iPos, jPos, 0, iDim) /= dRowSum;
-//         }
-//
-//     }
-//     return kernel;
-//
-// }
 
 int main() {
-    CImg<unsigned char> image("./media/image.jpg"), visu(500,400,1,3,0);
-    int iDim  =  3;
-    CImg<double> kern(iDim, iDim, 1, 3, 2);
-    normalize(kern);
+    CImg<unsigned char> image("./media/image.jpg"),  visu(500, 400, 1, 3, 0);
+
+
+    // CImg<double> greyimage=getframe(image, 1);
+//     CImg<double> greyimage=image;
+//     addnoise(greyimage, 2);
+//     CImgDisplay grey_disp (greyimage, "Image with noise,  Green frame", 0);
+//
+//     CImg<double> newu=greyimage;
+//     CImg<double> new2u=greyimage; //for isotropic denoising
+//     CImg<double> temp2x=greyimage;
+//     CImg<double> temp2y=greyimage;
+//     CImg<double> tempx=greyimage;
+//     CImg<double> tempy=greyimage;
+//     CImg<double> ones(greyimage.width(), greyimage.height(), greyimage.depth(),
+//                       greyimage.spectrum(), 1.0);
+//     CImg<double> denom=greyimage;
+//     double dt=.25;
+//     for (double t=0; t<10; t+=dt)
+// {
+//         tempx=Dxplus(newu);
+//         tempy=Dyplus(newu);
+//         denom= ones + gradsq(newu);
+//         denom.sqrt();
+//         tempx.div(denom);
+//         tempy.div(denom);
+//         temp2x=Dxminus(tempx);
+//         temp2y=Dyminus(tempy);
+//         newu = newu + dt*(temp2x + temp2y);
+//         new2u = new2u + dt*(DoubleDx(new2u) + DoubleDy(new2u) ); //isotropic
+//     }
+//     CImgDisplay iso_disp (new2u, "Image denoised isotropically", 0);
+//     CImgDisplay anis_disp (newu, "Image denoised anisotropically", 0);
+//
     CImgDisplay main_disp(image,  "Image",  0);
-    // CImgDisplay main_conv(convolute(image, kern, iDim),  "MeanFilter 5", 0);
-    CImgDisplay main_conv(convolve(image, kern),  "MeanFilter 5", 0);
+    double max_error = .9;
+    // vector<double> sol(3, 3);
+    vector<double> sol {1, 28, 76};
+    vector<double> initGuess {1, 0, 1};
+
+    matrix_type x2 = test(image, sol, initGuess, max_error);
 
     while(!main_disp.is_closed())
     {
         main_disp.wait();
     }
-
-    // const unsigned char red[] = { 255,0,0 }, green[] = { 0,255,0 }, blue[] =
-    // { 0,0,255 }; image.blur(2.5);
-    // CImgDisplay main_disp(image,"Click a point"),
-    //                      draw_disp(visu,"Intensity profile");
-    // while (!main_disp.is_closed() && !draw_disp.is_closed()) {
-    //     main_disp.wait();
-    //     if (main_disp.button() && main_disp.mouse_y()>=0) {
-    //         const int y = main_disp.mouse_y();
-    //         visu.fill(0).draw_graph(image.get_crop(0,y,0,0,image.width()-1,y,0,0),red,1,1,0,255,0);
-    //         visu.draw_graph(image.get_crop(0,y,0,1,image.width()-1,y,0,1),green,1,1,0,255,0);
-    //         visu.draw_graph(image.get_crop(0,y,0,2,image.width()-1,y,0,2),blue,1,1,0,255,0).display(draw_disp);
-    //     }
-    // }
     return 0;
 }
