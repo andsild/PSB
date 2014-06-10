@@ -2,6 +2,8 @@ Implement Gauss-solver
 
 Learn to calculate the difference
 
+Look into how PSB does the images - one vector or a stack of vectors?
+
 Present the difference as a series of numbers
 
 Ask for help
