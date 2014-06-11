@@ -26,41 +26,36 @@ CImg<double> poisson2d(const CImg<double> inImage, CImg<double> identity,
 {
     iSize = 9;
     CImg<double> retMatrix(iSize, iSize);
-    iSize = 3;
+    iSize = sqrt(iSize);
+    cout << iSize << endl;
     // CImg<double> retMatrix(9, 9);
 
-    for(int iCount = 0; iCount < iSize; iCount++)
+    for(int iCount = 0; iCount < iSize+1; iCount++)
     {
-        int mult = (iCount * iSize);
+        int skalar = (iCount * identity.width());
 
-    for(int iPos = 0; iPos < iSize; iPos++)
+    for(int iPos = 0; iPos < identity.width(); iPos++)
     {
-        for(int jPos = 0; jPos < iSize; jPos++)
+        for(int jPos = 0; jPos < identity.height(); jPos++)
         {
-            retMatrix(iPos+mult, jPos+iSize+mult) = identity(iPos, jPos, 0);
-            retMatrix(iPos+mult, jPos+mult) = inImage(iPos, jPos, 0);
+            if(iCount < iSize) {
+                //rightmost
+                retMatrix(iPos+skalar, jPos+skalar+identity.width()) = identity(iPos, jPos, 0);
+            }
+            if(skalar > 0){
+            // retMatrix(iPos+(skalar*identity.width()+1), jPos+(skalar*identity.width())) = inImage(iPos, jPos);
+            }
+            else{
+            // retMatrix(iPos+(skalar*identity.width()), jPos+(skalar*identity.width())) = inImage(iPos, jPos);
+            }
 
             if(iCount == 0) { continue; } // avoid filling first row
-            retMatrix(iPos+mult, jPos-iSize+mult) = identity(iPos, jPos, 0);
+            //leftmost I
+            retMatrix(iPos+skalar, jPos-identity.width()+skalar) = identity(iPos, jPos);
         }
     }
     }
-
-    // for(int iCount = 0; iCount < iSize; iCount++)
-    // {
-    //     int mult = (iCount * iSize) - 1;
-    //     if(mult < 0) { mult = 0; };
-    //
-    // for(int iPos = 0; iPos < iSize; iPos++)
-    // {
-    //     for(int jPos = 0; jPos < iSize; jPos++)
-    //     {
-    //         // retMatrix(iPos+mult, jPos+iSize+mult) = identity(iPos, jPos, 0);
-    //         if(iCount == 0) { continue; } // avoid filling first row
-    //         // retMatrix(iPos+iSize, jPos+iSize+mult) = identity(iPos, jPos, 0);
-    //     }
-    // }
-    // }
+    print_image(retMatrix);
     return retMatrix;
 }
 
@@ -72,21 +67,17 @@ int main() {
     double D[9] = {0,1,0, 0,-4,1, 0,1,0},
            I[9] = {-1,0,0, 0,-1,0, 0,0,0};
     CImg<double> mask = inputkernel(D, 3);
-    //FIXME
+    //FIXME: specified wrong order
     mask(0, 1) = -1;
     CImg<double> identity = inputkernel(I,3);
-    identity(2, 2) = 1;
+    identity(2, 2) = -1;
     CImg<double> masked = image.get_convolve(mask);
     CImg<double> F = masked.get_vector();
     //FIXME: mask is wrong
     CImg<double> A = poisson2d(mask, identity, masked.width()*masked.height());
+    CImg<double> UU(1, masked.width()*masked.height(), 1, 1, 0); //Initial guess shall be zero
 
-    print_image(A);
-    
-    //Initial guess shall be zero
-    CImg<double> UU(1, masked.width()*masked.height(), 1, 1, 0);
-
-    // matrix_type x2 = test(A, F, UU, max_error);
+    matrix_type x2 = test(A, F, UU, max_error);
 
 
 	// CImgDisplay main_disp(image,"Image",0);	
