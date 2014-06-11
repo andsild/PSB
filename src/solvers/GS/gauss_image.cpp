@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <vector>
 #include <stdio.h>
+#include <cmath>
 
 #include "../../../lib/CImg-1.5.8/CImg.h"
 
@@ -30,7 +31,10 @@ CImg<double> iterate(CImg<double> A, const CImg<double> F,
         {
             if (iPos != jPos) 
             {
-                sum += F(0,iPos) * A(iPos, jPos);// * U[jPos];
+                // Number in A times it's coefficient
+                sum += U(0,jPos*A.width()) * A(iPos, jPos);// * U[jPos];
+                if(std::isinf(sum)) 
+                {int a = 1;}
             }
         }
         if(A(iPos, iPos) == 0) 
@@ -38,8 +42,13 @@ CImg<double> iterate(CImg<double> A, const CImg<double> F,
             U(0, iPos) = 0;
             continue;
         }
-        double temp = ( (F(0, iPos) - sum) / A(iPos, iPos));
-        U(0, iPos) = temp;
+        double temp = ( (F(0, iPos*A.width()) - sum) / A(iPos, iPos));
+        if(std::isinf(temp)) 
+        {
+            int a = 1;
+        }
+
+        U(0, iPos*A.width()) = temp;
     }
     return U;
 }
@@ -51,7 +60,6 @@ void print_image(const CImg<double> img)
         for(int jPos = 0; jPos < img.height(); jPos++)
         {
             // if(img(iPos, jPos) == 0) { continue; }
-            // cout << img(iPos, jPos) << " "; 
             printf("\t%.2lf", img(iPos, jPos));
         }
         cout << endl << iPos+1 << "#: ";
@@ -63,7 +71,7 @@ void print_image(const CImg<double> img)
 matrix_type test(CImg<double> inmatrix, const CImg<double> solution,
                  CImg<double> guess, double dMaxErr) 
 {
-    double dMax = 200;
+    double dMax = 0;
     CImg<double> old_guess = guess;
     do
     {
@@ -83,7 +91,7 @@ matrix_type test(CImg<double> inmatrix, const CImg<double> solution,
             errorLine(iPos) = dRet;
         }
         dMax = errorLine.max();
-        // cout << "Max error: " << dMax << endl;
+        cout << "Max error: " << dMax << endl;
         old_guess = CImg<double>(newGuess);
 
     } while(dMax > dMaxErr);
