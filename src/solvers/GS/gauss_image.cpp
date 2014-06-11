@@ -2,6 +2,7 @@
 #include <cmath>
 #include <algorithm>
 #include <vector>
+#include <stdio.h>
 
 #include "../../../lib/CImg-1.5.8/CImg.h"
 
@@ -29,9 +30,8 @@ CImg<double> iterate(CImg<double> A, const CImg<double> F,
         {
             if (iPos != jPos) 
             {
-                sum += U(0,iPos) * A(iPos, jPos);// * U[jPos];
+                sum += F(0,iPos) * A(iPos, jPos);// * U[jPos];
             }
-            cout << sum << endl;
         }
         if(A(iPos, iPos) == 0) 
         { 
@@ -50,10 +50,11 @@ void print_image(const CImg<double> img)
     {
         for(int jPos = 0; jPos < img.height(); jPos++)
         {
-            if(img(iPos, jPos) == 0) { continue; }
-            cout << img(iPos, jPos) << " "; 
+            // if(img(iPos, jPos) == 0) { continue; }
+            // cout << img(iPos, jPos) << " "; 
+            printf("\t%.2lf", img(iPos, jPos));
         }
-        cout << endl;
+        cout << endl << iPos+1 << "#: ";
     }
 }
 
