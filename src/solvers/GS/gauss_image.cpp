@@ -15,66 +15,75 @@ typedef CImg<double> matrix_type;
 
 double calculateError(double, double);
 
-d1 iterate(CImg<double> image, const d1 solution,
-        d1 guess) 
+/** Gauss-seidel iteration
+ *
+ */
+CImg<double> iterate(CImg<double> A, const CImg<double> F,
+        CImg<double> U) 
 {
-    d1 mySecondArr = guess;
-
-    // 1 iteration
-    for (int iPos = 0; iPos < image.width(); iPos++) 
+    // 1 iteration of gauss-seidel
+    for (int iPos = 0; iPos < A.width(); iPos++) 
     {
         double sum = 0;
-        for (int jPos = 0; jPos < image.height(); jPos++) 
+        for (int jPos = 0; jPos < A.height(); jPos++) 
         {
             if (iPos != jPos) 
             {
-                sum += (double)image(iPos, jPos, 0, 0);// * guess[jPos];
+                sum += U(0,iPos) * A(iPos, jPos);// * U[jPos];
             }
+            cout << sum << endl;
         }
-        // if((double)image(iPos, iPos, 0, 0) == 0) 
-        // { 
-        //     guess[iPos] = 0;
-        //     continue;
-        // }
-        guess[iPos] = (solution[iPos] - sum) 
-                            / 
-                    ( (double)image(iPos, iPos, 0, 0));
-        //guess[iPos] = sum / (double)image(iPos, iPos, 0, 0);
+        if(A(iPos, iPos) == 0) 
+        { 
+            U(0, iPos) = 0;
+            continue;
+        }
+        double temp = ( (F(0, iPos) - sum) / A(iPos, iPos));
+        U(0, iPos) = temp;
     }
-    return guess;
+    return U;
+}
+
+void print_image(const CImg<double> img)
+{
+    for(int iPos = 0; iPos < img.width(); iPos++)
+    {
+        for(int jPos = 0; jPos < img.height(); jPos++)
+        {
+            if(img(iPos, jPos) == 0) { continue; }
+            cout << img(iPos, jPos) << " "; 
+        }
+        cout << endl;
+    }
 }
 
 //TODO: check for diagonal dominance
-//If you know that a matrix is diagonally dominant, 
-matrix_type test(CImg<double> inmatrix, const d1 solution,
-                 d1 guess, double dMaxErr) 
+//If you know that a matrix is diagonally dominant,
+matrix_type test(CImg<double> inmatrix, const CImg<double> solution,
+                 CImg<double> guess, double dMaxErr) 
 {
     double dMax = 200;
-    d1 old_guess = guess;
+    CImg<double> old_guess = guess;
     do
     {
-        d1 newGuess = iterate(inmatrix, solution, old_guess);
+        CImg<double> newGuess = iterate(inmatrix, solution, old_guess);
+
+        print_image(old_guess);
+        print_image(newGuess);
+        cout << "#### EOG ###" << endl;
 
         // getting the errors
-        d1 errorLine(inmatrix.width());
-        for(int iPos = 0; iPos < newGuess.size(); iPos++)
+        CImg<double> errorLine(newGuess.height());
+        //TODO: newGuess bigger than errorline
+        for(int iPos = 0; iPos < newGuess.height(); iPos++)
         {
-            errorLine[iPos] = calculateError(old_guess[iPos],
-                                            newGuess[iPos]);
+            double dRet = calculateError(old_guess(0, iPos),
+                                            newGuess(0, iPos));
+            errorLine(iPos) = dRet;
         }
-        d1::iterator pos = max_element(errorLine.begin(),
-                          errorLine.end());
-        dMax = (double)*pos;
-        old_guess = d1(newGuess);
-
-        for(d1::const_iterator i = newGuess.begin();
-            i != newGuess.end();
-            i++){
-                cout << *i << ' ';
-        }
-        cout << endl;
-
-        cout << "error: " << *pos << endl;
+        dMax = errorLine.max();
+        // cout << "Max error: " << dMax << endl;
+        old_guess = CImg<double>(newGuess);
 
     } while(dMax > dMaxErr);
 
@@ -83,6 +92,7 @@ matrix_type test(CImg<double> inmatrix, const d1 solution,
 
 double calculateError(const double dOriginal, const double dNew)
 {
+    if(dNew == 0) { return 0; }
     return abs( (dNew - dOriginal) / dNew) * 100;
 }
 }
