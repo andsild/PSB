@@ -19,71 +19,32 @@ CImg<double> inputkernel(double entries[], int iNewWidth, int iNewHeight)
     return image;
 }
 
-
-//TODO: find a better datatype and sparse representation.
-CImg<double> poisson2d(const CImg<double> inImage, CImg<double> identity, 
-                         int iSize)
-{
-    iSize = 183;
-    CImg<double> retMatrix(iSize, iSize);
-    iSize /= 3;
-    // iSize = sqrt(iSize);
-    cout << iSize << endl;
-    // CImg<double> retMatrix(9, 9);
-
-    for(int iCount = 0; iCount < iSize; iCount++)
-    {
-        int skalar = (iCount * identity.width());
-
-    for(int iPos = 0; iPos < identity.width(); iPos++)
-    {
-        for(int jPos = 0; jPos < identity.height(); jPos++)
-        {
-            if(iCount < iSize+1) {
-                //rightmost
-                retMatrix(iPos+skalar, jPos+skalar+identity.width()) = identity(iPos, jPos, 0);
-            }
-            retMatrix(iPos+skalar, jPos+skalar) = inImage(iPos, jPos);
-
-            if(iCount == 0) { continue; } // avoid filling first row
-            //leftmost I
-            retMatrix(iPos+skalar, jPos-identity.width()+skalar) = identity(iPos, jPos);
-        }
-    }
-    }
-    // print_image(retMatrix);
-    return retMatrix;
-}
-
-
 int main() {
-    CImg<unsigned char> image("./media/image.jpg"),  visu(500, 400, 1, 3, 0);
+    //visu is just the background for the preview
+    // CImg<unsigned char> image("./media/icon_img.png"),  visu(500, 400, 1, 3, 0);
+    CImg<unsigned char> image("./media/image.jpg"),  visu(499, 400, 1, 3, 0);
 
     double max_error = 1;
-    double D[9] = {0,1,0, 0,-4,1, 0,1,0},
-           I[9] = {-1,0,0, 0,-1,0, 0,0,0};
+    double D[9] = {0,1,0, 0,-4,1, 0,1,0};
     CImg<double> mask = inputkernel(D, 3);
     //FIXME: specified wrong order
     mask(0, 1) = 1;
-    CImg<double> identity = inputkernel(I,3);
-    identity(2, 2) = -1;
     CImg<double> masked = image.get_convolve(mask);
     CImg<double> F = masked.get_vector();
-    //FIXME: mask is wrong
-    CImg<double> A = poisson2d(mask, identity, masked.width()*masked.height());
-    // return 0;
-    CImg<double> UU(1, masked.width()*masked.height(), 1, 1, 0); //Initial guess shall be zero
+    //Initial guess shall be the zero-vector
+    CImg<double> UU(1, F.height(), 1, 1, 0); 
 
-    matrix_type x2 = test(A, F, UU, max_error);
+    matrix_type x2 = test(F, UU, max_error, image.width());
 
 
 	// CImgDisplay main_disp(image,"Image",0);	
 	// CImgDisplay mask_disp(x2,"Image",0);	
-
+    //
     // while (!main_disp.is_closed() && 
     //        !main_disp.is_keyESC() &&
     //        !main_disp.is_keyQ()) {
     //     main_disp.wait();
     // }
+    //
     return 0;
 }
