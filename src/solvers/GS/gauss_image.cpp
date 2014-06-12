@@ -73,6 +73,7 @@ matrix_type test(CImg<double> inmatrix, const CImg<double> solution,
 {
     double dMax = 0;
     CImg<double> old_guess = guess;
+    int iIterCount = 0;
     do
     {
         CImg<double> newGuess = iterate(inmatrix, solution, old_guess);
@@ -91,8 +92,9 @@ matrix_type test(CImg<double> inmatrix, const CImg<double> solution,
             errorLine(iPos) = dRet;
         }
         dMax = errorLine.max();
-        cout << "Max error: " << dMax << endl;
+        cout << "Max error: " << dMax << " after " << iIterCount << " iterations " << endl;
         old_guess = CImg<double>(newGuess);
+        iIterCount++;
 
     } while(dMax > dMaxErr);
 
