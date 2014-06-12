@@ -4,3 +4,9 @@ A is given as a
 
 D = tri-diag av masken
 I = Identity matrix
+
+A can be avoided in calculations
+
+condition number is used to detect divergence
+
+
