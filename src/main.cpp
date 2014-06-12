@@ -22,7 +22,7 @@ CImg<double> inputkernel(double entries[], int iNewWidth, int iNewHeight)
 int main() {
     //visu is just the background for the preview
     // CImg<unsigned char> image("./media/icon_img.png"),  visu(500, 400, 1, 3, 0);
-    CImg<unsigned char> image("./media/image.jpg"),  visu(499, 400, 1, 3, 0);
+    CImg<unsigned char> image("./media/109201.jpg"),  visu(499, 400, 1, 3, 0);
 
     double max_error = 1;
     double D[9] = {0,1,0, 0,-4,1, 0,1,0};
@@ -34,6 +34,7 @@ int main() {
     //Initial guess shall be the zero-vector
     CImg<double> UU(1, F.height(), 1, 1, 0); 
 
+#include <unistd.h>
     matrix_type x2 = test(F, UU, max_error, image.width());
 
 

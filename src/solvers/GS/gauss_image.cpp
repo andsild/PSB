@@ -64,6 +64,26 @@ CImg<double> iterate(const CImg<double> F, CImg<double> U, double iWidthLength)
     return U;
 }
 
+// difference from gauss is in_place fix
+CImg<double> iterate_jacobi(const CImg<double> F, CImg<double> U,
+                            double iWidthLength) 
+{
+    CImg<double>U_new(U);
+    for(int iPos = iWidthLength; iPos < F.height() - iWidthLength; iPos++)
+    {
+        // TODO: make sure that boundaries are extended, currently at end-of-row
+        // you extend to the next pixel in raster order.
+        U_new(0, iPos) = .25 
+                     * (U(0, iPos+1) + U(0, iPos-1)
+                       + U(0, iPos - iWidthLength)
+                       + U(0, iPos + iWidthLength)
+
+                       + F(0, iPos) * F.height()
+                    );
+    }
+    return U_new;
+}
+
 void print_image(const CImg<double> img)
 {
     for(int iPos = 0; iPos < img.width(); iPos++)
@@ -75,6 +95,41 @@ void print_image(const CImg<double> img)
         }
         cout << endl << iPos+1 << "#: ";
     }
+}
+CImg<double> iterate_sor(const CImg<double> F, CImg<double> U,
+                            double iWidthLength) 
+{
+    double omega = 2 / (1 + (3.14 / iWidthLength));
+    // update even sites first
+    for (int iPos= iWidthLength; iPos<= F.height() - iWidthLength; iPos++)
+    {
+        int xPos = iPos % (int)iWidthLength;
+        int yPos = iPos / (int)iWidthLength;
+        if ((xPos+yPos) % 2 == 0)
+        {
+            U(0, iPos) = (1 - omega) * U(0, iPos) + omega / 4
+                     * (U(0, iPos+1) + U(0, iPos-1)
+                       + U(0, iPos - iWidthLength)
+                       + U(0, iPos + iWidthLength)
+                       + F(0, iPos) * F.height());
+        }
+    }
+
+    for (int iPos= iWidthLength; iPos<= F.height() - iWidthLength; iPos++)
+    {
+        int xPos = iPos % (int)iWidthLength;
+        int yPos = iPos / (int)iWidthLength;
+        if ((xPos+yPos) % 2 != 0)
+        {
+            U(0, iPos) = (1 - omega) * U(0, iPos) + omega / 4
+                     * (U(0, iPos+1) + U(0, iPos-1)
+                       + U(0, iPos - iWidthLength)
+                       + U(0, iPos + iWidthLength)
+                       + F(0, iPos) * F.height());
+        }
+    }
+
+    return U;
 }
 
 //TODO: check for diagonal dominance
@@ -89,7 +144,9 @@ matrix_type test(const CImg<double> solution,
     do
     {
         dError = 0;
-        CImg<double> newGuess = iterate(solution, old_guess, iWidth);
+        // CImg<double> newGuess = iterate(solution, old_guess, iWidth);
+        // CImg<double> newGuess = iterate_jacobi(solution, old_guess, iWidth);
+        CImg<double> newGuess = iterate_sor(solution, old_guess, iWidth);
 
         // print_image(old_guess);
         // print_image(newGuess);
