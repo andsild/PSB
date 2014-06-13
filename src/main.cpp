@@ -59,9 +59,11 @@ void readImage(CImg<double> image)
         vec1[iPos] = F(0, iPos);
     }
     F = CImg<double>(1, 1, 1, 1, 1); // null out, get memory back
-    d1 vec2(height, 0);
+    d1 U(height, 0);
 
-    // matrix_type x2 = test(vec1, vec2, max_error, F.height(), image.width());
+    // matrix_type x2 = test(vec1, U, max_error, F.height(), image.width());
+    cout << "reading image" << endl;
+    two_grid(1, U, vec1, image.width(), 5);
     
 }
 
@@ -140,6 +142,7 @@ int main(int argc, char *argv[])
                 break;
 
             default:
+                readSingleImage();
                 break; // do nothing
         }
     } 

@@ -23,61 +23,95 @@ using namespace std;
 
 namespace pe_solver
 {
-
-void two_grid(double h, d1 &U, d1 &F, int iWidthLength, int iLength,
-              int iSmoothFactor)
+void two_grid(double h, d1 &U, d1 &F, int iWidthLength, int iSmoothFactor)
 {
+
     // solve exactly if there is only one interior point
+    if (iWidthLength == 1) 
+    {
+        U[0] = 0.25;// * (U[0][1] + U[2][1] + U[1][0] + U[1][2] + h * h * F[1][1]);
+        return;
+    }
+
     // do a few pre-smoothing Gauss-Seidel steps
     for (int iPos = 0; iPos < iSmoothFactor; iPos++)
-        iterate_gauss(F, U, iWidthLength, iLength);
+    {
+        iterate_gauss(F, U, iWidthLength, iWidthLength * 2, h);
+    }
 
     // find the residual
-    int iCoarseLength = iWidthLength / 2;
-    d1 r(iCoarseLength);
-    for (int iPos = iWidthLength; iPos <= iCoarseLength - iWidthLength; iPos++)
-        r[iPos] = getRangeVal(U, F, iPos, iWidthLength)
-                  - ((4 * U[iPos]) / (h * h));
+    d1 r(iWidthLength*2);
+    for (int yPos = iWidthLength;
+         yPos <= iWidthLength;
+         yPos += iWidthLength)
+    {
+        for (int xPos = 0; xPos <= iWidthLength; xPos++)
+        {
+            int iCurrent = xPos + yPos;
+            r[iCurrent] = F[iCurrent] - (4 * U[iCurrent] / (h * h))
+                            + ( U[iCurrent + 1] + U[iCurrent - 1]
+                              + U[iCurrent - iWidthLength] 
+                              + U[iCurrent + iWidthLength]);
+        }
+    }
 
     // restrict residual to coarser grid
-    // int L2 = iCoarseLength / 2;
-    // d1 R(L2 + 2, L2 + 2);
-    // for (int iPos = 1; iPos <= L2; iPos++) {
-    //     int iPos = 2 * iPos - 1;
-    //     for (int jPos = 1; jPos <= L2; jPos++) {
-    //         int jPos = 2 * jPos - 1;
-    //         R[iPos][jPos] = 0.25 * ( r[iPos][jPos] + r[iPos + 1][jPos] + r[iPos][jPos + 1] +
-    //                 r[iPos + 1][jPos + 1]);
-    //     }
-    // }
+    int L2 = iWidthLength / 2;
+    d1 R(iWidthLength);
+    for (int yPos = iWidthLength; yPos <= L2; yPos += iWidthLength)
+    {
+        int iPos = 2 * yPos - 1;
+        for (int xPos = 0; xPos <= L2; xPos++)
+        {
+            int jPos = 2 * jPos - 1;
+            int iCurrent = (iPos+jPos);
+            R[(yPos+xPos)] = 0.25 * 
+                            ( r[iCurrent]
+                              + r[iCurrent+iWidthLength]
+                              + r[iCurrent + 1]
+                              + r[iCurrent+1+iWidthLength]
+                            );
+        }
+    }
 
     // initialize correction V on coarse grid to zero
-    // d1 V(L2 + 2, L2 + 2);
+    d1 V(iWidthLength);
 
     // call twoGrid recursively
-    // double H = 2 * h;
-    // two_grid(H, V, R, iWidthLength, iLength, iSmoothFactor);
-    
+    double H = 2 * h;
+    two_grid(H, V, R, L2, iSmoothFactor);
+
     // prolongate V to fine grid using simple injection
-    // d1 v(iCoarseLength + 2, iCoarseLength + 2);
-    // for (int iPos = 1; iPos <= L2; iPos++) {
-    //     int iPos = 2 * iPos - 1;
-    //     for (int jPos = 1; jPos <= L2; jPos++) {
-    //         int jPos = 2 * jPos - 1;
-    //         v[iPos][jPos] = v[iPos + 1][jPos] = v[iPos][jPos + 1] = v[iPos + 1][jPos + 1] = V[iPos][jPos];
-    //     }
-    // }
+    d1 v(iWidthLength*2);
+    for (int yPos = iWidthLength; yPos <= L2; yPos += iWidthLength)
+    {
+        int iPos = 2 * yPos - 1;
+        for (int xPos = 0; xPos <= L2; xPos++)
+        {
+            int jPos = 2 * jPos - 1;
+            int iCurrent = (iPos+jPos);
+            v[(xPos + yPos)] = v[iCurrent+iWidthLength] 
+                             = v[iCurrent+1]
+                             = v[iCurrent+1+iWidthLength]
+                             = V[(xPos+yPos)];
+        }
+    }
 
     // correct U
-    //TODO: fix range
-    // for (int iPos = 1; iPos <= iCoarseLength; iPos++)
-    //     U[iPos] += v[iPos][jPos];
-    //
-    // // do a few post-smoothing Gauss-Seidel steps
-    // for (int iPos = 0; iPos < iSmoothFactor; iPos++)
-    //     iterate_gauss(F, U, iWidthLength, iCoarseLength);
-}
+    for(vector<int>::size_type iPos = iWidthLength;
+            iPos < iWidthLength * 2;
+            iPos++) 
+    {
+            U[iPos] += v[iPos];
+    }
+
+    // do a few post-smoothing Gauss-Seidel steps
+    for (int iPos = 0; iPos < iSmoothFactor; iPos++)
+    {
+        iterate_gauss(F, U, iWidthLength, iWidthLength * 2, h);
+    }
 
 }
 
+} // EndOfNamespace
 #endif

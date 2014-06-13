@@ -8,6 +8,8 @@ Legg til noen av de mer avanserte
 Lage histogram
 
 Kunne variere parameter
+    diskretisering
+    ω
 
 Optimaliser
     red black
