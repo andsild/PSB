@@ -61,7 +61,8 @@ void readImage(CImg<double> image)
     F = CImg<double>(1, 1, 1, 1, 1); // null out, get memory back
     d1 vec2(height, 0);
 
-    matrix_type x2 = test(vec1, vec2, max_error, F.height(), image.width());
+    // matrix_type x2 = test(vec1, vec2, max_error, F.height(), image.width());
+    
 }
 
 void readSingleImage()
