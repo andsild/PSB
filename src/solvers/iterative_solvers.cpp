@@ -12,8 +12,8 @@
 #include <cmath>
 #include <string>
 
-#include "../../main.cpp"
-#include "../../../lib/CImg-1.5.8/CImg.h"
+#include "../main.cpp"
+#include "../../lib/CImg-1.5.8/CImg.h"
 
 using namespace cimg_library;
 using namespace std;
@@ -129,16 +129,17 @@ d1 iterative_solve(d1 solution, d1 guess,
 {
     double dMax = 0;
     d1 old_guess = guess;
+    d1 newGuess;
     double dError = 0;
     int iIterCount = 0;
     vector<string> vOutput(1, "");
     do
     {
         dError = 0;
-        d1 newGuess = old_guess;
+        newGuess = old_guess;
         iterate_gauss(solution, newGuess, iLength, iWidth);
-        // CImg<double> newGuess = iterate_jacobi(solution, old_guess, iWidth);
-        // CImg<double> newGuess = iterate_sor(solution, old_guess, iWidth);
+        // iterate_jacobi(solution, old_guess, iWidth);
+        // iterate_sor(solution, old_guess, iWidth);
 
         dError = findError(old_guess, newGuess, iLength);
         old_guess = newGuess;
@@ -146,14 +147,11 @@ d1 iterative_solve(d1 solution, d1 guess,
         
         vOutput.push_back(to_string(iIterCount) + "\t" 
                           + to_string(dError) + "\n");
-
-    // } while(dMax > dMaxErr);
     } while(dError > dMaxErr);
 
     writeToFile(vOutput, dError);
 
-    return CImg<double>(1, 1, 1, 1, 1);
-    // return solution;
+    return newGuess;
 }
 
 void two_grid(double h, d1 &U, d1 &F, int iWidthLength, int iSmoothFactor)
