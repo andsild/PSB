@@ -1,10 +1,20 @@
+#ifndef _SOLVER
+#define _SOLVER 1
+
+// TODO: make sure that boundaries are extended, currently at end-of-row
+// you extend to the next pixel in raster order.
+//TODO: check for diagonal dominance
+//If you know that a matrix is diagonally dominant,
+//
 #include <iostream>
 #include <cmath>
 #include <algorithm>
 #include <vector>
 #include <stdio.h>
 #include <cmath>
+#include <string>
 
+#include "../../main.cpp"
 #include "../../../lib/CImg-1.5.8/CImg.h"
 
 using namespace cimg_library;
@@ -16,164 +26,98 @@ typedef vector<double> d1;
 typedef CImg<double> matrix_type;
 
 double calculateError(double, double);
+void writeToFile(vector<string>, double);
+
+
+double getRangeVal(const d1 &U, const d1 &F, const int iIndex, const int iWidthLength)
+{
+    int iIndexPixelAbove = iIndex - iWidthLength;
+    int iIndexPixelBelow = iIndex + iWidthLength;
+
+    return (U[iIndex+1] + U[iIndex-1]
+            + U[iIndexPixelAbove]
+            + U[iIndexPixelBelow]
+            + F[iIndex]);
+}
+
+/** jacobi iteration
+ *
+ */
+void iterate_jacobi(d1 F, d1 &U, double iWidthLength,
+                           int iLength)
+{
+    d1 copyU = U;
+    for(vector<int>::size_type iPos = iWidthLength;
+            iPos < iLength - iWidthLength;
+            iPos++) 
+    {
+        U[iPos] = .25 * (getRangeVal(copyU, F, iPos, iWidthLength));
+    }
+}
+
+
 
 /** Gauss-seidel iteration
  *
  */
-CImg<double> iterate(const CImg<double> F, CImg<double> U, double iWidthLength) 
+void iterate_gauss(d1 F, d1 &U, double iWidthLength,
+                           int iLength)
 {
-    // for(int iPos = 0; iPos < F.height(); iPos++)
-    for(int iPos = iWidthLength; iPos < F.height() - iWidthLength; iPos++)
+    for(vector<int>::size_type iPos = iWidthLength;
+            iPos < iLength - iWidthLength;
+            iPos++) 
     {
-        // TODO: make sure that boundaries are extended, currently at end-of-row
-        // you extend to the next pixel in raster order.
-        U(0, iPos) = .25 
-                     * (U(0, iPos+1) + U(0, iPos-1)
-                       + U(0, iPos - iWidthLength)
-                       + U(0, iPos + iWidthLength)
-
-                       + F(0, iPos) * F.height()
-                    );
-    }
-        // 1 iteration of gauss-seidel
-        // for (int iPos = 0; iPos < A.width(); iPos++) 
-        // {
-        //     double sum = 0;
-        //     for (int jPos = 0; jPos < A.height(); jPos++) 
-        //     {
-        //         if (iPos != jPos) 
-        //         {
-        //             // Number in A times it's coefficient
-        //             if(std::isinf(sum)) 
-        //             {int a = 1;}
-        //         }
-        //     }
-        //     if(A(iPos, iPos) == 0) 
-        //     { 
-        //         U(0, iPos) = 0;
-        //         continue;
-        //     }
-        //     double temp = ( (F(0, iPos*A.width()) - sum) / A(iPos, iPos));
-        //     if(std::isinf(temp)) 
-        //     {
-        //         int a = 1;
-        //     }
-        //
-        //     U(0, iPos*A.width()) = temp;
-        // }
-    return U;
-}
-
-// difference from gauss is in_place fix
-CImg<double> iterate_jacobi(const CImg<double> F, CImg<double> U,
-                            double iWidthLength) 
-{
-    CImg<double>U_new(U);
-    for(int iPos = iWidthLength; iPos < F.height() - iWidthLength; iPos++)
-    {
-        // TODO: make sure that boundaries are extended, currently at end-of-row
-        // you extend to the next pixel in raster order.
-        U_new(0, iPos) = .25 
-                     * (U(0, iPos+1) + U(0, iPos-1)
-                       + U(0, iPos - iWidthLength)
-                       + U(0, iPos + iWidthLength)
-
-                       + F(0, iPos) * F.height()
-                    );
-    }
-    return U_new;
-}
-
-void print_image(const CImg<double> img)
-{
-    for(int iPos = 0; iPos < img.width(); iPos++)
-    {
-        for(int jPos = 0; jPos < img.height(); jPos++)
-        {
-            // if(img(iPos, jPos) == 0) { continue; }
-            printf("\t%.2lf", img(iPos, jPos));
-        }
-        cout << endl << iPos+1 << "#: ";
+        U[iPos] = .25 * (getRangeVal(U, F, iPos, iWidthLength));
     }
 }
-CImg<double> iterate_sor(const CImg<double> F, CImg<double> U,
-                            double iWidthLength) 
+
+void iterate_sor(d1 F, d1 &U, double iWidthLength,
+                           int iLength)
 {
     double omega = 2 / (1 + (3.14 / iWidthLength));
+    double dOmegaConstant = omega / 4;
+    double dNotOmega = (1 - omega);
     // update even sites first
-    for (int iPos= iWidthLength; iPos<= F.height() - iWidthLength; iPos++)
+    for(vector<int>::size_type iPos = iWidthLength;
+            iPos < iLength - iWidthLength;
+            iPos++) 
     {
         int xPos = iPos % (int)iWidthLength;
         int yPos = iPos / (int)iWidthLength;
         if ((xPos+yPos) % 2 == 0)
         {
-            U(0, iPos) = (1 - omega) * U(0, iPos) + omega / 4
-                     * (U(0, iPos+1) + U(0, iPos-1)
-                       + U(0, iPos - iWidthLength)
-                       + U(0, iPos + iWidthLength)
-                       + F(0, iPos) * F.height());
+            U[iPos] = (dNotOmega * U[iPos])
+                     + dOmegaConstant
+                     * getRangeVal(U, F, iPos, iWidthLength);
         }
     }
 
-    for (int iPos= iWidthLength; iPos<= F.height() - iWidthLength; iPos++)
+    for(vector<int>::size_type iPos = iWidthLength;
+            iPos < iLength - iWidthLength;
+            iPos++) 
     {
         int xPos = iPos % (int)iWidthLength;
         int yPos = iPos / (int)iWidthLength;
         if ((xPos+yPos) % 2 != 0)
         {
-            U(0, iPos) = (1 - omega) * U(0, iPos) + omega / 4
-                     * (U(0, iPos+1) + U(0, iPos-1)
-                       + U(0, iPos - iWidthLength)
-                       + U(0, iPos + iWidthLength)
-                       + F(0, iPos) * F.height());
+            U[iPos] = (dNotOmega * U[iPos])
+                     + dOmegaConstant
+                     * getRangeVal(U, F, iPos, iWidthLength);
         }
     }
-
-    return U;
 }
 
-//TODO: check for diagonal dominance
-//If you know that a matrix is diagonally dominant,
-matrix_type test(const CImg<double> solution,
-                 CImg<double> guess, double dMaxErr, int iWidth) 
+// TODO: should this be max? (or get max() from diffs in vector?)
+double findError(const d1 origData, const d1 newData, int iLength)
 {
-    double dMax = 0;
-    CImg<double> old_guess = guess;
     double dError = 0;
-    int iIterCount = 0;
-    do
+    for(std::vector<int>::size_type iPos = 0; iPos != origData.size(); iPos++)
     {
-        dError = 0;
-        // CImg<double> newGuess = iterate(solution, old_guess, iWidth);
-        // CImg<double> newGuess = iterate_jacobi(solution, old_guess, iWidth);
-        CImg<double> newGuess = iterate_sor(solution, old_guess, iWidth);
+        dError += calculateError(origData[iPos],
+                                 newData[iPos]);
+    }
+    return dError /= iLength;
 
-        // print_image(old_guess);
-        // print_image(newGuess);
-        // cout << "#### EOG ###" << endl;
-
-        // getting the errors
-        CImg<double> errorLine(newGuess.height());
-        //TODO: newGuess bigger than errorline
-        for(int iPos = 0; iPos < newGuess.height(); iPos++)
-        {
-            double dRet = calculateError(old_guess(0, iPos),
-                                            newGuess(0, iPos));
-            dError += dRet;
-            // errorLine(iPos) = dRet;
-        }
-        dError /= newGuess.height();
-        dMax = errorLine.max();
-        // cout << "Max error: " << dMax << " after " << iIterCount << " iterations " << endl;
-        // cout << "Max error: " << dError << " after " << iIterCount << " iterations " << endl;
-        old_guess = CImg<double>(newGuess);
-        iIterCount++;
-        cout << iIterCount << "\t" << dError << endl;
-
-    // } while(dMax > dMaxErr);
-    } while(dError > dMaxErr);
-
-    return solution;
 }
 
 double calculateError(const double dOriginal, const double dNew)
@@ -181,6 +125,55 @@ double calculateError(const double dOriginal, const double dNew)
     if(dNew == 0) { return 0; }
     return abs( (dNew - dOriginal) / dNew) * 100;
 }
+
+matrix_type test(d1 solution, d1 guess,
+                double dMaxErr, int iLength, int iWidth) 
+{
+    double dMax = 0;
+    d1 old_guess = guess;
+    double dError = 0;
+    int iIterCount = 0;
+    vector<string> vOutput(1, "");
+    do
+    {
+        dError = 0;
+        d1 newGuess = old_guess;
+        iterate_gauss(solution, newGuess, iLength, iWidth);
+        // CImg<double> newGuess = iterate_jacobi(solution, old_guess, iWidth);
+        // CImg<double> newGuess = iterate_sor(solution, old_guess, iWidth);
+
+        dError = findError(old_guess, newGuess, iLength);
+        old_guess = newGuess;
+        iIterCount++;
+        
+        vOutput.push_back(to_string(iIterCount) + "\t" 
+                          + to_string(dError) + "\n");
+
+    // } while(dMax > dMaxErr);
+    } while(dError > dMaxErr);
+
+    writeToFile(vOutput, dError);
+
+    return CImg<double>(1, 1, 1, 1, 1);
+    // return solution;
 }
+
+void writeToFile(vector<string> vRes, double dID)
+{
+    ofstream data_file(DATA_DIR + to_string(dID) + DATA_EXTENSION);
+    for (vector<string>::iterator it = vRes.begin();
+            it != vRes.end();
+            ++it)
+    {
+        data_file << *it << endl;
+    }
+
+    data_file.close();
+}
+
+
+} // EndOfNamespace
+
+#endif
 
 /* EOF */
