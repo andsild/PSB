@@ -29,7 +29,8 @@ double calculateError(double, double);
 void writeToFile(vector<string>, double);
 
 
-double getRangeVal(const d1 &U, const d1 &F, const int iIndex, const int iWidthLength)
+double getRangeVal(const d1 &U, const d1 &F,
+        const int iIndex, const int iWidthLength, const double H = 1.0)
 {
     int iIndexPixelAbove = iIndex - iWidthLength;
     int iIndexPixelBelow = iIndex + iWidthLength;
@@ -37,7 +38,7 @@ double getRangeVal(const d1 &U, const d1 &F, const int iIndex, const int iWidthL
     return (U[iIndex+1] + U[iIndex-1]
             + U[iIndexPixelAbove]
             + U[iIndexPixelBelow]
-            + F[iIndex]);
+            + F[iIndex] * H * H );
 }
 
 /** jacobi iteration
@@ -61,13 +62,13 @@ void iterate_jacobi(d1 F, d1 &U, double iWidthLength,
  *
  */
 void iterate_gauss(d1 F, d1 &U, double iWidthLength,
-                           int iLength)
+                           int iLength, double H = 1)
 {
     for(vector<int>::size_type iPos = iWidthLength;
             iPos < iLength - iWidthLength;
             iPos++) 
     {
-        U[iPos] = .25 * (getRangeVal(U, F, iPos, iWidthLength));
+        U[iPos] = .25 * (getRangeVal(U, F, iPos, iWidthLength, H));
     }
 }
 
