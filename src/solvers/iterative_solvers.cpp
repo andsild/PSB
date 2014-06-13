@@ -25,7 +25,6 @@ typedef vector<double> d1;
 double calculateError(double, double);
 void writeToFile(vector<string>, double);
 
-
 double getRangeVal(const d1 &U, const d1 &F,
         const int iIndex, const int iWidthLength, const double H = 1.0)
 {
@@ -75,7 +74,7 @@ void iterate_sor(d1 F, d1 &U, double iWidthLength,
     double omega = 2 / (1 + (3.14 / iWidthLength));
     double dOmegaConstant = omega / 4;
     double dNotOmega = (1 - omega);
-    // update even sites first
+
     for(vector<int>::size_type iPos = iWidthLength;
             iPos < iLength - iWidthLength;
             iPos++) 
@@ -122,36 +121,6 @@ double calculateError(const double dOriginal, const double dNew)
 {
     if(dNew == 0) { return 0; }
     return abs( (dNew - dOriginal) / dNew) * 100;
-}
-
-d1 iterative_solve(d1 solution, d1 guess,
-                   double dMaxErr, int iLength, int iWidth) 
-{
-    double dMax = 0;
-    d1 old_guess = guess;
-    d1 newGuess;
-    double dError = 0;
-    int iIterCount = 0;
-    vector<string> vOutput(1, "");
-    do
-    {
-        dError = 0;
-        newGuess = old_guess;
-        iterate_gauss(solution, newGuess, iLength, iWidth);
-        // iterate_jacobi(solution, old_guess, iWidth);
-        // iterate_sor(solution, old_guess, iWidth);
-
-        dError = findError(old_guess, newGuess, iLength);
-        old_guess = newGuess;
-        iIterCount++;
-        
-        vOutput.push_back(to_string(iIterCount) + "\t" 
-                          + to_string(dError) + "\n");
-    } while(dError > dMaxErr);
-
-    writeToFile(vOutput, dError);
-
-    return newGuess;
 }
 
 void two_grid(double h, d1 &U, d1 &F, int iWidthLength, int iSmoothFactor)
@@ -230,7 +199,7 @@ void two_grid(double h, d1 &U, d1 &F, int iWidthLength, int iSmoothFactor)
             U[iPos] += v[iPos];
     }
 
-    // do a few post-smoothing Gauss-Seidel steps
+    // post-smoothing Gauss-Seidel
     for (int iPos = 0; iPos < iSmoothFactor; iPos++)
     {
         iterate_gauss(F, U, iWidthLength, iWidthLength * 2, h);
@@ -251,6 +220,34 @@ void writeToFile(vector<string> vRes, double dID)
     data_file.close();
 }
 
+void iterative_solve(void *function,
+                    d1 solution, d1 guess,
+                    double dMaxErr, int iLength, int iWidth) 
+{
+    double dMax = 0;
+    d1 old_guess = guess;
+    d1 newGuess;
+    double dError = 0;
+    int iIterCount = 0;
+    vector<string> vOutput(1, "");
+    do
+    {
+        dError = 0;
+        newGuess = old_guess;
+        iterate_gauss(solution, newGuess, iLength, iWidth);
+        // iterate_jacobi(solution, old_guess, iWidth);
+        // iterate_sor(solution, old_guess, iWidth);
+
+        dError = findError(old_guess, newGuess, iLength);
+        old_guess = newGuess;
+        iIterCount++;
+        
+        vOutput.push_back(to_string(iIterCount) + "\t" 
+                          + to_string(dError) + "\n");
+    } while(dError > dMaxErr);
+
+    writeToFile(vOutput, dError);
+}
 
 } // EndOfNamespace
 
