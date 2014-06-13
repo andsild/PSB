@@ -1,7 +1,7 @@
 PSB
 ===
 
-[P]oisson[S]olver[Benchmarks]. Determine the best one for a class of images.
+[P]oisson[S]olver[Benchmarks].
 
 # Images
 To get the images: 
