@@ -53,7 +53,7 @@ MAIN = out
 .PHONY: depend clean
 
 all:    $(MAIN)
-	@echo  Simple compiler named mycc has been compiled
+	@echo Program compiled!
 
 $(MAIN): $(OBJS) 
 	$(CC) $(CFLAGS) $(INCLUDES) -o ${BUILD_DIR}$(MAIN) $(OBJS) $(LFLAGS) $(LIBS)

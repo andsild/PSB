@@ -68,8 +68,7 @@ void iterate_gauss(d1 F, d1 &U, double iWidthLength,
     }
 }
 
-void iterate_sor(d1 F, d1 &U, double iWidthLength,
-                           int iLength)
+void iterate_sor(d1 F, d1 &U, double iWidthLength, int iLength)
 {
     double omega = 2 / (1 + (3.14 / iWidthLength));
     double dOmegaConstant = omega / 4;
