@@ -1,0 +1,6265 @@
+
+<!-- saved from url=(0049)http://www.physics.buffalo.edu/phy410-505/topic6/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Partial Differential Equations</title>
+
+<style type="text/css" id="internalStyle">
+a { text-decoration: none }
+a:hover { text-decoration: underline }
+a.nav { color: #fff; background-color: #008; text-decoration: none }
+a.h { color: #fff; background-color: #000; text-decoration: none }
+a.h:link { color: #fff } a.h:visited { color: #fff }
+a.nav:hover { text-decoration: underline }
+body { font-family: sans-serif; margin: 1em; }
+h1 { text-align: left; font-size: 150%; font-family: sans-serif;
+     font-weight: normal; border-top: 2px solid #aaa;
+     border-bottom: 1px solid #aaa; }
+h2 { text-align: left; font-size: 130%; font-family: sans-serif;
+     font-weight: bold }
+h3 { text-align: center; font-size: 110%; font-family: sans-serif;
+     font-weight: bold }
+p { margin-left:5%; margin-right:5% }
+span.head { font-family: sans-serif; font-size: 150%; font-weight: normal; }
+div.foot{ text-align: center; font-family: sans-serif; font-size: 75%;
+          font-weight: normal; line-height: 100%; }
+ul.horizontal { margin-left:2em; margin-right:2em; margin-top:0px;
+                margin-bottom:0px; text-align:left; }
+ul.horizontal li:before { content:'\25aa'; margin-right:5px; }
+li.horizontal { display: inline; padding-right: 10px; }
+</style>
+
+<script type="text/javascript">
+function doSearch() {
+  var google = 'http://www.google.com/search?as_sitesearch=';
+  var site = 'www.physics.buffalo.edu/phy410-505&q=';
+  var terms = document.searchBox.searchText.value;
+  window.open(google+site+terms);
+}
+</script>
+
+<link rel="stylesheet" type="text/css" href="chrome-extension://cgndfbhngibokieehnjhbjkkhbfmhojo/css/validation.css"></head><body>
+<table width="100%" border="0" cell-spacing="0" cell-padding="0">
+<tbody><tr valign="top">
+<td width="20%" align="left"> <span class="head">PHY 410-505</span></td>
+<td width="60%" align="center"> <span class="head">Partial Differential Equations</span></td>
+<td width="20%" align="right"> <span class="head">Fall 2012</span></td>
+</tr>
+</tbody></table>
+<br>
+<table width="100%" border="0" cell-spacing="0" cell-padding="0">
+<tbody><tr>
+<td align="left" valign="top">
+This page: &nbsp;<a href="http://www.physics.buffalo.edu/phy410-505/index.html">Home</a>&nbsp;&#8658;&nbsp;<a href="http://www.physics.buffalo.edu/phy410-505/topic6/index.html">Topic6</a></td>
+<td align="right">
+
+<form name="searchBox">
+ <input type="text" name="searchText" value="">
+ <input type="button" value="Search PHY 410-505" onclick="javascript:doSearch()">
+</form>
+</td>
+</tr>
+</tbody></table>
+
+<h1>Partial Differential Equations in Physics<a name="sec1"> </a></h1>
+
+<p>
+<a href="http://en.wikipedia.org/wiki/Partial_differential_equation" title="http://en.wikipedia.org/wiki/Partial_differential_equation">Partial differential equations</a>
+are very important in science and engineering, and have been studied
+extensively by mathematicians.
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<a href="http://en.wikipedia.org/wiki/The_Great_Wave_off_Kanagawa" title="http://en.wikipedia.org/wiki/The_Great_Wave_off_Kanagawa">Great Wave off Kanagawa</a> - by Hokusai
+<br>
+<img src="./Partial Differential Equations_files/800px-Great_Wave_off_Kanagawa2.jpg" height="300">
+<br>
+<a href="http://en.wikipedia.org/wiki/Water_waves" title="http://en.wikipedia.org/wiki/Water_waves">Water waves</a> are modeled using PDEs.
+</div>
+<p></p>
+
+<p></p>
+<p>
+A system of PDE's, together with appropriate boundary conditions,
+determines a set of functions of more than one independent
+variable. The most commonly encountered set of independent variables
+in physics is <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-0.png">, time and three cartesian space coordinates.
+</p>
+
+<h2>Elliptic partial differential equations</h2>
+
+<p>
+Given an electric charge distribution <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-1.png">,
+Poisson's equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-2.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+determines the potential <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-3.png"> at each point in space <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-4.png">
+of a region, provided that boundary conditions are
+specified on the closed boundary of the region.
+</p>
+
+<p></p>
+<p>
+The differential operator <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-5.png"> is called elliptic. To
+understand this terminology, consider two dimensions and let
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-6.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+Then
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-7.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The locus of <img style="vertical-align:-6px" src="./Partial Differential Equations_files/tex-8.png"> values in <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-9.png">-space of a given eigenvalue
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-10.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+of the operator, is a circle, a special case of an ellipse.
+</p>
+
+<p></p>
+<p>
+Various types of boundary conditions include:
+</p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<li> <b>Dirichlet boundary conditions:</b> the value of <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-11.png"> is
+specified on the closed boundary. In electrostatics this might
+correspond to specifying the potential on a conducting surface.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> <b>Neumann boundary conditions:</b> the normal component
+<img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-12.png"> is specified on the boundary.
+In electrostatics, this corresponds to specifing the normal component
+of the electric field <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-13.png"> on a conductor.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> <b>Periodic boundary conditions:</b> are often used to model
+finite regions of large systems.
+</li></ul>
+<p></p>
+
+<h2>Parabolic partial differential equations</h2>
+
+<p>
+Given a source <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-14.png"> as a function of space and time,
+and a diffusion coefficient <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-15.png">, the diffusion
+equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-16.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+determines the concentration <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-17.png"> in a closed region of space,
+provided that
+</p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<li> <b>initial conditions</b> are specified at some time <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-18.png">, and
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> <b>boundary conditions</b> are specified at the boundaries of
+the closed region for all times <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-19.png">.
+</li></ul>
+<p></p>
+
+<p></p>
+<p>
+The terminology parabolic can be understood by considering one
+spatial dimension, a constant <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-20.png">, and
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-21.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+for which the differential operator on the left hand side has the
+eigenvalue
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-22.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+which represents a parabola in <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-23.png"> space.
+</p>
+
+<p></p>
+<p>
+The time-dependent Schroedinger equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-24.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+for a particle of mass <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-25.png"> moving in a potential <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-26.png">
+is also classified as parabolic.
+</p>
+
+<p></p>
+<p>
+The Schroedinger equation can be viewed as a diffusion equation with
+imaginary diffusion constant <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-27.png">, or mathematically as a
+diffusion equation in imaginary time <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-28.png"> with a real diffusion
+constant <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-29.png">.
+</p>
+
+<h2>Hyperbolic partial differential equations</h2>
+
+<p>
+The wave equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-30.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+is classified as hyperbolic} because the eigenvalues of the
+differential operator
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-31.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+define hyperboloidal surfaces in <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-32.png"> space.
+</p>
+
+<p></p>
+<p>
+Unique solutions of the wave equation are obtained by specifying
+</p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<li> <b>initial conditions</b> on the solution and} its first derivative
+with respect to <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-33.png"> at some time <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-34.png">, and
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> <b>boundary conditions</b> at the boundaries of a closed region for
+all times <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-35.png">.
+</li></ul>
+<p></p>
+
+<h1>Relaxation Methods for Poisson's Equation<a name="sec2"> </a></h1>
+
+<p>
+The electric field <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-36.png"> due to a static charge density distribution
+<img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-37.png"> is determined by Gauss' Law:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-38.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-39.png"> is the permittivity constant. A static electric field
+can be derived from a scalar potential <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-40.png">
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-41.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+which obeys Poisson's equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-42.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This elliptic partial differential equations has a
+unique solution inside a region of space (which can be multiply
+connected) if the following types of boundary conditions are specified
+on the closed boundary of the region:
+</p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<li> the value of <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-43.png"> on the bounding surface is specified
+(Dirichlet conditions), or
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> the value of the normal derivative <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-44.png"> on
+the bounding surface is specified (Neumann conditions), or
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> periodic boundary conditions are imposed.
+</li></ul>
+<p></p>
+
+<h2>Discretization in two dimensions</h2>
+
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/red-black-lattice.png" width="50%">
+<br>
+</div>
+<p></p>
+
+<p></p>
+<p>
+Consider the 2-D form of Poisson's equation:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-45.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where we set <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-46.png"> for convenience. Let's solve this equation in
+the interior of a square region of unit side <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-47.png">. Introduce a
+grid of points separated by a lattice spacing <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-48.png"> in the <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-49.png"> and <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-50.png">
+directions:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-51.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+There are <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-52.png"> <b>interior points</b> as shown in the figure, and the
+lattice spacing <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-53.png">. The value of <img style="vertical-align:-6px" src="./Partial Differential Equations_files/tex-54.png"> at a
+lattice point is abbreviated <img style="vertical-align:-6px" src="./Partial Differential Equations_files/tex-55.png">, and
+<img style="vertical-align:-6px" src="./Partial Differential Equations_files/tex-56.png">.
+</p>
+
+<p></p>
+<p>
+We next need a discrete form for the Laplacian operator. There are many
+possibilities, but the simplest symmetric finite-difference form is
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-57.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+Note the following properties of this discretization:
+</p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<li> Each lattice site is connected to its 4 nearest neighbors.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> For later convenience, the <b>interior sites</b> are labeled even or odd
+depending on whether <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-58.png"> is even or odd. Even sites are colored black,
+and odd sites are colored red. Note that the 4 neighbors of a red site
+are black, and the 4 neighbors of a black site are red.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> The <b>boundary sites</b> are indicated using open circles. With the
+discretization formula above for the Laplacian operator, only those
+boundary sites that are nearest neighbors of an interior site need to
+be taken into consideration.
+</li></ul>
+<p></p>
+
+<h2>Jacobi's iterative method</h2>
+
+<p>
+Suppose we have found a solution of the discretized equation, then at
+each lattice site,
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-59.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+If we knew the right hand side, then we could compute the left hand side.
+Unfortunately, the right hand side involves <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-60.png"> at the 4 neighboring
+points! Thus to find the solution, the <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-61.png"> equations must be solved
+simultaneously. Solving Poisson's equation is essentially a problem in
+linear algebra.
+</p>
+
+<p></p>
+<p>
+Jacobi's iterative method for solving these simultaneous equations is
+to start with a guess <img style="vertical-align:-8px" src="./Partial Differential Equations_files/tex-62.png"> for the solution at the interior
+lattice points. Plugging this guess into the right hand sides yields
+<img style="vertical-align:-8px" src="./Partial Differential Equations_files/tex-63.png"> at all lattice points. This procedure
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-64.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+is repeated until (hopefully) the process converges to the correct
+solution.
+</p>
+
+<h2>Convergence of the iteration</h2>
+
+<p>
+We need to decide when the solution has converged sufficiently. Since
+we presumably do not know the exact solution, one criterion is to ask
+that the approximate solution ceases to change significantly from one
+iteration to the next. The following function estimates the relative
+error as the average over all lattice sites of non-zero magnitudes of
+change.
+</p>
+
+<h2>Gauss-Seidel method</h2>
+
+<p>
+This is a modification of the Jacobi method, which can be shown to converge
+a little faster. Suppose we are sweeping the lattice in order of increasing
+<img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-65.png"> and <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-66.png">, then the left and lower neighbors of each lattice site will
+have been updated: why not use these (presumably) more accurate values in
+Jacobi's formula? This results in one form of the Gauss-Seidel algorithm:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-67.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-68.png">
+</div>
+<p></p>
+
+<h2>The Successive Over Relaxation (SOR) method</h2>
+
+<p>
+The Jacobi and Gauss-Seidel methods do not use the value of <img style="vertical-align:-6px" src="./Partial Differential Equations_files/tex-69.png">
+at the same lattice point in updating <img style="vertical-align:-6px" src="./Partial Differential Equations_files/tex-70.png">. It turns out that
+the convergence of the iteration can be improved considerably by using
+a linear combination of the new and old solutions as follows:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-71.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-72.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The over-relaxation parameter <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-73.png"> can be tuned to optimize the
+convergence. It can be shown that:
+</p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<li> The method is convergent only for <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-74.png">.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> It is faster than Gauss-Seidel only if <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-75.png">.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> It converges fastest for a square lattice if
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-76.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-77.png"> is the number of lattice points in the <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-78.png"> or <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-79.png"> directions.
+</p></li></ul>
+<p></p>
+
+<p></p>
+<p>
+Note that SOR could also be implemented using the Jacobi prescription with
+  only <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-80.png"> values on the right hand side.
+</p>
+
+<p></p>
+<p>
+We will implement SOR with a variant of the Gauss-Seidel method. Since
+even sites only have odd neighbors, and odd sites only have even
+neighbors, we can update all of the even sites first. The updated even-site
+values are then used to update all of the odd sites.
+</p>
+
+<h2>C++ Code to solve Poisson's equation in 2-D</h2>
+
+<p>
+The <code>poisson</code> programs solve Poisson's equation with a charge
+<img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-81.png"> placed
+at the center of the square region, and with Dirichlet boundary conditions
+<img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-82.png"> on the sides of the square.
+</p>
+
+<p></p>
+<p>
+</p><div style="text-align:right;margin-right:2em"><a href="http://www.physics.buffalo.edu/phy410-505/topic6/poisson.cpp.txt"><code><b>poisson.cpp</b></code></a></div>
+<pre style="margin-left:4em">&nbsp;
+#include "cptstd.hpp"
+#include "matrix.hpp"
+using namespace cpt;
+&nbsp;
+int L = 50;                     // number of interior points in x and y
+Matrix&lt;double,2&gt; V(L+2, L+2),   // potential to be found
+    rho(L+2, L+2),              // given charge density
+    V_new(L+2, L+2);            // new potential after each step
+&nbsp;
+double h;                       // lattice spacing
+int steps;                      // number of iteration steps
+double accuracy;                // desired accuracy in solution
+double omega;                   // overrelaxation parameter
+&nbsp;
+void initialize()
+{
+    int N = L + 2;
+    V = rho = V_new = Matrix&lt;double,2&gt;(N, N);
+&nbsp;
+    h = 1 / double(L + 1);      // assume physical size in x and y = 1
+    double q = 10;              // point charge
+    int i = N / 2;              // center of lattice
+    rho[i][i] = q / (h * h);    // charge density
+    steps = 0;
+}
+&nbsp;
+void Jacobi() {
+    // Jacobi algorithm for a single iterative step
+    for (int i = 1; i &lt;= L; i++)
+        for (int j = 1; j &lt;= L; j++)
+            V_new[i][j] = 0.25 * (V[i - 1][j] + V[i + 1][j] +
+                                  V[i][j - 1] + V[i][j + 1] +
+                                  h * h * rho[i][j]);
+}
+double relative_error()
+{
+    double error = 0;           // average relative error per lattice point
+    int n = 0;                  // number of non-zero differences
+&nbsp;
+    for (int i = 1; i &lt;= L; i++)
+        for (int j = 1; j &lt;= L; j++) {
+            if (V_new[i][j] != 0)
+            if (V_new[i][j] != V[i][j]) {
+                error += abs(1 - V[i][j] / V_new[i][j]);
+                ++n;
+            }
+        }
+    if (n != 0)
+        error /= n;
+    return error;
+}
+&nbsp;
+void Gauss_Seidel()
+{
+    // copy V to V_new
+    V_new = V;
+&nbsp;
+    // Gauss-Seidel update in place
+    for (int i = 1; i &lt;= L; i++)
+        for (int j = 1; j &lt;= L; j++)
+            V_new[i][j] = 0.25 * (V_new[i - 1][j] + V_new[i + 1][j] +
+                                  V_new[i][j - 1] + V_new[i][j + 1] +
+                                  h * h * rho[i][j]);
+}
+&nbsp;
+void successive_over_relaxation()   // using red-black checkerboard updating
+{
+    // update even sites first
+    for (int i = 1; i &lt;= L; i++)
+        for (int j = 1; j &lt;= L; j++)
+            if ((i + j) % 2 == 0)
+                V_new[i][j] = (1 - omega) * V[i][j] + omega / 4 *
+                              (V[i - 1][j] + V[i + 1][j] +
+                              V[i][j - 1] + V[i][j + 1] +
+                               h * h * rho[i][j]);
+&nbsp;
+    // update odd sites using updated even sites
+    for (int i = 1; i &lt;= L; i++)
+        for (int j = 1; j &lt;= L; j++)
+            if ((i + j) % 2 != 0)
+                V_new[i][j] = (1 - omega) * V[i][j] + omega / 4 *
+                              (V_new[i - 1][j] + V_new[i + 1][j] +
+                              V_new[i][j - 1] + V_new[i][j + 1] +
+                              h * h * rho[i][j]);
+}
+&nbsp;
+void iterate(void (*method)())
+{
+    clock_t t0 = clock();
+&nbsp;
+    while (true) {
+        method();
+        ++steps;
+        double error = relative_error();
+        if (error &lt; accuracy)
+            break;
+        swap(V, V_new);         // use &lt;algorithm&gt; std::swap
+    }
+    cout &lt;&lt; " Number of steps = " &lt;&lt; steps &lt;&lt; endl;
+&nbsp;
+    clock_t t1 = clock();
+    cout &lt;&lt; " CPU time = " &lt;&lt; double(t1 - t0) / CLOCKS_PER_SEC
+         &lt;&lt; " sec" &lt;&lt; endl;
+}
+&nbsp;
+int main() {
+&nbsp;
+    cout &lt;&lt; " Iterative solution of Poisson's equation\n"
+         &lt;&lt; " ----------------------------------------\n";
+    cout &lt;&lt; " Enter number of interior points in x or y: ";
+    cin &gt;&gt; L;
+&nbsp;
+    initialize();
+&nbsp;
+    cout &lt;&lt; " Enter desired accuracy in solution: ";
+    cin &gt;&gt; accuracy;
+    cout &lt;&lt; " Enter 1 for Jacobi, 2 for Gauss Seidel, 3 for SOR: ";
+    int choice;
+    cin &gt;&gt; choice;
+&nbsp;
+    switch (choice) {
+    case 1:
+        iterate(Jacobi);
+        break;
+    case 2:
+        iterate(Gauss_Seidel);
+        break;
+    case 3:
+        cout &lt;&lt; " Enter overrelaxation parameter omega: ";
+        cin &gt;&gt; omega;
+        iterate(successive_over_relaxation);
+        break;
+    default:
+        cout &lt;&lt; " Jacobi: " &lt;&lt; endl;
+        iterate(Jacobi);
+        cout &lt;&lt; " Gauss-Seidel: " &lt;&lt; endl;
+        initialize();
+        iterate(Gauss_Seidel);
+        omega = 2 / (1 + 4 * atan(1.0) / double(L));
+        cout &lt;&lt; " Successive Over Relaxation with theoretical optimum omega = "
+             &lt;&lt; omega &lt;&lt; endl;
+        initialize();
+        iterate(successive_over_relaxation);
+        break;
+    }
+&nbsp;
+    // write potential to file
+    cout &lt;&lt; " Potential in file poisson.data" &lt;&lt; endl;
+    ofstream date_file("poisson.data");
+    for (int i = 0; i &lt; L + 2; i++) {
+        double x = i * h;
+        for (int j = 0; j &lt; L + 2; j++) {
+            double y = j * h;
+            date_file &lt;&lt; x &lt;&lt; '\t' &lt;&lt; y &lt;&lt; '\t' &lt;&lt; V[i][j] &lt;&lt; '\n';
+        }
+        date_file &lt;&lt; '\n';
+    }
+    date_file.close();
+}
+&nbsp;
+</pre>
+<p></p>
+
+<h3>Results from running the program</h3>
+
+<p>
+</p><pre style="margin-left:4em"> Iterative solution of Poisson's equation
+ ----------------------------------------
+ Enter number of interior points in x or y: 50
+ Enter desired accuracy in solution: 0.001
+ Enter 1 for Jacobi, 2 for Gauss Seidel, 3 for SOR: 0
+ Jacobi:
+ Number of steps = 1012
+ Gauss-Seidel:
+ Number of steps = 508
+ Successive Over Relaxation with theoretical optimum omega = 1.88177
+ Number of steps = 62
+ Potential in file poisson.data
+</pre>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/poisson.png" width="50%">
+<br>
+</div>
+<p></p>
+
+<p></p>
+<p>
+According to Numerical Recipes} \S19.5, the number of iterations <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-83.png">
+required to reduce the overall error by a factor of <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-84.png"> for Laplace's
+equation in 2-D is given by
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-85.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-86.png">
+</div>
+<p></p>
+
+<h2>Convergence rates of different methods</h2>
+
+<p>
+Successive Overrelaxation (SOR) is considerably more efficient than
+the Jacobi or Gauss-Seidel methods.
+</p>
+
+<p></p>
+<p>
+Let's write Poisson's equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-87.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+in matrix form
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-88.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-89.png"> is a column vector with the values <img style="vertical-align:-6px" src="./Partial Differential Equations_files/tex-90.png"> at the
+interior lattice points as components, and the components of <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-91.png">
+are determined by the charge density at interior points and the
+boundary values on the closed boundary of the region. The matrix <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-92.png">
+can be split into its lower triangular, diagonal and upper triangular
+parts
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-93.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+and the Jacobi iteration at step <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-94.png"> can be written
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-95.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-96.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The matrix
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-97.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+is called the <b>iteration matrix</b>, and the magnitude its largest
+eigenvalue is called the <b>spectral radius</b> for the relaxation
+problem. The spectral radius
+</p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<li> should lie between 0 and 1 for the method to be stable,
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> depends on the boundary conditions and the lattice spacing,
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> and approaches 1 as the number of lattice points increases.
+</li></ul>
+<p></p>
+
+<p></p>
+<p>
+For an <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-98.png"> square lattice with Dirichlet boundary conditions,
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-99.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+How many iterations does it take for the solution to be damped by a factor
+<img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-100.png">? This is in general determined by the largest eigenvalue of
+the iteration matrix, so
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-101.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This shows that the Jacobi method is not very efficient. For <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-102.png"> for
+example, it would take 1,000,000 iterations to improve the error to
+1% of its current value!
+The Gauss-Seidel method leads to the iteration matrix
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-103.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+which has a spectral radius for the <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-104.png"> Dirichlet lattice of
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-105.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This implies that the Gauss-Seidel method converges only twice as fast
+as the Jacobi method.
+</p>
+
+<p></p>
+<p>
+By contrast, Successive Over Relaxation has
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-106.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This is a dramatic improvement: for <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-107.png"> it should take
+less than 667 iterations
+iterations to improve the error to 1% of its current value!
+</p>
+
+<p></p>
+<p>
+Note that one iteration involves updating all interior lattice points.
+Thus the CPU time for the Jacobi or Gauss-Seidel methods for an <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-108.png">
+two-dimensional problem is of <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-109.png">, which is considerably
+reduced to <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-110.png"> for the SOR method. Even this is not very
+efficient for large problems.
+</p>
+
+<h2>Spectral Radius of Laplace Operator</h2>
+
+<p>
+Let's derive the spectral radius <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-111.png"> for the one-dimensional Laplace
+equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-112.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This equation can be discretized on a lattice
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/lattice1.png" width="50%">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-113.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The Jacobi iteration for this lattice is
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-114.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+If we apply Dirichlet boundary conditions <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-115.png">,
+it is easy to see that the <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-116.png"> eigenvectors of this iteration are
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-117.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The eigenvalues are determined by plugging in
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-118.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The spectral radius is given by the largest eigenvalue
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-119.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+for large <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-120.png">.
+</p>
+
+<p></p>
+<p>
+A similar analysis can be done in two dimensions to get the estimate
+given in Numerical Recipes
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-121.png">
+</div>
+<p></p>
+
+<h1>Solving Poisson's Equation using the FFT<a name="sec3"> </a></h1>
+
+<p>
+The Fast Fourier Transform can be used to solve elliptic partial
+differential equations in multiple dimensions.
+</p>
+
+<p></p>
+<p>
+The basic idea is very simple. Consider the one-dimensional equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-122.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+Express <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-123.png"> and <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-124.png"> in terms of their Fourier transforms:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-125.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The equation is diagonalized in <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-126.png">-space
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-127.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The solution is given by the inverse transform
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-128.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+We need to impose appropriate boundary conditions, and also specify how
+to treat the singularity at <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-129.png"> in the integral.
+</p>
+
+<h2>Boundary conditions and types of transforms</h2>
+
+<p>
+The boundary conditions determine the appropriate type of Fourier
+transform to solve the problem. Some problems, like conduction of
+heat through a rod which Fourier studied, require a sine transform.
+Others require a cosine or exponential transform.
+</p>
+
+<p></p>
+<p>
+Consider a domain <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-130.png"> in one dimension.  Choose a
+lattice of <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-131.png"> equally spaced points <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-132.png">.
+</p>
+
+<p></p>
+<p>
+The complex Fourier transform coefficients of <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-133.png"> are
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-134.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The inverse transform
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-135.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+will be periodic} in <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-136.png"> with period <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-137.png">.
+This complex Fourier transform is therefore appropriate for problems
+which satisfy periodic boundary conditions.
+</p>
+
+<p></p>
+<p>
+If the problem involves Dirichlet boundary conditions, for
+example, <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-138.png">, then it would be appropriate to use a
+sine Fourier transform}
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-139.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+If the problem involves Neumann boundary conditions it is appropriate
+to use is the cosine Fourier transform. One discrete version
+on <img style="vertical-align:-2px" src="./Partial Differential Equations_files/tex-140.png"> points given in Numerical Recipes is
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-141.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+Note that the cosine and sine transforms are not just the real
+and imaginary parts of the complex exponential transform. This is
+because the sine, cosine, and exponential functions separately form
+complete sets, albeit with different boundary conditions. The basic
+phase factor for the sine and cosine transforms is <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-142.png"> compared
+with <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-143.png"> for the exponential: the sine and cosine transforms
+require twice as many lattice points because they are real,
+compared with the exponential transform which is complex.
+</p>
+
+<h2>Poisson's equation in two dimensions</h2>
+
+<p>
+Let's consider the discrete form of Poisson's equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-144.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+on an <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-145.png"> grid of points in the region <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-146.png"> with a
+given charge density, say a single point charge located at the center
+of the square.
+</p>
+
+<p></p>
+<p>
+Impose periodic boundary conditions so that
+the exponential FFT can be used to obtain the solution.
+</p>
+
+<p></p>
+<p>
+The discrete Fourier transform is a linear operation, so we can
+apply it separately in the <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-147.png"> and <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-148.png"> directions, and it does not
+matter in which order the transforms are done.
+</p>
+
+<p></p>
+<p>
+The two-dimensional Fourier coefficients are given by
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-149.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-150.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The inverse transforms are
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-151.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-152.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+Plugging these expressions into the discretized equation and
+equating coefficients of <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-153.png"> gives
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-154.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+which is easily solved for
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-155.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The inverse Fourier transform then gives the potential.
+</p>
+
+<h2>Electric Field from Electrostatic Potential</h2>
+
+<p>
+Solving Poisson's equation yields the electrostatic potential
+  <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-156.png"> due to a given charge density <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-157.png">
+  and boundary conditons
+</p>
+
+<p></p>
+<p>
+The electrostatic field is given by
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-158.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+In two dimensions the field has components
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-159.png">
+</div>
+<p></p>
+
+<h2>Numerical Differentiation</h2>
+
+<p>
+Finding the numerical derivatives of a function is relatively
+straightforward, but there are some subtleties, see
+<a href="http://www.nrbook.com/a/bookcpdf/c5-7.pdf" title="http://www.nrbook.com/a/bookcpdf/c5-7.pdf">Chapter 5 Section 7</a>
+of Numerical Recipes.
+</p>
+
+<p></p>
+<p>
+Suppose we are given the numerical values of <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-160.png"> on a grid
+of points <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-161.png">, <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-162.png"> and <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-163.png"> is the lattice
+spacing, and <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-164.png">.
+</p>
+
+<p></p>
+<p>
+The forward difference approximation to the derivative is
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-165.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The backward difference approximation to the derivative is
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-166.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The symmetric difference (three-point formula) is the average
+of forward and backward differences
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-167.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+is one order in <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-168.png"> more accurate.
+</p>
+
+<p></p>
+<p>
+A five-point formula
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-169.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+provides greater accuracy still.
+</p>
+
+<p></p>
+<p>
+Unlike numerical integration, where higher order generally gives
+higher accuracy, higher order formulas for derivatives become
+increasingly sensitive to roundoff errors from cancellations between
+many terms of alternating signs.
+</p>
+
+<p></p>
+<p>
+In practice, the three point formula is a reasonable compromise between
+accuracy and stability.  Better methods are discussed in Numerical
+Recipes.
+</p>
+
+<p></p>
+<p>
+With the three-point formula, there is a problem with finding the
+derivative at boundary points.
+One strategy is to use the forward difference at the left
+boundary, and the backward difference at the right boundary.
+more accurate result is obtained by making a linear extrapolation
+of the derivatives already computed at the two closest interior points
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-170.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+which is more accurate than the forward difference by one order in <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-171.png">.
+At the right boundary
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-172.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/electric.png">
+<br>
+</div>
+<p></p>
+
+<p></p>
+<p>
+The plot was made using the following Gnuplot commands
+</p>
+
+<p></p>
+<p>
+</p><pre style="margin-left:4em">gnuplot&gt; set size square
+gnuplot&gt; set xrange [0.35:0.6]
+gnuplot&gt; set yrange [0.35:0.6]
+gnuplot&gt; plot "electric.data" with vectors
+</pre>
+<p></p>
+
+<p></p>
+<p>
+Notice the rapid fall off <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-173.png"> of the electric field with
+distance from the charge.
+</p>
+
+<p></p>
+<p>
+</p><div style="text-align:right;margin-right:2em"><a href="http://www.physics.buffalo.edu/phy410-505/topic6/poisson_fft.cpp.txt"><code><b>poisson_fft.cpp</b></code></a></div>
+<pre style="margin-left:4em">&nbsp;
+#include "cptstd.hpp"
+#include "linalg.hpp"
+using namespace cpt;
+&nbsp;
+int main() {
+&nbsp;
+    cout &lt;&lt; " FFT solution of Poisson's equation\n"
+         &lt;&lt; " ----------------------------------\n";
+    cout &lt;&lt; " Enter number points in x or y: ";
+    int N;
+    cin &gt;&gt; N;
+    int power_of_2 = 1;
+    while (power_of_2 &lt; N)
+        power_of_2 *= 2;
+    if (power_of_2 != N)
+        cout &lt;&lt; " Warning: N is not a power of 2 - FFT may be slow!" &lt;&lt; endl;
+&nbsp;
+    double h = 1 / double(N - 1);        // assume physical size in x and y = 1
+&nbsp;
+    clock_t t0 = clock();
+&nbsp;
+    double q = 10;                       // point charge
+    Matrix&lt;complex&lt;double&gt;,2&gt; rho(N, N);
+    for (int j = 0; j &lt; N; j++) {
+        for (int k = 0; k &lt; N; k++) {
+            if (j == N/2 &amp;&amp; k == N/2)    // at center of lattice
+                rho[j][k] = q / (h * h);
+            else
+                rho[j][k] = 0.0;
+        }
+    }
+&nbsp;
+    // FFT rows of rho
+    Matrix&lt;complex&lt;double&gt;,1&gt; f(N);      // to store rows and columns
+    for (int j = 0; j &lt; N; j++) {
+        for (int k = 0; k &lt; N; k++)
+            f[k] = rho[j][k];
+        fft(f);
+        for (int k = 0; k &lt; N; k++)
+            rho[j][k] = f[k];
+    }
+    // FFT columns of rho
+    for (int k = 0; k &lt; N; k++) {
+        for (int j = 0; j &lt; N; j++)
+            f[j] = rho[j][k];
+        fft(f);
+        for (int j = 0; j &lt; N; j++)
+            rho[j][k] = f[j];
+    }
+&nbsp;
+    // solve equation in Fourier space
+    Matrix&lt;complex&lt;double&gt;,2&gt; V(N, N);
+    complex&lt;double&gt; i(0.0, 1.0);
+    double pi = 4 * atan(1.0);
+    complex&lt;double&gt; W = exp(2.0 * pi * i / double(N));
+    complex&lt;double&gt; W_m = 1.0, W_n = 1.0;
+    for (int m = 0; m &lt; N; m++) {
+        for (int n = 0; n &lt; N; n++) {
+            complex&lt;double&gt; denom = 4.0;
+            denom -= W_m + 1.0 / W_m + W_n + 1.0 / W_n;
+            if (denom != 0.0)
+                V[m][n] = rho[m][n] * h * h / denom;
+            W_n *= W;
+        }
+        W_m *= W;
+    }
+&nbsp;
+    // inverse FFT rows of V
+    for (int j = 0; j &lt; N; j++) {
+        for (int k = 0; k &lt; N; k++)
+            f[k] = V[j][k];
+        fft_inv(f);
+        for (int k = 0; k &lt; N; k++)
+            V[j][k] = f[k];
+    }
+    // inverse FFT columns of V
+    for (int k = 0; k &lt; N; k++) {
+        for (int j = 0; j &lt; N; j++)
+            f[j] = V[j][k];
+        fft_inv(f);
+        for (int j = 0; j &lt; N; j++)
+            V[j][k] = f[j];
+    }
+&nbsp;
+    clock_t t1 = clock();
+    cout &lt;&lt; " CPU time = " &lt;&lt; double(t1 - t0) / CLOCKS_PER_SEC
+         &lt;&lt; " sec" &lt;&lt; endl;
+&nbsp;
+    // write potential to file
+    ofstream data_file("poisson_fft.data");
+    for (int j = 0; j &lt; N; j++) {
+        double x = j * h;
+        for (int k = 0; k &lt; N; k++) {
+            double y = k * h;
+            data_file &lt;&lt; x &lt;&lt; '\t' &lt;&lt; y &lt;&lt; '\t' &lt;&lt; real(V[j][k]) &lt;&lt; '\n';
+        }
+        data_file &lt;&lt; '\n';
+    }
+    data_file.close();
+    cout &lt;&lt; " Potential in file poisson_fft.data" &lt;&lt; endl;
+}
+&nbsp;
+</pre>
+<p></p>
+
+<h1>Solving Poisson's Equation using Multigrid Methods<a name="sec4"> </a></h1>
+
+<p>
+The multigrid method provides algorithms which can be used to
+accelerate the rate of convergence of iterative methods, such as
+Jacobi or Gauss-Seidel, for solving elliptic partial differential
+equations.
+</p>
+
+<p></p>
+<p>
+Iterative methods start with an approximate guess for the solution to
+the differential equation. In each iteration, the difference between
+the approximate solution and the exact solution is made smaller.
+</p>
+
+<p></p>
+<p>
+One can analyze this difference or error into components of
+different wavelengths, for example by using Fourier analysis.  In
+general the error will have components of many different wavelengths:
+there will be short wavelength error components and long wavelength
+error components.
+</p>
+
+<p></p>
+<p>
+Algorithms like Jacobi or Gauss-Seidel are local because the
+new value for the solution at any lattice site depends only on the value
+of the previous iterate at neighboring points. Such local algorithms are
+generally more efficient in reducing short wavelength error components.
+</p>
+
+<p></p>
+<p>
+The basic idea behind multigrid methods is to reduce long wavelength
+error components by updating blocks of grid points. This strategy is
+similar to that employed by cluster algorithms in Monte Carlo
+simulations of the Ising model close to the phase transtion
+temperature where long range correlations are important. In fact,
+multigrid algorithms can also be combined with Monte Carlo simulations.
+</p>
+
+<p></p>
+<p>
+Multigrid methods are discussed in
+<a href="http://www.nrbook.com/a/bookcpdf/c19-6.pdf" title="http://www.nrbook.com/a/bookcpdf/c19-6.pdf">Chapter 19 Section 6</a>
+of Numerical Recipes.
+</p>
+
+<h2>Multigrid method for Poisson's equation in 2-D</h2>
+
+<p>
+With a small change in notation, Poisson's equation in 2-D can be written:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-174.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where the unknown solution <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-175.png"> is determined by the given
+source term <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-176.png"> in a closed region. Let's consider a square
+domain <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-177.png"> with homogeneous Dirichlet boundary conditions
+<img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-178.png"> on the perimeter of the square. The equation is discretized on a
+grid with <img style="vertical-align:-2px" src="./Partial Differential Equations_files/tex-179.png"> lattice points, i.e., <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-180.png"> interior points and 2
+boundary points, in the <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-181.png"> and <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-182.png"> directions. At any interior point,
+the exact solution obeys
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-183.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The algorithm uses a succession of lattices or grids. The number of
+different grids is called the number of multigrid levels <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-184.png">.  The
+number of interior lattice points in the <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-185.png"> and <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-186.png"> directions is
+then taken to be <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-187.png">, so that <img style="vertical-align:-2px" src="./Partial Differential Equations_files/tex-188.png">, and the lattice
+spacing <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-189.png">.  <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-190.png"> is chosen in this manner so that the
+downward multigrid iteration can construct a sequence of coarser
+lattices with
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-191.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+interior points in the <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-192.png"> and <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-193.png"> directions.
+</p>
+
+<p></p>
+<p>
+Suppose that <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-194.png"> is the approximate solution at any stage in the
+calculation, and <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-195.png"> is the exact solution which we
+are trying to find.
+The multigrid algorithm defines the correction
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-196.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+is the function which must be added to the
+approximate solution to give the exact solution.
+</p>
+
+<p></p>
+<p>
+The residual or defect is defined as
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-197.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+Notice that the correction and the residual are related by the equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-198.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This equation has exactly the same form as Poisson's equation with <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-199.png">
+playing the role of unknown function and <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-200.png"> playing the role of known
+source function!
+</p>
+
+<h2>Simple V-Cycle Algorithm</h2>
+
+<p>
+The simplest multigrid algorithm is based on a two-grid improvement
+scheme. Consider two grids:
+</p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<li> a fine grid with <img style="vertical-align:-2px" src="./Partial Differential Equations_files/tex-201.png"> points in each direction, and
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> a coarse grid with <img style="vertical-align:-2px" src="./Partial Differential Equations_files/tex-202.png"> points.
+</li></ul>
+<p></p>
+
+<p></p>
+<p>
+We need to be able to move from one grid to another, i.e., given any
+function on the lattice, we need to able to
+</p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<li> restrict the function from fine <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-203.png"> coarse, and
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> prolongate or interpolate the function from coarse
+<img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-204.png"> fine.
+</li></ul>
+<p></p>
+
+<p></p>
+<p>
+Given these definitions, the multigrid <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-205.png">cycle can be defined
+recursively as follows:
+</p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<li> If <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-206.png"> there is only one interior point, so solve exactly for
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-207.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> Otherwise, calculate the current <img style="vertical-align:-2px" src="./Partial Differential Equations_files/tex-208.png">.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> Perform a few pre-smoothing iterations using a local algorithm
+such as Gauss-Seidel. The idea is to damp or reduce the short
+wavelength errors in the solution.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> Estimate the correction <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-209.png"> as follows:
+<p></p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<li> Compute the residual
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-210.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> Restrict the residual <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-211.png"> to the coarser grid.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> Set the coarser grid correction <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-212.png"> and improve it recursively.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> Prolongate the correction <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-213.png"> onto the finer grid.
+</li></ul>
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> Correct <img style="vertical-align:-2px" src="./Partial Differential Equations_files/tex-214.png">.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> Perform a few post-smoothing Gauss-Seidel interations
+and return this improved <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-215.png">.
+</li></ul>
+<p></p>
+
+<p></p>
+<p>
+How does this recursive algorithm scale with <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-216.png">? The pre-smoothing and
+post-smoothing Jacobi or Gauss-Seidel iterations are the most time
+consuming parts of the calculation. Recall that a single Jacobi or
+Gauss-Seidel iteration scales like <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-217.png">. The operations must
+be carried out on the sequence of grids with
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-218.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+interior lattice points in each direction. The total number of operations
+is of order
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-219.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+Thus the multigrid <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-220.png">cycle scales like <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-221.png">, i.e., linearly
+with the number of lattice points N!
+</p>
+
+<h2>Restricting the Residual to a Coarser Lattice</h2>
+
+<p>
+The coarser lattice with spacing <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-222.png"> is constructed as shown. A simple
+algorithm for restricting the residual to the coarser lattice is
+to set its value to the average of the values on the four surrounding
+lattice points (cell-centered coarsening):
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/restrict.png">
+<br>
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-223.png">
+</div>
+<p></p>
+
+<h2>Prolongation of the Correction to the Finer Lattice</h2>
+
+<p>
+Having restricted the residual to the coarser lattice with spacing <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-224.png">,
+we need to solve the equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-225.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+with the initial guess <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-226.png">. This is done by two-grid iteration
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-227.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The output must now be interpolated
+or prolongated} to the finer lattice. The simplest procedure is to
+copy the value of <img style="vertical-align:-6px" src="./Partial Differential Equations_files/tex-228.png"> on the coarse lattice to the 4 neighboring
+cell points on the finer lattice:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-229.png">
+</div>
+<p></p>
+
+<h2>Cell-centered and Vertex-centered Grids and Coarsenings</h2>
+
+<p>
+In the cell-centered prescription, the spatial domain is partitioned
+into discrete cells. Lattice points
+are defined at the center of each cell as shown in the figure:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/cell-center.png">
+<br>
+</div>
+<p></p>
+
+<p></p>
+<p>
+The coarsening operation is defined by doubling the size of a cell in each
+spatial dimension and placing a coarse lattice point at the center of the
+doubled cell.
+</p>
+
+<p></p>
+<p>
+Note that the number of lattice points or cells in each dimension must be
+a power of 2 if the coarsening operation is to terminate with a single
+cell. In the figure, the finest lattice has <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-230.png"> cells in each
+dimension, and 3 coarsening operations reduce the number of cells in
+each dimension
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-231.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+Note also that with the cell-centered prescription, the spatial location of
+lattice sites changes with each coarsening: coarse lattice sites are
+spatially displaced from fine lattice sites.
+</p>
+
+<p></p>
+<p>
+A vertex-centered prescription is defined by partitioning the
+spatial domain into discrete cells and locating the discrete lattice
+points at the vertices of the cells as shown in the figure:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/vertex-center.png">
+<br>
+</div>
+<p></p>
+
+<p></p>
+<p>
+The coarsening operation is implemented simply by dropping every other
+lattice site in each spatial dimension.
+</p>
+
+<p></p>
+<p>
+Note that the number of lattice points in each dimension must be one
+greater than a power of 2 if the coarsening operation is to reduce the
+number of cells to a single coarsest cell. In the example in the figure
+the finest lattice has <img style="vertical-align:-2px" src="./Partial Differential Equations_files/tex-232.png"> lattice sites in each dimension, and
+2 coarsening operations reduce the number of vertices in each dimension
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-233.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The vertex-centered prescription has the property that the spatial locations
+of the discretization points are not changed by the coarsening operation.
+</p>
+
+<h2>Boundary points</h2>
+
+<p>
+Let's assume that the outermost perimeter points are taken to be the
+boundary points.
+The behavior of these boundary points is different in the two prescriptions:
+</p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<li> <b>Cell-centered Prescription:</b>
+The boundary points move in space towards the
+center of the region at each coarsening. This implies that one has to
+be careful in defining the ``boundary values'' of the solution.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> <b>Vertex-centered Prescription:</b>
+The boundary points do not move when the lattice is coarsened. This make it
+easier in principle to define the boundary values.
+</li></ul>
+<p></p>
+
+<p></p>
+<p>
+These two different behaviors of the boundary points make the vertex-centered
+prescription a little more convenient to use in multigrid applications.
+However, there
+is no reason why the cell-centered prescription should not work as well.
+</p>
+
+<h2>Restriction and Prolongation Operators</h2>
+
+<p>
+In the multigrid method it is necessary to move functions from a fine
+grid to the next coarser grid (Restriction), and from a coarse
+grid to the next finer grid (Prolongatio}). Many prescriptions for
+restricting and prolongating functions have been studied.
+Let's consider two of the simplest prescriptions appropriate for cell-
+and vertex-centered coarsening:
+</p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<li> <b>Cell-centered Coarsening:</b> In this prescription, a coarse lattice
+point is naturally associated with <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-234.png"> neighboring fine lattice points
+in <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-235.png">-dimensions.
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/cell.png">
+<br>
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p></li><li>
+Suppose that <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-236.png"> is a function on the fine lattice at
+spatial position <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-237.png">, and <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-238.png"> is the corresponding function
+on the coarse lattice, then this diagram suggests a simple prescription for
+restriction and prolongation.
+<p></p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<li> Restriction: Average the function values at the 4 neighboring
+fine lattice sites <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-239.png">:
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-240.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> Prolongation: Inject the value of the function at the coarse lattice
+site to the 4 neighboring fine lattice sites:
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-241.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p></li></ul>
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> <b>Vertex-centered Coarsening:</b> Consider a coarse lattice
+point and the 9 neighboring fine lattice points shown in the figure:
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/vertex.png">
+<br>
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p></li><li>
+In this prescription, a coarse lattice
+point can naturally associated (in 2-D) with
+<p></p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<li> the corresponding fine lattice point, or
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> the four nearest neighbor fine lattice points, left, right, up, and
+down, or
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> with the four diagonally nearest fine lattice points, etc.
+</li></ul>
+<p></p>
+
+<p></p>
+<p>
+</p></li><li>
+It is a little more complicated here to define transfer operators. The
+problem is that the fine lattice points are associated with
+more than one} coarse lattice point, unlike the cell-centered case:
+<p></p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<li> The single red fine lattice point in the center coincides with an
+unique coarse lattice point.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> Each of the 4 black fine lattice points however is equidistant from
+two} coarse lattice points.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> Each of the 4 red fine lattice points is equidistant from four
+coarse lattice points.
+</li></ul>
+<p></p>
+
+<p></p>
+<p>
+</p></li><li>
+This sharing of lattice points suggests the following prescriptions:
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> Prolongation: use bilinear interpolation
+in which the value of <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-242.png"> at
+a coarse grid point is copied to 9 neighboring fine-grid points with
+the following weights:
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-243.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This matrix is called the stencil for the prolongation.
+</p>
+
+<p></p>
+<p>
+</p></li><li> Restriction: The restriction operator is taken to be the
+adjoint of the prolongation operator:
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-244.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This choice of restriction operator is called full weighting.
+</p></li></ul>
+<p></p>
+
+<h2>Improvements and More Complicated Multigrid Algorithms</h2>
+
+<p>
+The algorithm implemented above is the simplest multigrid scheme with
+a single V-cycle.
+<a href="http://www.nrbook.com/a/bookcpdf/c19-6.pdf" title="http://www.nrbook.com/a/bookcpdf/c19-6.pdf">Chapter 19 Section 6</a>
+of Numerical Recipes discusses various ways of improving this
+algorithm:
+</p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<li> One can repeat the two-grid iteration more than once. If it is
+repeated twice} in each multigrid level one obtains a W-cycle}
+type of algorithm.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> The Full Multigrid Algorithm starts with the coarsest grid
+on which the equation can be solved exactly. It then proceeds to finer
+grids, performing one or more V-cycles} at each level along the
+way. Numerical Recipes gives a program <code>mglin(u,n,ncycle)</code>
+which accepts the source function <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-245.png"> in the first argument and
+implements the full multigrid algorithm with <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-246.png">
+levels, performing <code>ncycle</code> V-cycles at each level, and returning
+the solution in the array parameter <code>u</code>. Note that this program
+assumes that the number of lattice points in each dimension <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-247.png"> is odd,
+which leads to vertex centered coarsening:
+</li></ul>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/restrict.png">
+<br>
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p><div style="text-align:right;margin-right:2em"><a href="http://www.physics.buffalo.edu/phy410-505/topic6/poisson_mg.cpp.txt"><code><b>poisson_mg.cpp</b></code></a></div>
+<pre style="margin-left:4em">&nbsp;
+#include "cptstd.hpp"
+#include "matrix.hpp"
+using namespace cpt;
+&nbsp;
+double accuracy = 0.001;        // desired relative accuracy in solution
+int L = 64;                     // number of interior points in each dimension
+int n_smooth = 5;               // number of pre and post smoothing iterations
+&nbsp;
+Matrix&lt;double,2&gt; psi(L+2, L+2), // solution to be found
+    psi_new(L+2, L+2),          // approximate solution after 1 iteration
+    rho(L+2, L+2);              // given source function
+&nbsp;
+double h = 1.0 / (L+1);         // step size
+int steps;                      // number of iteration steps
+&nbsp;
+void initialize()
+{
+    // check that L is a power of 2 as required by multigrid
+    int power_of_2 = 1;
+    while (power_of_2 &lt; L)
+        power_of_2 *= 2;
+    if (power_of_2 != L) {
+        L = power_of_2;
+        cout &lt;&lt; " Setting L = " &lt;&lt; L &lt;&lt; " (must be a power of 2)" &lt;&lt; endl;
+    }
+&nbsp;
+    // create (L+2)x(L+2) matrices and zero them
+    psi = psi_new = rho = Matrix&lt;double,2&gt;(L+2, L+2);
+&nbsp;
+    h = 1 / double(L + 1);      // assume physical size in x and y = 1
+    double q = 10;              // point charge
+    int i = L / 2;              // center of lattice
+    rho[i][i] = q / (h * h);    // charge density
+&nbsp;
+    steps = 0;
+}
+&nbsp;
+void Gauss_Seidel(double h, Matrix&lt;double,2&gt;&amp; u, const Matrix&lt;double,2&gt;&amp; f)
+{
+    int L = u.dim1() - 2;
+&nbsp;
+    // use checkerboard updating
+    for (int color = 0; color &lt; 2; color++)
+        for (int i = 1; i &lt;= L; i++)
+            for (int j = 1; j &lt;= L; j++)
+                if ((i + j) % 2 == color)
+                    u[i][j] = 0.25 * (u[i - 1][j] + u[i + 1][j] +
+                                      u[i][j - 1] + u[i][j + 1] +
+                                      h * h * f[i][j]);
+}
+&nbsp;
+void two_grid(double h, Matrix&lt;double,2&gt;&amp; u, Matrix&lt;double,2&gt;&amp; f)
+{
+    // solve exactly if there is only one interior point
+    int L = u.dim1() - 2;
+    if (L == 1) {
+        u[1][1] = 0.25 * (u[0][1] + u[2][1] + u[1][0] + u[1][2] +
+                          h * h * f[1][1]);
+        return;
+    }
+&nbsp;
+    // do a few pre-smoothing Gauss-Seidel steps
+    for (int i = 0; i &lt; n_smooth; i++)
+        Gauss_Seidel(h, u, f);
+&nbsp;
+    // find the residual
+    Matrix&lt;double,2&gt; r(L+2, L+2);
+    for (int i = 1; i &lt;= L; i++)
+        for (int j = 1; j &lt;= L; j++)
+            r[i][j] = f[i][j] +
+                      ( u[i + 1][j] + u[i - 1][j] +
+                        u[i][j + 1] + u[i][j - 1] - 4 * u[i][j]) / (h * h);
+&nbsp;
+    // restrict residual to coarser grid
+    int L2 = L / 2;
+    Matrix&lt;double,2&gt; R(L2 + 2, L2 + 2);
+    for (int I = 1; I &lt;= L2; I++) {
+        int i = 2 * I - 1;
+        for (int J = 1; J &lt;= L2; J++) {
+            int j = 2 * J - 1;
+            R[I][J] = 0.25 * ( r[i][j] + r[i + 1][j] + r[i][j + 1] +
+                               r[i + 1][j + 1]);
+        }
+    }
+&nbsp;
+    // initialize correction V on coarse grid to zero
+    Matrix&lt;double,2&gt; V(L2 + 2, L2 + 2);
+&nbsp;
+    // call twoGrid recursively
+    double H = 2 * h;
+    two_grid(H, V, R);
+&nbsp;
+    // prolongate V to fine grid using simple injection
+    Matrix&lt;double,2&gt; v(L + 2, L + 2);
+    for (int I = 1; I &lt;= L2; I++) {
+        int i = 2 * I - 1;
+        for (int J = 1; J &lt;= L2; J++) {
+            int j = 2 * J - 1;
+            v[i][j] = v[i + 1][j] = v[i][j + 1] = v[i + 1][j + 1] = V[I][J];
+        }
+    }
+&nbsp;
+    // correct u
+    for (int i = 1; i &lt;= L; i++)
+        for (int j = 1; j &lt;= L; j++)
+            u[i][j] += v[i][j];
+&nbsp;
+    // do a few post-smoothing Gauss-Seidel steps
+    for (int i = 0; i &lt; n_smooth; i++)
+        Gauss_Seidel(h, u, f);
+}
+&nbsp;
+double relative_error()
+{
+    double error = 0;           // average relative error per lattice point
+    int n = 0;                  // number of non-zero differences
+&nbsp;
+    for (int i = 1; i &lt;= L; i++)
+        for (int j = 1; j &lt;= L; j++) {
+            if (psi_new[i][j] != 0.0)
+                if (psi_new[i][j] != psi[i][j]) {
+                    error += abs(1 - psi[i][j] / psi_new[i][j]);
+                    ++n;
+                }
+        }
+    if (n != 0)
+        error /= n;
+&nbsp;
+    return error;
+}
+&nbsp;
+int main()
+{
+    cout &lt;&lt; " Multigrid solution of Poisson's equation\n"
+         &lt;&lt; " ----------------------------------------\n";
+    cout &lt;&lt; " Enter number of interior points in x or y: ";
+    cin &gt;&gt; L;
+    cout &lt;&lt; " Enter desired accuracy in the solution: ";
+    cin &gt;&gt; accuracy;
+    cout &lt;&lt; " Enter number of smoothing iterations: ";
+    cin &gt;&gt; n_smooth;
+&nbsp;
+    initialize();
+    clock_t t0 = clock();
+    while (true) {
+        for (int i = 0; i &lt; L+2; i++)
+            for (int j = 0; j &lt; L+2; j++)
+                psi_new[i][j] = psi[i][j];
+        two_grid(h, psi, rho);
+        ++steps;
+        double error = relative_error();
+        cout &lt;&lt; " Step No. " &lt;&lt; steps &lt;&lt; "\tError = " &lt;&lt; error &lt;&lt; endl;
+        if (steps &gt; 1 &amp;&amp; error &lt; accuracy)
+            break;
+    }
+    clock_t t1 = clock();
+    cout &lt;&lt; " CPU time = " &lt;&lt; double(t1 - t0) / CLOCKS_PER_SEC
+         &lt;&lt; " sec" &lt;&lt; endl;
+&nbsp;
+    // write potential to file
+    ofstream file("poisson_mg.data");
+    for (int i = 0; i &lt; L + 2; i++) {
+        double x = i * h;
+        for (int j = 0; j &lt; L + 2; j++) {
+            double y = j * h;
+            file &lt;&lt; x &lt;&lt; '\t' &lt;&lt; y &lt;&lt; '\t' &lt;&lt; psi[i][j] &lt;&lt; '\n';
+        }
+        file &lt;&lt; '\n';
+    }
+    file.close();
+    cout &lt;&lt; " Potential in file poisson_mg.data" &lt;&lt; endl;
+}
+&nbsp;
+</pre>
+<p></p>
+
+<h1>Assignment 9<a name="assignment9"> </a> is due November 18 on UBlearns<a name="sec5"> </a></h1>
+
+<p>
+NOTE: PHY 410 do Problems 1 and 2.  PHY 505 do all problems 1, 2, 3
+</p>
+
+<p></p>
+<p>
+Current versions of example files and cpt files needed for this
+assignment are archived in
+<a href="http://www.physics.buffalo.edu/phy410-505/topic6/hw-09.zip" title="hw-09.zip">hw-09.zip</a>.
+</p>
+
+<p></p>
+<p>
+<b>Problem 1:</b> &nbsp;
+Compute the electrostatic potential due to an electric dipole in a
+two-dimensional grounded metal box and compare with the expected exact solution
+(sum of the Coulomb potentials of two point charges) in a box of infinite size.
+Use at least two different methods (Jacobi/Gauss-Seidel, SOR, FFT, Multigrid).
+</p>
+
+<p></p>
+<p>
+<b>Problem 2:</b> &nbsp;
+Compute the electric field due to the dipole and plot it. You need to select a
+finite difference approximation to compute the partial derivatives of the
+potential generated in the previous problem.  To plot the field see
+<a href="http://gnuplot.info/demo/vector.html" title="http://gnuplot.info/demo/vector.html">http://gnuplot.info/demo/vector.html</a>.
+</p>
+
+<p></p>
+<p>
+<b>Problem 3 PHY 505 ONLY:</b> &nbsp;
+Study and summarize the following for the potential and electric field of the
+dipole: (1) How do the solutions depend on boundary conditions at the surface
+of the box, for example periodic versus Dirichlet or Neumann?
+(2) Time your codes for each algorithm and study the dependence on the number
+of lattice points in each case.
+</p>
+
+<h1>Parabolic Partial Differential Equations<a name="sec6"> </a></h1>
+
+<p>
+The
+<a href="http://en.wikipedia.org/wiki/Diffusion_equation" title="http://en.wikipedia.org/wiki/Diffusion_equation">Diffusion equation</a>
+and the time-dependent
+<a href="http://en.wikipedia.org/wiki/Schr%C3%B6dinger_equation" title="http://en.wikipedia.org/wiki/Schr%C3%B6dinger_equation">Schroedinger's equation</a>
+of quantum mechanics are important examples of parabolic partial
+differential equations.
+</p>
+
+<h2>The Time-Dependent Schroedinger Equation</h2>
+
+<p>
+The time-dependent Schroedinger equation
+for a particle of mass <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-248.png"> in one dimension is
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-249.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This equation has the formal solution
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-250.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-251.png"> is the hermitian Hamiltonian operator.
+Note that the time evolution is unitary}, which implies that
+probability is conserved:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-252.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This can be compared with a diffusion-type equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-253.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+In contrast to the unitary time evolution of quantum mechanics, diffusion
+is characterized by damped} evolution. A mode with wavenumber <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-254.png">
+is damped like <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-255.png">, whereas the wavefunction of a free
+particle with momentum <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-256.png"> and energy <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-257.png">
+behaves <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-258.png">.
+</p>
+
+<p></p>
+<p>
+We see by comparing the two equations that quantum mechanics
+of a free particle is mathematically equivalent to diffusion with an
+imaginary} diffusion constant <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-259.png">. The Schroedinger
+equation can also be considered to represent diffusion in imaginary time:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-260.png">
+</div>
+<p></p>
+
+<h2>Designing a Wave Packet Propagation Code</h2>
+
+<p>
+How can we construct a wave packet that moves with a given speed?
+</p>
+
+<p></p>
+<p>
+In quantum mechanics, a free particle with energy <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-261.png"> has a wave
+function
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-262.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where the momentum <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-263.png">. This is a plane wave which is
+not localized in space. If <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-264.png">, this state is not
+normalizable and therefore not physical.
+</p>
+
+<p></p>
+<p>
+We can construct a localized state using for example a Gaussian function
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-265.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+which is centered about <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-266.png"> and has width <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-267.png">. [Strictly speaking
+the full width at half maximum is <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-268.png">.]
+</p>
+
+<p></p>
+<p>
+However, this packet does not move! The expectation value of the momentum
+is
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-269.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+In fact it is easy to show that a real wave packet has zero momentum
+</p>
+
+<p></p>
+<p>
+To make the packet move, multiply it by a phase factor
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-270.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+which gives
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-271.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This packet moves with velocity <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-272.png">.
+</p>
+
+<p></p>
+<p>
+The expectation value of its energy can also be computed:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-273.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+which is close to the classical result <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-274.png"> if the packet is not
+too narrow.
+</p>
+
+<h2>C++ Codes for Wavepacket Motion</h2>
+
+<p>
+Choose an initial wave packet, e.g., Gaussian
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-275.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+width <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-276.png"> moving to right with speed <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-277.png">. <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-278.png">
+is approximated on lattice by a complex <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-279.png">-component
+vector.  <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-280.png"> can be pre-computed at the
+lattice sites if <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-281.png"> does not depend on time.
+</p>
+
+<p></p>
+<p>
+</p><div style="text-align:right;margin-right:2em"><a href="http://www.physics.buffalo.edu/phy410-505/topic6/wavepacket.hpp.txt"><code><b>wavepacket.hpp</b></code></a></div>
+<pre style="margin-left:4em">&nbsp;
+#include "cptstd.hpp"
+#include "linalg.hpp"
+using namespace cpt;
+&nbsp;
+// Constants
+const double pi = 4 * atan(1.0);
+&nbsp;
+double h_bar = 1;                   // natural units
+double mass = 1;                    // natural units
+&nbsp;
+// The spatial grid
+int N = 128;                        // number of interior grid points
+double L = 100;                     // system extends from x=0 to x=L
+double dx = L / N;                  // grid spacing
+double dt = 0.1;                    // time step
+Matrix&lt;double,1&gt; x;                 // coordinates of grid points
+bool periodic = true;               // false = oo potential, true = periodic
+&nbsp;
+// The potential V(x)
+double V_0 = 0.5;                   // height of potential barrier
+double V_width = 10;                // width of potential barrier
+double V_center = 0.75 * L;         // center of potential barrier
+bool gaussian = false;              // true = Gaussian, false = step potential
+&nbsp;
+double V(double x)                  // potential function
+{
+    double half_width = abs(0.5 * V_width);
+    if (gaussian) {
+        double d = x - V_center;
+        return V_0 * exp( - d * d / (2 * half_width * half_width));
+    } else {
+        if (abs(x - V_center) &lt;= half_width)
+            return V_0;
+        else
+            return 0.0;
+    }
+}
+&nbsp;
+// Initial wave packet
+double x_0 = L / 4;                 // location of center
+double E = 1;                       // average energy
+double sigma_0 = L / 10;            // width of wave packet
+double psi_norm;                    // norm of psi
+double k_0;                         // average wavenumber
+double velocity;                    // average velocity
+&nbsp;
+Matrix&lt;complex&lt;double&gt;,1&gt; psi(N+2); // complex wave function
+&nbsp;
+double t;                           // time
+&nbsp;
+void initialize ()
+{
+    t = 0;
+&nbsp;
+    // reset vectors
+    x = Matrix&lt;double,1&gt;(N);
+    psi = Matrix&lt;complex&lt;double&gt;,1&gt;(N);
+&nbsp;
+    // reset the lattice
+    dx = L / N;
+    for (int j = 0; j &lt; N; j++)
+        x[j] = j * dx;
+&nbsp;
+    // inititalize the packet
+    k_0 = sqrt(2*mass*E - h_bar*h_bar/2/sigma_0/sigma_0) / h_bar;
+    velocity = k_0 / mass;
+    psi_norm = 1 / sqrt(sigma_0 * sqrt(pi));
+    for (int j = 0; j &lt; N; j++) {
+        double exp_factor =
+            exp(-(x[j] - x_0) * (x[j] - x_0) / (2 * sigma_0 * sigma_0));
+        psi[j] = complex&lt;double&gt;(
+            psi_norm * cos(k_0 * x[j]) * exp_factor,
+            psi_norm * sin(k_0 * x[j]) * exp_factor);
+    }
+}
+&nbsp;
+</pre>
+<p></p>
+
+<h1>Quantum Wave Packet Evolution using FFT<a name="sec7"> </a></h1>
+
+<p>
+The Fast Fourier Transform can be used to solve the time-dependent
+Schroedinger equation for wave packet motion.
+</p>
+
+<p></p>
+<p>
+The time-dependent Schroedinger equation is a partial differential equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-282.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where
+<img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-283.png"> is differential operator and <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-284.png"> a multiplicative
+operator in position space.
+Fourier transformed to momentum space
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-285.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+the Schroedinger equation becomes
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-286.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+In momentum space the kinetic operator <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-287.png"> is multiplicative,
+while the potential operator <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-288.png"> is a more complicated
+convolution, making the Schroedinger equation an integral equation.
+</p>
+
+<p></p>
+<p>
+The Schroedinger equation has a formal operator solution
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-289.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where the exponential of operator defined by
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-290.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The operators <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-291.png"> and <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-292.png"> don't commute, so expansion is very
+complicated and not suited to numerical evaluation.
+</p>
+
+<h2>Discrete Time Approximation</h2>
+
+<p>
+The operator exponential can be simplified by
+using sufficiently small time step <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-293.png">
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-294.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+which allows for the <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-295.png"> and <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-296.png"> dependence to be
+disentangled.
+</p>
+
+<p></p>
+<p>
+There is an extremely useful factorization of the exponential of a
+sum of two non-commuting operators called the
+<a href="http://en.wikipedia.org/wiki/Baker-Campbell-Hausdorff_formula">Baker-Campbell-Hausdorff
+formula</a>, which states that
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-297.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+if and only if
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-298.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The commutator
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-299.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This formula shows that the simplest factorization
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-300.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+has an error of <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-301.png">.  The
+symmetric factorization
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-302.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+more accurate with an error of <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-303.png">.
+Note that this operator is unitary} and preserves the
+norm of the wave function.
+</p>
+
+<h2>Symmetric Split-Step Fourier Transform Algorithm</h2>
+
+<p>
+Symmetric factorization of the time evolution operator can be
+combined with Fourier transformation to design a simple and
+efficient algorithm to solve the time-dependent Schroedinger
+equation.
+</p>
+
+<p></p>
+<p>
+Given the wave function <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-304.png"> in position space at time
+<img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-305.png"> and a small time step <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-306.png">, the wave function at <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-307.png"> is
+estimated with the following steps:
+</p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<li> Multiply by the first half step potential evolution operator,
+which is diagonal in position space
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-308.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> Fourier transform to momentum space
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-309.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> Multiply by the kinetic evolution operator,
+which is diagonal in momentum space
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-310.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> Fourier transform back to position space
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-311.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> Multiply by the second half step potential evolution operator,
+which is diagonal in position space
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-312.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p></li></ul>
+<p></p>
+
+<p></p>
+<p>
+</p><div style="text-align:right;margin-right:2em"><a href="http://www.physics.buffalo.edu/phy410-505/topic6/wavepacket_fft.cpp.txt"><code><b>wavepacket_fft.cpp</b></code></a></div>
+<pre style="margin-left:4em">&nbsp;
+#include "wavepacket.hpp"
+&nbsp;
+Matrix&lt;complex&lt;double&gt;,1&gt;
+  T_exp_factor, V_exp_factor;   // precomputed phase rotations
+&nbsp;
+void initialize_phases()
+{
+    // initialize the phase rotation factors
+    T_exp_factor = Matrix&lt;complex&lt;double&gt;,1&gt;(N);
+    V_exp_factor = Matrix&lt;complex&lt;double&gt;,1&gt;(N);
+&nbsp;
+    for (int j = 0; j &lt; N; j++) {
+        // kinetic factor exp[-iT/h_bar dt]
+        const double pi = 4 * atan(1.0);
+        double p = j &lt; N / 2 ? j : j - N;
+        p *= h_bar * 2 * pi / L;
+        double theta = - p * p / (2 * mass) / h_bar * dt;
+        T_exp_factor[j] = complex&lt;double&gt;(cos(theta), sin(theta));
+&nbsp;
+        // potential factor exp[-iV(x)/(2h_bar) dt]
+        theta = - V(x[j]) / 2 / h_bar * dt;
+        V_exp_factor[j] = complex&lt;double&gt;(cos(theta), sin(theta));
+    }
+}
+&nbsp;
+void take_step() {
+&nbsp;
+    // first half potential phase rotation
+    for (int j = 0; j &lt; N; j++)
+        psi[j] *= V_exp_factor[j];
+&nbsp;
+    // FFT to momentum space
+    fft(psi);
+&nbsp;
+    // kinetic phase rotation
+    for (int j = 0; j &lt; N; j++)
+        psi[j] *= T_exp_factor[j];
+&nbsp;
+    // FFT back to position space
+    bool do_inverse = true;
+    fft_inv(psi);
+&nbsp;
+    // second half potential phase rotation
+    for (int j = 0; j &lt; N; j++)
+        psi[j] *= V_exp_factor[j];
+&nbsp;
+    t += dt;
+}
+&nbsp;
+int main() {
+&nbsp;
+    cout &lt;&lt; " Quantum Wavepacket Motion using FFT" &lt;&lt; endl;
+    initialize();
+    initialize_phases();
+&nbsp;
+    ofstream file("potential.data");
+    for (int i = 0; i &lt; N; i++)
+        file &lt;&lt; x[i] &lt;&lt; '\t' &lt;&lt; V(x[i]) &lt;&lt; '\n';
+    file.close();
+    cout &lt;&lt; " saved V(x) in file potential.data" &lt;&lt; endl;
+&nbsp;
+    save_psi(0);
+    int plots = 10;
+    for (int plot = 1; plot &lt;= plots; plot++) {
+        double delta_t = 0;
+        while (delta_t &lt; L / (plots * velocity)) {
+            take_step();
+            delta_t += dt;
+        }
+        save_psi(plot);
+    }
+&nbsp;
+    // simple gnuplot animation
+    int plot = 0;
+    while (true) {
+        fprintf(gnupipe, "set term %s\n", terminal.c_str());
+        fprintf(gnupipe, "plot \"psi_%d.data\" w l\n", plot);
+        plot = (plot+1) % (plots+1);
+        fflush(gnupipe);
+        time_t start_time = clock();
+        while (true) {
+            double secs = (clock() - start_time) / double(CLOCKS_PER_SEC);
+            if (secs &gt; 0.5)
+                break;
+        }
+    }
+}
+&nbsp;
+</pre>
+<p></p>
+
+<p></p>
+<p>
+</p><div style="text-align:right;margin-right:2em"><a href="http://www.physics.buffalo.edu/phy410-505/topic6/wavepacket.hpp.txt"><code><b>wavepacket.hpp</b></code></a></div>
+<pre style="margin-left:4em">&nbsp;
+// definitions for simple Gnuplot animation
+#include &lt;cstdio&gt;
+#ifdef _WIN32
+    string gnuplot = "env pgnuplot.exe -persist ";
+    string terminal = "windows";
+    FILE *gnupipe = _popen(gnuplot.c_str(), "w");
+#else
+    string gnuplot = "/usr/bin/env gnuplot -persist ";
+    string terminal = "x11";
+    FILE *gnupipe = popen(gnuplot.c_str(), "w");
+#endif
+&nbsp;
+void save_psi(int plot_number) {
+    ostringstream os;
+    os  &lt;&lt; "psi_" &lt;&lt; plot_number &lt;&lt; ".data";
+    string file_name(os.str());
+    ofstream file(file_name.c_str());
+    if (file)
+        cout &lt;&lt; " writing " &lt;&lt; file_name &lt;&lt; endl;
+    else
+        cerr &lt;&lt; " cannot open " &lt;&lt; file_name &lt;&lt; endl;
+    for (int i = 0; i &lt; N; i++)
+        file &lt;&lt; x[i] &lt;&lt; '\t' &lt;&lt; norm(psi[i]) &lt;&lt; '\t'
+             &lt;&lt; psi[i].real() &lt;&lt; '\t' &lt;&lt; psi[i].imag() &lt;&lt; '\n';
+    file.close();
+}
+&nbsp;
+</pre>
+<p></p>
+
+<h1>Finite Difference Methods for Schroedinger's Equation<a name="sec8"> </a></h1>
+
+<h2>Discretization using a Forward Time Centered Space (FTCS) Scheme</h2>
+
+<p>
+To solve this equation, we discretize space
+<img style="vertical-align:-6px" src="./Partial Differential Equations_files/tex-313.png"> in the spatial region
+<img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-314.png">, and time
+<img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-315.png">, and define <img style="vertical-align:-8px" src="./Partial Differential Equations_files/tex-316.png">
+and <img style="vertical-align:-6px" src="./Partial Differential Equations_files/tex-317.png">.
+</p>
+
+<p></p>
+<p>
+The discretized equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-318.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+can be solved explicitly} for the solution at the next time step
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-319.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+If we introduce the column vector of values of <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-320.png">
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-321.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+this equation can be written in matrix form
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-322.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+Here <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-323.png"> is the <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-324.png"> unit matrix, and <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-325.png"> is the
+discrete matrix representation of the Hamiltonian. Unfortunately, this
+scheme in unconditionally unstable. For example, is <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-326.png">
+happens to be an eigenvector
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-327.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+then
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-328.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+and the magnitude of the wavefunction
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-329.png">
+</div>
+<p></p>
+
+<h2>Backward Time Space Centered (BTCS) Implicit Differencing</h2>
+
+<p>
+If we choose to discretize the equation as follows
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-330.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+then it cannot} be solved explicitly} for the solution at
+the next time step because there are now three unknown quantities on
+the left hand side of
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-331.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+We need more equations to find the unknowns
+<img style="vertical-align:-8px" src="./Partial Differential Equations_files/tex-332.png">.
+In fact we need to use all <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-333.png"> equations, which can
+be written in matrix form
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-334.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+in order to obtain the solution at the next time step
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-335.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+It is easy to see that BTCS is unconditionally stable} by considering
+an eigenvector of <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-336.png"> with eigenvalue <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-337.png">:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-338.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+which implies that
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-339.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+Unfortunately, this stability implies that probability is not
+conserved!
+</p>
+
+<h2>Symmetric Time Space Centered (STCS) Crank-Nicolson Differencing</h2>
+
+<p>
+This scheme averages the FTCS and BTCS formulas
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-340.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+which leads to the matrix solution
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-341.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+It is easy to see that this scheme is unitary}
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-342.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+and conserves probability exactly:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-343.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+An additional advantage of this scheme is that it is one order of
+magnitude more accurate in time than FTCS or BTCS. Let us write the
+exact evolution operator for one time step <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-344.png"> schematically as
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-345.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-346.png">.
+The FTCS scheme corresponds to the following approximation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-347.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+while BTCS corresponds to
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-348.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+and the Crank-Nicolson scheme to
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-349.png">
+</div>
+<p></p>
+
+<h2>Sparse matrix methods for solving the Schroedinger equation</h2>
+
+<p>
+We have seen that solving the time-dependent Schroedinger equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-350.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+using the Crank-Nicolson algorithm is essentially a matrix inversion
+problem:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-351.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The standard Gaussian elimination techniques
+for solving a system of <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-352.png"> linear equations
+for <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-353.png"> unknowns, e.g., for finding the inverse of an <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-354.png">
+matrix, require <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-355.png"> operations. Assuming <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-356.png"> operations
+per second, the CPU time required to evolve the initial wave packet
+through 1,000 time steps on a lattice with <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-357.png"> points is
+<img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-358.png">~secs = 11.6 days.  Clearly this is unacceptably long.
+</p>
+
+<p></p>
+<p>
+In fact, the discrete lattice Hamiltonian matrix <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-359.png"> is a {\em
+sparse matrix}: most of its elements are zero, and the number of
+non-zero elements is <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-360.png"> and not <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-361.png">. There are
+very efficient algorithms for manipulation sparse matrices of
+particular types.  These methods are discussed for example in Section
+2.4 and Section 2.7 of Numerical Recipes.
+</p>
+
+<h2>Dirichlet Boundary Conditions: Tridiagonal Matrix</h2>
+
+<p>
+Let's examine the form of the matrix <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-362.png"> in the case of
+homogeneous Dirichlet boundary conditions <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-363.png">, which
+would be the appropriate choice for a particle in an infinitely deep
+potential well. Since the boundary values
+<img style="vertical-align:-7px" src="./Partial Differential Equations_files/tex-364.png">, the discretized Laplacian operator
+acting on <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-365.png"> takes the following form:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-366.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+As an example, if <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-367.png">, the form of <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-368.png"> is
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-369.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This matrix is tridiagonal} in form.
+</p>
+
+<p></p>
+<p>
+Since most of the matrix elements of a large tridiagonal matrix
+<img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-370.png"> are zero, it should be possible to solve a linear equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-371.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+with much fewer than <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-372.png"> operations, for example using
+the Thomas algorithm.
+</p>
+
+<h2>Periodic Boundary Conditions: Cyclic-Tridiagonal Matrix</h2>
+
+<p>
+In the case of periodic} boundary conditions
+<img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-373.png">, which would be appropriate to describe a particle
+confined to a ring of circumference <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-374.png">, <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-375.png"> and
+<img style="vertical-align:-7px" src="./Partial Differential Equations_files/tex-376.png">. In this case,
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-377.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+As an example, if <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-378.png">, the form of <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-379.png"> is
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-380.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+A matrix of this type is said to be cyclic-tridiagonal} in form.
+</p>
+
+<p></p>
+<p>
+A cyclic tridiagonal matrix is very close to being tridiagonal: only
+the two elements <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-381.png"> and <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-382.png"> differ from tridiagonal
+elements.  The Sherman-Morrison} formula can be used to obtain
+the solution of a linear equation involving a cyclic-tridiagonal
+matrix very efficiently in <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-383.png"> operations.
+</p>
+
+<h2>Program for wave packets in the Schroedinger equation</h2>
+
+<p>
+We would like to solve the time-dependent Schroedinger equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-384.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+using the Crank-Nicolson discretization formula
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-385.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+which is stable, conserves probability, and is <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-386.png">
+accurate in time. This matrix formula can be simplified by noting that
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-387.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-388.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+has the same tridiagonal (or cyclic tridiagonal) form as <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-389.png">.
+The discretized Schroedinger equation can thus be solved in two steps:
+First solve the linear equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-390.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+for <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-391.png"> from the known <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-392.png">, and then compute
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-393.png">
+</div>
+<p></p>
+
+<h2>Solving a Tridiagonal System of Equations</h2>
+
+<p>
+The inverse of a tridiagonal matrix in not} tridiagonal in form!
+For example,
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-394.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This implies that it would require <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-395.png"> operations to compute
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-396.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+if <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-397.png"> were known explicitly. In addition, storing the value
+of <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-398.png"> requires <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-399.png"> memory locations compared with
+only <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-400.png"> to store the non-zero elements of <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-401.png">. The
+Thomas algorithm} solves the tridiagonal system without}
+constructing <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-402.png">. The tridiagonal
+matrix elements of <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-403.png"> in the Schroedinger problem have the
+following values:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-404.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-405.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The Thomas algorithm applied to this problem can be summarized as follows:
+</p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<p></p>
+
+<p></p>
+<p>
+</p><li> Set <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-406.png"> and <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-407.png">.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> Perform the forward elimination iteration
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-408.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> Set <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-409.png">.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> Perform the backsubstitution iteration
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-410.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p></li></ul>
+<p></p>
+
+<h2>Periodic Boundary Conditions: Sherman-Morrison Formula</h2>
+
+<p>
+It requires a little more work to solve the equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-411.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+when <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-412.png"> is cyclic tridiagonal,
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-413.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This matrix can be simplified by defining two vectors <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-414.png"> and
+<img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-415.png"> and their outer product} <img style="vertical-align:-2px" src="./Partial Differential Equations_files/tex-416.png">
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-417.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-418.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-419.png"> and will be chosen later.
+We can then decompose
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-420.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The matrix <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-421.png"> is tridiagonal. The Sherman-Morrison formula}
+allows us to solve for <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-422.png"> by first solving the
+two equations
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-423.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+for <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-424.png"> and <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-425.png"> using the Thomas algorithm, and then computing
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-426.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+Numerical Recipes} recommends choosing <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-427.png"> to avoid
+potential loss of precision in applying the Thomas algorithm to the
+matrix <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-428.png">.  For a derivation of the Sherman-Morrison formula
+and discussion of cyclic tridiagonal matrices, see Section 2.7 of
+Numerical Recipes.
+</p>
+
+<p></p>
+<p>
+</p><div style="text-align:right;margin-right:2em"><a href="http://www.physics.buffalo.edu/phy410-505/topic6/wavepacket.cpp.txt"><code><b>wavepacket.cpp</b></code></a></div>
+<pre style="margin-left:4em">&nbsp;
+#include "wavepacket.hpp"
+&nbsp;
+// define names for complex numbers and vectors
+typedef complex&lt;double&gt; cdouble;
+typedef Matrix&lt;cdouble,1&gt; cvector;
+&nbsp;
+cvector chi;                    // complex wavefunction
+cvector a, b, c;                // to represent tridiagonal elements of Q
+cdouble alpha, beta;            // corner elements of Q
+&nbsp;
+void initialize_chi_and_Q ()
+{
+    // create and initialize vectors to zero
+    chi = cvector(N);
+    a = b = c = cvector(N);
+&nbsp;
+    // elements of tridiagonal matrix Q = (1/2)(1 + i dt H / (2 hbar))
+    const cdouble i(0.0, 1.0);
+    for (int j = 0; j &lt; N; j++) {
+        a[j] = - i * dt * h_bar / (8 * mass * dx * dx);
+        b[j] = 0.5 + 1j * dt / (4 * h_bar) *
+              (V(x[j]) + h_bar * h_bar / (mass * dx * dx));
+        c[j] = a[j];
+    }
+    alpha = c[N-1];
+    beta = a[0];
+}
+&nbsp;
+cvector solve_tridiagonal(cvector&amp; a, cvector&amp; b, cvector&amp; c, cvector&amp; r) {
+    // solve Ax = r where A is tridiagonal with diagonals (a, b, c) and return x
+    int n = r.size();
+    cvector x(n), gama(n);
+    cdouble beta = b[0];
+    x[0] = r[0] / beta;
+    for (int j = 1; j &lt; n; j++) {
+        gama[j] = c[j-1] / beta;
+        beta = b[j] - a[j] * gama[j];
+        x[j] = (r[j] - a[j] * x[j-1]) / beta;
+    }
+    for (int j = n-2; j &gt;= 0; j--)
+        x[j] -= gama[j+1] * x[j+1];
+    return x;
+}
+&nbsp;
+cvector solve_tridiagonal_cyclic(
+    cvector&amp; a, cvector&amp; b, cvector&amp; c, cvector&amp; r,
+    complex&lt;double&gt; alpha, complex&lt;double&gt; beta)
+{
+    // solve Ax = r where A is tridagonal with corner elements alpha, beta
+    int n = r.size();
+    cvector x(n), b_prime(n), u(n), z(n);
+    cdouble gama = -b[0];
+    b_prime[0] = b[0] - gama;
+    b_prime[n-1] = b[n-1] - alpha * beta / gama;
+    for (int j = 1; j &lt; n; j++)
+        b_prime[j] = b[j];
+    x = solve_tridiagonal(a, b_prime, c, r);
+    u[0] = gama;
+    u[n-1] = alpha;
+    for (int j = 1; j &lt; n-1; j++)
+        u[j] = 0;
+    z = solve_tridiagonal(a, b_prime, c, u);
+    cdouble fact = x[0] + beta * x[n-1] / gama;
+    fact /= 1.0 + z[0] + beta * z[n-1] / gama;
+    for (int j = 0; j &lt; n; j++)
+        x[j] -= fact * z[j];
+    return x;
+}
+&nbsp;
+void take_step () {              // time step using sparse matrix routines
+    if (periodic)
+        chi = solve_tridiagonal_cyclic(a, b, c, psi, alpha, beta);
+    else
+        chi = solve_tridiagonal(a, b, c, psi);
+    for (int j = 0; j &lt; N; j++)
+        psi[j] = chi[j] - psi[j];
+    t += dt;
+&nbsp;
+}
+&nbsp;
+int main() {
+&nbsp;
+    cout &lt;&lt; " Quantum Wavepacket Motion" &lt;&lt; endl;
+    initialize();
+    initialize_chi_and_Q();
+&nbsp;
+    ofstream file("potential.data");
+    for (int i = 0; i &lt; N; i++)
+        file &lt;&lt; x[i] &lt;&lt; '\t' &lt;&lt; V(x[i]) &lt;&lt; '\n';
+    file.close();
+    cout &lt;&lt; " saved V(x) in file potential.data" &lt;&lt; endl;
+&nbsp;
+    save_psi(0);
+    int plots = 10;
+    for (int plot = 1; plot &lt;= plots; plot++) {
+        double delta_t = 0;
+        while (delta_t &lt; L / (plots * velocity)) {
+            take_step();
+            delta_t += dt;
+        }
+        save_psi(plot);
+    }
+&nbsp;
+    // simple gnuplot animation
+    int plot = 0;
+    while (true) {
+        fprintf(gnupipe, "set term %s\n", terminal.c_str());
+        fprintf(gnupipe, "plot \"psi_%d.data\" w l\n", plot);
+        plot = (plot+1) % (plots+1);
+        fflush(gnupipe);
+        time_t start_time = clock();
+        while (true) {
+            double secs = (clock() - start_time) / double(CLOCKS_PER_SEC);
+            if (secs &gt; 0.5)
+                break;
+        }
+    }
+}
+&nbsp;
+</pre>
+<p></p>
+
+<h1>Hyperbolic Wave Equations<a name="sec9"> </a></h1>
+
+<h2>The Linear Light Wave Equation</h2>
+
+<p>
+The wave equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-429.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-430.png"> is the wave speed, and <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-431.png"> is a given source function,
+is a typical hyperbolic PDE.
+</p>
+
+<p></p>
+<p>
+This equation has a unique solution if
+</p><ul style="margin-left:5%;margin-right:5%">
+<li> initial values} of <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-432.png">
+and <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-433.png"> are specified at some
+time <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-434.png">, and
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> boundary values} are specified on the boundaries of
+a closed region.
+</li></ul>
+<p></p>
+
+<p></p>
+<p>
+The one-dimensional wave equation}
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-435.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-436.png"> is the wave speed, is the simplest example of a hyperbolic
+equation.
+</p>
+
+<p></p>
+<p>
+The wave equation on the infinite interval <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-437.png"> actually
+factorizes into simpler first order equations:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-438.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The equation is linear,
+and the solution can be expressed as a superposition of left-moving}
+and right-moving} waves
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-439.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-440.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where the left-mover function <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-441.png"> and the right-mover function <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-442.png"> are
+determined by the initial conditions. These left- and right-movers are
+waveforms which propagate independently of one another with constant
+velocities <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-443.png">, and without changing their respective shapes! On a
+finite interval the left- and right-movers cannot in general be chosen
+independently: they must cooperate to satisfy the boundary conditions.
+For example, Dirichlet boundary conditions can be satisfied by a
+standing wave, which has both left- and right-moving components.
+</p>
+
+<h2>The Simple Advection Equation</h2>
+
+<p>
+The right-mover equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-444.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+which has the analytical solution
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-445.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-446.png"> is the initial condition at <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-447.png">, is an example of an
+advective equation.
+</p>
+
+<p></p>
+<p>
+<b>Advection</b> is a process in which a property <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-448.png"> at some
+point <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-449.png"> and time <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-450.png"> is determined by the shape of the
+function <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-451.png"> as it is carried past that point. This behavior is typical of
+fluid flow, for example: the density of the fluid at a point in space
+is determined by the density of the fluid element that happens to flow
+past that point at that time.
+</p>
+
+<p></p>
+<p>
+Contrast this with convection} in which the density of the fluid
+element is determined by its position in space: hotter fluid is less
+dense and rises, and colder fluid is more dense and sinks; and the
+density changes as the fluid moves.
+</p>
+
+<h3>Flux-Conservative Equations in One Dimension</h3>
+
+<p>
+The simple advective equation above is an example of a
+flux-conservative} equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-452.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-453.png"> is a vector of functions, and the vector
+<img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-454.png"> is called the conserved flux} of <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-455.png">. These
+one-dimensional PDE's are discussed in Numerical Recipes Section 19.1.
+</p>
+
+<p></p>
+<p>
+Suppose that <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-456.png"> represents the density of fluid at point <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-457.png"> at
+time <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-458.png">. The total amount (mass) of fluid between the boundaries
+<img style="vertical-align:-6px" src="./Partial Differential Equations_files/tex-459.png"> is
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-460.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The rate of change of fluid in the region is
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-461.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-462.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+which shows that <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-463.png"> can be interpreted as the fluid flux},
+that is, the mass of fluid flowing in the positive <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-464.png"> direction per
+unit time across an imaginary boundary located at <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-465.png"> and at time <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-466.png">.
+The fluid moves such that its mass is conserved.
+</p>
+
+<h3>FTCS Algorithm for the Advective Equation</h3>
+
+<p>
+One possible discretization of the simple advective equation is
+obtained by introducing a spatial lattice
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-467.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+and a time step <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-468.png"> so that <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-469.png">. Let <img style="vertical-align:-8px" src="./Partial Differential Equations_files/tex-470.png">.
+</p>
+
+<p></p>
+<p>
+The FTCS marching algorithm with this discretization is
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-471.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+Note that the spatial derivative has been approximated by a symmetric}
+difference
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-472.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+Unfortunately, it turns out that this algorithm is unstable no matter
+how small the time step <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-473.png"> is made! This can be shown using
+von Neumann stability analysis. A mode
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-474.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+with wave number <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-475.png"> gets amplified by a factor <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-476.png">, which is easily
+computed from the recurrence
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-477.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+Since <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-478.png"> for any mode, the FTCS algorithm is unconditionally unstable.
+</p>
+
+<h3>The Lax and Lax-Wendroff Methods</h3>
+
+<p>
+Lax modified the FTCS recurrence as follows:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-479.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+It is easy to see that the mode amplification factor is
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-480.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-481.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+Note that <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-482.png"> if <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-483.png">, which implies exact flux
+conservation for each mode! If <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-484.png"> modes will grow, making the
+solution unstable.  However, if <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-485.png"> the modes will all damp to
+zero, which also does not conserve flux! So for the Lax method to give
+reasonable results, <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-486.png"> should be chosen close to <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-487.png"> and a
+little smaller so that large <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-488.png"> modes are damped.
+</p>
+
+<p></p>
+<p>
+The condition for stability
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-489.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+is the famous Courant-Friedrichs-Lewy criterion. The ratio
+on the left side of this condition is called the CFL number},
+and is especially important in computational fluid dynamics.
+</p>
+
+<p></p>
+<p>
+The criterion has a simple interpretation show in the figure.
+Consider the domain of dependency}, shown shaded, which consists
+of all points in the past from which information can propagate at
+or slower than the wave speed <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-490.png">.
+For any differencing scheme, the differencing domain} consists of
+the set of points used to determine the next value of the solution.
+</p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<p></p>
+
+<p></p>
+<p>
+</p><li> If the differencing domain is wider in <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-491.png"> than the domain of
+dependency, then the algorithm is CFL stable.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> If the differencing domain is narrower in <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-492.png"> than the domain of
+dependency, then the algorithm is CFL unstable.
+<p></p>
+
+<p></p>
+<p>
+</p></li></ul>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/courant.png">
+<br>
+</div>
+<p></p>
+
+<p></p>
+<p>
+The Lax-Wendroff method attempts to improve the solution accuracy by
+including terms of order <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-493.png"> in the discretization:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-494.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+Here we have used <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-495.png">.
+</p>
+
+<p></p>
+<p>
+The stability criterion for the Lax-Wendroff method is
+discussed in Numerical Recipes: it turns out to be the same
+Courant-Friedrichs-Lewy criterion} <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-496.png">
+as in the Lax
+method. The Lax-Wendroff method is considerably more accurate than the
+Lax method for the same time step <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-497.png">.
+</p>
+
+<p></p>
+<p>
+Note that the added term of <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-498.png"> has the form of a
+diffusion term in the diffusion equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-499.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+which discretizes as
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-500.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+In general, a diffusive term in a recurrence
+formula has a damping effect on the solution amplitude.
+</p>
+
+<h2>Codes to Solve the Advection Equation</h2>
+
+<p>
+The instabilities of the FTCS, Lax, and Lax-Wendroff methods are
+demonstrated by running the codes:
+</p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<p></p>
+
+<p></p>
+<p>
+</p><li> The FTCS method shows exponentially growing runaway modes if it is
+run long enough.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> The Lax method solution either damps rapidly to zero or grows
+uncontrollably if <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-501.png"> is very different from <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-502.png">.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> The Lax-Wendroff method mitigates the instabilities in the Lax method.
+<p></p>
+
+<p></p>
+<p>
+</p></li><li> The Lax-Wendroff method develops spurious oscillations with
+the step function waveform.
+<p></p>
+
+<p></p>
+<p>
+</p></li></ul>
+<p></p>
+
+<p></p>
+<p>
+</p><div style="text-align:right;margin-right:2em"><a href="http://www.physics.buffalo.edu/phy410-505/topic6/advection.cpp.txt"><code><b>advection.cpp</b></code></a></div>
+<pre style="margin-left:4em">&nbsp;
+#include "cptstd.hpp"
+#include "matrix.hpp"
+using namespace cpt;
+&nbsp;
+#include &lt;cstdio&gt;
+#ifdef _WIN32
+    string gnuplot = "env pgnuplot.exe ";
+    string terminal = "windows";
+    FILE *gnupipe = _popen(gnuplot.c_str(), "w");
+#else
+    string gnuplot = "/usr/bin/env gnuplot ";
+    string terminal = "x11";
+    FILE *gnupipe = popen(gnuplot.c_str(), "w");
+#endif
+&nbsp;
+const double pi = 4 * atan(1.0);
+&nbsp;
+double L = 5.0;                 // system size
+int N;                          // number of grid intervals
+double dx;                      // grid spacing
+double c = 1;                   // wave speed
+double t;                       // time
+double dt;                      // time step
+void (*method)();               // integration algorithm
+Matrix&lt;double,1&gt; x;             // grid points
+Matrix&lt;double,1&gt; u, u_new;      // wave amplitude
+int step_number;                // step number
+bool step_wave;                 // otherwise Gaussian modulate cosine
+&nbsp;
+double f_0(double x) {        // initial waveform
+&nbsp;
+    double x_0 = L / 2;
+    double sigma = 0.1 * L;   // width of initial waveform
+&nbsp;
+    if (step_wave) {
+        if (abs(x - x_0) &lt; sigma)
+            return 1;
+        else
+            return 0;
+    } else {
+        double k = pi / sigma;
+        double gaussian = exp(- (x - x_0) * (x - x_0) / (2 * sigma * sigma));
+        return cos(k * (x - x_0)) * gaussian;
+    }
+}
+&nbsp;
+void initialize() {
+&nbsp;
+    dx = L / double(N);         // grid spacing
+&nbsp;
+    // initialize the spatial grid
+    x = Matrix&lt;double,1&gt;(N+1);
+    for (int i = 0; i &lt;= N; i++)
+        x[i] = i * dx;
+&nbsp;
+    // initialize the solution vector
+    u = Matrix&lt;double,1&gt;(N+1);
+    u_new = Matrix&lt;double,1&gt;(N+1);
+    for(int i = 0; i &lt;= N; i++)
+        u[i] = f_0(x[i]);
+&nbsp;
+    t = 0;
+    step_number = 0;
+}
+&nbsp;
+void FTCS() {
+    for (int i = 0; i &lt;= N; i++) {
+        int i_plus_1 = i &lt; N ? i + 1 : 0;
+        int i_minus_1 = i &gt; 0 ? i - 1 : N;
+        u_new[i] = u[i] - c * dt / (2 * dx) * (u[i_plus_1] - u[i_minus_1]);
+    }
+}
+&nbsp;
+void Lax() {
+    for (int i = 0; i &lt;= N; i++) {
+        int i_plus_1 = i &lt; N ? i + 1 : 0;
+        int i_minus_1 = i &gt; 0 ? i - 1 : N;
+        u_new[i] = (u[i_plus_1] + u[i_minus_1]) / 2
+                  - c * dt / (2 * dx) * (u[i_plus_1] - u[i_minus_1]);
+    }
+}
+&nbsp;
+void Lax_Wendroff() {
+    double D = c * c * dt * dt / (2 * dx * dx);
+    for (int i = 0; i &lt;= N; i++) {
+        int i_plus_1 = i &lt; N ? i + 1 : 0;
+        int i_minus_1 = i &gt; 0 ? i - 1 : N;
+        u_new[i] = u[i] - c * dt / (2 * dx) * (u[i_plus_1] - u[i_minus_1])
+                   + D * (u[i_plus_1] + u[i_minus_1] - 2 * u[i]);
+    }
+}
+&nbsp;
+void take_step() {
+    method();
+    u = u_new;
+    t += dt;
+    ++step_number;
+}
+&nbsp;
+void save_u(int plot_number) {
+    ostringstream os;
+    os  &lt;&lt; "u_" &lt;&lt; plot_number &lt;&lt; ".data";
+    string file_name(os.str());
+    ofstream file(file_name.c_str());
+    if (file)
+        cout &lt;&lt; " writing " &lt;&lt; file_name &lt;&lt; endl;
+    else
+        cerr &lt;&lt; " cannot open " &lt;&lt; file_name &lt;&lt; endl;
+    for (int i = 0; i &lt; N; i++)
+        file &lt;&lt; x[i] &lt;&lt; '\t' &lt;&lt; u[i] &lt;&lt; '\n';
+    file.close();
+}
+&nbsp;
+int main()
+{
+    cout &lt;&lt; " Finite Difference solution of the Advection Equation\n"
+         &lt;&lt; " Choose a numerical method: 1) FTCS, 2) Lax, 3) Lax-Wendroff : ";
+    int m;
+    cin &gt;&gt; m;
+    method = FTCS;
+    if (m == 2)
+        method = Lax;
+    if (m == 3)
+        method = Lax_Wendroff;
+    cout &lt;&lt; " Enter number of grid cells: ";
+    cin &gt;&gt; N;
+    cout &lt;&lt; " Time for wave to move one grid spacing is " &lt;&lt; L/(N*c) &lt;&lt; endl;
+    cout &lt;&lt; " Enter time step dt: ";
+    cin &gt;&gt; dt;
+&nbsp;
+    initialize();
+    int plots = 10;
+    save_u(0);
+    for (int plot = 0; plot &lt; plots; plot++) {
+        double delta_t = 0;
+        while (delta_t &lt; L / (c * plots)) {
+            take_step();
+            delta_t += t;
+        }
+        save_u(plot+1);
+    }
+&nbsp;
+    // simple Gnuplot pipes animation
+    cout &lt;&lt; " Enter animation time: ";
+    double t_max;
+    cin &gt;&gt; t_max;
+    initialize();
+    double frame_rate = 30;
+    double dt_frame = 1 / frame_rate;
+    int steps_per_frame = max(1, int(dt_frame / dt));
+    while (t &lt; t_max) {
+        ostringstream os;
+        os &lt;&lt; "plot \'-\' with impulses\n";
+        for (int i = 0; i &lt; N; i++)
+            os &lt;&lt; x[i] &lt;&lt; '\t' &lt;&lt; u[i] &lt;&lt; '\n';
+        os &lt;&lt; "e\n";
+        fprintf(gnupipe, "%s", os.str().c_str());
+        fflush(gnupipe);
+        time_t start_time = clock();
+        for (int step = 0; step &lt; steps_per_frame; step++) {
+            take_step();
+            t += dt;
+        }
+        while (true) {
+            double secs = (clock() - start_time) / double(CLOCKS_PER_SEC);
+            if (secs &gt; dt_frame)
+                break;
+        }
+    }
+    fclose(gnupipe);
+}
+&nbsp;
+</pre>
+<p></p>
+
+<h1>Creutz Wavetank Simulations<a name="sec10"> </a></h1>
+
+<p>
+Dr. Michael Creutz, a computational physicist at Brookhaven National
+Laboratory who works on Lattice Gauge Theory, has coded simulations
+of various models, which he calls
+<a href="http://thy.phy.bnl.gov/www/xtoys/xtoys.html">Xtoys</a>.
+His programs are highly-optimized low-level codes written in C for the
+<a href="http://en.wikipedia.org/wiki/X_Window_System">X Window System</a>.
+</p>
+
+<p></p>
+<p>
+One of the codes
+<a href="http://thy.phy.bnl.gov/www/xtoys/schrodinger.c">schrodinger.c</a>
+solves the one-dimensional Schroedinger equation with a smoothly varying
+potential.
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/schrodinger.png" width="50%">
+<br>
+</div>
+<p></p>
+
+<p></p>
+<p>
+Another code
+<a href="http://thy.phy.bnl.gov/www/xtoys/xwaves.c">xwaves.c</a> simulates
+waves in a tank with periodic boundary conditions.
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/wavetank.png" width="50%">
+<br>
+</div>
+<p></p>
+
+<h3>User Guide for Xwaves</h3>
+
+<p>
+The following is extracted from
+<a href="http://thy.phy.bnl.gov/www/xtoys/xwaves.txt">xwaves.txt</a>.
+</p>
+
+<p></p>
+<p>
+The program illustrates the behaviors of three common wave equations,
+differing in the relation between the frequency <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-503.png"> and the wave number
+<img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-504.png">.
+</p>
+
+<p></p>
+<p>
+</p><ul style="margin-left:5%;margin-right:5%">
+<p></p>
+
+<p></p>
+<p>
+</p><li>
+The first is the simple wave equation with <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-505.png"> proportional to
+<img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-506.png">; this is the equation obeyed by free photons
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-507.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p></li><li>
+The second is the
+<a href="http://en.wikipedia.org/wiki/Klein-Gordon_equation">Klein-Gordon equation</a>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-508.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+with <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-509.png"> proportional to <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-510.png"> with <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-511.png"> a constant (using units
+<img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-512.png">) representing a particle mass, say that of the electron or a pion.
+</p>
+
+<p></p>
+<p>
+</p></li><li>
+The third is the equation for long wavelength water waves, which obey
+<img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-513.png">.
+<p></p>
+
+<p></p>
+<p>
+</p></li></ul>
+<p></p>
+
+<p></p>
+<p>
+The program starts with wave packets cycling around the periodic
+boundary conditions.  The equation is that for light, and the wave
+packets move with the same velocity as the short waves of which they
+are composed.
+</p>
+
+<p></p>
+<p>
+Clicking on the "mesons" button causes the mass term of the
+Klein-Gordon equation to be turned on.  Note how the short components now
+move faster than the packets.  This illustrates how the group velocity
+of a wave equation can differ from the phase velocity.  For the
+Klein-Gordon equation, the phase velocity exceeds the speed of light,
+but this is not a problem because information is carried only by wave
+packets, which move at the group velocity.  The latter is always less
+than the speed of light.
+</p>
+
+<p></p>
+<p>
+Selecting the water button shows a similar effect.  In this case the
+group velocity is exactly one half the phase velocity.  This follows
+from the frequency going as the square root of the wavelength.  This
+is my favorite example of an interesting result following from
+dimensional analysis.
+</p>
+
+<p></p>
+<p>
+Mathematically, the phase velocity <img style="vertical-align:-6px" src="./Partial Differential Equations_files/tex-514.png"> of a wave equation is given by
+the relation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-515.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+while the group velocity <img style="vertical-align:-6px" src="./Partial Differential Equations_files/tex-516.png"> is
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-517.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+Only for the simple wave equation are these equal.
+</p>
+
+<p></p>
+<p>
+<a href="http://en.wikipedia.org/wiki/Ocean_surface_wave#Science_of_waves">Surface waves</a> travel with speed
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-518.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-519.png"> is the acceleration of gravity and <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-520.png"> the water depth.
+Deep water is defined as <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-521.png">,
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-522.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+which gives a group velocity
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-523.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The program has a variety of other buttons to play with.  The
+"quit," "pause," and "slow" buttons do the obvious things.  A
+mouse click in the wave portion of the window will insert a
+disturbance, much like throwing a rock into a pond.  The "damp"
+button slowly damps out any waves present, while "vacuum" settles
+the system immediately.  The "reverse" button reverses the motion of
+all waves.  The "right" button eliminates all left moving waves.
+Pressing "packet" restores the initial two packet state.
+</p>
+
+<p></p>
+<p>
+The "blob" gadget changes the display so the waves run around a
+spherical blob rather than along the periodic line.  The "drift"
+button lets that blob drift around and bounce off the window walls.
+It has no effect when not in the blob display mode.  A highly excited
+drifting blob with the slow button seems like a blend of Matisse with
+a lava lamp.
+</p>
+
+<p></p>
+<p>
+For each one of the three equations, try calming the state with the
+vacuum button and then exciting a pulse with a mouse click.  Observe
+how the light equation gives a pulse dividing into oppositely moving
+pieces that move without changing shape.  With the meson equation, an
+oscillating central region emits at first short wavelengths followed
+by longer ones.  With water, the long waves are the first to leave the
+excitation region.
+</p>
+
+<p></p>
+<p>
+Some technical details: The waves are displayed using the Xlib routine
+<code>XPolyFill()</code> with 256 points on the wave surface.  To avoid
+discretization errors, the evolution is calculated in momentum space
+and then a fast Fourier transform gives the position space
+coordinates.  You can easily obtain other wave equations by modifying
+the routine <code>makedispersion()</code>.
+</p>
+
+<h2>Simpler Gnuplot Wavetank Code</h2>
+
+<p>
+</p><div style="text-align:right;margin-right:2em"><a href="http://www.physics.buffalo.edu/phy410-505/topic6/wavetank.cpp.txt"><code><b>wavetank.cpp</b></code></a></div>
+<pre style="margin-left:4em">&nbsp;
+#include "cptstd.hpp"
+#include "linalg.hpp"
+#include "graphics.hpp"
+using namespace cpt;
+&nbsp;
+const double pi = 4 * atan(1.0);
+&nbsp;
+typedef complex&lt;double&gt; cdouble;
+typedef Matrix&lt;cdouble,1&gt; cvector;
+&nbsp;
+double t;                   // time
+double L = 2 * pi;          // size of wavetank
+int N = 1024;               // number of grid intervals
+double c = 1;               // wave speed constant
+double g = 9.8;             // acceleration of gravity
+cvector u, u_0;             // wave amplitude and initial profile
+double center = L / 2;      // initial position
+double width = 0.1;         // width of initial Gaussian
+&nbsp;
+void initialize_wave()
+{
+    t = 0;
+    u = cvector(N);
+    for (int j = 0; j &lt; N; j++) {
+        double x = j * L / N;
+        const cdouble i(0.0, 1.0);
+        u[j] = exp( - pow((x - center) / width, 2.0) / 2 );
+    }
+    u_0 = u;
+    fft(u_0);
+}
+&nbsp;
+enum equation_type { light, meson, water, n_equations } equation;
+string equation_name[] = { "Light Waves", "Meson Waves", "Water Waves" };
+&nbsp;
+double m = 1;               // meson mass
+&nbsp;
+double omega(double k)
+{
+    double omega = 0;
+    switch (equation) {
+    default:
+    case light:
+        omega = c * abs(k);
+        break;
+    case meson:
+        omega = sqrt(pow(c * k, 2.0) + pow(m * c * c, 2.0));
+        break;
+    case water:
+        omega = sqrt(g * abs(k));
+        break;
+    }
+    return omega;
+}
+&nbsp;
+double dt;          // time step
+string data_file_name("wavetank.data"),
+    gnuplot_file_name("wavetank.gnu");
+&nbsp;
+void take_step()
+{
+    // compute time-evolved normal modes
+    for (int j = 0; j &lt; N; j++) {
+        double k = j;
+        if (j &gt; N / 2)
+            k -= N;
+        u[j] = u_0[j] * cos(omega(k) * t);
+    }
+&nbsp;
+    // transform to position space
+    fft_inv(u);
+&nbsp;
+    t += dt;
+&nbsp;
+    // write wave profile in data file for Gnuplot animation
+    ofstream data_file(data_file_name.c_str());
+    for (int j = 0; j &lt; N; j++) {
+        double x = j * L / N;
+        data_file &lt;&lt; x &lt;&lt; '\t' &lt;&lt; u[j].real() &lt;&lt; '\n';
+    }
+    data_file.close();
+&nbsp;
+    // write Gnuplot commands in gnuplot file
+    ofstream gnuplot_file(gnuplot_file_name.c_str());
+    gnuplot_file
+        &lt;&lt; "set title \"" &lt;&lt; equation_name[equation] &lt;&lt; "\"\n"
+        &lt;&lt; "set xrange [0:" &lt;&lt; L &lt;&lt; "]\n"
+        &lt;&lt; "set yrange [-1:1]\n"
+        &lt;&lt; "set xlabel \"x\"\n"
+        &lt;&lt; "set ylabel \"u(x,t)\"\n"
+        &lt;&lt; "unset label\n"
+        &lt;&lt; "set label \"t = " &lt;&lt; t &lt;&lt; "\" at 0.1,0.9\n"
+        &lt;&lt; "plot \'" &lt;&lt; data_file_name &lt;&lt; "\' notitle with filledcurve y1=0\n";
+    gnuplot_file.close();
+}
+&nbsp;
+int main()
+{
+    cout &lt;&lt; " Wavetank Gnuplot Animation\n"
+         &lt;&lt; " 0 = light waves, 1 = mesons, 2 = water waves\n"
+         &lt;&lt; " Enter equation type 0, 1, or 2: ";
+    int n;
+    cin &gt;&gt; n;
+    if (n &gt;= 0 &amp;&amp; n &lt; n_equations)
+        equation = equation_type(n);
+    initialize_wave();
+&nbsp;
+    // simple Gnuplot pipes animation
+    Gnuplot gnuplot;
+    gnuplot.set_step_callback(take_step);
+&nbsp;
+    cout &lt;&lt; " Enter animation frame rate: ";
+    double frame_rate = 24;             // animation frames per second
+    cin &gt;&gt; frame_rate;
+    gnuplot.set_frame_rate(frame_rate);
+    dt = 1 / frame_rate;
+&nbsp;
+    cout &lt;&lt; " Enter total animation time: ";
+    double t_max;
+    cin &gt;&gt; t_max;
+    gnuplot.clear_commands();
+    gnuplot.add_command("load \'" + gnuplot_file_name + "\'");
+&nbsp;
+    gnuplot.animate(int(t_max * frame_rate));
+}
+&nbsp;
+</pre>
+<p></p>
+
+<h1>Nonlinear Wave Equations: Solitons and Shocks<a name="sec11"> </a></h1>
+
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/soliton1m.gif" width="30%">
+<br>
+<a href="http://www.ma.hw.ac.uk/solitons/press.html">J.
+Scott Russell's Soliton Wave Re-created</a>
+</div>
+<p></p>
+
+<p></p>
+<p>
+We have seen that the one-dimensional wave equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-524.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+describes independent right- and left-moving waves which preserve their
+shape.
+</p>
+
+<p></p>
+<p>
+This equation is  <b> linear </b>  in the wave amplitude <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-525.png">.
+Why do the right- and left moving waves preserve their shape?
+The answer is that the wave equation also has  <b> linear dispersion </b> .
+</p>
+
+<p></p>
+<p>
+Recall that dispersion is the relation between wave number and frequency.
+Assume a plane wave solution:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-526.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This shows that all right-moving modes with frequency <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-527.png"> and
+wavenmber <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-528.png"> have the  <b> same </b>  velocity <img style="vertical-align:-2px" src="./Partial Differential Equations_files/tex-529.png">, and all left-moving
+modes have velocity <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-530.png">. Since the speed of each mode is
+independent of its wavelength, the left- and right-moving waves
+preserve their shape!
+</p>
+
+<h3>Dispersion</h3>
+
+<p>
+Dispersion occurs when the velocity of a wave component depends on its
+wavelength. A simple example of a dispersive wave equation is
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-531.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+Plugging a plane wave <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-532.png"> in this equation gives the
+nonlinear dispersion relation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-533.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The phase velocity <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-534.png"> depends on the wave number <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-535.png">.
+This implies that the different plane wave components that make up a
+wave form travel with different speeds, and the wave form therefore
+changes it shape or  <b> disperses </b>.
+</p>
+
+<h3>Dissipation or Diffusion</h3>
+
+<p>
+Adding a diffusive term to the advection equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-536.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-537.png"> is a positive  <b> diffusion constant </b>,
+causes the amplitude of the wave amplitude to  <b> dissipate </b>.
+</p>
+
+<p></p>
+<p>
+Plugging
+the plane wave function <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-538.png"> into this equation gives
+the dispersion relation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-539.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+which shows that every mode with <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-540.png"> damps exponentially to zero.
+</p>
+
+<h3>Nonlinearity</h3>
+
+<p>
+An example of a nonlinear equation with traveling wave solutions
+is
+<a href="http://en.wikipedia.org/wiki/Burgers'_equation" title="http://en.wikipedia.org/wiki/Burgers&#39;_equation">Burgers' equation</a>
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-541.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-542.png"> and <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-543.png"> are constants, and <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-544.png"> is the density
+of the wave. The term <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-545.png"> is  <b> nonlinear </b>
+in the wave amplitude <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-546.png">.
+</p>
+
+<p></p>
+<p>
+It is easy to see that Burgers' equation has the solution
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-547.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+by calculating the partial derivatives
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-548.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-549.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This implicit solution describes a right-moving wave with velocity
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-550.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+that  <b> depends on the density of the wave </b>! The dependence of the wave
+velocity on its amplitude leads to many fascinating effects such as
+ <b> breaking </b>  and formation of  <b> shock fronts </b>.
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/300px-Great_Wave_off_Kanagawa2.jpg" width="40%">
+<br>
+<a href="http://en.wikipedia.org/wiki/The_Great_Wave_off_Kanagawa">
+The Great Wave off Kanagawa</a>
+</div>
+<p></p>
+
+<p></p>
+<p>
+Here are some interesting
+<a href="http://lyman.c.u-tokyo.ac.jp/~hachisu/java.shtml" title="http://lyman.c.u-tokyo.ac.jp/~hachisu/java.shtml">Java applets</a>
+on the motion of waves in one dimension.
+</p>
+
+<h2>Russell's Solitary Wave and the Korteweg-deVries Equation</h2>
+
+<p>
+<a href="http://www.ma.hw.ac.uk/~chris/scott_russell.html" title="http://www.ma.hw.ac.uk/~chris/scott_russell.html">John Scott Russell</a>
+built a <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-551.png"> wave tank in his backyard.
+Dropping a weight at one end of the channel produced a solitary
+ <b> gravity wave </b>  with speed
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-552.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-553.png"> is the height of undisturbed water in the channel,
+<img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-554.png"> is the wave amplitude, and <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-555.png"> is the acceleration of gravity.
+Note that larger amplitude waves move faster than smaller amplitude waves.
+He observed a compound wave which split into two with larger one
+racing ahead of the smaller.
+</p>
+
+<p></p>
+<p>
+<a href="http://en.wikipedia.org/wiki/Wave_pool" title="http://en.wikipedia.org/wiki/Wave_pool">Wave pools</a>
+in amusement parks operate on a similar principle, using a
+plunger at one end of pool, blowing air on surface at one end, or dumping
+a large volume of water at one end.
+</p>
+
+<p></p>
+<p>
+<a href="http://en.wikipedia.org/wiki/Joseph_Valentin_Boussinesq" title="http://en.wikipedia.org/wiki/Joseph_Valentin_Boussinesq">Boussinesq</a>
+in (1871) and
+<a href="http://en.wikipedia.org/wiki/John_Strutt%2C_3rd_Baron_Rayleigh" title="http://en.wikipedia.org/wiki/John_Strutt%2C_3rd_Baron_Rayleigh">Rayleigh</a>
+in (1876) showed that the waveform of Russell's wave is
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-556.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+<a href="http://en.wikipedia.org/wiki/Korteweg-de_Vries_equation" title="http://en.wikipedia.org/wiki/Korteweg-de_Vries_equation">Korteweg and de Vries</a>
+(1895) found an equation which has this solitary
+wave as a solution, the KdV equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-557.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+which  can be written in different forms by making changes of
+dependent and independent variables, e.g., let <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-558.png">
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-559.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where a subscript <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-560.png"> or <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-561.png"> stands for <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-562.png">
+or <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-563.png">.
+</p>
+
+<p></p>
+<p>
+Letting <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-564.png"> gives another commonly used form
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-565.png">
+</div>
+<p></p>
+
+<h3>Korteweg - de Vries Solitons</h3>
+
+<p>
+Let <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-566.png"> where <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-567.png"> is a positive constant.  Let's look for a
+right-moving wave solution <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-568.png">
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-569.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This can be integrated in <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-570.png">
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-571.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-572.png"> is an integration constant.
+</p>
+
+<p></p>
+<p>
+If <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-573.png"> represents a localized solution in <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-574.png"> then
+<img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-575.png"> (unlike a plane
+wave), so the integration constant <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-576.png">.
+</p>
+
+<p></p>
+<p>
+Multiplying the above by the  <b> integrating factor </b> <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-577.png">
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-578.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This can be integrated again, with zero integration constant
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-579.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-580.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+This equation can be integrated analytically:
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-581.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where <img style="vertical-align:-3px" src="./Partial Differential Equations_files/tex-582.png"> is an arbitrary integration constant which gives the
+location of the peak at <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-583.png">.
+Note that the soliton amplitude is proportional to its speed <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-584.png">.
+</p>
+
+<h3>Multi-soliton solutions</h3>
+
+<p>
+Zabusky and Kruskal
+<a href="http://prola.aps.org/abstract/PRL/v15/i6/p240_1" title="http://prola.aps.org/abstract/PRL/v15/i6/p240_1">Phys. Rev. Lett. <b>15</b>, 240 (1965)</a>
+discovered multi-soliton solutions numerically in 1965
+</p><ol style="margin-left:4em;margin-right:4em">
+<li> Solitons accelerate as they pass through one another
+<br><br>
+</li><li> The joint amplitude  <b> decreases </b> -- nonlinear!
+<br><br>
+</li><li> Soliton shapes are preserved, but there is a phase shift
+</li></ol>
+<p></p>
+
+<p></p>
+<p>
+Later, the
+<a href="http://en.wikipedia.org/wiki/Inverse_scattering_transform" title="http://en.wikipedia.org/wiki/Inverse_scattering_transform">Inverse scattering transform</a>
+was used to derive analytic multi-soliton solutions,
+see Gardner, Greene, Kruskal and Miura
+<a href="http://prola.aps.org/abstract/PRL/v19/i19/p1095_1" title="http://prola.aps.org/abstract/PRL/v19/i19/p1095_1">Phys. Rev. Lett. <b>19</b>, 1095 (1967)</a>.
+</p>
+
+<p></p>
+<p>
+An example of a 2-soliton solution is
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-585.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p><ol style="margin-left:4em;margin-right:4em">
+<li> One soliton is 4 times taller than the other and travels 4 times faster
+<br><br>
+</li><li> In the scattering the taller moves forward <img style="vertical-align:-7px" src="./Partial Differential Equations_files/tex-586.png"> and
+the shorter moves back <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-587.png">
+</li></ol>
+<p></p>
+
+<p></p>
+<p>
+An <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-588.png">-soliton solution has the asymptotic behavior
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-589.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+At the initial time
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-590.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+As <img style="vertical-align:-1px" src="./Partial Differential Equations_files/tex-591.png"> the solitons separate with the tallest
+moving fastest and the shortest slowest.
+The phases are given by
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-592.png">
+</div>
+<p></p>
+
+<h3>Pseudo-Spectral Leapfrog Scheme</h3>
+
+<p>
+<a href="http://en.wikipedia.org/wiki/Leapfrog_integration" title="http://en.wikipedia.org/wiki/Leapfrog_integration">Leapfrog integration</a>
+</p>
+
+<p></p>
+<p>
+</p><div style="text-align:right;margin-right:2em"><a href="http://www.physics.buffalo.edu/phy410-505/topic6/solitons.cpp.txt"><code><b>solitons.cpp</b></code></a></div>
+<pre style="margin-left:4em">&nbsp;
+int main()
+{
+&nbsp;
+}
+&nbsp;
+</pre>
+<p></p>
+
+<h2>Shock Waves and Burgers Equation</h2>
+
+<p>
+J.M. Burgers, Adv. Appl. Mech. <b>1</b>, 171 (1948), introduced the
+equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-593.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+as a simple model of shock propagation. This is basically a
+Navier-Stokes equation in one dimension without a pressure term. The
+convective term on the left is nonlinear. The diffusive term on the
+right represents the effects of viscosity.
+</p>
+
+<p></p>
+<p>
+The development of a shock can be seen by letting the kinematic
+vicosity <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-594.png">. This gives the inviscid} Burgers' equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-595.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+Compare this with the linear equation
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-596.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-597.png"> is a constant. The linear equation has the solution
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-598.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-599.png"> is any differentiable function. This solution represents
+a wave form with shape <img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-600.png"> moving to the right with constant speed
+<img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-601.png">.
+</p>
+
+<p></p>
+<p>
+Now, in the inviscid Burgers' equation, the "speed" <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-602.png">, i.e., the
+instantaneous speed of the wave form is proportional to its amplitude
+<img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-603.png">. This implies that a peak in the wave travels faster than a
+trough, which implies that the wave will tend to break. This is
+not allowed mathematically beacuse breaking implies that the solution
+<img style="vertical-align:-5px" src="./Partial Differential Equations_files/tex-604.png"> becomes multiple valued. What actually happens is that a
+<b>shock front</b> develops: this is a moving point at which the solution is
+discontinuous.
+</p>
+
+<p></p>
+<p>
+The viscous term in Burgers' equation has two effects. First, it
+causes the wave amplitude to damp to zero in a diffusive
+fashion. Secondly, it prevents the development of a mathematical
+singularity at the shock front: the amplitude is continuous albeit
+varying very rapidly through the front.
+</p>
+
+<h3>Riemann Problem and Godunov's Scheme</h3>
+
+<p>
+This type of scheme was introduced by S.K. Godunov, Mat. Sb.
+<b>47</b>, 271 (1959). This is an upwind differencing scheme
+which makes use of the solution to a local Riemann problem.
+</p>
+
+<p></p>
+<p>
+A Riemann problem is an initial value problem for a partial
+differential equation with a piecewise constant initial value
+function, i.e., the solution at <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-605.png"> is a step function. A
+Riemann solver is an exact or approximate algorithm for
+solving a Riemann problem.
+</p>
+
+<p></p>
+<p>
+The basic formula for updating <img style="vertical-align:-0px" src="./Partial Differential Equations_files/tex-606.png"> is
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-607.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+where <img style="vertical-align:-10px" src="./Partial Differential Equations_files/tex-608.png"> represents the average flux on the cells to the
+right and left of the lattice point <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-609.png"> respectively. These average
+flux values are computed from Riemann problems in the cells to the right
+and left of <img style="vertical-align:-4px" src="./Partial Differential Equations_files/tex-610.png"> using upwind initial data
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-611.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+The solution to the Riemann problem on the left cell is
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-612.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+and for the cell on the right
+</p>
+
+<p></p>
+<p>
+</p><div align="center">
+<img src="./Partial Differential Equations_files/tex-613.png">
+</div>
+<p></p>
+
+<p></p>
+<p>
+</p><div style="text-align:right;margin-right:2em"><a href="http://www.physics.buffalo.edu/phy410-505/topic6/burgers.cpp.txt"><code><b>burgers.cpp</b></code></a></div>
+<pre style="margin-left:4em">&nbsp;
+#include "cptstd.hpp"
+#include "graphics.hpp"
+#include "linalg.hpp"
+using namespace cpt;
+&nbsp;
+#ifdef __APPLE__
+#  include &lt;GLUT/glut.h&gt;
+#else
+#  include &lt;GL/glut.h&gt;
+#endif
+&nbsp;
+const double pi = 4 * atan(1.0);
+&nbsp;
+double L = 1;                       // size of periodic region
+int N = 200;                        // number of grid points
+double h;                           // lattice spacing
+double t;                           // time
+double uMax;                        // maximum wave amplitude
+double tau;                         // time step
+double CFLRatio = 1;                // Courant-Friedrichs-Lewy ratio tau/h
+enum {SINE, STEP};
+int initialWaveform = SINE;         // sine function, step, etc.
+&nbsp;
+double nu = 1e-6;                   // kinematic viscosity
+Matrix&lt;double,1&gt; u, uNew;           // the solution and its update
+Matrix&lt;double,1&gt; F;                 // the flow
+Matrix&lt;double,1&gt; uPlus, uMinus;     // for Godunov scheme
+int step;                           // integration step number
+&nbsp;
+void initialize()
+{
+    u = Matrix&lt;double,1&gt;(N);
+    uNew = Matrix&lt;double,1&gt;(N);
+    F = Matrix&lt;double,1&gt;(N);
+    uPlus = Matrix&lt;double,1&gt;(N);
+    uMinus = Matrix&lt;double,1&gt;(N);
+&nbsp;
+    h = L / N;
+&nbsp;
+    for (int i = 0; i &lt; N; i++) {
+        double x = i * h;
+        switch (initialWaveform) {
+        case SINE:
+            u[i] = sin(2 * pi * x) + 0.5 * sin(pi * x);
+        break;
+        case STEP:
+            u[i] = 0;
+            if (x &gt; L / 4 &amp;&amp; x &lt; 3 * L / 4)
+                u[i] = 1;
+            break;
+        default:
+            u[i] = 1;
+            break;
+        }
+        if (abs(u[i]) &gt; uMax)
+            uMax = abs(u[i]);
+    }
+&nbsp;
+    tau = CFLRatio * h / uMax;
+    t = 0;
+    step = 0;
+}
+&nbsp;
+void (*integrationAlgorithm)();
+void redraw();
+&nbsp;
+double T = 5;                   // time to cross screen
+double framesPerSec = 50;       // animation rate for screen redraws
+&nbsp;
+void takeStep()
+{
+    static clock_t clockStart;
+    static bool done;
+    if (!done) {
+        double t0 = t;
+        do {
+            integrationAlgorithm();
+            u = uNew;
+            t += tau;
+            ++step;
+        } while (abs(uMax * (t - t0)) &lt; L / T / framesPerSec);
+        done = true;
+    }
+    clock_t clockNow = clock();
+    double seconds = (clockNow - clockStart) / double(CLOCKS_PER_SEC);
+    if ( seconds &lt; 1 / framesPerSec ) {
+        return;
+    } else {
+        clockStart = clockNow;
+        done = false;
+    }
+    redraw();
+}
+&nbsp;
+void FTCS()
+{
+    for (int j = 0; j &lt; N; j++) {
+        int jNext = j &lt; N - 1 ? j + 1 : 0;
+        int jPrev = j &gt; 0 ? j - 1 : N - 1;
+        uNew[j] = u[j] * (1 - tau / (2 * h) * (u[jNext] - u[jPrev])) +
+                  nu * tau / h / h * (u[jNext] + u[jPrev] - 2 * u[j]);
+    }
+}
+&nbsp;
+void Lax()
+{
+    for (int j = 0; j &lt; N; j++) {
+        int jNext = j &lt; N - 1 ? j + 1 : 0;
+        int jPrev = j &gt; 0 ? j - 1 : N - 1;
+        uNew[j] = (u[jNext] + u[jPrev]) / 2
+                  - u[j] * tau / (2 * h) * (u[jNext] - u[jPrev])
+                  + nu * tau / h / h * (u[jNext] + u[jPrev] - 2 * u[j]);
+    }
+}
+&nbsp;
+void LaxWendroff()
+{
+    for (int j = 0; j &lt; N; j++)
+        F[j] = u[j] * u[j] / 2;
+    for (int j = 0; j &lt; N; j++) {
+        int jMinus1 = j &gt; 0 ? j - 1 : N - 1;
+        int jPlus1 = j &lt; N - 1 ? j + 1 : 0;
+        int jPlus2 = jPlus1 &lt; N - 1 ? jPlus1 + 1 : 0;
+        uNew[j] = (u[j] + u[jPlus1]) / 2 -
+                  (tau / 2 / h) * (F[jPlus1] - F[j]) +
+                  (nu * tau / (2 * h * h)) * (
+                      (u[jPlus1] + u[jMinus1] - 2 * u[j]) / 2 +
+                      (u[jPlus2] + u[j] - 2 * u[jPlus1]) / 2 );
+    }
+    for (int j = 0; j &lt; N; j++)
+        F[j] = uNew[j] * uNew[j] / 2;
+    for (int j = 0; j &lt; N; j++) {
+        int jMinus1 = j &gt; 0 ? j - 1 : N - 1;
+        int jPlus1 = j &lt; N - 1 ? j + 1 : 0;
+        uNew[j] = u[j] - (tau / h) * (F[j] - F[jMinus1]) +
+                  (nu * tau / (h * h)) * (u[jPlus1] + u[jMinus1] - 2 * u[j]);
+    }
+}
+&nbsp;
+void Godunov()
+{
+    for (int j = 0; j &lt; N; j++) {
+        uPlus[j] = u[j] &gt; 0 ? u[j] : 0;
+        uMinus[j] = u[j] &lt; 0 ? u[j] : 0;
+    }
+    for (int j = 0; j &lt; N; j++) {
+        int jNext = j &lt; N - 1 ? j + 1 : 0;
+        int jPrev = j &gt; 0 ? j - 1 : N - 1;
+        double f1 = uPlus[jPrev] * uPlus[jPrev] / 2;
+        double f2 = uMinus[j] * uMinus[j] / 2;
+        F[jPrev] = f1 &gt; f2 ? f1 : f2;
+        f1 = uPlus[j] * uPlus[j] / 2;
+        f2 = uMinus[jNext] * uMinus[jNext] / 2;
+        F[j] = f1 &gt; f2 ? f1 : f2;
+        uNew[j] = u[j]  + nu * tau / h / h * (u[jNext] + u[jPrev] - 2 * u[j]);
+        uNew[j] -= (tau / h) * (F[j] - F[jPrev]);
+    }
+}
+&nbsp;
+int mainWindow, solutionWindow, controlWindow;
+int margin = 10;
+int controlHeight = 30;
+&nbsp;
+void reshape(int w, int h)
+{
+    glViewport(0, 0, w, h);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, w, 0, h);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+}
+&nbsp;
+void redraw()
+{
+    glutSetWindow(solutionWindow);
+    glutPostRedisplay();
+}
+&nbsp;
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+&nbsp;
+    glutSwapBuffers();
+}
+&nbsp;
+void drawText(const string&amp; str, double x, double y)
+{
+    glRasterPos2d(x, y);
+    int len = str.find('\0');
+    for (int i = 0; i &lt; len; i++)
+       glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i]);
+}
+&nbsp;
+void displaySolution()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+    glColor3ub(255, 255, 255);
+    glBegin(GL_LINE_STRIP);
+        for (int i = 0; i &lt; N; i++) {
+            int iNext = i &lt; N - 1 ? i + 1 : 0;
+            glVertex2d(i * h, u[i]);
+            glVertex2d((i + 1) * h, u[iNext]);
+        }
+    glEnd();
+    ostringstream os;
+    os &lt;&lt; "CFL Ratio = " &lt;&lt; CFLRatio &lt;&lt; "    nu = " &lt;&lt; nu
+       &lt;&lt; "    t = " &lt;&lt; step * tau &lt;&lt; ends;
+    drawText(os.str(), 0.02, -0.95);
+    glutSwapBuffers();
+}
+&nbsp;
+void (*method[])() = {FTCS, Lax, LaxWendroff, Godunov};
+char methodName[][20] = {"FTCS", "Lax", "Lax Wendroff", "Godunov"};
+&nbsp;
+void displayControl()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+    int w = glutGet(GLUT_WINDOW_WIDTH);
+    int h = glutGet(GLUT_WINDOW_HEIGHT);
+    for (int i = 0; i &lt; 4; i++) {
+        if (method[i] == integrationAlgorithm)
+            glColor3ub(255, 0, 0);
+        else
+            glColor3ub(0, 0, 255);
+        glRectd((i + 0.025) * w / 4, 0.1 * h, (i + 0.975) * w / 4, 0.9 * h);
+        glColor3ub(255, 255, 255);
+        ostringstream os;
+        os &lt;&lt; methodName[i] &lt;&lt; ends;
+        drawText(os.str(), (i + 0.2) * w / 4, 0.3 * h);
+    }
+    glutSwapBuffers();
+}
+&nbsp;
+void reshapeMain(int w, int h)
+{
+    reshape(w, h);
+&nbsp;
+    glutSetWindow(solutionWindow);
+    glutPositionWindow(margin, margin);
+    glutReshapeWindow(w - 2 * margin, h - 3 * margin - controlHeight);
+&nbsp;
+    glutSetWindow(controlWindow);
+    glutPositionWindow(margin, h - margin - controlHeight);
+    glutReshapeWindow(w - 2 * margin, controlHeight);
+}
+&nbsp;
+void reshapeSolution(int w, int h)
+{
+    glViewport(0, 0, w, h);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, 1, -1, +1.5);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+}
+&nbsp;
+void mouseSolution(int button, int state, int x, int y)
+{
+   static bool running = false;
+&nbsp;
+    switch (button) {
+    case GLUT_LEFT_BUTTON:
+        if (state == GLUT_DOWN) {
+            if (running) {
+                glutIdleFunc(NULL);
+                running = false;
+            } else {
+                glutIdleFunc(takeStep);
+                running = true;
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
+&nbsp;
+void mouseControl(int button, int state, int x, int y)
+{
+    if (button == GLUT_LEFT_BUTTON &amp;&amp; state == GLUT_DOWN) {
+        int w = glutGet(GLUT_WINDOW_WIDTH);
+        int algorithm = int(x / double(w) * 4);
+        if (algorithm &gt;= 0 &amp;&amp; algorithm &lt; 4)
+            integrationAlgorithm = method[algorithm];
+        glutPostRedisplay();
+    }
+}
+&nbsp;
+void makeMainWindow() {
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitWindowSize(600, 400);
+    glutInitWindowPosition(100, 100);
+    mainWindow = glutCreateWindow("One-dimensional Burgers' Equation");
+    glClearColor(1.0, 1.0, 1.0, 0.0);
+    glShadeModel(GL_FLAT);
+    glutDisplayFunc(display);
+    glutReshapeFunc(reshapeMain);
+}
+&nbsp;
+void solutionMenu(int menuItem)
+{
+    switch (menuItem) {
+    case 1:
+        initialWaveform = SINE;
+        break;
+    case 2:
+        initialWaveform = STEP;
+        break;
+    default:
+        break;
+    }
+    initialize();
+    glutPostRedisplay();
+}
+&nbsp;
+void makeSolutionWindow()
+{
+    glutSetWindow(mainWindow);
+    int w = glutGet(GLUT_WINDOW_WIDTH);
+    int h = glutGet(GLUT_WINDOW_HEIGHT);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    solutionWindow = glutCreateSubWindow(mainWindow, margin, margin,
+                     w - 2 * margin, h - 3 * margin - controlHeight);
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glShadeModel(GL_FLAT);
+    glutDisplayFunc(displaySolution);
+    glutReshapeFunc(reshapeSolution);
+    glutMouseFunc(mouseSolution);
+    integrationAlgorithm = Lax;
+    glutCreateMenu(solutionMenu);
+    glutAddMenuEntry("Initial Sine Waveform", 1);
+    glutAddMenuEntry("Initial Step Waveform", 2);
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+&nbsp;
+void makeControlWindow() {
+    glutSetWindow(mainWindow);
+    int w = glutGet(GLUT_WINDOW_WIDTH);
+    int h = glutGet(GLUT_WINDOW_HEIGHT);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    controlWindow = glutCreateSubWindow(mainWindow,
+                      margin, h - margin - controlHeight,
+                      w - 2 * margin, controlHeight);
+    glClearColor(0.0, 1.0, 0.0, 0.0);
+    glShadeModel(GL_FLAT);
+    glutDisplayFunc(displayControl);
+    glutReshapeFunc(reshape);
+    glutMouseFunc(mouseControl);
+}
+&nbsp;
+int main(int argc, char *argv[])
+{
+    glutInit(&amp;argc, argv);
+    if (argc &gt; 1)
+        CFLRatio = atof(argv[1]);
+    if (argc &gt; 2)
+        nu = atof(argv[2]);
+    initialize();
+    makeMainWindow();
+    makeSolutionWindow();
+    makeControlWindow();
+    glutMainLoop();
+}
+</pre>
+<p></p>
+
+<h1>Assignment 10<a name="assignment10"> </a> is due November 25 on UBlearns<a name="sec12"> </a></h1>
+
+<p>
+NOTE: PHY 410 do Problems 1 and 2.  PHY 505 do all problems 1, 2, 3
+</p>
+
+<p></p>
+<p>
+Current versions of example files and cpt files needed for this
+assignment are archived in
+<a href="http://www.physics.buffalo.edu/phy410-505/topic6/hw-10.zip" title="hw-10.zip">hw-10.zip</a>.
+</p>
+
+<p></p>
+<p>
+<b>Problem 1:</b> &nbsp;
+Use any wavepacket code to reproduce the movie frames in the article by
+Goldberg, Schey and Schwartz
+<a href="http://dx.doi.org/10.1119/1.1973991">Am. J. Phys. 35, 177-186, 1967</a>
+or <a href="http://www.physics.buffalo.edu/phy410-505/topic6/goldberg.pdf" title="goldberg.pdf">PDF copy</a>.
+<br>
+Modify the wavepacket code to study scattering from a potential of your choice.
+It might be most instructive to choose an example from your modern physics
+or quantum mechanics textbook. Describe the most interesting example you found.
+</p>
+
+<p></p>
+<p>
+<b>Problem 2:</b> &nbsp;
+Choose any 2 hyperbolic PDEs that you find most interesting from (1) advection
+(2) Burgers (3) free photons
+(4) Klein-Gordon (5) long-wavelength water waves.
+Choose some representative examples of initial profiles.
+Evolve the <u>same</u> initial profile using each of the two equations: observe,
+describe, and explain physically the similarities and differences between the
+two solutions.
+</p>
+
+<p></p>
+<p>
+<b>Problem 3 PHY 505 ONLY:</b> &nbsp;
+(1) Study the spreading of a quantum
+<a href="http://en.wikipedia.org/wiki/Wave_packet#Gaussian_wavepackets_in_quantum_mechanics" title="http://en.wikipedia.org/wiki/Wave_packet#Gaussian_wavepackets_in_quantum_mechanics">Gaussian wave packet</a>
+numerically and compare with theoretical expectations.
+<br>
+(2)
+The free photon wave equation factorizes into left-mover and right-mover
+advection equations.  This implies that every left-moving wave solution of
+the left-mover advection equation is also a solution of the free photon
+equation.  The same holds for right-moving wave solutions of the right-mover
+advection equation.  Linear superpositions of left-moving and right-moving
+waves are also solutions of the free photon equation.  Does this imply that
+<u>every</u> solution of the free photon equation is a linear superposition of
+left-movers and right-movers?  Why or why not?
+Illustrate your answer with some representative
+examples of initial profiles and their numerical evolution.
+</p>
+
+<br><br>
+<div class="foot">
+© 2012 &nbsp;
+<a href="http://www.physics.buffalo.edu/faculty/RGonsalves.html">Richard J. Gonsalves</a>
+<br><br>
+<a href="http://www.physics.buffalo.edu/">Department of Physics</a>
+&nbsp;|&nbsp;
+<a href="http://www.buffalo.edu/">University at Buffalo</a>
+</div>
+
+
+
+<div id="html-validator-loading"><img src="chrome-extension://cgndfbhngibokieehnjhbjkkhbfmhojo/images/loading.gif">Validating...</div><div id="html-validator-message"><span id="html-validation-message-close">X</span><div id="html-validator-message-content"></div></div></body></html>

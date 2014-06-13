@@ -1,0 +1,20 @@
+Start med smaa bilder, drit i optimalisering.
+    lese mappe
+    /* kombiner resultat/output fra mappene */
+        /* skaffe average, regne dette til en fil.. */
+
+Legg til noen av de mer avanserte
+
+Lage histogram
+
+Kunne variere parameter
+
+Optimaliser
+    red black
+    multitraad
+
+Vi skal ogsaa kunne oppdage noen ting som konvergensrate
+    http://www.physics.buffalo.edu/phy410-505/2011/topic3/app1/index.html
+        cirka midt.
+
+hvordan ser en matrise ut mot slutten? kan noen deler kuttes ut?

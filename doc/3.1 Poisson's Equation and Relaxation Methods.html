@@ -1,0 +1,1672 @@
+
+<!-- saved from url=(0069)http://www.physics.buffalo.edu/phy410-505/2011/topic3/app1/index.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>3.1 Poisson's Equation and Relaxation Methods
+</title>
+
+<style type="text/css" id="internalStyle">
+
+body { font-family: sans-serif;  margin: 1em; }
+
+p { margin-left: 2em; margin-right: 2em; }
+
+h1 { text-align: center; font-family: sans-serif; font-size: 200%;
+     font-weight: normal; }
+
+h2 { text-align: left; font-family: sans-serif; font-size: 150%;
+     font-weight: normal; }
+
+h3 { text-align: left; font-family: sans-serif; font-size: 120%;
+     font-weight: bold; }
+
+h4 { text-align: center; font-family: sans-serif; font-size: 100%;
+     font-weight: bold; }
+
+a { text-decoration: none; }
+
+a:hover { text-decoration: underline; }
+
+span.head { font-family: sans-serif; font-size: 200%; font-weight: normal; }
+
+div.foot{ text-align: center; font-family: sans-serif; font-size: 75%;
+          font-weight: normal; line-height: 100%; }
+
+</style>
+
+<link rel="stylesheet" type="text/css" href="chrome-extension://cgndfbhngibokieehnjhbjkkhbfmhojo/css/validation.css"></head>
+<body>
+
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<tbody><tr valign="top"><td width="20%" align="left"><span class="head">410-505</span></td>
+<td width="60%" align="center"><span class="head">3.1 Poisson's Equation and Relaxation Methods
+</span></td>
+<td width="20%" align="right"><span class="head">Fall 2011</span></td>
+</tr>
+</tbody></table>
+
+<br>
+<div align="center">
+  <a href="http://www.physics.buffalo.edu/phy410-505/2011/index.html">Home</a>
+  &nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="http://www.physics.buffalo.edu/phy410-505/2011/syllabus.html">Syllabus</a>
+  &nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="http://www.physics.buffalo.edu/phy410-505/2011/tools.html">Tools</a>
+  &nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="http://www.physics.buffalo.edu/phy410-505/2011/topic1/index.html">Topic 1</a>
+  &nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="http://www.physics.buffalo.edu/phy410-505/2011/topic2/index.html">Topic 2</a>
+  &nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="http://www.physics.buffalo.edu/phy410-505/2011/topic3/index.html">Topic 3</a>
+  &nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="http://www.physics.buffalo.edu/phy410-505/2011/topic4/index.html">Topic 4</a>
+  &nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="http://www.physics.buffalo.edu/phy410-505/2011/topic5/index.html">Topic 5</a>
+</div>
+<br>
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<tbody><tr>
+<td width="50%" align="left">
+This Page: &nbsp;
+<a href="http://www.physics.buffalo.edu/phy410-505/2011/index.html">Home</a>
+&nbsp;&nbsp;&gt;&gt;&nbsp;&nbsp;
+<a href="http://www.physics.buffalo.edu/phy410-505/2011/topic3/index.html">Topic 3</a>
+&nbsp;&nbsp;&gt;&gt;&nbsp;&nbsp;
+<a href="./3.1 Poisson's Equation and Relaxation Methods_files/3.1 Poisson's Equation and Relaxation Methods.html">Application 1</a>
+</td><td width="50%" align="right">
+<form method="GET" action="http://search.buffalo.edu/search">
+ <input type="text" name="q" size="32" maxlength="2048" value="">
+ <input type="submit" name="btnG" value="Search 410-505">
+ <input type="hidden" name="client" value="UB">
+ <input type="hidden" name="proxystylesheet" value="UB">
+ <input type="hidden" name="output" value="xml_no_dtd">
+ <input type="hidden" name="site" value="UB">
+ <input type="hidden" name="as_sitesearch" value="www.physics.buffalo.edu/phy410-505">
+</form>
+</td>
+</tr>
+</tbody></table>
+
+<h2>Partial Differential Equations in Physics </h2>
+<p>
+
+</p>
+<p>
+Partial differential equations are very important in science and
+engineering.
+</p>
+<p>
+A system of PDE's, together with appropriate boundary conditions,
+determines a set of functions of <i>more than one</i> independent
+variable. The most commonly encountered set of independent variables
+in physics is <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex0.png">, time and three cartesian space coordinates.
+</p>
+<p>
+
+</p>
+
+<h3>Elliptic partial differential equations </h3>
+<p>
+
+</p>
+<p>
+Given an electric charge distribution <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex1.png">,
+Poisson's equation
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex2.png">
+</div>
+<p>
+determines the potential <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex3.png"> at each point in space <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex4.png">
+of a region, provided that <i>boundary conditions</i> are
+specified on the <i>closed boundary</i> of the region.
+</p>
+<p>
+The differential operator <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex5.png"> is called <i>elliptic</i>. To
+understand this terminology, consider two dimensions and let
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex6.png">
+</div>
+<p>
+Then
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex7.png">
+</div>
+<p>
+The locus of <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex8.png"> values in <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex9.png">-space of a given eigenvalue
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex10.png">
+</div>
+<p>
+of the operator, is a circle, a special case of an ellipse.
+</p>
+<p>
+Various types of boundary conditions include:
+</p>
+<p>
+</p><ul style="margin-left:2em">
+<li> <i>Dirichlet boundary conditions</i> --- the value of <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex11.png"> is
+specified on the closed boundary. In electrostatics this might
+correspond to specifying the potential on a conducting surface.
+<p></p>
+<p>
+</p></li><li> <i>Neumann boundary conditions</i> --- the <i>normal component</i>
+<img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex12.png"> is specified on the boundary.
+In electrostatics, this corresponds to specifing the normal component
+of the electric field <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex13.png"> on a conductor.
+<p></p>
+<p>
+</p></li><li> <i>Periodic boundary conditions</i> are often used to model
+finite regions of large systems.
+</li></ul>
+<p></p>
+<p>
+
+</p>
+
+<h3>Parabolic partial differential equations </h3>
+<p>
+
+</p>
+<p>
+Given a <i>source</i> <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex14.png"> as a function of space and time,
+and a <i>diffusion coefficient</i> <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex15.png">, the diffusion
+equation
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex16.png">
+</div>
+<p>
+determines the <i>concentration</i> in a closed region of space, provided that
+</p>
+<p>
+</p><ul style="margin-left:2em">
+<li> <i>initial conditions</i> are specified at some time <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex17.png">, and
+<p></p>
+<p>
+</p></li><li> <i>boundary conditions</i> are specified at the boundaries of
+the closed region for all times <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex18.png">.
+</li></ul>
+<p></p>
+<p>
+The terminology <i>parabolic</i> can be understood by considering one
+spatial dimension, a constant <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex19.png">, and
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex20.png">
+</div>
+<p>
+for which the differential operator on the left hand side has the
+eigenvalue
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex21.png">
+</div>
+<p>
+which represents a parabola in <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex22.png"> space.
+</p>
+<p>
+The time-dependent Schroedinger equation
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex23.png">
+</div>
+<p>
+for a particle of mass <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex24.png"> moving in a potential <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex25.png">
+is also classified as parabolic.
+</p>
+<p>
+The Schroedinger equation can be viewed as a diffusion equation with
+imaginary diffusion constant <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex26.png">, or mathematically as a
+diffusion equation in imaginary time <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex27.png"> with a real diffusion
+constant <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex28.png">.
+</p>
+<p>
+
+</p>
+
+<h3>Hyperbolic partial differential equations </h3>
+<p>
+
+</p>
+<p>
+The wave equation
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex29.png">
+</div>
+<p>
+is classified as <i>hyperbolic</i> because the eigenvalues of the
+differential operator
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex30.png">
+</div>
+<p>
+define hyperboloidal surfaces in <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex31.png"> space.
+</p>
+<p>
+Unique solutions of the wave equation are obtained by specifying
+</p>
+<p>
+</p><ul style="margin-left:2em">
+<li> <i>initial conditions</i> on the solution <i>and</i> its first derivative
+with respect to <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex32.png"> at some time <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex33.png">, and
+<p></p>
+<p>
+</p></li><li> <i>boundary conditions</i> at the boundaries of a closed region for
+all times <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex34.png">.
+</li></ul>
+<p></p>
+<p>
+
+</p>
+
+<h2>Relaxation Methods for Poisson's Equation </h2>
+<p>
+
+</p>
+<p>
+The electric field <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex35.png"> due to a static charge density distribution
+<img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex36.png"> is determined by Gauss' Law:
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex37.png">
+</div>
+<p>
+where <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex38.png"> is the permittivity constant. A static electric field
+can be derived from a scalar potential <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex39.png">
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex40.png">
+</div>
+<p>
+which obeys Poisson's equation
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex41.png">
+</div>
+<p>
+</p>
+<p>
+This elliptic partial differential equations has a
+unique solution inside a region of space (which can be multiply
+connected) if the following types of boundary conditions are specified
+on the <i>closed</i> boundary of the region:
+</p>
+<p>
+</p><ul style="margin-left:2em">
+<li> the value of <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex42.png"> on the bounding surface is specified
+(Dirichlet conditions), or
+<p></p>
+<p>
+</p></li><li> the value of the normal derivative <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex43.png"> on
+the bounding surface is specified (Neumann conditions), or
+<p></p>
+<p>
+</p></li><li> periodic boundary conditions are imposed.
+</li></ul>
+<p></p>
+<p>
+
+</p>
+
+<h3>Discretization in two dimensions </h3>
+<p>
+
+</p>
+<p>
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/red-black-lattice.png">
+</div>
+<p>
+</p>
+<p>
+Consider the 2-D form of Poisson's equation:
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex44.png">
+</div>
+<p>
+where we set <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex45.png"> for convenience. Let's solve this equation in
+the interior of a square region of unit side <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex46.png">. Introduce a
+grid of points separated by a lattice spacing <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex47.png"> in the <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex48.png"> and <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex49.png">
+directions:
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex50.png">
+</div>
+<p>
+</p>
+<p>
+There are <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex51.png"> <i>interior</i> points as shown in the figure, and the
+lattice spacing <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex52.png">. The value of <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex53.png"> at a
+lattice point is abbreviated <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex54.png">, and
+<img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex55.png">.
+</p>
+<p>
+We next need a discrete form for the Laplacian operator. There are many
+possibilities, but the simplest symmetric finite-difference form is
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex56.png">
+</div>
+<p>
+</p>
+<p>
+Note the following properties of this discretization:
+</p>
+<p>
+</p><ul style="margin-left:2em">
+<li> Each lattice site is connected to its 4 nearest neighbors.
+<p></p>
+<p>
+</p></li><li> For later convenience, the interior sites are labeled even or odd
+depending on whether <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex57.png"> is even or odd. Even sites are colored black,
+and odd sites are colored red. Note that the 4 neighbors of a red site
+are black, and the 4 neighbors of a black site are red.
+<p></p>
+<p>
+</p></li><li> The boundary sites are indicated using open circles. With the
+discretization formula above for the Laplacian operator, only those
+boundary sites that are nearest neighbors of an interior site need to
+be taken into consideration.
+</li></ul>
+<p></p>
+<p>
+
+</p>
+
+<h3>Jacobi's iterative method </h3>
+<p>
+
+</p>
+<p>
+Suppose we have found a solution of the discretized equation, then at
+each lattice site,
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex58.png">
+</div>
+<p>
+If we knew the right hand side, then we could compute the left hand side.
+Unfortunately, the right hand side involves <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex59.png"> at the 4 neighboring
+points! Thus to find the solution, the <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex60.png"> equations must be solved
+simultaneously. Solving Poisson's equation is essentially a problem in
+linear algebra.
+</p>
+<p>
+Jacobi's iterative method for solving these simultaneous equations is
+to start with a guess <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex61.png"> for the solution at the interior
+lattice points. Plugging this guess into the right hand sides yields
+<img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex62.png"> at all lattice points. This procedure
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex63.png">
+</div>
+<p>
+is repeated until (hopefully) the process converges to the correct
+solution.
+</p>
+<p>
+
+</p>
+
+<h3>Convergence of the iteration </h3>
+<p>
+
+</p>
+<p>
+We need to decide when the solution has converged sufficiently. Since
+we presumably do not know the exact solution, one criterion is to ask
+that the approximate solution ceases to change significantly from one
+iteration to the next. The following function estimates the relative
+error as the average over all lattice sites of non-zero magnitudes of
+change.
+</p>
+<p>
+
+</p>
+
+<h3>Gauss-Seidel method </h3>
+<p>
+
+</p>
+<p>
+This is a modification of the Jacobi method, which can be shown to converge
+a little faster. Suppose we are sweeping the lattice in order of increasing
+<img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex64.png"> and <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex65.png">, then the left and lower neighbors of each lattice site will
+have been updated: why not use these (presumably) more accurate values in
+Jacobi's formula? This results in one form of the Gauss-Seidel algorithm:
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex66.png">
+</div>
+<p>
+</p>
+<p>
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex67.png">
+</div>
+<p>
+</p>
+<p>
+
+</p>
+
+<h3>The Successive Over Relaxation (SOR) method </h3>
+<p>
+
+</p>
+<p>
+The Jacobi and Gauss-Seidel methods do not use the value of <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex68.png">
+at the same lattice point in updating <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex69.png">. It turns out that
+the convergence of the iteration can be improved considerably by using
+a linear combination of the new and old solutions as follows:
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex70.png">
+</div>
+<p>
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex71.png">
+</div>
+<p>
+</p>
+<p>
+The <i>over-relaxation parameter</i> <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex72.png"> can be tuned to optimize the
+convergence. It can be shown that:
+</p>
+<p>
+</p><ul style="margin-left:2em">
+<li> The method is convergent only for <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex73.png">.
+<p></p>
+<p>
+</p></li><li> It is faster than Gauss-Seidel only if <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex74.png">.
+<p></p>
+<p>
+</p></li><li> It converges fastest for a square lattice if
+<p></p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex75.png">
+</div>
+<p>
+where <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex76.png"> is the number of lattice points in the <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex77.png"> or <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex78.png"> directions.
+</p></li></ul>
+<p></p>
+<p>
+Note that SOR could also be implemented using the Jacobi prescription with
+  only <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex79.png"> values on the right hand side.
+</p>
+<p>
+
+</p>
+
+<h3>Checkerboard (red-black) updating </h3>
+<p>
+
+</p>
+<p>
+We will implement SOR with a variant of the Gauss-Seidel method. Since
+even sites only have odd neighbors, and odd sites only have even
+neighbors, we can update all of the even sites first. The updated even-site
+values are then used to update all of the odd sites.
+</p>
+<p>
+
+</p>
+
+<h3>Programs for solving Poisson's equation in 2-D </h3>
+<p>
+
+</p>
+<p>
+The <code>poisson</code> programs solve Poisson's equation with a charge
+<img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex80.png"> placed
+at the center of the square region, and with Dirichlet boundary conditions
+<img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex81.png"> on the sides of the square.
+</p>
+<p>
+
+</p>
+
+<h3>Results from running the program </h3>
+<p>
+
+</p>
+<p>
+</p><pre style="margin-left:4em"> Iterative solution of Poisson's equation
+ ----------------------------------------
+ Enter number of interior points in x or y: 50
+ Enter desired accuracy in solution: 0.001
+ Enter 1 for Jacobi, 2 for Gauss Seidel, 3 for SOR: 0
+ Jacobi:
+ Number of steps = 1012
+ Gauss-Seidel:
+ Number of steps = 506
+ Successive Over Relaxation with theoretical optimum omega = 1.88177
+ Number of steps = 62
+ Potential in file poisson.data
+</pre>
+<p></p>
+<p>
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/poisson.png">
+</div>
+<p>
+</p>
+<p>
+According to <i>Numerical Recipes</i> \S19.5, the number of iterations <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex82.png">
+required to reduce the overall error by a factor of <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex83.png"> for Laplace's
+equation in 2-D is given by
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex84.png">
+</div>
+<p>
+</p>
+<p>
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex85.png">
+</div>
+<p>
+</p>
+<p>
+
+</p>
+
+<h3>Convergence rates of different methods </h3>
+<p>
+
+</p>
+<p>
+Successive Overrelaxation (SOR) is considerably more efficient than
+the Jacobi or Gauss-Seidel methods.
+</p>
+<p>
+Let's write Poisson's equation
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex86.png">
+</div>
+<p>
+in matrix form
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex87.png">
+</div>
+<p>
+where <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex88.png"> is a column vector with the values <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex89.png"> at the
+interior lattice points as components, and the components of <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex90.png">
+are determined by the charge density at interior points and the
+boundary values on the closed boundary of the region. The matrix <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex91.png">
+can be split into its lower triangular, diagonal and upper triangular
+parts
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex92.png">
+</div>
+<p>
+and the Jacobi iteration at step <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex93.png"> can be written
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex94.png">
+</div>
+<p>
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex95.png">
+</div>
+<p>
+</p>
+<p>
+The matrix
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex96.png">
+</div>
+<p>
+is called the <i>iteration matrix</i>, and the magnitude its largest
+eigenvalue is called the <i>spectral radius</i> for the relaxation
+problem. The spectral radius
+</p>
+<p>
+</p><ul style="margin-left:2em">
+<li> should lie between 0 and 1 for the method to be stable,
+<p></p>
+<p>
+</p></li><li> depends on the boundary conditions and the lattice spacing,
+<p></p>
+<p>
+</p></li><li> and approaches 1 as the number of lattice points increases.
+</li></ul>
+<p></p>
+<p>
+For an <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex97.png"> square lattice with Dirichlet boundary conditions,
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex98.png">
+</div>
+<p>
+</p>
+<p>
+How many iterations does it take for the solution to be damped by a factor
+<img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex99.png">? This is in general determined by the largest eigenvalue of
+the iteration matrix, so
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex100.png">
+</div>
+<p>
+</p>
+<p>
+This shows that the Jacobi method is not very efficient. For <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex101.png"> for
+example, it would take 1,000,000 iterations to improve the error to
+1\% of its current value!
+The Gauss-Seidel method leads to the iteration matrix
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex102.png">
+</div>
+<p>
+which has a spectral radius for the <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex103.png"> Dirichlet lattice of
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex104.png">
+</div>
+<p>
+</p>
+<p>
+This implies that the Gauss-Seidel method converges only twice as fast
+as the Jacobi method.
+</p>
+<p>
+By contrast, Successive Overrelaxation has
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex105.png">
+</div>
+<p>
+This is a dramatic improvement: for <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex106.png"> it should take
+less than 667 iterations
+iterations to improve the error to 1\% of its current value!
+</p>
+<p>
+Note that one iteration involves updating all interior lattice points.
+Thus the CPU time for the Jacobi or Gauss-Seidel methods for an <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex107.png">
+two-dimensional problem is of <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex108.png">, which is considerably
+reduced to <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex109.png"> for the SOR method. Even this is not very
+efficient for large problems.
+</p>
+<p>
+
+</p>
+
+<h3>Spectral Radius of Laplace Operator </h3>
+<p>
+
+</p>
+<p>
+Let's derive the spectral radius <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex110.png"> for the one-dimensional Laplace
+equation
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex111.png">
+</div>
+<p>
+</p>
+<p>
+<!--
+%% This equation can be discretized on the lattice
+%% \def\bb{<img style="vertical-align:px" src="img/tex112.png" />}
+%% \def\cc{<img style="vertical-align:px" src="img/tex113.png" />}
+%% \newdimen\dx
+%% \dx=\baselineskip
+%% \def\dbox#1{\hbox to\dx{\hfil#1\hfil}}
+%% \def\ebox#1{\hbox to2\dx{#1\hfil}}
+%% \begin{center}
+%% \begin{tabular}{ccccccccccc}
+%%  \ebox{}&\dbox{\bb}&\dbox{\cc}&\dbox{\cc}&\dbox{\cc}&\dbox{\cc}&\dbox{\cc}&\dbox
+%% {\cc}&\dbox{\cc}&\dbox{\cc}&\dbox{\bb}\\
+%%  \ebox{<img style="vertical-align:px" src="img/tex114.png" />}&\dbox{0}&\dbox{1}&\dbox{2}&\dbox{3}&\dbox{}&\dbox{}&\dbox
+%% {}&\dbox{}&\dbox{L}&\dbox{L{+}1}\\
+%% \end{tabular}
+%% \end{center}
+-->
+</p>
+<p>
+The discretized equation on this lattice is
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex115.png">
+</div>
+<p>
+</p>
+<p>
+The Jacobi iteration for this lattice is
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex116.png">
+</div>
+<p>
+</p>
+<p>
+If we apply Dirichlet boundary conditions <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex117.png">,
+it is easy to see that the <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex118.png"> eigenvectors of this iteration are
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex119.png">
+</div>
+<p>
+</p>
+<p>
+The eigenvalues are determined by plugging in
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex120.png">
+</div>
+<p>
+</p>
+<p>
+The spectral radius is given by the largest eigenvalue
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex121.png">
+</div>
+<p>
+for large <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex122.png">.
+</p>
+<p>
+A similar analysis can be done in two dimensions to get the estimates
+  in Numerical Recipes
+</p>
+<p>
+
+</p>
+
+<h2>Solving Poisson's Equation using the FFT </h2>
+<p>
+
+</p>
+<p>
+The Fast Fourier Transform can be used to solve elliptic partial
+differential equations in multiple dimensions.
+</p>
+<p>
+The basic idea is very simple. Consider the one-dimensional equation
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex123.png">
+</div>
+<p>
+Express <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex124.png"> and <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex125.png"> in terms of their Fourier transforms:
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex126.png">
+</div>
+<p>
+The equation is diagonalized in <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex127.png">-space
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex128.png">
+</div>
+<p>
+The solution is given by the inverse transform
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex129.png">
+</div>
+<p>
+</p>
+<p>
+We need to impose appropriate boundary conditions, and also specify how
+to treat the singularity at <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex130.png"> in the integral.
+</p>
+<p>
+
+</p>
+
+<h3>Boundary conditions and types of transforms </h3>
+<p>
+
+</p>
+<p>
+The boundary conditions determine the appropriate type of Fourier
+transform to solve the problem. Some problems, like conduction of
+heat through a rod which Fourier studied, require a sine transform.
+Others require a cosine or exponential transform.
+</p>
+<p>
+Consider a domain <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex131.png"> in one dimension.  Choose a
+lattice of <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex132.png"> equally spaced points <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex133.png">.
+</p>
+<p>
+The complex Fourier transform coefficients of <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex134.png"> are
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex135.png">
+</div>
+<p>
+The inverse transform
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex136.png">
+</div>
+<p>
+will be <i>periodic</i> in <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex137.png"> with period <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex138.png">.
+This complex Fourier transform is therefore appropriate for problems
+which satisfy <i>periodic boundary conditions</i>.
+</p>
+<p>
+If the problem involves <i>Dirichlet boundary conditions</i>, for
+example, <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex139.png">, then it would be appropriate to use a
+<i>sine Fourier transform</i>
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex140.png">
+</div>
+<p>
+</p>
+<p>
+If the problem involves <i>Neumann boundary conditions</i> it is appropriate
+to use is the <i>cosine Fourier transform</i>. One discrete version
+on <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex141.png"> points given in Numerical Recipes is
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex142.png">
+</div>
+<p>
+</p>
+<p>
+Note that the cosine and sine transforms are <i>not</i> just the real
+and imaginary parts of the complex exponential transform. This is
+because the sine, cosine, and exponential functions separately form
+complete sets, albeit with different boundary conditions. The basic
+phase factor for the sine and cosine transforms is <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex143.png"> compared
+with <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex144.png"> for the exponential: the sine and cosine transforms
+require <i>twice as many lattice points</i> because they are real,
+compared with the exponential transform which is complex.
+</p>
+<p>
+
+</p>
+
+<h3>Poisson's equation in two dimensions </h3>
+<p>
+
+</p>
+<p>
+Let's consider the discrete form of Poisson's equation
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex145.png">
+</div>
+<p>
+on an <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex146.png"> grid of points in the region <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex147.png"> with a
+given charge density, say a single point charge located at the center
+of the square.
+</p>
+<p>
+Impose periodic boundary conditions so that
+the exponential FFT can be used to obtain the solution.
+</p>
+<p>
+The discrete Fourier transform is a <i>linear operation</i>, so we can
+apply it separately in the <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex148.png"> and <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex149.png"> directions, and it does not
+matter in which order the transforms are done.
+</p>
+<p>
+The two-dimensional Fourier coefficients are given by
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex150.png">
+</div>
+<p>
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex151.png">
+</div>
+<p>
+The inverse transforms are
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex152.png">
+</div>
+<p>
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex153.png">
+</div>
+<p>
+</p>
+<p>
+Plugging these expressions into the discretized equation and
+equating coefficients of <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex154.png"> gives
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex155.png">
+</div>
+<p>
+which is easily solved for
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex156.png">
+</div>
+<p>
+The inverse Fourier transform then gives the potential.
+</p>
+<p>
+
+</p>
+
+<h3>Electric Field from Electrostatic Potential </h3>
+<p>
+
+</p>
+<p>
+Solving Poisson's equation yields the electrostatic potential
+  <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex157.png"> due to a given charge density <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex158.png">
+  and boundary conditons
+</p>
+<p>
+</p>
+<p>
+The electrostatic field is given by
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex159.png">
+</div>
+<p>
+In two dimensions the field has components
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex160.png">
+</div>
+<p>
+</p>
+<p>
+
+</p>
+
+<h3>Numerical Differentiation </h3>
+<p>
+
+</p>
+<p>
+Finding the numerical derivatives of a function is relatively
+  straightforward -- but there are some subtleties, see
+  \href{http://www.nrbook.com/a/bookcpdf/c5-7.pdf}{Section 5.7}
+  of Numerical Recipes
+</p>
+<p>
+Suppose we are given the numerical values of <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex161.png"> on a grid
+  of points <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex162.png">, <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex163.png"> and <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex164.png"> is the lattice
+  spacing, and <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex165.png">.
+</p>
+<p>
+The forward difference approximation to the derivative is
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex166.png">
+</div>
+<p>
+</p>
+<p>
+The backward difference approximation to the derivative is
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex167.png">
+</div>
+<p>
+</p>
+<p>
+The symmetric difference (three-point formula) is the average
+of forward and backward differences
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex168.png">
+</div>
+<p>
+    is one order in <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex169.png"> more accurate.
+</p>
+<p>
+A five-point formula
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex170.png">
+</div>
+<p>
+provides greater accuracy still.
+</p>
+<p>
+Unlike numerical integration, where higher order generally gives
+higher accuracy, higher order formulas for derivatives become
+increasingly sensitive to roundoff errors from cancellations between
+many terms of alternating signs.
+</p>
+<p>
+In practice, the three point formula is a reasonable compromise between
+accuracy and stability.  Better methods are discussed in Numerical
+Recipes.
+</p>
+<p>
+With the three-point formula, there is a problem with finding the
+derivative at boundary points.
+One strategy is to use the forward difference at the left
+boundary, and the backward difference at the right boundary.
+more accurate result is obtained by making a linear extrapolation
+of the derivatives already computed at the two closest interior points
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex171.png">
+</div>
+<p>
+which is more accurate than the forward difference by one order in <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex172.png">.
+At the right boundary
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex173.png">
+</div>
+<p>
+</p>
+<p>
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/electric.png">
+</div>
+<p>
+The plot was made using the following Gnuplot commands
+</p>
+<p>
+</p><pre style="margin-left:4em">gnuplot&gt; set size square
+gnuplot&gt; set xrange [0.35:0.6]
+gnuplot&gt; set yrange [0.35:0.6]
+gnuplot&gt; plot "electric.data" with vectors
+</pre>
+<p></p>
+<p>
+Notice the rapid fall off <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex174.png"> of the electric field with
+distance from the charge.
+</p>
+<p>
+
+</p>
+
+<h2>Solving Poisson's Equation using Multigrid Methods </h2>
+<p>
+
+</p>
+<p>
+
+</p>
+
+<h3>Multigrid Methods </h3>
+<p>
+
+</p>
+<p>
+The multigrid method provides algorithms which can be used to
+accelerate the rate of convergence of iterative methods, such as
+Jacobi or Gauss-Seidel, for solving elliptic partial differential
+equations.
+</p>
+<p>
+Iterative methods start with an approximate guess for the solution to
+the differential equation. In each iteration, the difference between
+the approximate solution and the exact solution is made smaller.
+</p>
+<p>
+One can analyze this difference or <i>error</i> into components of
+different wavelengths, for example by using Fourier analysis.  In
+general the error will have components of many different wavelengths:
+there will be short wavelength error components and long wavelength
+error components.
+</p>
+<p>
+Algorithms like Jacobi or Gauss-Seidel are <i>local</i> because the
+new value for the solution at any lattice site depends only on the value
+of the previous iterate at neighboring points. Such local algorithms are
+generally more efficient in reducing short wavelength error components.
+</p>
+<p>
+The basic idea behind multigrid methods is to reduce long wavelength
+error components by updating blocks of grid points. This strategy is
+similar to that employed by cluster algorithms in Monte Carlo
+simulations of the Ising model close to the phase transtion
+temperature where long range correlations are important. In fact,
+multigrid algorithms can also be combined with Monte Carlo simulations.
+</p>
+<p>
+
+</p>
+
+<h3>Multigrid method for Poisson's equation in 2-D </h3>
+<p>
+
+</p>
+<p>
+With a small change in notation, Poisson's equation in 2-D can be written:
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex175.png">
+</div>
+<p>
+where the unknown solution <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex176.png"> is determined by the given {\em
+source term} <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex177.png"> in a closed region. Let's consider a square
+domain <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex178.png"> with homogeneous Dirichlet boundary conditions
+<img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex179.png"> on the perimeter of the square. The equation is discretized on a
+grid with <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex180.png"> lattice points, i.e., <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex181.png"> interior points and 2
+boundary points, in the <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex182.png"> and <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex183.png"> directions. At any interior point,
+the exact solution obeys
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex184.png">
+</div>
+<p>
+</p>
+<p>
+The algorithm uses a succession of lattices or grids. The number of
+different grids is called the number of multigrid levels <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex185.png">.  The
+number of interior lattice points in the <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex186.png"> and <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex187.png"> directions is
+then taken to be <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex188.png">, so that <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex189.png">, and the lattice
+spacing <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex190.png">.  <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex191.png"> is chosen in this manner so that the
+downward multigrid iteration can construct a sequence of coarser
+lattices with
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex192.png">
+</div>
+<p>
+interior points in the <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex193.png"> and <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex194.png"> directions.
+</p>
+<p>
+Suppose that <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex195.png"> is the approximate solution at any stage in the
+calculation, and <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex196.png"> is the exact solution which we
+are trying to find.
+The multigrid algorithm defines the <i>correction</i>
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex197.png">
+</div>
+<p>
+is the function which must be added to the
+approximate solution to give the exact solution.
+\bitem The <i>residual</i> or <i>defect</i> is defined as
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex198.png">
+</div>
+<p>
+</p>
+<p>
+Notice that the correction and the residual are related by the equation
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex199.png">
+</div>
+<p>
+This equation has exactly the same form as Poisson's equation with <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex200.png">
+playing the role of unknown function and <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex201.png"> playing the role of known
+source function!
+</p>
+<p>
+
+</p>
+
+<h3>Simple $V-$cycle algorithm </h3>
+<p>
+
+</p>
+<p>
+The simplest multigrid algorithm is based on a <i>two-grid</i> improvement
+scheme. Consider two grids:
+</p>
+<p>
+</p><ul style="margin-left:2em">
+<li> a <i>fine grid</i> with <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex202.png"> points in each direction, and
+<p></p>
+<p>
+</p></li><li> a <i>coarse grid</i> with <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex203.png"> points.
+</li></ul>
+<p></p>
+<p>
+We need to be able to move from one grid to another, i.e., given any
+function on the lattice, we need to able to
+</p>
+<p>
+</p><ul style="margin-left:2em">
+<li> <i>restrict</i> the function from fine <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex204.png"> coarse, and
+<p></p>
+<p>
+</p></li><li> <i>prolongate</i> or <i>interpolate</i> the function from coarse
+<img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex205.png"> fine.
+</li></ul>
+<p></p>
+<p>
+Given these definitions, the multigrid <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex206.png">cycle can be defined
+recursively as follows:
+</p>
+<p>
+</p><ul style="margin-left:2em">
+<li> If <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex207.png"> there is only one interior point, so solve exactly for
+<p></p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex208.png">
+</div>
+<p>
+</p>
+<p>
+</p></li><li> Otherwise, calculate the current <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex209.png">.
+<p></p>
+<p>
+</p></li><li> Perform a few pre-smoothing iterations using a local algorithm
+such as Gauss-Seidel. The idea is to damp or reduce the short
+wavelength errors in the solution.
+<p></p>
+<p>
+</p></li><li> Estimate the correction <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex210.png"> as follows:
+<p></p>
+<p>
+</p><ul style="margin-left:2em">
+<li> Compute the residual
+<p></p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex211.png">
+</div>
+<p>
+</p>
+<p>
+</p></li><li> Restrict the residual <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex212.png"> to the coarser grid.
+<p></p>
+<p>
+</p></li><li> Set the coarser grid correction <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex213.png"> and improve it recursively.
+<p></p>
+<p>
+</p></li><li> Prolongate the correction <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex214.png"> onto the finer grid.
+</li></ul>
+<p></p>
+<p>
+</p></li><li> Correct <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex215.png">.
+<p></p>
+<p>
+</p></li><li> Perform a few post-smoothing Gauss-Seidel interations
+and return this improved <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex216.png">.
+</li></ul>
+<p></p>
+<p>
+How does this recursive algorithm scale with <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex217.png">? The pre-smoothing and
+post-smoothing Jacobi or Gauss-Seidel iterations are the most time
+consuming parts of the calculation. Recall that a single Jacobi or
+Gauss-Seidel iteration scales like <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex218.png">. The operations must
+be carried out on the sequence of grids with
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex219.png">
+</div>
+<p>
+interior lattice points in each direction. The total number of operations
+is of order
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex220.png">
+</div>
+<p>
+Thus the multigrid <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex221.png">cycle scales like <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex222.png">, i.e., linearly
+with the number of lattice points N!
+</p>
+<p>
+
+</p>
+
+<h3>Restricting the Residual to a Coarser Lattice </h3>
+<p>
+
+</p>
+<p>
+The coarser lattice with spacing <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex223.png"> is constructed as shown. A simple
+algorithm for <i>restricting</i> the residual to the coarser lattice is
+to set its value to the average of the values on the four surrounding
+lattice points (cell-centered coarsening):
+</p>
+<p>
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/restrict.png">
+</div>
+<p>
+</p>
+<p>
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex224.png">
+</div>
+<p>
+</p>
+<p>
+
+</p>
+
+<h3>Prolongation of the Correction to the Finer Lattice </h3>
+<p>
+
+</p>
+<p>
+Having restricted the residual to the coarser lattice with spacing <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex225.png">,
+we need to solve the equation
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex226.png">
+</div>
+<p>
+with the initial guess <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex227.png">. This is done by two-grid iteration
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex228.png">
+</div>
+<p>
+The output must now be interpolated
+or <i>prolongated</i> to the finer lattice. The simplest procedure is to
+copy the value of <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex229.png"> on the coarse lattice to the 4 neighboring
+cell points on the finer lattice:
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex230.png">
+</div>
+<p>
+</p>
+<p>
+
+</p>
+
+<h3>Cell-centered and Vertex-centered Grids and Coarsenings </h3>
+<p>
+
+</p>
+<p>
+In the <i>cell-centered</i> prescription, the spatial domain is partitioned
+into discrete cells. Lattice points
+are defined at the <i>center</i> of each cell as shown in the figure:
+</p>
+<p>
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/cell-center.png">
+</div>
+<p>
+</p>
+<p>
+The coarsening operation is defined by doubling the size of a cell in each
+spatial dimension and placing a coarse lattice point at the center of the
+doubled cell.
+</p>
+<p>
+Note that the number of lattice points or cells in each dimension must be
+a power of 2 if the coarsening operation is to terminate with a single
+cell. In the figure, the finest lattice has <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex231.png"> cells in each
+dimension, and 3 coarsening operations reduce the number of cells in
+each dimension
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex232.png">
+</div>
+<p>
+</p>
+<p>
+Note also that with the cell-centered prescription, the spatial location of
+lattice sites <i>changes</i> with each coarsening: coarse lattice sites are
+spatially displaced from fine lattice sites.
+</p>
+<p>
+A <i>vertex-centered</i> prescription is defined by partitioning the
+spatial domain into discrete cells and locating the discrete lattice
+points at the <i>vertices</i> of the cells as shown in the figure:
+</p>
+<p>
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/vertex-center.png">
+</div>
+<p>
+</p>
+<p>
+The coarsening operation is implemented simply by dropping every other
+lattice site in each spatial dimension.
+</p>
+<p>
+Note that the number of lattice points in each dimension must be one
+greater than a power of 2 if the coarsening operation is to reduce the
+number of cells to a single coarsest cell. In the example in the figure
+the finest lattice has <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex233.png"> lattice sites in each dimension, and
+2 coarsening operations reduce the number of vertices in each dimension
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex234.png">
+</div>
+<p>
+</p>
+<p>
+The vertex-centered prescription has the property that the spatial locations
+of the discretization points are not changed by the coarsening operation.
+</p>
+<p>
+
+</p>
+
+<h3>Boundary points </h3>
+<p>
+
+</p>
+<p>
+Let's assume that the outermost perimeter points are taken to be the
+boundary points.
+The behavior of these boundary points is different in the two prescriptions:
+</p>
+<p>
+</p><ul style="margin-left:2em">
+<li> <i>Cell-centered Prescription:</i>
+The boundary points move in space towards the
+center of the region at each coarsening. This implies that one has to
+be careful in defining the ``boundary values'' of the solution.
+<p></p>
+<p>
+</p></li><li> <i>Vertex-centered Prescription:</i>
+The boundary points do not move when the lattice is coarsened. This make it
+easier in principle to define the boundary values.
+</li></ul>
+<p></p>
+<p>
+These two different behaviors of the boundary points make the vertex-centered
+prescription a little more convenient to use in multigrid applications.
+However, there
+is no reason why the cell-centered prescription should not work as well.
+</p>
+<p>
+
+</p>
+
+<h3>Restriction and Prolongation Operators </h3>
+<p>
+
+</p>
+<p>
+In the multigrid method it is necessary to move functions from a fine
+grid to the next coarser grid (<i>Restriction</i>), and from a coarse
+grid to the next finer grid (<i>Prolongation</i>). Many prescriptions for
+restricting and prolongating functions have been studied.
+Let's consider two of the simplest prescriptions appropriate for cell-
+and vertex-centered coarsening:
+</p>
+<p>
+</p><ul style="margin-left:2em">
+<li> <i>Cell-centered Coarsening:</i> In this prescription, a coarse lattice
+point is naturally associated with <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex235.png"> neighboring fine lattice points
+in <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex236.png">-dimensions.
+<p></p>
+<p>
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/cell.png">
+</div>
+<p>
+</p>
+<p>
+</p></li><li>
+Suppose that <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex237.png"> is a function on the fine lattice at
+spatial position <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex238.png">, and <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex239.png"> is the corresponding function
+on the coarse lattice, then this diagram suggests a simple prescription for
+restriction and prolongation.
+<p></p>
+<p>
+</p><ul style="margin-left:2em">
+<li> <i>Restriction:</i> Average the function values at the 4 neighboring
+fine lattice sites <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex240.png">:
+<p></p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex241.png">
+</div>
+<p>
+</p></li><li> <i>Prolongation:</i> Inject the value of the function at the coarse lattice
+site to the 4 neighboring fine lattice sites:
+<p></p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex242.png">
+</div>
+<p>
+</p></li></ul>
+<p></p>
+<p>
+</p></li><li> <i>Vertex-centered Coarsening:</i> Consider a coarse lattice
+point and the 9 neighboring fine lattice points shown in the figure:
+<p></p>
+<p>
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/vertex.png">
+</div>
+<p>
+</p>
+<p>
+</p></li><li>
+In this prescription, a coarse lattice
+point can naturally associated (in 2-D) with
+<p></p>
+<p>
+</p><ul style="margin-left:2em">
+<li> the corresponding fine lattice point, or
+<p></p>
+<p>
+</p></li><li> the four nearest neighbor fine lattice points, left, right, up, and
+down, or
+<p></p>
+<p>
+</p></li><li> with the four diagonally nearest fine lattice points, etc.
+</li></ul>
+<p></p>
+<p>
+</p></li><li>
+It is a little more complicated here to define transfer operators. The
+problem is that the fine lattice points are associated with
+<i>more than one</i> coarse lattice point, unlike the cell-centered case:
+<p></p>
+<p>
+</p><ul style="margin-left:2em">
+<li> The single red fine lattice point in the center coincides with an
+unique coarse lattice point.
+<p></p>
+<p>
+</p></li><li> Each of the 4 black fine lattice points however is equidistant from
+<i>two</i> coarse lattice points.
+<p></p>
+<p>
+</p></li><li> Each of the 4 red fine lattice points is equidistant from <i>four</i>
+coarse lattice points.
+</li></ul>
+<p></p>
+<p>
+</p></li><li>
+This sharing of lattice points suggests the following prescriptions:
+<p></p>
+<p>
+</p></li><li> <i>Prolongation:</i> use <i>bilinear interpolation</i>
+in which the value of <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex243.png"> at
+a coarse grid point is copied to 9 neighboring fine-grid points with
+the following weights:
+<p></p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex244.png">
+</div>
+<p>
+This matrix is called the <i>stencil</i> for the prolongation.
+</p>
+<p>
+</p></li><li> <i>Restriction:</i> The restriction operator is taken to be the
+<i>adjoint</i> of the prolongation operator:
+<p></p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/tex245.png">
+</div>
+<p>
+This choice of restriction operator is called <i>full weighting</i>.
+</p></li></ul>
+<p></p>
+<p>
+
+</p>
+
+<h3>Improvements and More Complicated Multigrid Algorithms </h3>
+<p>
+
+</p>
+<p>
+The algorithm implemented above is the simplest multigrid scheme with
+a single <i>V-cycle</i>.
+Section 19.6
+of <i>Numerical Recipes</i> discusses various ways of improving this
+algorithm:
+</p>
+<p>
+</p><ul style="margin-left:2em">
+<li> One can repeat the two-grid iteration more than once. If it is
+repeated <i>twice</i> in each multigrid level one obtains a <i>W-cycle</i>
+type of algorithm.
+<p></p>
+<p>
+</p></li><li> The <i>Full Multigrid Algorithm</i> starts with the coarsest grid
+on which the equation can be solved exactly. It then proceeds to finer
+grids, performing one or more <i>V-cycles</i> at each level along the
+way. <i>Numerical Recipes</i> gives a program <code>mglin(u,n,ncycle)</code>
+which accepts the source function <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex246.png"> in the first argument and
+implements the full multigrid algorithm with <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex247.png">
+levels, performing <code>ncycle</code> V-cycles at each level, and returning
+the solution in the array parameter <code>u</code>. Note that this program
+assumes that the number of lattice points in each dimension <img style="vertical-align:px" src="./3.1 Poisson's Equation and Relaxation Methods_files/tex248.png"> is odd,
+which leads to vertex centered coarsening:
+</li></ul>
+<p></p>
+<p>
+</p>
+<div align="center">
+<img src="./3.1 Poisson's Equation and Relaxation Methods_files/restrict.png">
+</div>
+<p>
+</p>
+<p>
+
+<br><br>
+</p><div class="foot">
+© 2011 &nbsp; <a href="http://www.physics.buffalo.edu/gonsalves">Richard J. Gonsalves</a>
+<br><br>
+<a href="http://www.physics.buffalo.edu/">Department of Physics</a>
+&nbsp;|&nbsp;
+<a href="http://www.buffalo.edu/">University at Buffalo</a>
+</div>
+
+
+<div id="html-validator-loading"><img src="chrome-extension://cgndfbhngibokieehnjhbjkkhbfmhojo/images/loading.gif">Validating...</div><div id="html-validator-message"><span id="html-validation-message-close">X</span><div id="html-validator-message-content"></div></div></body></html>
