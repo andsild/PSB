@@ -41,7 +41,7 @@ double getRangeVal(const d1 &U, const d1 &F,
  *
  */
 void iterate_jacobi(d1 F, d1 &U, double iWidthLength,
-                    int iLength)
+                    int iLength, double H = 1)
 {
     d1 copyU = U;
     for(vector<int>::size_type iPos = iWidthLength;
@@ -68,7 +68,7 @@ void iterate_gauss(d1 F, d1 &U, double iWidthLength,
     }
 }
 
-void iterate_sor(d1 F, d1 &U, double iWidthLength, int iLength)
+void iterate_sor(d1 F, d1 &U, double iWidthLength, int iLength, double H = 1)
 {
     double omega = 2 / (1 + (3.14 / iWidthLength));
     double dOmegaConstant = omega / 4;
@@ -219,7 +219,7 @@ void writeToFile(vector<string> vRes, double dID)
     data_file.close();
 }
 
-void iterative_solve(void *function,
+void iterative_solve(void (*function)(d1, d1 &arg, double, int, double),
                     d1 solution, d1 guess,
                     double dMaxErr, int iLength, int iWidth) 
 {
@@ -233,7 +233,7 @@ void iterative_solve(void *function,
     {
         dError = 0;
         newGuess = old_guess;
-        iterate_gauss(solution, newGuess, iLength, iWidth);
+        function(solution, newGuess, iLength, iWidth, iLength);
         // iterate_jacobi(solution, old_guess, iWidth);
         // iterate_sor(solution, old_guess, iWidth);
 
