@@ -16,7 +16,7 @@
 
 
 #include "../lib/CImg-1.5.8/CImg.h"
-#include "solvers/GS/gauss_image.cpp"
+#include "solvers/GS/iterative_solvers.cpp"
 #include "solvers/GS/multigrid.cpp"
 
 #define no_argument 0
@@ -49,6 +49,7 @@ void readImage(CImg<double> image)
     CImg<double> mask = inputkernel(D, 3);
     //FIXME: specified wrong order
     mask(0, 1) = 1;
+    //FIXME: ... this is not the right way to mask, is it?
     CImg<double> masked = image.get_convolve(mask);
     CImg<double> F = masked.get_vector();
     // cannot use RAW array, running out of stack space
@@ -61,7 +62,7 @@ void readImage(CImg<double> image)
     F = CImg<double>(1, 1, 1, 1, 1); // null out, get memory back
     d1 U(height, 0);
 
-    // matrix_type x2 = test(vec1, U, max_error, F.height(), image.width());
+    // matrix_type x2 = iterative_solve(vec1, U, max_error, F.height(), image.width());
     cout << "reading image" << endl;
     two_grid(1, U, vec1, image.width(), 5);
     
