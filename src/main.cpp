@@ -43,34 +43,25 @@ void readImage(CImg<double> image)
 {
     double max_error = 1;
     double D[9] = {0,1,0, 0,-4,1, 0,1,0};
-    CImg<double> mask = inputkernel(D, 3);
-    for(int iPos = 0; iPos < mask.height(); iPos++)
-    {
-        for(int jPos = 0; jPos < mask.width(); jPos++)
-        {
-            cout << mask(jPos, iPos) << endl;
-        }
-    }
+    CImg<double> mask = inputkernel(D, 3); //FIXME: WRONG
+    CImg<double> masked = image.get_convolve(mask); 
+        //FIXME: ... this is not the right way to mask, is it?
+    CImg<double> F = masked.get_vector(); //FIXME: has > inf excess pixels..
+    int iHeight = F.height();
+    d1 image_vec(iHeight, 0);
 
-    //FIXME: specified wrong order
-    mask(0, 1) = 1;
-    //FIXME: ... this is not the right way to mask, is it?
-    CImg<double> masked = image.get_convolve(mask);
-    CImg<double> F = masked.get_vector(); // has like > inf more pixels..
-    // cannot use RAW array, running out of stack space
-    int height = F.height();
-    d1 image_vec(height, 0);
+    /* Load F into a vector */
     for(int iPos = 0; iPos < F.height(); iPos++)
     {
         image_vec[iPos] = F(0, iPos);
     }
     F = CImg<double>(1, 1, 1, 1, 1); // TODO: does this get memory back?
-    d1 U(height, 0); // wait to declare this until memory is freed?
+    d1 U(iHeight, 0); // wait to declare this until memory is freed?
 
+    /* Solve */
     iterative_solve(iterate_gauss,
                     image_vec, U,
                     max_error, F.height(), image.width());
-    cout << "reading image" << endl;
     // two_grid(1, U, vec1, image.width(), 5);
 }
 
@@ -80,6 +71,9 @@ void readSingleImage()
     readImage(image);
 }
 
+/** Read a series of images and solve them
+ *
+ */
 void readFolder(char *dir)
 {
     CImgList<double> imgList;
