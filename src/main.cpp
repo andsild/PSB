@@ -16,8 +16,7 @@
 
 
 #include "../lib/CImg-1.5.8/CImg.h"
-#include "solvers/GS/iterative_solvers.cpp"
-#include "solvers/GS/multigrid.cpp"
+#include "solvers/iterative_solvers.cpp"
 
 #define no_argument 0
 #define required_argument 1 
@@ -41,7 +40,6 @@ CImg<double> inputkernel(double entries[], int iNewWidth, int iNewHeight)
     return image;
 }
 
-
 void readImage(CImg<double> image)
 {
     double max_error = 1;
@@ -64,13 +62,13 @@ void readImage(CImg<double> image)
 
     // matrix_type x2 = iterative_solve(vec1, U, max_error, F.height(), image.width());
     cout << "reading image" << endl;
-    two_grid(1, U, vec1, image.width(), 5);
+    // two_grid(1, U, vec1, image.width(), 5);
     
 }
 
 void readSingleImage()
 {
-    CImg<unsigned char> image("./media/109201.jpg");
+    CImg<unsigned char> image("./media/109201.jpg"); //example
     readImage(image);
 }
 
@@ -147,6 +145,7 @@ int main(int argc, char *argv[])
                 break; // do nothing
         }
     } 
+    
     // CImg<unsigned char> image("./media/icon_img.png");
 	// CImgDisplay main_disp(image,"Image",0);	
 	// CImgDisplay mask_disp(x2,"Image",0);	
