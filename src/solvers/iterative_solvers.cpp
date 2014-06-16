@@ -13,23 +13,24 @@
 #include <string>
 
 #include "../main.cpp"
-#include "../../lib/CImg-1.5.8/CImg.h"
+#include "../file.cpp"
 
-using namespace cimg_library;
 using namespace std;
 
 namespace pe_solver //[p]oison-[e]quation
 {
+
 typedef vector<double> d1;
+typedef void (*iterative_function)(d1, d1 &arg, double, int, double) ;
 
 double calculateError(double, double);
-void writeToFile(vector<string>, double, string);
 
 double getRangeVal(const d1 &U, const d1 &F,
         const int iIndex, const int iWidthLength, const double H = 1.0)
 {
     int xPos = iIndex % (int)iWidthLength;
-    if(xPos < 0 || xPos >= iWidthLength) { return 0; }
+    /* Skip the first and last column */
+    if(xPos < 1 || xPos >= iWidthLength) { return 0; }
     /* XXX: Row-wise skips are made in external for-loops */
 
     int iIndexPixelAbove = iIndex - iWidthLength;
@@ -210,25 +211,8 @@ void two_grid(double h, d1 &U, d1 &F, int iWidthLength, int iSmoothFactor)
 }
 
 
-void writeToFile(vector<string> vRes, double dID, string sFolderDest)
-{
-    ofstream data_file(DATA_DIR + sFolderDest + "/" +  to_string(dID) 
-                       + DATA_EXTENSION);
-
-    for (vector<string>::iterator it = vRes.begin();
-            it != vRes.end();
-            ++it)
-    {
-        data_file << setprecision(PRECISION) << fixed << *it << endl;
-    }
-
-    data_file.close();
-}
-
-typedef void (*iterative_function)(d1, d1 &arg, double, int, double) ;
-
-void iterative_solve(iterative_function function, string sLocation,
-                    d1 solution, d1 guess,
+vector<string> iterative_solve(iterative_function function,
+                    d1 &solution, d1 guess,
                     double dMaxErr, int iLength, int iWidth) 
 {
     double dMax = 0;
@@ -246,14 +230,12 @@ void iterative_solve(iterative_function function, string sLocation,
         dError = findError(old_guess, newGuess, iLength);
         old_guess = newGuess;
         iIterCount++;
-        // cout << iIterCount << "\t" << dError << endl;
-        
-        // vOutput.push_back(to_string(iIterCount) + "\t" 
-        //                   + to_string(dError) + "\n");
+
         vOutput.push_back(to_string(dError));
     } while(dError > dMaxErr);
 
-    writeToFile(vOutput, dError, sLocation);
+    return vOutput;
+    // writeToFile(vOutput, "dwad");
 }
 
 } // EndOfNamespace
