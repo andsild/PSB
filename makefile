@@ -42,7 +42,9 @@ OBJS = $(SRCS:.c=.o)
 
 # define the executable file 
 BUILD_DIR = ./build/
+BIN_DIR = ./bin/
 MAIN = out
+SRC_DIR = ./src
 
 #
 # The following part of the makefile is generic; it can be used to 
@@ -56,7 +58,7 @@ all:    $(MAIN)
 	@echo Program compiled!
 
 $(MAIN): $(OBJS) 
-	$(CC) $(CFLAGS) $(INCLUDES) -o ${BUILD_DIR}$(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
+	$(CC) $(CFLAGS) $(INCLUDES) -o ${BIN_DIR}$(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
 
 # this is a suffix replacement rule for building .o's from .c's
 # it uses automatic variables $<: the name of the prerequisite of

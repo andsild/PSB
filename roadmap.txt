@@ -1,12 +1,18 @@
 # Gong ville gjoore dette 
 ((Legg til noen av de mer avanserte))
 
+#1 reconstruct iamges
+
+#2 fix division by pixel size
+
+
+#3 plots should have average AND all the others
+
 #1 multi-threaded, to be faster per image
     red black
     multitraad
 
 #2 timing different functions / iterations
-
 
 #3 make histograms
 
@@ -15,6 +21,7 @@
 #5 Variation of parameters used in functions
     diskretisering
     ω
+
 #7 Detection of convergence, etc
     http://www.physics.buffalo.edu/phy410-505/2011/topic3/app1/index.html
         [described in the moddile of the page]

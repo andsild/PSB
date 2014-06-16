@@ -20,6 +20,9 @@
 *.out
 *.app
 
+# Images
+*.png
+
 # Large files
 media/
 small_media/*
