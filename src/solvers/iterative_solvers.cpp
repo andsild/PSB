@@ -209,6 +209,7 @@ void two_grid(double h, d1 &U, d1 &F, int iWidthLength, int iSmoothFactor)
 void writeToFile(vector<string> vRes, double dID)
 {
     ofstream data_file(DATA_DIR + to_string(dID) + DATA_EXTENSION);
+
     for (vector<string>::iterator it = vRes.begin();
             it != vRes.end();
             ++it)
@@ -228,7 +229,7 @@ void iterative_solve(void (*function)(d1, d1 &arg, double, int, double),
     d1 newGuess;
     double dError = 0;
     int iIterCount = 0;
-    vector<string> vOutput(1, "");
+    vector<string> vOutput;
     do
     {
         dError = 0;
@@ -236,13 +237,16 @@ void iterative_solve(void (*function)(d1, d1 &arg, double, int, double),
         function(solution, newGuess, iLength, iWidth, iLength);
         // iterate_jacobi(solution, old_guess, iWidth);
         // iterate_sor(solution, old_guess, iWidth);
+        
 
         dError = findError(old_guess, newGuess, iLength);
         old_guess = newGuess;
         iIterCount++;
+        // cout << iIterCount << "\t" << dError << endl;
         
-        vOutput.push_back(to_string(iIterCount) + "\t" 
-                          + to_string(dError) + "\n");
+        // vOutput.push_back(to_string(iIterCount) + "\t" 
+        //                   + to_string(dError) + "\n");
+        vOutput.push_back(to_string(dError));
     } while(dError > dMaxErr);
 
     writeToFile(vOutput, dError);
