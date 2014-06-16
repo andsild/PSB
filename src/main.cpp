@@ -15,6 +15,7 @@
 #include <sys/types.h>
 #include <fstream>
 #include <sstream> 
+#include <map>
 
 
 #include "../lib/CImg-1.5.8/CImg.h"
@@ -42,15 +43,22 @@ CImg<double> inputkernel(double entries[], int iNewWidth, int iNewHeight)
     return image;
 }
 
-void readImage(CImg<double> image)
+void readImage(CImg<double> image, vector<iterative_function> vIf)
 {
     double max_error = 1;
     double D[9] = {0,1,0, 1,-4,1, 0,1,0};
     CImg<double> mask = inputkernel(D, 3); 
 
+    map<iterative_function, string> fileLocations;
+    fileLocations[iterate_gauss] = "gauss";
+    fileLocations[iterate_jacobi] = "jacobi";
+    fileLocations[iterate_sor] = "sor";
+
+
     CImg<double> masked = image.get_convolve(mask); 
        //FIXME: ... this is not the right way to mask, is it?
     CImg<double> F = masked.get_vector(); //FIXME: has > inf excess pixels..
+    F = image;
     int iHeight = F.height();
     d1 image_vec(iHeight, 0);
 
@@ -63,23 +71,31 @@ void readImage(CImg<double> image)
     d1 U(iHeight, 0); // wait to declare this until memory is freed?
 
     /* Solve */
-    iterative_solve(iterate_gauss,
-                    image_vec, U,
-                    max_error, F.height(), image.width());
+    for (vector<iterative_function>::iterator it = vIf.begin();
+            it != vIf.end();
+            ++it)
+    {
+    // iterative_solve(*it, fileLocations[*it],
+    //                 image_vec, U,
+    //                 max_error, F.height(), image.width());
+        iterative_solve(*it, fileLocations[*it],
+                        image_vec, U,
+                        max_error, F.height(), image.width());
+    }
     // two_grid(1, U, vec1, image.width(), 5);
 }
 
-void readSingleImage()
+void readSingleImage(vector<iterative_function> vIf)
 {
     // CImg<unsigned char> image("./media/109201.jpg"); //example
     CImg<unsigned char> image("./small_media/104000.jpg"); //example
-    readImage(image);
+    readImage(image, vIf);
 }
 
 /** Read a series of images and solve them
  *
  */
-void readFolder(char *dir)
+void readFolder(char *dir, vector<iterative_function> vIf)
 {
     CImgList<double> imgList;
 
@@ -111,12 +127,26 @@ void readFolder(char *dir)
         imgList.push_back(img);
     }
 
+
     for (CImgList<double>::iterator it = imgList.begin(); it != imgList.end(); ++it)
     {
-        readImage(*it);
+        readImage(*it, vIf);
     }
 
-    calculateAverage("./data/");
+    map<iterative_function, string> fileLocations;
+    fileLocations[iterate_gauss] = "gauss";
+    fileLocations[iterate_jacobi] = "jacobi";
+    fileLocations[iterate_sor] = "sor";
+
+
+    for (vector<iterative_function>::iterator it = vIf.begin();
+            it != vIf.end();
+            ++it)
+    {
+        string sDest = DATA_DIR;
+        sDest += fileLocations[*it];
+        calculateAverage(sDest);
+    }
 }
 
 void calculateAverage(string sFilePath)
@@ -129,6 +159,7 @@ void calculateAverage(string sFilePath)
     struct dirent *dirp;
 
     vector<string> files;
+    sFilePath += "/";
 
     dp = opendir( sFilePath.c_str() );
     if (dp == NULL)
@@ -152,7 +183,7 @@ void calculateAverage(string sFilePath)
     }
 
     double dNumFiles = files.size();
-    vector<double> average(600);
+    vector<double> average(990); // can give undererror
     for (vector<string>::iterator it = files.begin();
             it != files.end();
             ++it)
@@ -163,20 +194,20 @@ void calculateAverage(string sFilePath)
         double dNum;
         while(infile >> dNum)
         {
-            average[iPos] += dNum;
+            average[iPos] = dNum;
             iPos++;
         }
     }
 
     string sFileName = "average";
-    ofstream data_file(DATA_DIR + sFileName + DATA_EXTENSION);
+    ofstream data_file(sFilePath + "/" + sFileName + DATA_EXTENSION);
     for (vector<double>::iterator it = average.begin();
             it != average.end();
             ++it)
     {
         if(*it == 0) { break; }
         data_file << (*it /= dNumFiles) << endl;
-        cout << (*it /= dNumFiles) << endl;
+        // cout << (*it /= dNumFiles) << endl;
     }
     data_file.close();
 }
@@ -194,27 +225,56 @@ int main(int argc, char *argv[])
     int iarg=0;
     extern char *optarg;
     
-    // opterr=1; //turn off getopt error message
+    int f = 0, g = 0, i = 0, j = 0, s = 0;
+    char *folder;
+    vector<iterative_function> test;
 
     while(iarg != -1)
     {
-        iarg = getopt_long(argc, argv, "if:", longopts, &index);
+        iarg = getopt_long(argc, argv, "f:gijs", longopts, &index);
 
         switch (iarg)
         {
             case 'i':
-                readSingleImage();
+                i++;
                 break;
 
             case 'f':
-                readFolder(optarg);
+                f++;
+                folder = optarg;
                 break;
 
-            default: // always do something
-                readSingleImage(); 
+            case 'g':
+                test.push_back(iterate_gauss);
+                break;
+
+            case 'j':
+                test.push_back(iterate_jacobi);
+                break;
+
+            case 's':
+                test.push_back(iterate_sor);
+                break;
+
+            default: 
                 break; 
         }
     } 
+
+
+    if(f) {
+        readFolder(folder, test);
+    }
+    else if(i)
+    {
+        readSingleImage(test);
+    }
+    else //default
+    {
+        test.push_back(iterate_gauss);
+        readSingleImage(test);
+    }
+
     
     //show image(s)
     // CImg<unsigned char> image("./media/icon_img.png");
