@@ -23,7 +23,7 @@ namespace pe_solver //[p]oison-[e]quation
 typedef vector<double> d1;
 
 double calculateError(double, double);
-void writeToFile(vector<string>, double);
+void writeToFile(vector<string>, double, string);
 
 double getRangeVal(const d1 &U, const d1 &F,
         const int iIndex, const int iWidthLength, const double H = 1.0)
@@ -206,9 +206,10 @@ void two_grid(double h, d1 &U, d1 &F, int iWidthLength, int iSmoothFactor)
 }
 
 
-void writeToFile(vector<string> vRes, double dID)
+void writeToFile(vector<string> vRes, double dID, string sFolderDest)
 {
-    ofstream data_file(DATA_DIR + to_string(dID) + DATA_EXTENSION);
+    ofstream data_file(DATA_DIR + sFolderDest + "/" +  to_string(dID) 
+                       + DATA_EXTENSION);
 
     for (vector<string>::iterator it = vRes.begin();
             it != vRes.end();
@@ -220,7 +221,9 @@ void writeToFile(vector<string> vRes, double dID)
     data_file.close();
 }
 
-void iterative_solve(void (*function)(d1, d1 &arg, double, int, double),
+typedef void (*iterative_function)(d1, d1 &arg, double, int, double) ;
+
+void iterative_solve(iterative_function function, string sLocation,
                     d1 solution, d1 guess,
                     double dMaxErr, int iLength, int iWidth) 
 {
@@ -234,10 +237,7 @@ void iterative_solve(void (*function)(d1, d1 &arg, double, int, double),
     {
         dError = 0;
         newGuess = old_guess;
-        function(solution, newGuess, iLength, iWidth, iLength);
-        // iterate_jacobi(solution, old_guess, iWidth);
-        // iterate_sor(solution, old_guess, iWidth);
-        
+        function(solution, newGuess, iLength, iWidth, 1);
 
         dError = findError(old_guess, newGuess, iLength);
         old_guess = newGuess;
@@ -249,7 +249,7 @@ void iterative_solve(void (*function)(d1, d1 &arg, double, int, double),
         vOutput.push_back(to_string(dError));
     } while(dError > dMaxErr);
 
-    writeToFile(vOutput, dError);
+    writeToFile(vOutput, dError, sLocation);
 }
 
 } // EndOfNamespace
