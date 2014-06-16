@@ -221,6 +221,8 @@ vector<string> iterative_solve(iterative_function function,
     double dError = 0;
     int iIterCount = 0;
     vector<string> vOutput;
+    //FIXME: images are too small
+    //FIXME: iWidth is 1, lol
     do
     {
         dError = 0;
@@ -228,12 +230,15 @@ vector<string> iterative_solve(iterative_function function,
         function(solution, newGuess, iLength, iWidth, 1);
 
         dError = findError(old_guess, newGuess, iLength);
+        cout << dError << endl;
         old_guess = newGuess;
         iIterCount++;
 
         vOutput.push_back(to_string(dError));
     } while(dError > dMaxErr);
 
+    // cout << function << endl;
+    // cout << vOutput.size() << endl;
     return vOutput;
     // writeToFile(vOutput, "dwad");
 }

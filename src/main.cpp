@@ -37,7 +37,8 @@ void calculateAverage(string);
 typedef CImg<double> image;
 typedef CImgList<double> imageList;
 
-CImgList<double> readImage(CImg<double> image, const char *fileName, vector<iterative_function> vIf)
+CImgList<double> readImage(CImg<double> image,
+                           const char *fileName, vector<iterative_function> vIf)
 {
     double max_error = 1;
     int iHeight = image.height();
@@ -61,8 +62,8 @@ CImgList<double> readImage(CImg<double> image, const char *fileName, vector<iter
 
     /* Solve */
     for (vector<iterative_function>::iterator it = vIf.begin();
-            it != vIf.end();
-            ++it)
+        it != vIf.end();
+        ++it)
     {
         double *dImage = new double[image_vec.size()];
 
@@ -70,7 +71,8 @@ CImgList<double> readImage(CImg<double> image, const char *fileName, vector<iter
                                        image_vec, U,
                                        max_error, image.height(), image.width());
 
-        writeToFile(vOutput, strcat(fileLocations[*it], fileName), fileLocations[*it]);
+        string fileLocation = (string)fileLocations[*it] + fileName;
+        writeToFile(vOutput, fileName, fileLocations[*it]);
 
         for(vector<int>::size_type iPos = 0;
                 iPos < image_vec.size();
@@ -113,7 +115,7 @@ void readFolder(char *dir, vector<iterative_function> vIf)
     dp = opendir( dir );
     if (dp == NULL)
     {
-        cout << "Error in openning (errcode: " << errno << ")" << endl;
+        cout << "Error in openin" << endl;
         return;
     }
 
@@ -184,7 +186,7 @@ void calculateAverage(string sFilePath)
     dp = opendir( sFilePath.c_str() );
     if (dp == NULL)
     {
-        cout << "Error in openning (errcode: " << errno << ")" << endl;
+        cout << "Error in opening" << endl;
         return;
     }
 
@@ -205,10 +207,9 @@ void calculateAverage(string sFilePath)
     double dNumFiles = files.size();
     vector<double> average; // can give undererror
     int iLineCount = numeric_limits<int>::max();
-    cout << files.size() << endl;
     for (vector<string>::iterator it = files.begin();
-            it != files.end();
-            ++it)
+        it != files.end();
+        ++it)
     {
         ifstream infile;
         infile.open(*it);
