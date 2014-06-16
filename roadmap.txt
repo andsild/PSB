@@ -1,21 +1,21 @@
-Start med smaa bilder, drit i optimalisering.
-    lese mappe
-    /* kombiner resultat/output fra mappene */
-        /* skaffe average, regne dette til en fil.. */
+#1 skaffe average, regne dette til en fil..
 
-Legg til noen av de mer avanserte
+#2 bestemme pre-emptive hvilken funksjon(er)
 
-Lage histogram
+# Gong ville gjoore dette 
+((Legg til noen av de mer avanserte))
 
-Kunne variere parameter
+#3 Lage histogram
+
+#4 Kunne variere parameter
     diskretisering
     ω
 
-Optimaliser
+#5 Optimaliser
     red black
     multitraad
 
-Vi skal ogsaa kunne oppdage noen ting som konvergensrate
+#6 Vi skal ogsaa kunne oppdage noen ting som konvergensrate
     http://www.physics.buffalo.edu/phy410-505/2011/topic3/app1/index.html
         cirka midt.
 

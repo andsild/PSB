@@ -13,6 +13,8 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <fstream>
+#include <sstream> 
 
 
 #include "../lib/CImg-1.5.8/CImg.h"
@@ -25,6 +27,8 @@
 using namespace cimg_library;
 using namespace pe_solver;
 using namespace std;
+
+void calculateAverage(string);
 
 CImg<double> inputkernel(double entries[], int iNewDim)
 {
@@ -45,7 +49,7 @@ void readImage(CImg<double> image)
     CImg<double> mask = inputkernel(D, 3); 
 
     CImg<double> masked = image.get_convolve(mask); 
-        //FIXME: ... this is not the right way to mask, is it?
+       //FIXME: ... this is not the right way to mask, is it?
     CImg<double> F = masked.get_vector(); //FIXME: has > inf excess pixels..
     int iHeight = F.height();
     d1 image_vec(iHeight, 0);
@@ -67,7 +71,8 @@ void readImage(CImg<double> image)
 
 void readSingleImage()
 {
-    CImg<unsigned char> image("./media/109201.jpg"); //example
+    // CImg<unsigned char> image("./media/109201.jpg"); //example
+    CImg<unsigned char> image("./small_media/104000.jpg"); //example
     readImage(image);
 }
 
@@ -92,16 +97,17 @@ void readFolder(char *dir)
         return;
     }
 
+    filepath = strcat(dir, "/");
+
     while ((dirp = readdir( dp )))
     {
-        filepath = strcat(dir, "/");
-        filepath = filepath + dirp->d_name;
+        string readFile = filepath + dirp->d_name;
 
         // Check for valid file(s)
-        if (stat( filepath.c_str(), &filestat )) continue;
+        if (stat( readFile.c_str(), &filestat )) continue;
         if (S_ISDIR( filestat.st_mode ))         continue;
 
-        CImg<unsigned char> img(filepath.c_str());
+        CImg<unsigned char> img(readFile.c_str());
         imgList.push_back(img);
     }
 
@@ -109,6 +115,70 @@ void readFolder(char *dir)
     {
         readImage(*it);
     }
+
+    calculateAverage("./data/");
+}
+
+void calculateAverage(string sFilePath)
+{
+    ifstream fin;
+    string filepath;
+    int num;
+    DIR *dp;
+    struct stat filestat;
+    struct dirent *dirp;
+
+    vector<string> files;
+
+    dp = opendir( sFilePath.c_str() );
+    if (dp == NULL)
+    {
+        cout << "Error in openning (errcode: " << errno << ")" << endl;
+        return;
+    }
+
+    while ((dirp = readdir( dp )))
+    {
+        string readFile = sFilePath + dirp->d_name;
+
+        // Check for valid file(s)
+        if (stat( readFile.c_str(), &filestat)
+        || (S_ISDIR( filestat.st_mode ))
+        || readFile.compare("./data/average.dat") == 0)
+        {
+            continue;
+        }
+        files.push_back(readFile);
+    }
+
+    double dNumFiles = files.size();
+    vector<double> average(600);
+    for (vector<string>::iterator it = files.begin();
+            it != files.end();
+            ++it)
+    {
+        ifstream infile;
+        infile.open(*it);
+        int iPos = 0;
+        double dNum;
+        while(infile >> dNum)
+        {
+            average[iPos] += dNum;
+            iPos++;
+        }
+    }
+
+    string sFileName = "average";
+    ofstream data_file(DATA_DIR + sFileName + DATA_EXTENSION);
+    for (vector<double>::iterator it = average.begin();
+            it != average.end();
+            ++it)
+    {
+        if(*it == 0) { break; }
+        data_file << (*it /= dNumFiles) << endl;
+        cout << (*it /= dNumFiles) << endl;
+    }
+    data_file.close();
 }
 
 int main(int argc, char *argv[]) 
@@ -137,7 +207,6 @@ int main(int argc, char *argv[])
                 break;
 
             case 'f':
-                std::cout << optarg << std::endl;
                 readFolder(optarg);
                 break;
 
