@@ -28,6 +28,10 @@ void writeToFile(vector<string>, double, string);
 double getRangeVal(const d1 &U, const d1 &F,
         const int iIndex, const int iWidthLength, const double H = 1.0)
 {
+    int xPos = iIndex % (int)iWidthLength;
+    if(xPos < 0 || xPos >= iWidthLength) { return 0; }
+    /* XXX: Row-wise skips are made in external for-loops */
+
     int iIndexPixelAbove = iIndex - iWidthLength;
     int iIndexPixelBelow = iIndex + iWidthLength;
 

@@ -1,18 +1,23 @@
 # Gong ville gjoore dette 
 ((Legg til noen av de mer avanserte))
 
-#3 Lage histogram
-
-#4 Kunne variere parameter
-    diskretisering
-    ω
-
-#5 Optimaliser
+#1 multi-threaded, to be faster per image
     red black
     multitraad
 
-#6 Vi skal ogsaa kunne oppdage noen ting som konvergensrate
-    http://www.physics.buffalo.edu/phy410-505/2011/topic3/app1/index.html
-        cirka midt.
+#2 timing different functions / iterations
 
-hvordan ser en matrise ut mot slutten? kan noen deler kuttes ut?
+
+#3 make histograms
+
+#4 code refactoring
+
+#5 Variation of parameters used in functions
+    diskretisering
+    ω
+#7 Detection of convergence, etc
+    http://www.physics.buffalo.edu/phy410-505/2011/topic3/app1/index.html
+        [described in the moddile of the page]
+
+#8 Other optimizations?
+    hvordan ser en matrise ut mot slutten? kan noen deler kuttes ut?
