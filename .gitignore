@@ -24,4 +24,4 @@
 media/
 small_media/*
 test_media/
-data/*.dat
+data/*/*.dat
