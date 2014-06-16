@@ -26,7 +26,6 @@ using namespace cimg_library;
 using namespace pe_solver;
 using namespace std;
 
-//returns the forward 2nd derivative w.r.t x and y (d2u/dxdy)
 CImg<double> inputkernel(double entries[], int iNewDim)
 {
     CImg<double> image(entries, iNewDim, iNewDim, 1, 1, false);
@@ -42,8 +41,9 @@ CImg<double> inputkernel(double entries[], int iNewWidth, int iNewHeight)
 void readImage(CImg<double> image)
 {
     double max_error = 1;
-    double D[9] = {0,1,0, 0,-4,1, 0,1,0};
-    CImg<double> mask = inputkernel(D, 3); //FIXME: WRONG
+    double D[9] = {0,1,0, 1,-4,1, 0,1,0};
+    CImg<double> mask = inputkernel(D, 3); 
+
     CImg<double> masked = image.get_convolve(mask); 
         //FIXME: ... this is not the right way to mask, is it?
     CImg<double> F = masked.get_vector(); //FIXME: has > inf excess pixels..
@@ -161,4 +161,14 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+    // for(int iPos = 0; iPos < 3; iPos++)
+    // {
+    //     for(int jPos = 0; jPos < 3; jPos++)
+    //     {
+    //         cout << mask(iPos, jPos);
+    //     }
+    //     cout << endl;
+    // }
+    // return;
+    //
 #endif /* _MAIN.cpp */
