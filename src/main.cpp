@@ -3,11 +3,15 @@
 
 #define DATA_DIR "./data/"
 #define DATA_EXTENSION ".dat"
+#define PRECISION 20
 
 #include <fstream>
 #include <getopt.h>
 #include <iostream>
+#include <iomanip>
+
 #include <string>
+#include <limits>
 #include <sys/stat.h>
 
 #include <dirent.h>
@@ -183,7 +187,8 @@ void calculateAverage(string sFilePath)
     }
 
     double dNumFiles = files.size();
-    vector<double> average(990); // can give undererror
+    vector<double> average; // can give undererror
+    int iLineCount = numeric_limits<int>::max();
     for (vector<string>::iterator it = files.begin();
             it != files.end();
             ++it)
@@ -194,19 +199,23 @@ void calculateAverage(string sFilePath)
         double dNum;
         while(infile >> dNum)
         {
-            average[iPos] = dNum;
+            if(iPos >= average.size())
+                average.push_back(dNum);
+            else
+                average[iPos] += dNum;
             iPos++;
         }
+        /* Smallest file */
+        if (iPos < iLineCount) { iLineCount = iPos; }
     }
 
     string sFileName = "average";
     ofstream data_file(sFilePath + "/" + sFileName + DATA_EXTENSION);
-    for (vector<double>::iterator it = average.begin();
-            it != average.end();
-            ++it)
+    for(vector<int>::size_type iPos = 0;
+            iPos < iLineCount;
+            iPos++) 
     {
-        if(*it == 0) { break; }
-        data_file << (*it /= dNumFiles) << endl;
+        data_file << setprecision(PRECISION) << fixed << (average[iPos] /= dNumFiles) << endl;
         // cout << (*it /= dNumFiles) << endl;
     }
     data_file.close();
