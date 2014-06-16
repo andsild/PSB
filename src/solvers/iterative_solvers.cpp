@@ -45,7 +45,7 @@ void iterate_jacobi(d1 F, d1 &U, double iWidthLength,
 {
     d1 copyU = U;
     for(vector<int>::size_type iPos = iWidthLength;
-            iPos < iLength - iWidthLength;
+            iPos < F.size() - iWidthLength;
             iPos++) 
     {
         U[iPos] = .25 * (getRangeVal(copyU, F, iPos, iWidthLength));
@@ -61,7 +61,7 @@ void iterate_gauss(d1 F, d1 &U, double iWidthLength,
                            int iLength, double H = 1)
 {
     for(vector<int>::size_type iPos = iWidthLength;
-            iPos < iLength - iWidthLength;
+            iPos < F.size()- iWidthLength;
             iPos++) 
     {
         U[iPos] = .25 * (getRangeVal(U, F, iPos, iWidthLength, H));
@@ -75,7 +75,7 @@ void iterate_sor(d1 F, d1 &U, double iWidthLength, int iLength, double H = 1)
     double dNotOmega = (1 - omega);
 
     for(vector<int>::size_type iPos = iWidthLength;
-            iPos < iLength - iWidthLength;
+            iPos < F.size() - iWidthLength;
             iPos++) 
     {
         int xPos = iPos % (int)iWidthLength;
@@ -89,7 +89,7 @@ void iterate_sor(d1 F, d1 &U, double iWidthLength, int iLength, double H = 1)
     }
 
     for(vector<int>::size_type iPos = iWidthLength;
-            iPos < iLength - iWidthLength;
+            iPos < F.size() - iWidthLength;
             iPos++) 
     {
         int xPos = iPos % (int)iWidthLength;
@@ -215,7 +215,7 @@ void writeToFile(vector<string> vRes, double dID, string sFolderDest)
             it != vRes.end();
             ++it)
     {
-        data_file << *it << endl;
+        data_file << setprecision(PRECISION) << fixed << *it << endl;
     }
 
     data_file.close();
