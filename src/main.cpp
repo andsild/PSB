@@ -19,7 +19,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "../lib/CImg-1.5.8/CImg.h"
+#include "CImg.h"
 #include "./file.cpp"
 #include "solvers/iterative_solvers.cpp"
 
@@ -55,10 +55,33 @@ CImgList<double> readImage(CImg<double> image,
     fileLocations[iterate_jacobi] = "jacobi";
     fileLocations[iterate_sor] = "sor";
 
-    for(int iPos = 0; iPos < image.height(); iPos++)
+    //http://sourceforge.net/p/cimg/discussion/334630/thread/6a560357/
+    image.sRGBtoRGB();
+    CImg<double> grayscale(iWidth, iHeight);
+    for(int iPos = 0; iPos < iWidth; iPos++)
     {
-        for(int jPos = 0; jPos < image.width(); jPos++)
+        for(int jPos = 0; jPos < iHeight; jPos++)
         {
+            double r = image(iPos,jPos); // First channel RED
+            double g = image(iPos, jPos, 0, 1);
+            double b = image(iPos, jPos, 0, 2);
+
+
+            cout << image(iPos, jPos) << "\t" << image(iPos, jPos, 0, 0) 
+                << "\t" << image(iPos, jPos, 0, 1) << "\t" <<
+                image(iPos, jPos, 0, 2) << endl;
+            // average method (per gimp)
+            // image(jPos, iPos) = (r / 3)  ;
+        }
+    }
+
+    image.save("./test.jpg");
+
+    for(int iPos = 0; iPos < iHeight; iPos++)
+    {
+        for(int jPos = 0; jPos < iWidth; jPos++)
+        {
+            
             image_vec.push_back(image(jPos, iPos));
             //TODO: push back makes it bigger than it should be
         }
@@ -124,6 +147,7 @@ void readFolder(char *dir, vector<iterative_function> vIf)
             iPos < filenames.size();
             iPos++) 
     {
+        //TODO: potentially reads too many / too large images
         CImg<double> img(filenames[iPos].c_str());
 
         /* Returns images for each iteration */
@@ -150,7 +174,6 @@ void readFolder(char *dir, vector<iterative_function> vIf)
             trimLeadingFileName(filenames[iPos]);
             string sImageDest = sDest + "/image/" + filenames[iPos];
 
-            CImg<double> debug = images[iPos];
             images[iPos].save(sImageDest.c_str());
             calculateAverage(sDest);
         }
