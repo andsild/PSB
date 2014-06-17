@@ -230,7 +230,7 @@ vector<string> iterative_solve(iterative_function function,
         old_guess = newGuess;
         iIterCount++;
 
-        vOutput.push_back(to_string(dError));
+        vOutput.push_back(std::to_string(dError));
     } while(dError > dMaxErr);
 
     return vOutput;
