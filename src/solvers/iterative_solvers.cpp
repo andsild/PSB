@@ -30,7 +30,7 @@ double getRangeVal(const d1 &U, const d1 &F,
 {
     int xPos = iIndex % (int)iWidthLength;
     /* Skip the first and last column */
-    if(xPos < 1 || xPos >= iWidthLength) { return 0; }
+    if(xPos < 1 || xPos >= iWidthLength - 1) { return 0; }
     /* XXX: Row-wise skips are made in external for-loops */
 
     int iIndexPixelAbove = iIndex - iWidthLength;

@@ -22,6 +22,7 @@
 
 # Images
 *.png
+*.jpg
 
 # Large files
 media/
