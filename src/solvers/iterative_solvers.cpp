@@ -66,7 +66,7 @@ void iterate_gauss(d1 F, d1 &U, double iWidthLength,
                            int iLength, double H = 1)
 {
     for(vector<int>::size_type iPos = iWidthLength;
-            iPos < F.size()- iWidthLength;
+            iPos < F.size() - iWidthLength;
             iPos++) 
     {
         U[iPos] = .25 * (getRangeVal(U, F, iPos, iWidthLength, H));
@@ -215,32 +215,25 @@ vector<string> iterative_solve(iterative_function function,
                     d1 &solution, d1 guess,
                     double dMaxErr, int iLength, int iWidth) 
 {
-    double dMax = 0;
     d1 old_guess = guess;
     d1 newGuess;
     double dError = 0;
     int iIterCount = 0;
     vector<string> vOutput;
-    //FIXME: images are too small
-    //FIXME: iWidth is 1, lol
     do
     {
         dError = 0;
         newGuess = old_guess;
-        function(solution, newGuess, iLength, iWidth, 1);
+        function(solution, newGuess, iWidth, iLength, 1);
 
         dError = findError(old_guess, newGuess, iLength);
-        cout << dError << endl;
         old_guess = newGuess;
         iIterCount++;
 
         vOutput.push_back(to_string(dError));
     } while(dError > dMaxErr);
 
-    // cout << function << endl;
-    // cout << vOutput.size() << endl;
     return vOutput;
-    // writeToFile(vOutput, "dwad");
 }
 
 } // EndOfNamespace
