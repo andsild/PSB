@@ -148,10 +148,9 @@ void readFolder(char *dir, vector<iterative_function> vIf)
             string sDest = DATA_DIR;
             sDest += fileLocations[*funcIt];
             trimLeadingFileName(filenames[iPos]);
-            string sImageDest = sDest + "image/" + filenames[iPos];
+            string sImageDest = sDest + "/image/" + filenames[iPos];
 
             CImg<double> debug = images[iPos];
-            cout << debug.width() << endl;
             images[iPos].save(sImageDest.c_str());
             calculateAverage(sDest);
         }
@@ -247,8 +246,8 @@ int main(int argc, char *argv[])
         }
     } 
 
-
     if(f) {
+        //FIXME: doesn't add a (necessary) trailing  slash
         readFolder(folder, test);
     }
     else if(i)
