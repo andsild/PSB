@@ -20,8 +20,33 @@ using namespace std;
 namespace file_IO
 {
 
+void trimLeadingFileName(string &str)
+{
+    size_t endpos = str.find_last_of("/");
+
+    /* Ensure filename is valid */
+    if( string::npos != endpos )
+    {
+        str = str.substr(endpos+1,str.size() );
+    }
+}
+
+void trimTrailingFilename(string &str)
+{
+    size_t newpos = str.find_last_of(".");
+    if( string::npos != newpos)
+    {
+        str = str.substr(0, newpos -1);
+    }
+}
+
+
+//TODO: does not warn of IO-error
 void writeToFile(vector<string> vRes, string sFilename, string sFolderDest)
 {
+    trimLeadingFileName(sFilename);
+    trimTrailingFilename(sFilename);
+
     ofstream data_file(DATA_DIR + sFolderDest + "/" + sFilename
                        + DATA_EXTENSION);
 
@@ -33,6 +58,37 @@ void writeToFile(vector<string> vRes, string sFilename, string sFolderDest)
     }
 
     data_file.close();
+}
+
+vector<string> getFilesInFolder(char *dir)
+{
+    ifstream fin;
+    int num;
+    DIR *dp;
+    struct stat filestat;
+    struct dirent *dirp;
+
+    dp = opendir( dir );
+    if (dp == NULL)
+    {
+        cout << "Error in openin" << endl;
+        cout << dir << endl;
+        throw;
+    }
+
+    vector<string> filenames;
+
+    while ((dirp = readdir( dp )))
+    {
+        string readFile = string(dir) + string(dirp->d_name);
+
+        // Check for valid file(s)
+        if (stat( readFile.c_str(), &filestat )) continue;
+        if (S_ISDIR( filestat.st_mode ))         continue;
+
+        filenames.push_back(readFile);
+    }
+    return filenames;
 }
 
 }

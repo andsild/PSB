@@ -34,17 +34,20 @@ using namespace std;
 
 void calculateAverage(string);
 
-typedef CImg<double> image;
-typedef CImgList<double> imageList;
+typedef CImg<double> image_fmt;
+typedef CImgList<double> imageList_fmt;
 
 CImgList<double> readImage(CImg<double> image,
                            const char *fileName, vector<iterative_function> vIf)
 {
-    double max_error = 1;
-    int iHeight = image.height();
+    double max_error = .9;
+    int iHeight = image.height(), iWidth = image.width(),
+         iDepth = image.depth(), iSpectrum = image.spectrum();
+    int iDim = iWidth * iHeight;
 
     CImgList<double> retList;
-    d1 image_vec(iHeight, 0);
+    // d1 image_vec(iDim, 0);
+    d1 image_vec;
     d1 U;
     map<iterative_function, string> fileLocations;
 
@@ -52,13 +55,17 @@ CImgList<double> readImage(CImg<double> image,
     fileLocations[iterate_jacobi] = "jacobi";
     fileLocations[iterate_sor] = "sor";
 
-    /* Load F into a vector */
-    for(int iPos = 0; iPos < iHeight; iPos++)
+    for(int iPos = 0; iPos < image.height(); iPos++)
     {
-        image_vec[iPos] = image(0, iPos);
+        for(int jPos = 0; jPos < image.width(); jPos++)
+        {
+            image_vec.push_back(image(jPos, iPos));
+            //TODO: push back makes it bigger than it should be
+        }
     }
+
     image = CImg<double>(1, 1, 1, 1, 1); // TODO: does this get memory back?
-    U = vector<double>(iHeight, 0); // wait to declare this until memory is freed?
+    U = vector<double>(iDim, 0); // wait to declare this until memory is freed?
 
     /* Solve */
     for (vector<iterative_function>::iterator it = vIf.begin();
@@ -69,7 +76,7 @@ CImgList<double> readImage(CImg<double> image,
 
         vector<string> vOutput =  iterative_solve(*it, 
                                        image_vec, U,
-                                       max_error, image.height(), image.width());
+                                       max_error, iDim, iWidth);
 
         string fileLocation = (string)fileLocations[*it] + fileName;
         writeToFile(vOutput, fileName, fileLocations[*it]);
@@ -81,10 +88,10 @@ CImgList<double> readImage(CImg<double> image,
             dImage[iPos] = image_vec.at(iPos);
         }
 
-        CImg<double> test(dImage, image.width(), image.height(),
-                          image.depth(), image.spectrum(), true);
+        CImg<double> test(dImage, iWidth, iHeight,
+                          iDepth, iSpectrum, false);
         retList.push_back(test);
-        delete dImage;
+        // delete dImage;
     }
 
     return retList;
@@ -103,69 +110,49 @@ void readSingleImage(vector<iterative_function> vIf)
  */
 void readFolder(char *dir, vector<iterative_function> vIf)
 {
-    CImgList<double> imgList;
-
-    ifstream fin;
-    string filepath;
-    int num;
-    DIR *dp;
-    struct stat filestat;
-    struct dirent *dirp;
-
-    dp = opendir( dir );
-    if (dp == NULL)
-    {
-        cout << "Error in openin" << endl;
-        return;
-    }
-
-    filepath = strcat(dir, "/");
+    CImgList<double> images; 
     vector<string> filenames;
 
-    while ((dirp = readdir( dp )))
-    {
-        string readFile = filepath + dirp->d_name;
-
-        // Check for valid file(s)
-        if (stat( readFile.c_str(), &filestat )) continue;
-        if (S_ISDIR( filestat.st_mode ))         continue;
-
-        CImg<unsigned char> img(readFile.c_str());
-        imgList.push_back(img);
-        filenames.push_back(readFile);
+    try{
+        filenames = getFilesInFolder(dir);
+    }
+    catch(...) {
+        cout << "dadwa" << endl;
     }
 
-
-    CImgList<double> images; 
     for(vector<int>::size_type iPos = 0;
             iPos < filenames.size();
             iPos++) 
     {
-        /* Returns images for each iteration */
-        CImgList<double> cil = readImage(imgList[iPos], filenames[iPos].c_str(), vIf);
-        cil.move_to(images);
-    }
+        CImg<double> img(filenames[iPos].c_str());
 
+        /* Returns images for each iteration */
+        CImgList<double> cil = readImage(img, filenames[iPos].c_str(),
+                                         vIf);
+        images.insert(cil, images.size());
+    }
 
     map<iterative_function, string> fileLocations;
     fileLocations[iterate_gauss] = "gauss/";
     fileLocations[iterate_jacobi] = "jacobi/";
     fileLocations[iterate_sor] = "sor/";
 
-
-    for (CImgList<double>::iterator imageIt = images.begin();
-         imageIt != images.end();
-         ++imageIt)
+    for(vector<int>::size_type iPos = 0;
+            iPos < filenames.size();
+            iPos++) 
     {
         for (vector<iterative_function>::iterator funcIt = vIf.begin();
-                funcIt != vIf.end();
-                ++funcIt)
+            funcIt != vIf.end();
+            ++funcIt)
         {
             string sDest = DATA_DIR;
             sDest += fileLocations[*funcIt];
-            string sImageDest = sDest + "/file.png";
+            trimLeadingFileName(filenames[iPos]);
+            string sImageDest = sDest + "image/" + filenames[iPos];
 
-            (*imageIt).save(sImageDest.c_str());
+            CImg<double> debug = images[iPos];
+            cout << debug.width() << endl;
+            images[iPos].save(sImageDest.c_str());
             calculateAverage(sDest);
         }
     }
@@ -173,38 +160,9 @@ void readFolder(char *dir, vector<iterative_function> vIf)
 
 void calculateAverage(string sFilePath)
 {
-    ifstream fin;
-    string filepath;
-    int num;
-    DIR *dp;
-    struct stat filestat;
-    struct dirent *dirp;
-
-    vector<string> files;
     sFilePath += "/";
+    vector<string> files = getFilesInFolder(&sFilePath[0]);
 
-    dp = opendir( sFilePath.c_str() );
-    if (dp == NULL)
-    {
-        cout << "Error in opening" << endl;
-        return;
-    }
-
-    while ((dirp = readdir( dp )))
-    {
-        string readFile = sFilePath + dirp->d_name;
-
-        // Check for valid file(s)
-        if (stat( readFile.c_str(), &filestat)
-        || (S_ISDIR( filestat.st_mode ))
-        || readFile.compare("average.dat") == 0)
-        {
-            continue;
-        }
-        files.push_back(readFile);
-    }
-
-    double dNumFiles = files.size();
     vector<double> average; // can give undererror
     int iLineCount = numeric_limits<int>::max();
     for (vector<string>::iterator it = files.begin();
@@ -233,9 +191,10 @@ void calculateAverage(string sFilePath)
             iPos < iLineCount;
             iPos++) 
     {
-        data_file << setprecision(PRECISION) << fixed << (average[iPos] /= dNumFiles) << endl;
-        // cout << (*it /= dNumFiles) << endl;
+        data_file << setprecision(PRECISION) << fixed 
+                  << (average[iPos] /= files.size()) << endl;
     }
+
     data_file.close();
 }
 
