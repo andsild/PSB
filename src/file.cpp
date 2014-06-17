@@ -46,9 +46,10 @@ void writeToFile(vector<string> vRes, string sFilename, string sFolderDest)
 {
     trimLeadingFileName(sFilename);
     trimTrailingFilename(sFilename);
+    string sFinalname = DATA_DIR + sFolderDest + "/" + sFilename 
+                        + DATA_EXTENSION;
 
-    ofstream data_file(DATA_DIR + sFolderDest + "/" + sFilename
-                       + DATA_EXTENSION);
+    ofstream data_file(sFinalname.c_str(),  ios::out);
 
     for (vector<string>::iterator it = vRes.begin();
             it != vRes.end();
@@ -68,7 +69,7 @@ vector<string> getFilesInFolder(char *dir)
     struct stat filestat;
     struct dirent *dirp;
 
-    dp = opendir( dir );
+    dp = opendir( dir);
     if (dp == NULL)
     {
         cout << "Error in openin" << endl;

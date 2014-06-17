@@ -56,7 +56,7 @@ endif()
 find_package(PkgConfig)
 
 #    Tell CMake where to leave executables 
-SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}../bin/)
+SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../bin/)
 
 #Path of CImg.h file relative to this file path
 set(CIMG_H_PATH ${PROJECT_SOURCE_DIR}/../lib/CImg-1.5.8)
@@ -239,7 +239,7 @@ endif()
 
 # Add CIMG Flags to Compilation Flags
 # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CIMG_CFLAGS} -L/usr/X11/R6/lib")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CIMG_CFLAGS} -lpthread -I/usr/X11R6/include -L/usr/X11R6/lib -lm -lpthread -lX11 ")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CIMG_CFLAGS} -std=c++11 -lpthread -I/usr/X11R6/include -L/usr/X11R6/lib -lm -lpthread -lX11 ")
 
 
 SET(CIMG_FILES main
