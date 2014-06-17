@@ -36,7 +36,7 @@ void trimTrailingFilename(string &str)
     size_t newpos = str.find_last_of(".");
     if( string::npos != newpos)
     {
-        str = str.substr(0, newpos -1);
+        str = str.substr(0, newpos);
     }
 }
 

@@ -41,8 +41,7 @@
 
 cmake_minimum_required(VERSION 2.6)
 
-
-PROJECT(Examples-CIMG)
+PROJECT(PSB)
 
 # Prevent compilation in-source
 if( ${CMAKE_BINARY_DIR} STREQUAL ${PROJECT_SOURCE_DIR} )
@@ -57,15 +56,12 @@ endif()
 find_package(PkgConfig)
 
 #    Tell CMake where to leave executables 
-SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR})
+SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}../bin/)
 
 #Path of CImg.h file relative to this file path
-set(CIMG_H_PATH ${PROJECT_SOURCE_DIR}/..)
+set(CIMG_H_PATH ${PROJECT_SOURCE_DIR}/../lib/CImg-1.5.8)
 include_directories( ${PROJECT_SOURCE_DIR} )
 include_directories( ${CIMG_H_PATH} )
-
-
-
 
 # ### CIMG related stuff
 # Flags to enable fast image display, using the XSHM library.
@@ -86,16 +82,13 @@ SET(CIMG_TIFF_CCFLAGS  -Dcimg_use_tiff)
 # ( http://www.libpng.org/ )
 SET(CIMG_PNG_CCFLAGS  -Dcimg_use_png)
 
-# Flags to enable native support of most classical image file formats, using the Magick++ library.
-# ( http://www.imagemagick.org/Magick++/ )
-SET(CIMG_MAGICK_CCFLAGS -Dcimg_use_magick)
 
 # Flags to enable faster Discrete Fourier Transform computation, using the FFTW3 library
 # ( http://www.fftw.org/ )
 SET(CIMG_FFTW3_CCFLAGS  -Dcimg_use_fftw3)
 
 # ### Search Additional Libraries ##########
-FIND_PACKAGE(OpenCV)
+# FIND_PACKAGE(OpenCV)
 FIND_PACKAGE(JPEG)
 FIND_PACKAGE(TIFF)
 FIND_PACKAGE(PNG)
@@ -105,7 +98,7 @@ FIND_PACKAGE(BLAS)
 
 PKG_CHECK_MODULES(FFTW3 fftw3)
 PKG_CHECK_MODULES(OPENEXR OpenEXR)
-PKG_CHECK_MODULES(MAGICK Magick++)
+# PKG_CHECK_MODULES(MAGICK Magick++)
 
 # PKG_CHECK_MODULES(LIBAVCODEC libavcodec)
 # PKG_CHECK_MODULES(LIBAVFORMAT libavformat)
@@ -201,7 +194,7 @@ if(NOT APPLE)
   if(NOT WIN32)
     if(X11_FOUND)
       SET(CIMG_CFLAGS "${CIMG_CFLAGS} ${CIMG_XSHM_CCFLAGS} ${CIMG_XRANDR_CCFLAGS}")
-      SET(SYSTEM_LIBS ${SYSTEM_LIBS} Xext Xrandr)
+      SET(SYSTEM_LIBS ${SYSTEM_LIBS} Xext Xrandr "-lX11 -L/usr/X11/R6/lib")
     endif()
   endif(NOT WIN32)
 endif(NOT APPLE)
@@ -209,7 +202,7 @@ endif(NOT APPLE)
 if(X11_FOUND)
   link_directories(${X11_LIB_DIRS})
   include_directories(${X11_INCLUDE_DIR})
-  SET( SYSTEM_LIBS ${SYSTEM_LIBS} ${X11_LIBRARIES} )
+  SET( SYSTEM_LIBS ${SYSTEM_LIBS} ${X11_LIBRARIES}  )
 endif()
 
 if (NOT WIN32)
@@ -217,7 +210,7 @@ if (NOT WIN32)
 endif()
 
 if( WIN32)
-  SET( SYSTEM_LIBS  ${SYSTEM_LIBS}  gdi32 )
+  SET( SYSTEM_LIBS  ${SYSTEM_LIBS}  gdi32 " -lgdi32")
 endif()
 
 if (OpenCV_FOUND)
@@ -244,41 +237,12 @@ if(BLAS_FOUND)
   SET( SYSTEM_LIBS ${SYSTEM_LIBS} ${BLAS_LIBRARIES} )
 endif()
 
-
 # Add CIMG Flags to Compilation Flags
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CIMG_CFLAGS}")
+# SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CIMG_CFLAGS} -L/usr/X11/R6/lib")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CIMG_CFLAGS} -lpthread -I/usr/X11R6/include -L/usr/X11R6/lib -lm -lpthread -lX11 ")
 
 
-SET(CIMG_FILES CImg_demo
-  captcha
-  curve_editor2d
-  dtmri_view3d
-  edge_explorer2d
-  fade_images
-  gaussian_fit1d
-  generate_loop_macros
-  hough_transform2d
-  image_registration2d
-  image2ascii
-  image_surface3d
-  jawbreaker
-  mcf_levelsets2d
-  mcf_levelsets3d
-  odykill
-  pde_heatflow2d
-  pde_TschumperleDeriche2d
-  plotter1d
-  radon_transform2d
-  scene3d
-  spherical_function3d
-  tetris
-  tron
-  tutorial
-  wavelet_atrous
-  use_draw_gradient
-  use_nlmeans
-  use_skeleton
-  use_RGBclass
+SET(CIMG_FILES main
   )
 
 foreach(program ${CIMG_FILES})

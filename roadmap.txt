@@ -1,12 +1,20 @@
 # Gong ville gjoore dette 
 ((Legg til noen av de mer avanserte))
 
-#1 reconstruct iamges
-
 #2 fix division by pixel size
 
-
 #3 plots should have average AND all the others
+    ish done
+
+#1 compute images on a grayscale 
+    in progress
+
+#4 compute line on I and U
+    so it is easier to analytically get the solution.
+
+#5 make for mac
+
+#5 render two images, show plot for these two.
 
 #1 multi-threaded, to be faster per image
     red black

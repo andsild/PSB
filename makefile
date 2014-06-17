@@ -14,8 +14,7 @@ CFLAGS = -g -std=c++11
 
 # define any directories containing header files other than /usr/include
 #
-# INCLUDES = -I/home/newhall/include  -I../include
-INCLUDES =
+INCLUDES = -I./lib/CImg-1.5.8/
 
 # define library paths in addition to /usr/lib
 #   if I wanted to include libraries not in /usr/lib I'd specify
