@@ -6,7 +6,6 @@
 #define PRECISION 20
 
 #include <fstream>
-#include <getopt.h>
 #include <iostream>
 #include <iomanip>
 #include <limits>
@@ -15,13 +14,16 @@
 #include <string>
 
 #include <dirent.h>
-#include <unistd.h>
+#include <getopt.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include "CImg.h"
 #include "./file.cpp"
 #include "solvers/iterative_solvers.cpp"
+// #include "plot.cpp"
+// #include "solvers/FFT.cpp"
 
 #define no_argument 0
 #define required_argument 1 
@@ -57,37 +59,42 @@ CImgList<double> readImage(CImg<double> image,
 
     //http://sourceforge.net/p/cimg/discussion/334630/thread/6a560357/
     image.sRGBtoRGB();
-    CImg<double> grayscale(iWidth, iHeight);
+    CImg<double> grayscale(iWidth, iHeight, 1, 1, 0);
     for(int iPos = 0; iPos < iWidth; iPos++)
     {
         for(int jPos = 0; jPos < iHeight; jPos++)
         {
-            double r = image(iPos,jPos); // First channel RED
+            double r = image(iPos, jPos, 0, 0); // First channel RED
             double g = image(iPos, jPos, 0, 1);
             double b = image(iPos, jPos, 0, 2);
 
+            double grayValue = (r + g + b) / 3 ;
+            grayscale(iPos, jPos, 0, 0) = grayValue;
 
-            cout << image(iPos, jPos) << "\t" << image(iPos, jPos, 0, 0) 
-                << "\t" << image(iPos, jPos, 0, 1) << "\t" <<
-                image(iPos, jPos, 0, 2) << endl;
+
+            // cout << image(iPos, jPos) << "\t" << image(iPos, jPos, 0, 0) 
+            //     << "\t" << image(iPos, jPos, 0, 1) << "\t" <<
+            //     image(iPos, jPos, 0, 2) << endl;
             // average method (per gimp)
-            // image(jPos, iPos) = (r / 3)  ;
+            image(jPos, iPos) = (r / 3)  ;
         }
     }
 
-    image.save("./test.jpg");
+    grayscale.save("./test.jpg");
 
     for(int iPos = 0; iPos < iHeight; iPos++)
     {
         for(int jPos = 0; jPos < iWidth; jPos++)
         {
             
-            image_vec.push_back(image(jPos, iPos));
+            image_vec.push_back(grayscale(jPos, iPos, 0, 0));
             //TODO: push back makes it bigger than it should be
+            //      (should pre-compute size instead)
         }
     }
 
     image = CImg<double>(1, 1, 1, 1, 1); // TODO: does this get memory back?
+    grayscale = CImg<double>(1, 1, 1, 1, 1); // TODO: does this get memory back?
     U = vector<double>(iDim, 0); // wait to declare this until memory is freed?
 
     /* Solve */
@@ -97,6 +104,7 @@ CImgList<double> readImage(CImg<double> image,
     {
         double *dImage = new double[image_vec.size()];
 
+        cout << "beginning image " << fileName << endl;
         vector<string> vOutput =  iterative_solve(*it, 
                                        image_vec, U,
                                        max_error, iDim, iWidth);
@@ -111,8 +119,10 @@ CImgList<double> readImage(CImg<double> image,
             dImage[iPos] = image_vec.at(iPos);
         }
 
+        cout << "finished image " << fileName << endl;
         CImg<double> test(dImage, iWidth, iHeight,
-                          iDepth, iSpectrum, false);
+                          1, 1, false);
+                          // iDepth, iSpectrum, false);
         retList.push_back(test);
         // delete dImage;
     }
@@ -124,23 +134,24 @@ void readSingleImage(vector<iterative_function> vIf)
 {
     // CImg<unsigned char> image("./media/109201.jpg"); //example
     char cImageName[] = "./small_media/104000.jpg";
-    CImg<unsigned char> image(cImageName); //example
+    string sDest = get_path() + string(cImageName);
+    CImg<unsigned char> image(sDest.c_str()); //example
     CImgList<double> cil = readImage(image, cImageName, vIf);
 }
 
 /** Read a series of images and solve them
  *
  */
-void readFolder(char *dir, vector<iterative_function> vIf)
+void readFolder(string sDir, vector<iterative_function> vIf)
 {
     CImgList<double> images; 
     vector<string> filenames;
 
     try{
-        filenames = getFilesInFolder(dir);
+        filenames = getFilesInFolder(sDir);
     }
     catch(...) {
-        cout << "dadwa" << endl;
+        cout << "could not find files" << endl;
     }
 
     for(vector<int>::size_type iPos = 0;
@@ -172,7 +183,7 @@ void readFolder(char *dir, vector<iterative_function> vIf)
             string sDest = DATA_DIR;
             sDest += fileLocations[*funcIt];
             trimLeadingFileName(filenames[iPos]);
-            string sImageDest = sDest + "/image/" + filenames[iPos];
+            string sImageDest = get_path() + sDest + "/image/" + filenames[iPos];
 
             images[iPos].save(sImageDest.c_str());
             calculateAverage(sDest);
@@ -183,7 +194,7 @@ void readFolder(char *dir, vector<iterative_function> vIf)
 void calculateAverage(string sFilePath)
 {
     sFilePath += "/";
-    vector<string> files = getFilesInFolder(&sFilePath[0]);
+    vector<string> files = getFilesInFolder(sFilePath.c_str());
 
     vector<double> average; // can give undererror
     int iLineCount = numeric_limits<int>::max();
@@ -264,6 +275,9 @@ int main(int argc, char *argv[])
                 test.push_back(iterate_sor);
                 break;
 
+            case 't':
+                break;
+
             default: 
                 break; 
         }
@@ -280,8 +294,8 @@ int main(int argc, char *argv[])
     else //default
     {
         test.push_back(iterate_gauss);
-        char s1[] = "small_media/";
-        readFolder(s1, test);
+        string sDir = "small_media/";
+        readFolder(sDir, test);
         // readSingleImage(test);
     }
 
