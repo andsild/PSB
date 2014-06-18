@@ -23,6 +23,7 @@
 #include "solvers/iterative_solvers.cpp"
 #include "plot.cpp"
 
+#include <sys/ioctl.h>
 
 using namespace cimg_library;
 using namespace pe_solver;
@@ -33,13 +34,41 @@ using namespace plot;
 namespace image_psb
 {
 
+void printLoadingbar(double &dProgress, int iNumIterations, double dStepSize)
+{
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
+    if(dProgress >= 100) 
+    { 
+        cout << "(error: loading bar exceeded 100 %)" << endl;
+        return;
+    }
+
+    int xPos = 0, yPos = 0;
+    int iColWidth = w.ws_col - 10; // To compensate for []>::space:: symbols
+    int iSignPercentage = (int) ((dProgress * iColWidth) / 100),
+        iPercentage     = (int)dProgress;
+    string sMarker(iColWidth, '=');
+
+    printf("\033[%d;%dH[%s>%*c] %3d%%\n", xPos, yPos
+                             , sMarker.substr(0,iSignPercentage).c_str()
+                             , iColWidth - iSignPercentage, ' '
+                             , iPercentage);
+
+    dProgress += dStepSize;
+}
+
+
 void calculateAverage(string);
 
 typedef CImg<double> image_fmt;
 typedef CImgList<double> imageList_fmt;
 
 CImgList<double> readImage(CImg<double> image,
-                           const char *fileName, vector<iterative_function> vIf)
+                           const char *fileName, vector<iterative_function> vIf,
+                           double &dProgress, int iTotalIterations,
+                           double dStepSize)
 {
     double max_error = .9;
     int iHeight = image.height(), iWidth = image.width(),
@@ -98,8 +127,10 @@ CImgList<double> readImage(CImg<double> image,
         it != vIf.end();
         ++it)
     {
+        // printLoadingbar(dProgress, iTotalIterations, dStepSize);
         double *dImage = new double[image_vec.size()];
 
+        printLoadingbar(dProgress, iTotalIterations, dStepSize);
         cout << "beginning image " << fileName << endl;
         vector<string> vOutput =  iterative_solve(*it, 
                                        image_vec, U,
@@ -157,7 +188,7 @@ void readSingleImage(vector<iterative_function> vIf)
         cout << cioe.what() << endl;
         exit(EXIT_FAILURE);
     }
-    CImgList<double> cil = readImage(image, cImageName, vIf);
+    // CImgList<double> cil = readImage(image, cImageName, vIf);
 }
 
 /** Read a series of images and solve them
@@ -167,6 +198,9 @@ void readFolder(string sDir, vector<iterative_function> vIf)
 {
     CImgList<double> images; 
     vector<string> filenames;
+    int iTotalIterations;
+    double dProgress = 0;
+    double dStepSize;
 
     try{
         filenames = getFilesInFolder(sDir);
@@ -178,6 +212,9 @@ void readFolder(string sDir, vector<iterative_function> vIf)
         exit(EXIT_FAILURE);
     }
 
+    iTotalIterations = filenames.size() * vIf.size();
+    dStepSize = (100 / iTotalIterations);
+    
     for(vector<int>::size_type iPos = 0;
             iPos < filenames.size();
             iPos++) 
@@ -194,7 +231,8 @@ void readFolder(string sDir, vector<iterative_function> vIf)
 
         /* Returns images for each iteration */
         CImgList<double> cil = readImage(img, filenames[iPos].c_str(),
-                                         vIf);
+                                         vIf, dProgress, iTotalIterations,
+                                         dStepSize);
         images.insert(cil, images.size());
     }
 
@@ -203,21 +241,24 @@ void readFolder(string sDir, vector<iterative_function> vIf)
     fileLocations[iterate_jacobi] = "jacobi/";
     fileLocations[iterate_sor] = "sor/";
 
+    // cout << "ERDWAD     " << (int)(images.size() / vIf.size()) << endl;
+
     for(vector<int>::size_type iPos = 0;
-            iPos < filenames.size();
+            iPos < (int)(images.size() / vIf.size());
             iPos++) 
     {
-        for (vector<iterative_function>::iterator funcIt = vIf.begin();
-            funcIt != vIf.end();
-            ++funcIt)
-        {
-            string sDest = DATA_DIR;
-            sDest += fileLocations[*funcIt];
-            trimLeadingFileName(filenames[iPos]);
-            string sImageDest = get_path() + sDest + "/image/" + filenames[iPos];
+        trimLeadingFileName(filenames[iPos]);
 
-            images[iPos].save(sImageDest.c_str());
+        for(vector<int>::size_type jPos = 0;
+                jPos < vIf.size();
+                jPos++) 
+        {
+            string sDest = get_path() + DATA_DIR + fileLocations[vIf[jPos]];
+            string sImageDest = sDest + "/image/" + filenames[iPos];
+
+            images[iPos+jPos].save(sImageDest.c_str());
             calculateAverage(sDest);
+            //FIXME: line above causes segfault
         }
     }
 }

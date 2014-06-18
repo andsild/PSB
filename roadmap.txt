@@ -1,9 +1,9 @@
 # Specified in order of priority, i.e. top item is done first, last item last
 
 make program user friendly!
-    default flag
     output what is going on
     estimate a total loading time
+    cut down on readimage to more functions
     
 fix division by pixel size
 
