@@ -1,5 +1,9 @@
 # Specified in order of priority, i.e. top item is done first, last item last
 
+make program user friendly!
+
+relocate image stuff to a file of it's own making main to main..
+
 fix division by pixel size
 
 plots should have average AND all the others
