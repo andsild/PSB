@@ -1,11 +1,7 @@
 # Specified in order of priority
 
 plots should be generated with a flag specification
-    try to avoid boost
-    gnuplot from c++, not bash
-        havily relies on boost
-
-gnuplot - either assume users have it, or use c++ version (and link to boost)
+    FOR NOW, JUST SYSTEM(plot.sh)
 
 implement FFT
     make sure FFT-lib does not have any plotting, otherwise replace gnuplot
@@ -14,6 +10,9 @@ fix division by pixel size
 
 plots should have average AND all the others
     ish done
+
+gnuplot from c++, not bash
+    havily relies on boost
 
  compute line on I and U
     so it is easier to analytically get the solution.

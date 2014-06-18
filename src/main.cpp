@@ -22,7 +22,7 @@
 #include "CImg.h"
 #include "./file.cpp"
 #include "solvers/iterative_solvers.cpp"
-// #include "plot.cpp"
+#include "plot.cpp"
 // #include "solvers/FFT.cpp"
 
 #define no_argument 0
@@ -32,6 +32,7 @@
 using namespace cimg_library;
 using namespace pe_solver;
 using namespace file_IO;
+using namespace plot;
 using namespace std;
 
 void calculateAverage(string);
@@ -79,8 +80,6 @@ CImgList<double> readImage(CImg<double> image,
             image(jPos, iPos) = (r / 3)  ;
         }
     }
-
-    grayscale.save("./test.jpg");
 
     for(int iPos = 0; iPos < iHeight; iPos++)
     {
@@ -250,7 +249,7 @@ int main(int argc, char *argv[])
 
     while(iarg != -1)
     {
-        iarg = getopt_long(argc, argv, "f:gijs", longopts, &index);
+        iarg = getopt_long(argc, argv, "f:gijps", longopts, &index);
 
         switch (iarg)
         {
@@ -277,6 +276,9 @@ int main(int argc, char *argv[])
 
             case 't':
                 break;
+            
+            case 'p':
+                plot::plot();
 
             default: 
                 break; 
