@@ -1,15 +1,11 @@
-# Specified in order of priority
-
-plots should be generated with a flag specification
-    FOR NOW, JUST SYSTEM(plot.sh)
-
-implement FFT
-    make sure FFT-lib does not have any plotting, otherwise replace gnuplot
+# Specified in order of priority, i.e. top item is done first, last item last
 
 fix division by pixel size
 
 plots should have average AND all the others
     ish done
+
+run on all images with iterative
 
 gnuplot from c++, not bash
     havily relies on boost
@@ -28,9 +24,7 @@ the output, data-folder should not be in project dir, rather in pwd() from
 
  render two images, show plot for these two.
 
- multi-threaded, to be faster per image
-    red black
-    multitraad
+
 
  timing different functions / iterations
 
@@ -38,9 +32,17 @@ the output, data-folder should not be in project dir, rather in pwd() from
 
  code refactoring
 
+ implement FFT
+
  Variation of parameters used in functions
     discretization
     ω
+
+
+ multi-threaded, to be faster per image
+    red black
+    multitraad
+
 
  Detection of convergence, etc
     http://www.physics.buffalo.edu/phy410-505/2011/topic3/app1/index.html
@@ -49,7 +51,8 @@ the output, data-folder should not be in project dir, rather in pwd() from
  Other optimizations?
     hvordan ser en matrise ut mot slutten? kan noen deler kuttes ut?
 
-My translation to vector takes about 10 seconds
+My translation to vector takes about 0.1 seconds for each image - maybe there is
+    better way
 
 # Gong ville gjoore dette 
 ((adding some of the more advanced))

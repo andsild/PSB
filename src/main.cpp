@@ -243,7 +243,7 @@ int main(int argc, char *argv[])
     int iarg=0;
     extern char *optarg;
     
-    int f = 0, g = 0, i = 0, j = 0, s = 0;
+    int f = 0, g = 0, i = 0, j = 0, p = 0, s = 0;
     char *folder;
     vector<iterative_function> test;
 
@@ -278,7 +278,7 @@ int main(int argc, char *argv[])
                 break;
             
             case 'p':
-                plot::plot();
+                p++;
 
             default: 
                 break; 
@@ -301,6 +301,10 @@ int main(int argc, char *argv[])
         // readSingleImage(test);
     }
 
+    if(p) 
+    { 
+        plot::plot();
+    }
     
     //show image(s)
     // CImg<unsigned char> image("./media/icon_img.png");
