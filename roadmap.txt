@@ -1,7 +1,6 @@
 # Specified in order of priority, i.e. top item is done first, last item last
 
 make program user friendly!
-    try/catch when opening files
     default flag
     output what is going on
     estimate a total loading time
