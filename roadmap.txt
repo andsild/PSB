@@ -1,16 +1,27 @@
+# Specified in order of priority
 
- make for mac
+plots should be generated with a flag specification
+    try to avoid boost
+    gnuplot from c++, not bash
+        havily relies on boost
 
+gnuplot - either assume users have it, or use c++ version (and link to boost)
 
- compute images on a grayscale in progress
+implement FFT
+    make sure FFT-lib does not have any plotting, otherwise replace gnuplot
 
- fix division by pixel size
+fix division by pixel size
 
- plots should have average AND all the others
+plots should have average AND all the others
     ish done
 
  compute line on I and U
     so it is easier to analytically get the solution.
+
+the output, data-folder should not be in project dir, rather in pwd() from
+    where you are
+        all saves and everything should be rendered through classes such that it
+            is easy to get the right path for all.
 
  Make the graphs loggy
     easier to see what's going on 
@@ -39,6 +50,7 @@
  Other optimizations?
     hvordan ser en matrise ut mot slutten? kan noen deler kuttes ut?
 
+My translation to vector takes about 10 seconds
 
 # Gong ville gjoore dette 
 ((adding some of the more advanced))

@@ -63,6 +63,12 @@ set(CIMG_H_PATH ${PROJECT_SOURCE_DIR}/../lib/CImg-1.5.8)
 include_directories( ${PROJECT_SOURCE_DIR} )
 include_directories( ${CIMG_H_PATH} )
 
+find_program(GNUPLOT_BIN gnuplot)
+if(NOT GNUPLOT_BIN)
+    message (FATAL_ERROR "Could not find gnuplot")
+endif(NOT GNUPLOT_BIN)
+
+
 # ### CIMG related stuff
 # Flags to enable fast image display, using the XSHM library.
 SET(CIMG_XSHM_CCFLAGS  -Dcimg_use_xshm)

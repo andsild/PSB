@@ -1,6 +1,8 @@
 #ifndef _FILE_CPP
 #define _FILE_CPP 1
 
+#define PROJECT_DIR "PSB"
+
 //TODO: check for diagonal dominance
 //If you know that a matrix is diagonally dominant,
 //
@@ -19,6 +21,27 @@ using namespace std;
 
 namespace file_IO
 {
+
+
+string get_path()
+{
+    char cwd[1024];
+    getcwd(cwd, sizeof(cwd));
+    string sCwd = string(cwd);
+
+    size_t project_index = sCwd.find(PROJECT_DIR);
+    if (project_index!=string::npos)
+    {
+        size_t slash_index = sCwd.find_first_of("/", project_index);
+        if (slash_index!=string::npos)
+            return sCwd.substr(0, slash_index + 1);  //include slash
+    }
+    else {
+        return string("./");
+    }
+}
+
+
 
 void trimLeadingFileName(string &str)
 {
@@ -46,8 +69,8 @@ void writeToFile(vector<string> vRes, string sFilename, string sFolderDest)
 {
     trimLeadingFileName(sFilename);
     trimTrailingFilename(sFilename);
-    string sFinalname = DATA_DIR + sFolderDest + "/" + sFilename 
-                        + DATA_EXTENSION;
+    string sFinalname = get_path() + DATA_DIR + sFolderDest + "/"
+                        + sFilename + DATA_EXTENSION;
 
     ofstream data_file(sFinalname.c_str(),  ios::out);
 
@@ -61,7 +84,7 @@ void writeToFile(vector<string> vRes, string sFilename, string sFolderDest)
     data_file.close();
 }
 
-vector<string> getFilesInFolder(char *dir)
+vector<string> getFilesInFolder(string sDir)
 {
     ifstream fin;
     int num;
@@ -69,11 +92,13 @@ vector<string> getFilesInFolder(char *dir)
     struct stat filestat;
     struct dirent *dirp;
 
-    dp = opendir( dir);
+    string sFullDir = get_path() + sDir;
+
+    dp = opendir(sFullDir.c_str());
     if (dp == NULL)
     {
         cout << "Error in openin" << endl;
-        cout << dir << endl;
+        cout << sFullDir <<  endl;
         throw;
     }
 
@@ -81,7 +106,7 @@ vector<string> getFilesInFolder(char *dir)
 
     while ((dirp = readdir( dp )))
     {
-        string readFile = string(dir) + string(dirp->d_name);
+        string readFile = sFullDir + string(dirp->d_name);
 
         // Check for valid file(s)
         if (stat( readFile.c_str(), &filestat )) continue;
