@@ -36,12 +36,32 @@ using namespace image_psb;
 using namespace file_IO;
 using namespace plot;
 
+void usage()
+{
+    cout << "Usage: main <folder>" << endl;
+
+    printf("\t -%c, %s\t%s\n", 'f', "--folder", "folder with images");
+    printf("\t -%c, %s\t%s\n", 'g', "--gauss", "perform gauss-seidel iteration");
+    printf("\t -%c, %s\t%s\n", 'h', "--help", "view this text");
+    printf("\t -%c, %s\t%s\n", 'j', "--jacobi", "perform jacobi iteration");
+    printf("\t -%c, %s\t%s\n", 'p', "--plot", "generate plots for graphs");
+    printf("\t -%c, %s\t%s\n", 's', "--sor", "perform sor iteration");
+    printf("\n");
+
+    exit(EXIT_FAILURE);
+}
+
 int main(int argc, char *argv[]) 
 {
     const struct option longopts[] =
     {
-        {"image",   no_argument,        0, 'i'},
         {"folder",     required_argument,  0, 'f'},
+        {"gauss",   no_argument,        0, 'g'},
+        {"help",   no_argument,        0, 'h'},
+        {"image",   no_argument,        0, 'i'},
+        {"jacobi",   no_argument,        0, 'j'},
+        {"plot",   no_argument,        0, 'p'},
+        {"sor",   no_argument,        0, 's'},
         {0,0,0,0},
     };
 
@@ -53,9 +73,20 @@ int main(int argc, char *argv[])
     char *folder;
     vector<iterative_function> test;
 
+    if(argc == 2)
+    {
+        test.push_back(iterate_gauss);
+        readFolder(string(argv[1]), test);
+        plot::plot();
+        exit(EXIT_SUCCESS);
+    }
+        // test.push_back(iterate_jacobi);
+        // test.push_back(iterate_sor);
+       
+
     while(iarg != -1)
     {
-        iarg = getopt_long(argc, argv, "f:gijps", longopts, &index);
+        iarg = getopt_long(argc, argv, "f:gijhps", longopts, &index);
 
         switch (iarg)
         {
@@ -76,6 +107,10 @@ int main(int argc, char *argv[])
                 test.push_back(iterate_jacobi);
                 break;
 
+            case 'h':
+                usage();
+                break;
+
             case 's':
                 test.push_back(iterate_sor);
                 break;
@@ -85,9 +120,11 @@ int main(int argc, char *argv[])
             
             case 'p':
                 p++;
+                break;
 
             default: 
-                break; 
+                usage();
+                break;
         }
     } 
 
