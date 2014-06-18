@@ -75,6 +75,7 @@ int main(int argc, char *argv[])
 
     if(argc == 2)
     {
+        cout << "Assuming \"-f " << string(argv[1]) << " --gauss" << endl;
         test.push_back(iterate_gauss);
         readFolder(string(argv[1]), test);
         plot::plot();
@@ -123,13 +124,15 @@ int main(int argc, char *argv[])
                 break;
 
             default: 
-                usage();
+                // usage();
                 break;
         }
     } 
 
     if(f) {
         //FIXME: doesn't add a (necessary) trailing  slash
+        if(test.size() < 1)
+            cout << "Warning: no iterators chosen" << endl;
         readFolder(folder, test);
     }
     else if(i)
