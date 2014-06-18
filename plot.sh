@@ -1,16 +1,18 @@
 #!/bin/bash
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 cmd="plot"
-for file in $(find "./data/" -type f -name "*average.dat")
+for file in $(find "${DIR}/data/" -type f -name "*average.dat")
 do
     cmd="${cmd} \"${file}\" using 1 title \"test${file}\" with linespoints ,"
 done
 
 # cmd="${cmd%%,};"
 
-for file in $(find "./data/" -regextype sed -regex ".*/[0-9].*\.dat")
+for file in $(find "${DIR}/data/" -regextype sed -regex ".*/[0-9].*\.dat")
 do
-    cmd="${cmd} \"${file}\" using 1 with points pt 7 lc rgb \"\#FFB801\" title \"gauss\","
+    cmd="${cmd} \"${file}\" using 1 with points pt 7 lc rgb \"\#FFB801\" notitle,"
     # break;
 done
 
