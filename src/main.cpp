@@ -5,7 +5,6 @@
 #define DATA_EXTENSION ".dat"
 #define PRECISION 20
 
-
 #include <fstream>
 #include <iostream>
 #include <iomanip>

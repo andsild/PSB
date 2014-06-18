@@ -22,6 +22,22 @@ using namespace std;
 namespace file_IO
 {
 
+class DirNotFound : public exception
+{
+    public:
+        explicit DirNotFound(const std::string& message):
+            msg_(message)
+         {}
+
+        virtual ~DirNotFound() throw (){}
+        virtual const char* what() const throw()
+        {
+            string ret = string("Could not find folder: ") + msg_;
+            return ret.c_str();
+        }
+    protected:
+        std::string msg_;
+};
 
 string get_path()
 {
@@ -64,7 +80,6 @@ void trimTrailingFilename(string &str)
 }
 
 
-//TODO: does not warn of IO-error
 void writeToFile(vector<string> vRes, string sFilename, string sFolderDest)
 {
     trimLeadingFileName(sFilename);
@@ -73,6 +88,11 @@ void writeToFile(vector<string> vRes, string sFilename, string sFolderDest)
                         + sFilename + DATA_EXTENSION;
 
     ofstream data_file(sFinalname.c_str(),  ios::out);
+    if(!data_file)
+    {
+        cout << "Unable to write to file: " << sFinalname << endl;
+        return;
+    }
 
     for (vector<string>::iterator it = vRes.begin();
             it != vRes.end();
@@ -97,20 +117,24 @@ vector<string> getFilesInFolder(string sDir)
     dp = opendir(sFullDir.c_str());
     if (dp == NULL)
     {
-        cout << "Error in openin" << endl;
-        cout << sFullDir <<  endl;
-        throw;
+        throw DirNotFound(sDir);
     }
 
     vector<string> filenames;
 
     while ((dirp = readdir( dp )))
     {
-        string readFile = sFullDir + string(dirp->d_name);
+        string readFile = sFullDir + "/" + string(dirp->d_name);
 
         // Check for valid file(s)
-        if (stat( readFile.c_str(), &filestat )) continue;
-        if (S_ISDIR( filestat.st_mode ))         continue;
+        if (stat( readFile.c_str(), &filestat ))
+        {
+            cout << "Skipping " << readFile << " : file invalid" << endl;
+        }
+        if (S_ISDIR( filestat.st_mode ))
+        {
+            continue;
+        }
 
         filenames.push_back(readFile);
     }

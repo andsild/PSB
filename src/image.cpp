@@ -83,7 +83,6 @@ CImgList<double> readImage(CImg<double> image,
     {
         for(int jPos = 0; jPos < iWidth; jPos++)
         {
-            
             image_vec.push_back(grayscale(jPos, iPos, 0, 0));
             //TODO: push back makes it bigger than it should be
             //      (should pre-compute size instead)
@@ -137,8 +136,8 @@ CImg<double> getImage(string sDest)
     }
     catch(CImgIOException cioe)
     {
-        cout << "Unable to open image: " << sDest << endl;
-        throw cioe;
+        string sMsg = string("Unable to open image: ") + sDest;
+        throw CImgIOException(sMsg.c_str(), &cioe);
     }
 
     return image;
@@ -150,14 +149,20 @@ void readSingleImage(vector<iterative_function> vIf)
     char cImageName[] = "./small_media/104000.jpg";
     string sDest = get_path() + string(cImageName);
     // CImg<unsigned char> image(sDest.c_str()); //example
-    CImg<double> image = getImage(sDest.c_str());
+    CImg<double> image ;
+    try{
+        image = getImage(sDest.c_str());
+    }
+    catch(CImgIOException cioe) {
+        cout << cioe.what() << endl;
+        exit(EXIT_FAILURE);
+    }
     CImgList<double> cil = readImage(image, cImageName, vIf);
 }
 
 /** Read a series of images and solve them
  *
  */
-
 void readFolder(string sDir, vector<iterative_function> vIf)
 {
     CImgList<double> images; 
@@ -166,8 +171,11 @@ void readFolder(string sDir, vector<iterative_function> vIf)
     try{
         filenames = getFilesInFolder(sDir);
     }
-    catch(...) {
-        cout << "could not find files" << endl;
+    // catch(std::ios_base::failure &f) {
+    catch(const file_IO::DirNotFound& f)
+    {
+        cout << f.what() << endl;
+        exit(EXIT_FAILURE);
     }
 
     for(vector<int>::size_type iPos = 0;
@@ -180,6 +188,7 @@ void readFolder(string sDir, vector<iterative_function> vIf)
             img = getImage(filenames[iPos].c_str());
         }
         catch(CImgIOException &cioe) {
+            cout << cioe.what() << endl;
             continue;
         }
 
@@ -216,7 +225,16 @@ void readFolder(string sDir, vector<iterative_function> vIf)
 void calculateAverage(string sFilePath)
 {
     sFilePath += "/";
-    vector<string> files = getFilesInFolder(sFilePath.c_str());
+    vector<string> files;
+
+    try
+    {
+        files = getFilesInFolder(sFilePath.c_str());
+    }
+    catch(file_IO::DirNotFound &f)
+    {
+        cout << f.what() << endl;
+    }
 
     vector<double> average; // can give undererror
     int iLineCount = numeric_limits<int>::max();
