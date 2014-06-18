@@ -24,6 +24,9 @@
 *.png
 *.jpg
 
+# To build - these are specific for each arch
+build/*
+
 # Large files
 media/
 small_media/*

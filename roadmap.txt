@@ -1,38 +1,44 @@
-# Gong ville gjoore dette 
-((Legg til noen av de mer avanserte))
 
-#2 fix division by pixel size
+ make for mac
 
-#3 plots should have average AND all the others
+
+ compute images on a grayscale in progress
+
+ fix division by pixel size
+
+ plots should have average AND all the others
     ish done
 
-#1 compute images on a grayscale 
-    in progress
-
-#4 compute line on I and U
+ compute line on I and U
     so it is easier to analytically get the solution.
 
-#5 make for mac
+ Make the graphs loggy
+    easier to see what's going on 
 
-#5 render two images, show plot for these two.
 
-#1 multi-threaded, to be faster per image
+ render two images, show plot for these two.
+
+ multi-threaded, to be faster per image
     red black
     multitraad
 
-#2 timing different functions / iterations
+ timing different functions / iterations
 
-#3 make histograms
+ make histograms
 
-#4 code refactoring
+ code refactoring
 
-#5 Variation of parameters used in functions
-    diskretisering
+ Variation of parameters used in functions
+    discretization
     ω
 
-#7 Detection of convergence, etc
+ Detection of convergence, etc
     http://www.physics.buffalo.edu/phy410-505/2011/topic3/app1/index.html
         [described in the moddile of the page]
 
-#8 Other optimizations?
+ Other optimizations?
     hvordan ser en matrise ut mot slutten? kan noen deler kuttes ut?
+
+
+# Gong ville gjoore dette 
+((adding some of the more advanced))
