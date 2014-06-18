@@ -3,6 +3,13 @@ PSB
 
 [P]oisson[S]olver[Benchmarks].
 
+# To build:
+```bash
+cd build && cmake ../src && make
+../bin/main
+```
+
+
 # Images
 To get the images: 
 ```bash
