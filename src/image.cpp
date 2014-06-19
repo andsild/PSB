@@ -35,34 +35,69 @@ using namespace plot;
 namespace image_psb
 {
 
-void printLoadingbar(double &dProgress, int iNumIterations, double dStepSize
-                     , int iMinutes = 0, int iSeconds = 0)
+class LoadingBar
 {
-    struct winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    private:
+        int iNumIterations;
+        double dStepSize;
+        mutable double dProgress;
+        int iTimeRemaining;
 
-    if(dProgress > 100) 
+    public:
+        struct winsize w;
+        LoadingBar(int iNumIterations) : iNumIterations(iNumIterations)
+    {
+        this->dProgress = 0;
+        this->dStepSize = ((double)100 / iNumIterations);
+        this->iTimeRemaining = 100;//filenames.size() * vIf.size() 
+                             //* (pow( (img.height() * img.width()), 0.3));
+    }
+    string getTimeLeft() const
+    {
+        int iMinutesLeft = this->iTimeRemaining / 60;
+        int iSecondsLeft = this->iTimeRemaining - (iMinutesLeft * 60);
+        return string(to_string(iMinutesLeft) + "m"
+                + to_string(iSecondsLeft) + "s");
+    }
+    void increaseProgress() const
+    {
+        this->dProgress += this->dStepSize;
+    }
+    void increaseProgress(int iIterations)
+    {
+        this->dProgress += this->dStepSize * iIterations;
+    }
+    double getProgress() const { return this->dProgress; }
+    friend ostream& operator<< (ostream &str, const LoadingBar& obj);
+
+};
+
+ostream& operator<< (ostream &str, const LoadingBar& obj)
+{
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &obj.w);
+
+    if(obj.getProgress() > 100) 
     { 
-        cout << "(error: loading bar exceeded 100 %)" << endl;
-        return;
+        // str << "(error: loading bar exceeded 100 %)" << endl;
+        return str;
     }
 
     const int xPos = 0, yPos = 0;
-    int iColWidth = w.ws_col - 10; // To compensate for []>::space:: symbols
-    int iSignPercentage = (int) ((dProgress * iColWidth) / 100),
-        iPercentage     = (int)dProgress;
+    // To compensate for []>::space:: symbols
+    int iColWidth = obj.w.ws_col - 10; 
+    int iSignPercentage = (int) ((obj.getProgress() * iColWidth) / 100),
+        iPercentage     = (int)obj.getProgress();
     string sMarker(iColWidth, '=');
 
     // printf("\033[%d;%dH[%s>%*c] %3d%%\n", xPos, yPos
-    printf("\r[%s>%*c] %3d%% ETA %d3m:%2ds\n"
+    printf("\r[%s>%*c] %3d%% ETA %s"
                              , sMarker.substr(0,iSignPercentage).c_str()
                              , iColWidth - iSignPercentage, ' '
                              , iPercentage
-                             , iMinutes, iSeconds);
-
-    dProgress += dStepSize;
+                             , obj.getTimeLeft().c_str());
+    obj.increaseProgress();
+    return str;
 }
-
 
 void calculateAverage(string);
 
@@ -71,8 +106,7 @@ typedef CImgList<double> imageList_fmt;
 
 CImgList<double> readImage(CImg<double> image,
                            const char *fileName, vector<iterative_function> vIf,
-                           double &dProgress, int iTotalIterations,
-                           double dStepSize)
+                           LoadingBar &loadbar)
 {
     double max_error = .9;
     int iHeight = image.height(), iWidth = image.width(),
@@ -134,7 +168,7 @@ CImgList<double> readImage(CImg<double> image,
         double *dImage = new double[image_vec.size()];
 
         cout << "beginning image " << fileName << endl;
-        printLoadingbar(dProgress, iTotalIterations, dStepSize);
+        cout << loadbar << endl;
         vector<string> vOutput =  iterative_solve(*it, 
                                        image_vec, U,
                                        max_error, iDim, iWidth);
@@ -205,6 +239,7 @@ void readFolder(string sDir, vector<iterative_function> vIf)
     double dProgress = 0;
     double dStepSize;
 
+
     try{
         filenames = getFilesInFolder(sDir);
     }
@@ -218,6 +253,7 @@ void readFolder(string sDir, vector<iterative_function> vIf)
     iTotalIterations = filenames.size() * vIf.size();
     dStepSize = ((double)100 / iTotalIterations);
     int iTimeRemaining = filenames.size() * vIf.size();
+    LoadingBar loadBar(iTotalIterations);
 
     
     for(vector<int>::size_type iPos = 0;
@@ -231,26 +267,21 @@ void readFolder(string sDir, vector<iterative_function> vIf)
         }
         catch(CImgIOException &cioe) {
             cout << cioe.what() << endl;
-            dProgress += dStepSize * vIf.size();
+            loadBar.increaseProgress(vIf.size() - 1);
+            cout << loadBar << endl;
             // iTotalIterations -= vIf.size();
             // dStepSize = (100 / iTotalIterations);
 
             continue;
         }
 
-        int iTimeRemaining = filenames.size() * vIf.size() 
-                             * (pow( (img.height() * img.width()), 0.3));
-        int iMinutesLeft = iTimeRemaining / 60;
-        int iSecondsLeft = iTimeRemaining - (iMinutesLeft * 60);
-        
 
         /* Returns images for each iteration */
         CImgList<double> cil = readImage(img, filenames[iPos].c_str(),
-                                         vIf, dProgress, iTotalIterations,
-                                         dStepSize);
+                                         vIf, loadBar);
         images.insert(cil, images.size());
     }
-    printLoadingbar(dProgress, iTotalIterations, dStepSize);
+    cout << loadBar << endl;// if last image has errors, this might be necessary
 
     map<iterative_function, string> fileLocations;
     fileLocations[iterate_gauss] = "gauss/";
