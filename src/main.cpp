@@ -1,7 +1,7 @@
 #ifndef _MAIN_CPP
 #define _MAIN_CPP   1
 
-#define DATA_DIR "./data/"
+#define DATA_DIR "./output/"
 #define DATA_EXTENSION ".dat"
 #define PRECISION 20
 
@@ -58,7 +58,6 @@ int main(int argc, char *argv[])
         {"folder",     required_argument,  0, 'f'},
         {"gauss",   no_argument,        0, 'g'},
         {"help",   no_argument,        0, 'h'},
-        {"image",   no_argument,        0, 'i'},
         {"jacobi",   no_argument,        0, 'j'},
         {"plot",   no_argument,        0, 'p'},
         {"sor",   no_argument,        0, 's'},
@@ -71,29 +70,27 @@ int main(int argc, char *argv[])
     
     int f = 0, g = 0, i = 0, j = 0, p = 0, s = 0;
     char *folder;
-    vector<iterative_function> test;
+    function_container test;
+    SolverMeta smG(iterate_gauss, "gauss/", "images/");
+    SolverMeta smJ(iterate_jacobi, "jacobi/", "images/");
+    SolverMeta smS(iterate_sor, "sor/", "images/");
 
     if(argc == 2)
     {
         cout << "Assuming \"-f " << string(argv[1]) << " --gauss" << endl;
-        test.push_back(iterate_gauss);
+        test.push_back(smG);
         readFolder(string(argv[1]), test);
         plot::plot();
         exit(EXIT_SUCCESS);
     }
-        // test.push_back(iterate_jacobi);
-        // test.push_back(iterate_sor);
-       
+
 
     while(iarg != -1)
     {
-        iarg = getopt_long(argc, argv, "f:gijhps", longopts, &index);
+        iarg = getopt_long(argc, argv, "f:gjhps", longopts, &index);
 
         switch (iarg)
         {
-            case 'i':
-                i++;
-                break;
 
             case 'f':
                 f++;
@@ -101,11 +98,11 @@ int main(int argc, char *argv[])
                 break;
 
             case 'g':
-                test.push_back(iterate_gauss);
+                test.push_back(smG);
                 break;
 
             case 'j':
-                test.push_back(iterate_jacobi);
+                test.push_back(smJ);
                 break;
 
             case 'h':
@@ -113,12 +110,12 @@ int main(int argc, char *argv[])
                 break;
 
             case 's':
-                test.push_back(iterate_sor);
+                test.push_back(smS);
                 break;
 
             case 't':
                 break;
-            
+
             case 'p':
                 p++;
                 break;
@@ -130,40 +127,34 @@ int main(int argc, char *argv[])
     } 
 
     if(f) {
-        //FIXME: doesn't add a (necessary) trailing  slash
         if(test.size() < 1)
             cout << "Warning: no iterators chosen" << endl;
         readFolder(folder, test);
     }
-    else if(i)
-    {
-        readSingleImage(test);
-    }
     else //default
     {
-        test.push_back(iterate_gauss);
-        string sDir = "small_media/";
+        test.push_back(smG);
+        string sDir = "../small_media/";
         readFolder(sDir, test);
-        // readSingleImage(test);
     }
 
     if(p) 
     { 
         plot::plot();
     }
-    
-    //show image(s)
-    // CImg<unsigned char> image("./media/icon_img.png");
-	// CImgDisplay main_disp(image,"Image",0);	
-	// CImgDisplay mask_disp(x2,"Image",0);	
-    //
-    // while (!main_disp.is_closed() && 
-    //        !main_disp.is_keyESC() &&
-    //        !main_disp.is_keyQ()) {
-    //     main_disp.wait();
-    // }
-    //
-    return 0;
+
+    // //show image(s)
+    // // CImg<unsigned char> image("./media/icon_img.png");
+	// // CImgDisplay main_disp(image,"Image",0);	
+	// // CImgDisplay mask_disp(x2,"Image",0);	
+    // //
+    // // while (!main_disp.is_closed() && 
+    // //        !main_disp.is_keyESC() &&
+    // //        !main_disp.is_keyQ()) {
+    // //     main_disp.wait();
+    // // }
+    // //
+    // return 0;
 }
 
 #endif /* _MAIN.cpp */
