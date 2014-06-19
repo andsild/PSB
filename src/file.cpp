@@ -2,6 +2,7 @@
 #define _FILE_CPP 1
 
 #define PROJECT_DIR "PSB"
+#define DEFAULT_MODE      S_IRWXU | S_IRGRP |  S_IXGRP | S_IROTH | S_IXOTH
 
 //TODO: check for diagonal dominance
 //If you know that a matrix is diagonally dominant,
@@ -13,6 +14,7 @@
 #include <stdio.h>
 #include <cmath>
 #include <string>
+#include <sys/stat.h>
 
 #include "./main.cpp"
 
@@ -79,24 +81,60 @@ void trimTrailingFilename(string &str)
     }
 }
 
+#include <errno.h>
 
-void writeToFile(vector<string> vRes, string sFilename, string sFolderDest)
+void mkdirp(const char* path, mode_t mode = DEFAULT_MODE) {
+  // const cast for hack
+  char* p = const_cast<char*>(path);
+
+  // Do mkdir for each slash until end of string or error
+  while (*p != '\0') {
+    // Skip first character
+    p++;
+
+    // Find first slash or end
+    while(*p != '\0' && *p != '/') p++;
+
+    // Remember value from p
+    char v = *p;
+
+    // Write end of string at p
+    *p = '\0';
+
+    // Create folder from path to '\0' inserted at p
+    if(mkdir(path, mode) == -1 && errno != EEXIST) {
+      *p = v;
+      return;
+    }
+    // Restore path to it's former glory
+    *p = v;
+  }
+}
+
+template <typename t>
+void writeToFile(const vector<t> vRes, string sFilename, string sFolderDest)
 {
     trimLeadingFileName(sFilename);
     trimTrailingFilename(sFilename);
-    string sFinalname = get_path() + DATA_DIR + sFolderDest + "/"
-                        + sFilename + DATA_EXTENSION;
+    string sFileDir = DATA_DIR + sFolderDest + "/";
+    sFilename = sFileDir + sFilename + DATA_EXTENSION;
 
-    ofstream data_file(sFinalname.c_str(),  ios::out);
+    ofstream data_file;
+
+    data_file.open(sFilename.c_str(), ios::out);
     if(!data_file)
     {
-        cout << "Unable to write to file: " << sFinalname << endl;
-        return;
+        mkdirp(sFileDir.c_str());
+        data_file.open(sFilename.c_str(), ios::out);
+        if(!data_file)
+        {
+            cout << "Unable to write to file: " << sFilename << endl;
+            return;
+        }
     }
 
-    for (vector<string>::iterator it = vRes.begin();
-            it != vRes.end();
-            ++it)
+    typename vector<t>::const_iterator it;
+    for (it = vRes.begin(); it != vRes.end(); ++it)
     {
         data_file << setprecision(PRECISION) << fixed << *it << endl;
     }
@@ -112,7 +150,7 @@ vector<string> getFilesInFolder(string sDir)
     struct stat filestat;
     struct dirent *dirp;
 
-    string sFullDir = get_path() + sDir;
+    string sFullDir = /* get_path() + */ sDir;
 
     dp = opendir(sFullDir.c_str());
     if (dp == NULL)

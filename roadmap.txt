@@ -1,14 +1,20 @@
 # Specified in order of priority, i.e. top item is done first, last item last
 
-make program user friendly!
-    output what is going on
-    estimate a total loading time
-    cut down on readimage to more functions
+fix relative path in param
+    the output, data-folder should not be in project dir, rather in pwd() from
+        where you are
+            all saves and everything should be rendered through classes such that it
+                is easy to get the right path for all.
+
     
 fix division by pixel size
 
 plots should have average AND all the others
     ish done
+
+make program user friendly!
+    output what is going on
+    estimate a total loading time
 
 run on all images with iterative
 
@@ -17,11 +23,6 @@ gnuplot from c++, not bash
 
  compute line on I and U
     so it is easier to analytically get the solution.
-
-the output, data-folder should not be in project dir, rather in pwd() from
-    where you are
-        all saves and everything should be rendered through classes such that it
-            is easy to get the right path for all.
 
  Make the graphs loggy
     easier to see what's going on 
