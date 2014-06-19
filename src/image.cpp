@@ -41,7 +41,8 @@ class LoadingBar
         int iNumIterations;
         double dStepSize;
         mutable double dProgress;
-        int iTimeRemaining;
+        mutable int iTimeRemaining;
+        mutable int iImageSize;
 
     public:
         struct winsize w;
@@ -49,7 +50,7 @@ class LoadingBar
     {
         this->dProgress = 0;
         this->dStepSize = ((double)100 / iNumIterations);
-        this->iTimeRemaining = 100;//filenames.size() * vIf.size() 
+        this->iTimeRemaining = 0;//filenames.size() * vIf.size() 
                              //* (pow( (img.height() * img.width()), 0.3));
     }
     string getTimeLeft() const
@@ -59,13 +60,18 @@ class LoadingBar
         return string(to_string(iMinutesLeft) + "m"
                 + to_string(iSecondsLeft) + "s");
     }
-    void increaseProgress() const
+    void updateTimeRemaining(int iImageSize) const
     {
-        this->dProgress += this->dStepSize;
+        this->iImageSize = iImageSize;
+        int iIterationsLeft = int((100 - this->getProgress()) 
+                                   / this->dStepSize);
+        // rough estimate
+        this->iTimeRemaining = iIterationsLeft * pow(iImageSize, 0.3); 
     }
-    void increaseProgress(int iIterations)
+    void increaseProgress(int iIterations = 1) const
     {
         this->dProgress += this->dStepSize * iIterations;
+        updateTimeRemaining(this->iImageSize);
     }
     double getProgress() const { return this->dProgress; }
     friend ostream& operator<< (ostream &str, const LoadingBar& obj);
@@ -84,7 +90,7 @@ ostream& operator<< (ostream &str, const LoadingBar& obj)
 
     const int xPos = 0, yPos = 0;
     // To compensate for []>::space:: symbols
-    int iColWidth = obj.w.ws_col - 10; 
+    int iColWidth = obj.w.ws_col - 20; 
     int iSignPercentage = (int) ((obj.getProgress() * iColWidth) / 100),
         iPercentage     = (int)obj.getProgress();
     string sMarker(iColWidth, '=');
@@ -159,6 +165,7 @@ CImgList<double> readImage(CImg<double> image,
     image = CImg<double>(1, 1, 1, 1, 1); // TODO: does this get memory back?
     grayscale = CImg<double>(1, 1, 1, 1, 1); // TODO: does this get memory back?
     U = vector<double>(iDim, 0); // wait to declare this until memory is freed?
+    loadbar.updateTimeRemaining(iHeight * iWidth);
 
     /* Solve */
     for (vector<iterative_function>::iterator it = vIf.begin();
