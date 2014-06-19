@@ -13,6 +13,7 @@
 
 #include <dirent.h>
 #include <getopt.h>
+#include <math.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -34,27 +35,30 @@ using namespace plot;
 namespace image_psb
 {
 
-void printLoadingbar(double &dProgress, int iNumIterations, double dStepSize)
+void printLoadingbar(double &dProgress, int iNumIterations, double dStepSize
+                     , int iMinutes = 0, int iSeconds = 0)
 {
     struct winsize w;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
-    if(dProgress >= 100) 
+    if(dProgress > 100) 
     { 
         cout << "(error: loading bar exceeded 100 %)" << endl;
         return;
     }
 
-    int xPos = 0, yPos = 0;
+    const int xPos = 0, yPos = 0;
     int iColWidth = w.ws_col - 10; // To compensate for []>::space:: symbols
     int iSignPercentage = (int) ((dProgress * iColWidth) / 100),
         iPercentage     = (int)dProgress;
     string sMarker(iColWidth, '=');
 
-    printf("\033[%d;%dH[%s>%*c] %3d%%\n", xPos, yPos
+    // printf("\033[%d;%dH[%s>%*c] %3d%%\n", xPos, yPos
+    printf("\r[%s>%*c] %3d%% ETA %d3m:%2ds\n"
                              , sMarker.substr(0,iSignPercentage).c_str()
                              , iColWidth - iSignPercentage, ' '
-                             , iPercentage);
+                             , iPercentage
+                             , iMinutes, iSeconds);
 
     dProgress += dStepSize;
 }
@@ -127,11 +131,10 @@ CImgList<double> readImage(CImg<double> image,
         it != vIf.end();
         ++it)
     {
-        // printLoadingbar(dProgress, iTotalIterations, dStepSize);
         double *dImage = new double[image_vec.size()];
 
-        printLoadingbar(dProgress, iTotalIterations, dStepSize);
         cout << "beginning image " << fileName << endl;
+        printLoadingbar(dProgress, iTotalIterations, dStepSize);
         vector<string> vOutput =  iterative_solve(*it, 
                                        image_vec, U,
                                        max_error, iDim, iWidth);
@@ -146,7 +149,7 @@ CImgList<double> readImage(CImg<double> image,
             dImage[iPos] = image_vec.at(iPos);
         }
 
-        cout << "finished image " << fileName << endl;
+        cout << "\rfinished image " << fileName << endl;
         CImg<double> test(dImage, iWidth, iHeight,
                           1, 1, false);
                           // iDepth, iSpectrum, false);
@@ -213,7 +216,9 @@ void readFolder(string sDir, vector<iterative_function> vIf)
     }
 
     iTotalIterations = filenames.size() * vIf.size();
-    dStepSize = (100 / iTotalIterations);
+    dStepSize = ((double)100 / iTotalIterations);
+    int iTimeRemaining = filenames.size() * vIf.size();
+
     
     for(vector<int>::size_type iPos = 0;
             iPos < filenames.size();
@@ -226,8 +231,18 @@ void readFolder(string sDir, vector<iterative_function> vIf)
         }
         catch(CImgIOException &cioe) {
             cout << cioe.what() << endl;
+            dProgress += dStepSize * vIf.size();
+            // iTotalIterations -= vIf.size();
+            // dStepSize = (100 / iTotalIterations);
+
             continue;
         }
+
+        int iTimeRemaining = filenames.size() * vIf.size() 
+                             * (pow( (img.height() * img.width()), 0.3));
+        int iMinutesLeft = iTimeRemaining / 60;
+        int iSecondsLeft = iTimeRemaining - (iMinutesLeft * 60);
+        
 
         /* Returns images for each iteration */
         CImgList<double> cil = readImage(img, filenames[iPos].c_str(),
@@ -235,6 +250,7 @@ void readFolder(string sDir, vector<iterative_function> vIf)
                                          dStepSize);
         images.insert(cil, images.size());
     }
+    printLoadingbar(dProgress, iTotalIterations, dStepSize);
 
     map<iterative_function, string> fileLocations;
     fileLocations[iterate_gauss] = "gauss/";
@@ -253,8 +269,8 @@ void readFolder(string sDir, vector<iterative_function> vIf)
                 jPos < vIf.size();
                 jPos++) 
         {
-            string sDest = get_path() + DATA_DIR + fileLocations[vIf[jPos]];
-            string sImageDest = sDest + "/image/" + filenames[iPos];
+            string sDest = DATA_DIR + fileLocations[vIf[jPos]];
+            string sImageDest = get_path() + sDest + "/image/" + filenames[iPos];
 
             images[iPos+jPos].save(sImageDest.c_str());
             calculateAverage(sDest);
@@ -275,10 +291,12 @@ void calculateAverage(string sFilePath)
     catch(file_IO::DirNotFound &f)
     {
         cout << f.what() << endl;
+        exit(EXIT_FAILURE);
     }
 
     vector<double> average; // can give undererror
     int iLineCount = numeric_limits<int>::max();
+    //FIXME: doesn't exclude average.dat
     for (vector<string>::iterator it = files.begin();
         it != files.end();
         ++it)
@@ -289,7 +307,7 @@ void calculateAverage(string sFilePath)
         double dNum;
         while(infile >> dNum)
         {
-            if(iPos >= average.size())
+            if(iPos >= average.size()) 
                 average.push_back(dNum);
             else
                 average[iPos] += dNum;
