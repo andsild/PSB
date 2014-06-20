@@ -10,7 +10,8 @@ namespace plot
 
 void plot()
 {
-    string sPlotDir = file_IO::get_path() + "plot.sh";
+    //TODO: fix path..
+    string sPlotDir = "../plot.sh";
     #ifdef __APPLE__
     string exe = "open " + sPlotDir;
     system(exe.c_str());

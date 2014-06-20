@@ -241,12 +241,115 @@ CImg<double> getImage(string sDest)
     return image;
 }
 
+CImgList<double> processImages(vector<string> &filenames, 
+                               function_container vIf, LoadingBar &loadBar)
+{
+    CImgList<double> images;
+    for (vector<string>::iterator it = filenames.begin();
+         it != filenames.end();
+         //XXX: No increment (using erase)
+        )
+    {
+        CImg<double> img;
+        try {
+            cimg::exception_mode(0);
+            img = getImage((*it).c_str());
+        }
+        catch(CImgIOException &cioe) {
+            cout << cioe.what() << endl;
+            //XXX: temporary and slow
+            loadBar.increaseProgress(vIf.size() - 1);
+            cout << loadBar << endl;
+            it = filenames.erase(it);
+
+            continue;
+        }
+
+        /* Returns images for each iteration */
+        CImgList<double> cil = readImage(img, (*it).c_str(),
+                                         vIf, loadBar);
+        images.insert(cil, images.size());
+
+        it++;
+    }
+
+    return images;
+}
+
+void saveImages(vector<string> filenames, CImgList<double> images,
+        function_container vIf)
+{
+    // what about the files we skipped?
+    for(vector<int>::size_type iPos = 0;
+            iPos < (int)(filenames.size());
+            iPos++) 
+    {
+        string sFilename = filenames[iPos];
+        trimLeadingFileName(sFilename);
+
+        for(vector<int>::size_type jPos = 0;
+                jPos < vIf.size();
+                jPos++) 
+        {
+            string sDest = DATA_DIR + vIf[jPos].sPath + "/image/";
+            string sImageDest = sDest + sFilename;
+
+            //TODO: all file-writing should be standardized in 
+            // file.cpp to avoid errors
+            cimg::exception_mode(0);
+            try {
+                images[iPos+jPos].save(sImageDest.c_str());
+            }
+            catch(CImgIOException cioe)
+            {
+                mkdirp(sDest.c_str());
+                images[iPos+jPos].save(sImageDest.c_str());
+                cout << cioe.what() << endl;
+                continue;
+            }
+        }
+    }
+
+
+    for(vector<int>::size_type iPos = 0;
+            iPos < (int)(images.size());
+            iPos += vIf.size()) 
+    {
+        int iFile = (iPos / vIf.size());
+        string sFilename = filenames[iFile];
+        trimLeadingFileName(sFilename);
+
+        string sDest;
+        for(vector<int>::size_type jPos = 0;
+                jPos < vIf.size();
+                jPos++) 
+        {
+            sDest = DATA_DIR + vIf[jPos].sPath + "/image/";
+            string sImageDest = sDest + sFilename;
+
+            //TODO: all file-writing should be standardized in 
+            // file.cpp to avoid errors
+            cimg::exception_mode(0);
+            try {
+                images[iPos+jPos].save(sImageDest.c_str());
+            }
+            catch(CImgIOException cioe)
+            {
+                mkdirp(sDest.c_str());
+                images[iPos+jPos].save(sImageDest.c_str());
+                cout << cioe.what() << endl;
+                continue;
+            }
+        }
+    }
+}
+
+
 /** Read a series of images and solve them
  *
  */
 void readFolder(string sDir, function_container vIf)
 {
-    CImgList<double> images; 
     vector<string> filenames;
     int iTotalIterations;
     double dProgress = 0;
@@ -267,65 +370,15 @@ void readFolder(string sDir, function_container vIf)
     int iTimeRemaining = filenames.size() * vIf.size();
     LoadingBar loadBar(iTotalIterations);
 
-
-    for(vector<int>::size_type iPos = 0;
-            iPos < filenames.size();
-            iPos++) 
-    {
-        CImg<double> img;
-        try {
-            cimg::exception_mode(0);
-            img = getImage(filenames[iPos].c_str());
-        }
-        catch(CImgIOException &cioe) {
-            cout << cioe.what() << endl;
-            loadBar.increaseProgress(vIf.size() - 1);
-            cout << loadBar << endl;
-
-            continue;
-        }
-
-        /* Returns images for each iteration */
-        CImgList<double> cil = readImage(img, filenames[iPos].c_str(),
-                                         vIf, loadBar);
-        images.insert(cil, images.size());
-    }
+    CImgList<double> images = processImages(filenames, vIf, loadBar);
     cout << loadBar << endl;// if last image has errors, this might be necessary
-
-    for(vector<int>::size_type iPos = 0;
-            iPos < (int)(images.size());
-            iPos += vIf.size()) 
-    {
-        trimLeadingFileName(filenames[iPos]);
-
-        string sDest;
-        for(vector<int>::size_type jPos = 0;
-                jPos < vIf.size();
-                jPos++) 
-        {
-            sDest = DATA_DIR + vIf[jPos].sPath + "/image/";
-            string sImageDest = sDest + filenames[iPos];
-
-            cimg::exception_mode(0);
-            try {
-            images[iPos+jPos].save(sImageDest.c_str());
-            }
-            catch(CImgIOException cioe)
-            {
-                mkdirp(sDest.c_str());
-                images[iPos+jPos].save(sImageDest.c_str());
-                cout << cioe.what() << endl;
-                continue;
-            }
-        }
-    }
+    saveImages(filenames, images, vIf);
 
     for (function_container::iterator it = vIf.begin();
         it != vIf.end();
         ++it)
     {
-        string sPath = DATA_DIR + (*it).sPath;
-        calculateAverage(sPath);
+        calculateAverage((*it).sPath);
     }
 }
 
@@ -334,9 +387,11 @@ void calculateAverage(string sFilePath)
     sFilePath += "/"; // just in case
     vector<string> files;
 
+    string sReadFolder = DATA_DIR + sFilePath;
+
     try
     {
-        files = getFilesInFolder(sFilePath.c_str());
+        files = getFilesInFolder(sReadFolder.c_str());
     }
     catch(file_IO::DirNotFound &f)
     {
@@ -344,19 +399,26 @@ void calculateAverage(string sFilePath)
         exit(EXIT_FAILURE);
     }
 
-    vector<double> average; // can give undererror
+
+    d1 average; // can give undererror
     int iLineCount = numeric_limits<int>::max();
     //FIXME: doesn't exclude average.dat
+    string avoid = "average";
+    double dValidFiles = 0;
     for (vector<string>::iterator it = files.begin();
         it != files.end();
         ++it)
     {
+        size_t found = (*it).find(avoid);
+        if(found!=string::npos) { continue; }
+        dValidFiles++;
+
         ifstream infile;
         int iPos = 0;
         double dNum;
         infile.open(*it);
 
-        while(infile >> dNum && iPos < iLineCount) // read whole file or stop
+        while(infile >> dNum) // read whole file or stop
         {
             if(iPos >= average.size()) 
                 average.push_back(dNum);
@@ -367,10 +429,15 @@ void calculateAverage(string sFilePath)
         /* Smallest file */
         if (iPos < iLineCount) { iLineCount = iPos; }
     }
+    for(d1::iterator it = average.begin();
+        it != average.end();
+        it++)
+    {
+        *it /= dValidFiles;
+    }
 
-    string sFileName = "average";
-    string sDest = sFilePath + "/" + sFileName + DATA_EXTENSION;
-    writeToFile(average, "average", sDest);
+    string sFilename = string("average") + DATA_EXTENSION;
+    writeToFile(average, sFilename, sFilePath);
 }
 
 }

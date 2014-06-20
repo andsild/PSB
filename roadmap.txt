@@ -1,20 +1,15 @@
 # Specified in order of priority, i.e. top item is done first, last item last
 
-fix relative path in param
-    the output, data-folder should not be in project dir, rather in pwd() from
-        where you are
-            all saves and everything should be rendered through classes such that it
-                is easy to get the right path for all.
-
-    
 fix division by pixel size
 
 plots should have average AND all the others
     ish done
 
+plot theoretical bounds
+
 make program user friendly!
     output what is going on
-    estimate a total loading time
+    estimate a total loading time betterly
 
 run on all images with iterative
 
