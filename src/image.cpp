@@ -165,7 +165,7 @@ CImg<double> sRGBtoGrayscale(CImg<double> image)
     return image;
 }
 
-d1 imageTo1d(CImg<double> &image, double dScalar = 1)
+d1 imageTo1d(CImg<double> image, double dScalar = 1)
 {
     d1 image_vec;
 
@@ -241,13 +241,12 @@ class ImageProcess
         }
 
         void solve(iterative_function func, LoadingBar &loadbar)
-        {
+       {
             mapfuncres::const_iterator search = this->mapFuncRes.find(func);
             if(search != mapFuncRes.end()) 
             {                
             }
 
-            writeToFile(
         }
 };
 
@@ -302,6 +301,8 @@ CImgList<double> readImage(CImg<double> image,
                           1, 1, false);
         retList.push_back(test);
     }
+    d1 poo(0,0);
+    image_vec = poo;
     return retList;
 }
 
@@ -334,11 +335,26 @@ CImg<double> getImage(string sDest)
     return image;
 }
 
+
+void printImage(image_fmt image)
+{
+    for(int iPos = 0; iPos < image.width(); iPos++)
+    {
+        for(int jPos = 0; jPos < image.height(); jPos++)
+        {
+            cout << image(iPos, jPos, 0, 0) << " " ; 
+        }
+        cout << endl;
+    }
+}
+
+
 CImgList<double> processImages(vector<string> &filenames, 
                                function_container vIf, LoadingBar &loadBar,
-                               double dScalar = 1)
+                               double dScalar = 1, bool resolve = false)
 {
     CImgList<double> images;
+
     for (vector<string>::iterator it = filenames.begin();
          it != filenames.end();
          //XXX: No increment (using erase)
@@ -347,7 +363,20 @@ CImgList<double> processImages(vector<string> &filenames,
         CImg<double> img;
         try {
             cimg::exception_mode(0);
-            img = getImage((*it).c_str());
+            string sNew = (*it);
+
+            // if(resolve)
+            // {
+            //     string avoid = "image";
+            //     size_t found = (*it).find(avoid);
+            //     if(found!=string::npos) 
+            //     {
+            //         sNew = (*it).substr(0, found);
+            //         sNew = "/new" + (*it).substr(found+6, (*it).size());
+            //     }
+            // }
+            img = getImage(sNew.c_str());
+            // img = getImage((*it).c_str());
         }
         catch(CImgIOException &cioe) {
             cout << cioe.what() << endl;
@@ -362,6 +391,8 @@ CImgList<double> processImages(vector<string> &filenames,
         vector<vector<string> > vRet;
         CImgList<double> cil = readImage(img, (*it).c_str(),
                                          vIf, loadBar, vRet, dScalar);
+        // printImage(img);
+        //FIXME: damage is already done
         writeImageList(vIf, (*it).c_str(), vRet);
         images.insert(cil, images.size());
 
@@ -370,7 +401,6 @@ CImgList<double> processImages(vector<string> &filenames,
 
     return images;
 }
-
 void saveImages(vector<string> filenames, CImgList<double> images,
         function_container vIf)
 {
@@ -409,7 +439,7 @@ void saveImages(vector<string> filenames, CImgList<double> images,
 /** Read a series of images and solve them
  *
  */
-void readFolder(string sDir, function_container vIf, double dScalar = 1)
+void readFolder(string sDir, function_container vIf, double dScalar = 1, bool resolve= false)
 {
     vector<string> filenames;
     int iTotalIterations;
@@ -430,7 +460,7 @@ void readFolder(string sDir, function_container vIf, double dScalar = 1)
     int iTimeRemaining = filenames.size() * vIf.size();
     LoadingBar loadBar(iTotalIterations);
 
-    CImgList<double> images = processImages(filenames, vIf, loadBar, dScalar);
+    CImgList<double> images = processImages(filenames, vIf, loadBar, dScalar, resolve);
     //make it so that process images do not write .... just solve and return
     cout << loadBar << endl;// if last image has errors, this might be necessary
     saveImages(filenames, images, vIf);
@@ -507,19 +537,30 @@ void calculateAverage(string sFilePath)
     writeToFile(average, sFilename, sFilePath);
 }
 
-void re_solve(function_container vIf)
+void re_solve(string sDir, function_container vIf)
 {
     vector<string> naughty;
     for (function_container::iterator it = vIf.begin();
         it != vIf.end();
         ++it)
     {
-        naughty.push_back((*it).sPath);
-        string sPath = DATA_DIR + (*it).sPath + string("image/");
-        (*it).sPath = (*it).sPath + "new/";
         //XXX
-        readFolder(sPath, vIf);
     }
+
+    for (function_container::iterator it = vIf.begin();
+        it != vIf.end();
+        ++it)
+    {
+        function_container lazy;
+        // sDir = DATA_DIR + (*it).sPath + string("image/");
+        sDir = DATA_DIR + (*it).sPath + string("image/");
+        (*it).sPath = (*it).sPath + "new/";
+        lazy.push_back(*it);
+        readFolder(sDir, lazy, 2, true);
+
+        naughty.push_back((*it).sPath);
+    }
+
 
     for(vector<int>::size_type iPos = 0;
             iPos < (int)(naughty.size());

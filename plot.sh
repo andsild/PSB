@@ -34,7 +34,6 @@ for solver in "${solvers[@]}"
 do
     for file in $(find "${DIR}/build/output/${solver}" -type f ! -name "*${NAME_FILE_AVERAGE}" -and ! -name "*.png")
     do
-        echo ${file}
         cmd="${cmd} \"${file}\" using 1 with points pointtype ${POINT_TYPE} pointsize ${POINT_SIZE} linecolor rgb \"#${colors["${solver}"]}\" notitle,"
     done
 done
@@ -46,6 +45,5 @@ LOGSCALE_AXIS="set xlabel \"iterations\" ; set ylabel \"(logscale) error in cent
 LABEL_AXIS="set xlabel \"iterations\" ; set ylabel \"error in central difference\" ;"
 
 gnuplot -e \
-    "set terminal png; set output \"out.png\" ; ${LOGSCALE_AXIS} ;
+    "set terminal png; set output \"graph.png\" ; ${LOGSCALE_AXIS} ;
      ${cmd};"
-#echo "set terminal png; set output \"out.png\" ; ${cmd};"
