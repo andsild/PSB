@@ -1,11 +1,19 @@
 # Specified in order of priority, i.e. top item is done first, last item last
 
+gongs task: check special images
+
+make OOP to avoid throwing so many variables around
+
+ compute line on I and U
+    so it is easier to analytically get the solution.
+
 fix division by pixel size
 
-plots should have average AND all the others
-    ish done
-
 plot theoretical bounds
+
+does cimg have to grayscale..?  
+cimg has path stuff
+
 
 make program user friendly!
     output what is going on
@@ -16,8 +24,6 @@ run on all images with iterative
 gnuplot from c++, not bash
     havily relies on boost
 
- compute line on I and U
-    so it is easier to analytically get the solution.
 
  Make the graphs loggy
     easier to see what's going on 
@@ -30,6 +36,7 @@ gnuplot from c++, not bash
  timing different functions / iterations
 
  make histograms
+    cimg has this
 
  code refactoring
 
