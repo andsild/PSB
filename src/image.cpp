@@ -7,6 +7,7 @@
 #include <iostream>
 #include <iomanip>
 #include <limits>
+#include <list>
 #include <sstream> 
 #include <string>
 
@@ -405,12 +406,17 @@ void calculateAverage(string sFilePath)
     //FIXME: doesn't exclude average.dat
     string avoid = "average";
     double dValidFiles = 0;
+    list<int> lLengths;
     for (vector<string>::iterator it = files.begin();
         it != files.end();
         ++it)
     {
         size_t found = (*it).find(avoid);
-        if(found!=string::npos) { continue; }
+        if(found!=string::npos) 
+        {
+           cout << "average: skipping file " << *it << endl;
+            continue;
+        }
         dValidFiles++;
 
         ifstream infile;
@@ -426,14 +432,22 @@ void calculateAverage(string sFilePath)
                 average[iPos] += dNum;
             iPos++;
         }
-        /* Smallest file */
-        if (iPos < iLineCount) { iLineCount = iPos; }
+
+        lLengths.push_back(iPos);
     }
-    for(d1::iterator it = average.begin();
-        it != average.end();
-        it++)
+
+    lLengths.sort();
+    for(vector<int>::size_type iPos = 0;
+            iPos < (int)(average.size());
+            iPos++) 
     {
-        *it /= dValidFiles;
+        if(lLengths.size() > 0 &&
+            iPos >= lLengths.front()) //XXX: or iPos >= ?
+        {
+            lLengths.pop_front();
+            dValidFiles--;
+        }
+        average[iPos] /= dValidFiles;
     }
 
     string sFilename = string("average") + DATA_EXTENSION;
