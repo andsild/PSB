@@ -55,11 +55,13 @@ int main(int argc, char *argv[])
 {
     const struct option longopts[] =
     {
+        {"average", no_argument,  0, 'a'},
         {"folder",     required_argument,  0, 'f'},
         {"gauss",   no_argument,        0, 'g'},
         {"help",   no_argument,        0, 'h'},
         {"jacobi",   no_argument,        0, 'j'},
         {"plot",   no_argument,        0, 'p'},
+        {"resolve",   no_argument,        0, 'r'},
         {"sor",   no_argument,        0, 's'},
         {0,0,0,0},
     };
@@ -68,9 +70,9 @@ int main(int argc, char *argv[])
     int iarg=0;
     extern char *optarg;
     
-    int f = 0, g = 0, i = 0, j = 0, p = 0, s = 0;
+    int a = 0, f = 0, g = 0, i = 0, j = 0, p = 0, r = 0, s = 0;
     char *folder;
-    function_container test;
+    function_container vFuncContainer;
     SolverMeta smG(iterate_gauss, "gauss/", "images/");
     SolverMeta smJ(iterate_jacobi, "jacobi/", "images/");
     SolverMeta smS(iterate_sor, "sor/", "images/");
@@ -78,8 +80,8 @@ int main(int argc, char *argv[])
     if(argc == 2)
     {
         cout << "Assuming \"-f " << string(argv[1]) << " --gauss" << endl;
-        test.push_back(smG);
-        readFolder(string(argv[1]), test);
+        vFuncContainer.push_back(smG);
+        readFolder(string(argv[1]), vFuncContainer);
         plot::plot();
         exit(EXIT_SUCCESS);
     }
@@ -87,10 +89,13 @@ int main(int argc, char *argv[])
 
     while(iarg != -1)
     {
-        iarg = getopt_long(argc, argv, "f:gjhps", longopts, &index);
+        iarg = getopt_long(argc, argv, "af:gjhprs", longopts, &index);
 
         switch (iarg)
         {
+            case 'a':
+                a++;
+                break;
 
             case 'f':
                 f++;
@@ -98,22 +103,23 @@ int main(int argc, char *argv[])
                 break;
 
             case 'g':
-                test.push_back(smG);
+                vFuncContainer.push_back(smG);
                 break;
 
             case 'j':
-                test.push_back(smJ);
+                vFuncContainer.push_back(smJ);
                 break;
 
             case 'h':
                 usage();
                 break;
 
-            case 's':
-                test.push_back(smS);
+            case 'r':
+                r++;
                 break;
 
-            case 't':
+            case 's':
+                vFuncContainer.push_back(smS);
                 break;
 
             case 'p':
@@ -127,21 +133,37 @@ int main(int argc, char *argv[])
     } 
 
     if(f) {
-        if(test.size() < 1)
+        if(vFuncContainer.size() < 1)
             cout << "Warning: no iterators chosen" << endl;
-        readFolder(folder, test);
+        readFolder(folder, vFuncContainer);
     }
     else //default
     {
-        test.push_back(smG);
+        vFuncContainer.push_back(smG);
         string sDir = "../small_media/";
-        readFolder(sDir, test);
+        readFolder(sDir, vFuncContainer);
+    }
+
+    if(r)
+    {
+        re_solve(vFuncContainer);
     }
 
     if(p) 
     { 
         plot::plot();
     }
+
+    if(a)
+    {
+        for (function_container::iterator it = vFuncContainer.begin();
+            it != vFuncContainer.end();
+            ++it)
+        {
+            calculateAverage((*it).sPath);
+        }
+    }
+
 
     // //show image(s)
     // // CImg<unsigned char> image("./media/icon_img.png");

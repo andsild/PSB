@@ -17,10 +17,12 @@ POINT_SIZE="2"
 
 cmd="plot"
 
+NAME_FILE_AVERAGE="average.dat"
+
 
 for solver in "${solvers[@]}"
 do
-    for file in $(find "${DIR}/build/output/${solver}" -type f -name "*average.dat")
+    for file in $(find "${DIR}/build/output/${solver}" -type f -name "*${NAME_FILE_AVERAGE}")
     do
         cmd="${cmd} \"${file}\" using 1 title \"${solver}\" lc rgb \"#${colors["${solver}"]}\"  with lines   ,"
     done
@@ -30,17 +32,20 @@ done
 
 for solver in "${solvers[@]}"
 do
-    for file in $(find "${DIR}/build/output/${solver}" -regextype sed -regex ".*/[0-9].*\.dat")
+    for file in $(find "${DIR}/build/output/${solver}" -type f ! -name "*${NAME_FILE_AVERAGE}" -and ! -name "*.png")
     do
-        cmd="${cmd} \"${file}\" using 1 with points pointtype ${POINT_TYPE} pointsize ${POINT_SIZE} lc rgb \"#${colors["${solver}"]}\" notitle,"
+        echo ${file}
+        cmd="${cmd} \"${file}\" using 1 with points pointtype ${POINT_TYPE} pointsize ${POINT_SIZE} linecolor rgb \"#${colors["${solver}"]}\" notitle,"
     done
 done
 
 cmd="${cmd%%,}"
 
+LOGSCALE_AXIS="set xlabel \"iterations\" ; set ylabel \"(logscale) error in central difference\" ;
+     set logscale y ;"
+LABEL_AXIS="set xlabel \"iterations\" ; set ylabel \"error in central difference\" ;"
+
 gnuplot -e \
-    "set terminal png; set output \"out.png\" ;
-     set xlabel \"iterations\" ; set ylabel \"error in central difference\" ;
-     set logscale y ;
+    "set terminal png; set output \"out.png\" ; ${LOGSCALE_AXIS} ;
      ${cmd};"
 #echo "set terminal png; set output \"out.png\" ; ${cmd};"

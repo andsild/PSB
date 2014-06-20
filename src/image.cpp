@@ -35,6 +35,7 @@ using namespace plot;
 namespace image_psb
 {
 
+
 class LoadingBar
 {
     private:
@@ -105,10 +106,35 @@ ostream& operator<< (ostream &str, const LoadingBar& obj)
     return str;
 }
 
+
+class SolverMeta
+{
+    public:
+        iterative_function func;
+        string sPath;
+        vector<string> vSubDirs;
+        SolverMeta(iterative_function func,
+                          string sPath,
+                          vector<string> *vSubDirs = NULL)
+            : func(func), sPath(sPath), vSubDirs(*vSubDirs)
+        {
+        }
+        SolverMeta(iterative_function func,
+                          string sPath,
+                          string sSubDir)
+            : func(func), sPath(sPath)
+        {
+            this->vSubDirs.push_back(sSubDir);
+        }
+};
+
+
+
 void calculateAverage(string);
 
 typedef CImg<double> image_fmt;
 typedef CImgList<double> imageList_fmt;
+typedef vector<SolverMeta> function_container;
 
 CImg<double> sRGBtoGrayscale(CImg<double> image)
 {
@@ -137,7 +163,7 @@ CImg<double> sRGBtoGrayscale(CImg<double> image)
     return image;
 }
 
-d1 imageTo1d(CImg<double> image)
+d1 imageTo1d(CImg<double> &image, double dScalar = 1)
 {
     d1 image_vec;
 
@@ -145,7 +171,8 @@ d1 imageTo1d(CImg<double> image)
     {
         for(int jPos = 0; jPos < image.width(); jPos++)
         {
-            image_vec.push_back(image(jPos, iPos, 0, 0));
+            double newVal = (double)image(jPos, iPos, 0, 0) * dScalar;
+            image_vec.push_back(newVal);
             //TODO: push back makes it bigger than it should be
             //      (should pre-compute size instead)
         }
@@ -153,41 +180,55 @@ d1 imageTo1d(CImg<double> image)
     return image_vec;
 }
 
-class SolverMeta
-{
-    public:
-        iterative_function func;
-        string sPath;
-        vector<string> vSubDirs;
-        SolverMeta(iterative_function func,
-                          string sPath,
-                          vector<string> *vSubDirs = NULL)
-            : func(func), sPath(sPath), vSubDirs(*vSubDirs)
-        {
-        }
-        SolverMeta(iterative_function func,
-                          string sPath,
-                          string sSubDir)
-            : func(func), sPath(sPath)
-        {
-            this->vSubDirs.push_back(sSubDir);
-        }
-};
 
-typedef vector<SolverMeta> function_container;
+d1 convertImage(CImg<double> image, double dScalar = 1)
+{
+    CImg<double> grayscale;
+    if(image.spectrum() == 1)
+    {
+       grayscale = image;
+    }
+    else
+    {
+        grayscale = sRGBtoGrayscale(image);
+    }
+    return imageTo1d(grayscale, dScalar);
+}
+    
+
+class ImageProcess
+{
+    private:
+        image_fmt image;
+        void convertImage(double dScalar = 1)
+        {
+            CImg<double> grayscale;
+            if(image.spectrum() != 1)
+                this->image =  sRGBtoGrayscale(image);
+            return imageTo1d(grayscale, dScalar);
+        }
+
+    public
+        ImageProcess(image_fmt image, const char *fileName) 
+        {
+            
+        }
+
 
 CImgList<double> readImage(CImg<double> image,
                            const char *fileName, function_container vIf,
-                           LoadingBar &loadbar)
+                           LoadingBar &loadbar,
+                           vector<vector<string> > &vRet,
+                           double dScalar = 1)
 {
     double max_error = .9;
     int iHeight = image.height(), iWidth = image.width(),
          iDepth = image.depth(), iSpectrum = image.spectrum();
     int iDim = iWidth * iHeight;
     d1 U = vector<double>(iDim, 0); 
-    CImg<double> grayscale = sRGBtoGrayscale(image);
     CImgList<double> retList;
-    d1 image_vec = imageTo1d(grayscale);
+    d1 image_vec = convertImage(image, dScalar);
+    //TODO: check file type
 
     loadbar.updateTimeRemaining(iHeight * iWidth);
 
@@ -196,19 +237,21 @@ CImgList<double> readImage(CImg<double> image,
         it != vIf.end();
         ++it)
     {
-        double *dImage = new double[image_vec.size()];
 
         cout << "beginning image " << fileName << endl;
         cout << loadbar << endl;
         vector<string> vOutput =  iterative_solve((*it).func, 
                                                    image_vec, U,
                                                    max_error, iDim, iWidth);
+
+        double *dImage = new double[image_vec.size()];
         if(vOutput.size() < 1)
         {
             cout << "Solver had no results for " << fileName << endl;
             continue;
         }
-        writeToFile(vOutput, fileName, (*it).sPath);
+
+        vRet.push_back(vOutput);
 
         for(vector<int>::size_type iPos = 0;
                 iPos < image_vec.size();
@@ -223,6 +266,18 @@ CImgList<double> readImage(CImg<double> image,
         retList.push_back(test);
     }
     return retList;
+}
+
+void writeImageList(function_container vIf, const char *filename, vector<vector<string> > err)
+{
+    if(vIf.size() != err.size() ) { cout << "DADAW" << endl; exit(EXIT_FAILURE); }
+
+    for(vector<int>::size_type iPos = 0;
+        iPos < (int)(err.size());
+        iPos++) 
+    {
+        writeToFile(err[iPos], filename, vIf[iPos].sPath);
+    }
 }
 
 CImg<double> getImage(string sDest)
@@ -243,7 +298,8 @@ CImg<double> getImage(string sDest)
 }
 
 CImgList<double> processImages(vector<string> &filenames, 
-                               function_container vIf, LoadingBar &loadBar)
+                               function_container vIf, LoadingBar &loadBar,
+                               double dScalar = 1)
 {
     CImgList<double> images;
     for (vector<string>::iterator it = filenames.begin();
@@ -258,7 +314,6 @@ CImgList<double> processImages(vector<string> &filenames,
         }
         catch(CImgIOException &cioe) {
             cout << cioe.what() << endl;
-            //XXX: temporary and slow
             loadBar.increaseProgress(vIf.size() - 1);
             cout << loadBar << endl;
             it = filenames.erase(it);
@@ -267,8 +322,10 @@ CImgList<double> processImages(vector<string> &filenames,
         }
 
         /* Returns images for each iteration */
+        vector<vector<string> > vRet;
         CImgList<double> cil = readImage(img, (*it).c_str(),
-                                         vIf, loadBar);
+                                         vIf, loadBar, vRet, dScalar);
+        writeImageList(vIf, (*it).c_str(), vRet);
         images.insert(cil, images.size());
 
         it++;
@@ -280,7 +337,6 @@ CImgList<double> processImages(vector<string> &filenames,
 void saveImages(vector<string> filenames, CImgList<double> images,
         function_container vIf)
 {
-    // what about the files we skipped?
     for(vector<int>::size_type iPos = 0;
             iPos < (int)(filenames.size());
             iPos++) 
@@ -310,52 +366,18 @@ void saveImages(vector<string> filenames, CImgList<double> images,
             }
         }
     }
-
-
-    for(vector<int>::size_type iPos = 0;
-            iPos < (int)(images.size());
-            iPos += vIf.size()) 
-    {
-        int iFile = (iPos / vIf.size());
-        string sFilename = filenames[iFile];
-        trimLeadingFileName(sFilename);
-
-        string sDest;
-        for(vector<int>::size_type jPos = 0;
-                jPos < vIf.size();
-                jPos++) 
-        {
-            sDest = DATA_DIR + vIf[jPos].sPath + "/image/";
-            string sImageDest = sDest + sFilename;
-
-            //TODO: all file-writing should be standardized in 
-            // file.cpp to avoid errors
-            cimg::exception_mode(0);
-            try {
-                images[iPos+jPos].save(sImageDest.c_str());
-            }
-            catch(CImgIOException cioe)
-            {
-                mkdirp(sDest.c_str());
-                images[iPos+jPos].save(sImageDest.c_str());
-                cout << cioe.what() << endl;
-                continue;
-            }
-        }
-    }
 }
 
 
 /** Read a series of images and solve them
  *
  */
-void readFolder(string sDir, function_container vIf)
+void readFolder(string sDir, function_container vIf, double dScalar = 1)
 {
     vector<string> filenames;
     int iTotalIterations;
     double dProgress = 0;
     double dStepSize;
-
 
     try{
         filenames = getFilesInFolder(sDir);
@@ -371,16 +393,10 @@ void readFolder(string sDir, function_container vIf)
     int iTimeRemaining = filenames.size() * vIf.size();
     LoadingBar loadBar(iTotalIterations);
 
-    CImgList<double> images = processImages(filenames, vIf, loadBar);
+    CImgList<double> images = processImages(filenames, vIf, loadBar, dScalar);
+    //make it so that process images do not write .... just solve and return
     cout << loadBar << endl;// if last image has errors, this might be necessary
     saveImages(filenames, images, vIf);
-
-    for (function_container::iterator it = vIf.begin();
-        it != vIf.end();
-        ++it)
-    {
-        calculateAverage((*it).sPath);
-    }
 }
 
 void calculateAverage(string sFilePath)
@@ -453,6 +469,30 @@ void calculateAverage(string sFilePath)
     string sFilename = string("average") + DATA_EXTENSION;
     writeToFile(average, sFilename, sFilePath);
 }
+
+void re_solve(function_container vIf)
+{
+    vector<string> naughty;
+    for (function_container::iterator it = vIf.begin();
+        it != vIf.end();
+        ++it)
+    {
+        naughty.push_back((*it).sPath);
+        string sPath = DATA_DIR + (*it).sPath + string("image/");
+        (*it).sPath = (*it).sPath + "new/";
+        //XXX
+        readFolder(sPath, vIf);
+    }
+
+    for(vector<int>::size_type iPos = 0;
+            iPos < (int)(naughty.size());
+            iPos++) 
+    {
+        vIf[iPos].sPath = naughty[iPos];        
+    }
+
+}
+
 
 }
 
