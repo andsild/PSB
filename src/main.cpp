@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
 
     if(r)
     {
-        re_solve(vFuncContainer);
+        re_solve(folder, vFuncContainer);
     }
 
     if(p) 
