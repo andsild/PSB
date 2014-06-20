@@ -1,3 +1,5 @@
+                    //TODO: push back makes it bigger than it should be
+                    //      (should pre-compute size instead)
 #ifndef _IMAGE_CPP
 #define _IMAGE_CPP   1
 
@@ -199,20 +201,55 @@ d1 convertImage(CImg<double> image, double dScalar = 1)
 class ImageProcess
 {
     private:
+    typedef map<iterative_function,vector<string> > mapfuncres;
         image_fmt image;
+        int iHeight, iWidth, iDepth, iSpectrum, iDim;
         void convertImage(double dScalar = 1)
         {
             CImg<double> grayscale;
             if(image.spectrum() != 1)
                 this->image =  sRGBtoGrayscale(image);
-            return imageTo1d(grayscale, dScalar);
+            // return imageTo1d(grayscale, dScalar);
+        }
+        const char fileName;
+        mapfuncres mapFuncRes;
+        d1 image_vec;
+
+        void genImageVec(double dScalar = 1)
+        {
+            for(int iPos = 0; iPos < this->iHeight; iPos++)
+            {
+                for(int jPos = 0; jPos < this->iWidth; jPos++)
+                {
+                    double newVal = (double)this->image(jPos, iPos, 0, 0) * dScalar;
+                    this->image_vec.push_back(newVal);
+                }
+            }
         }
 
-    public
-        ImageProcess(image_fmt image, const char *fileName) 
+    public:
+        ImageProcess(image_fmt image, const char *fileName) : fileName(*fileName)
         {
-            
+            this->convertImage();
+            this->genImageVec();
+
+            this->iHeight = image.height();
+            this->iWidth = image.width();
+            this->iSpectrum = image.spectrum();
+            this->iDepth = image.depth();
+            this->iDim = image.height() * image.width();
         }
+
+        void solve(iterative_function func, LoadingBar &loadbar)
+        {
+            mapfuncres::const_iterator search = this->mapFuncRes.find(func);
+            if(search != mapFuncRes.end()) 
+            {                
+            }
+
+            writeToFile(
+        }
+};
 
 
 CImgList<double> readImage(CImg<double> image,
