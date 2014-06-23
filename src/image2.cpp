@@ -163,6 +163,7 @@ template <class T> class ImageProcess : CImg<T>
                 }
             }
         }
+    double dScalar;
         
         CImg<double> sRGBtoGrayscale()
         {
@@ -201,7 +202,7 @@ template <class T> class ImageProcess : CImg<T>
             {
                 for(int jPos = 0; jPos < grayscale.width(); jPos++)
                 {
-                    double newVal = (double)grayscale(jPos, iPos, 0, 0) * 1.0;
+                    double newVal = (double)grayscale(jPos, iPos, 0, 0) * this->dScalar;
                     image_vec.push_back(newVal);
                     //TODO: push back makes it bigger than it should be
                     //      (should pre-compute size instead)
@@ -211,9 +212,10 @@ template <class T> class ImageProcess : CImg<T>
             
     public:
         double dMaxErr;
-        ImageProcess(image_fmt image, const char *fileName, double dMaxErr)
+        ImageProcess(image_fmt image, const char *fileName, double dMaxErr,
+                     double dScalar)
                 : fileName(fileName), dMaxErr(dMaxErr),
-                  image(image)
+                  image(image), dScalar(dScalar)
 
         {
             this->convertImage();
@@ -279,28 +281,49 @@ template <class T> class ImageProcess : CImg<T>
 
 class ImageSolver
 {
+    private:
+
     public:
         LoadingBar loadBar;
         vector<string> filenames;
-        ImageSolver(string sFolder, function_container vIf)
+        ImageSolver(string sReadFromFolder, function_container vIf,
+                   const char *cImagePath = "/image/", const char *cResultPath = "/./")
         {
-            this->solve(sFolder, vIf);
+            // this->solve(sReadFromFolder, vIf, cImagePath, cResultPath);
         }
-        ImageSolver() { }
-        void solve(string sFolder, function_container vIf)
-        {
-            int iTotalIterations;
-            double dProgress = 0;
-            double dStepSize;
 
+        void addFolder(string sFolder)
+        {
             try{
-                this->filenames = getFilesInFolder(sFolder);
+                getFilesInFolder(sFolder, this->filenames);
             }
             catch(const file_IO::DirNotFound& f)
             {
                 cout << f.what() << endl;
                 exit(EXIT_FAILURE);
             }
+        }
+        ImageSolver() { }
+        void multiFolderSolve(vector<string> vInputFolders, function_container vIf,
+                   const char *cImagePath = "/image/", const char *cResultPath = "/./")
+        {
+            for(vector<string>::iterator it = vInputFolders.begin();
+                it != vInputFolders.end();
+                it++)
+            {
+                this->addFolder((*it));
+            }
+
+            this->solve(vIf, cImagePath, cResultPath);
+        }
+
+        void solve(function_container vIf,
+                   const char *cImagePath = "/image/", const char *cResultPath = "/./"
+                   , double dScalar = 1)
+        {
+            int iTotalIterations;
+            double dProgress = 0;
+            double dStepSize;
 
             iTotalIterations = filenames.size() * vIf.size();
             dStepSize = ((double)100 / iTotalIterations);
@@ -323,15 +346,17 @@ class ImageSolver
                     cout << loadBar << endl;
                     continue;
                 }
-                ImageProcess<double> ipImage(image, (*it).c_str(), .9);
+
+                ImageProcess<double> ipImage(image, (*it).c_str(), .9, dScalar);
+
                 for (function_container::iterator subIt = vIf.begin();
                     subIt != vIf.end();
                     ++subIt)
                 {
-                    string sImageDir = DATA_DIR + (*subIt).sPath + "/image/";
+                    string sImageDir = DATA_DIR + (*subIt).sPath + string(cImagePath);
                     ipImage.solve((*subIt).func);
                     cout << loadBar << endl;
-                    ipImage.writeResultToFile((*subIt).sPath);
+                    ipImage.writeResultToFile(string(cResultPath) + (*subIt).sPath);
                     ipImage.writeImageToFile(sImageDir.c_str());
                 }                
             }
@@ -352,7 +377,7 @@ void calculateAverage(string sFilePath)
 
     try
     {
-        files = getFilesInFolder(sReadFolder.c_str());
+        getFilesInFolder(sReadFolder.c_str(), files);
     }
     catch(file_IO::DirNotFound &f)
     {

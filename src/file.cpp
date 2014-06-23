@@ -117,7 +117,7 @@ void writeToFile(const vector<t> vRes, string sFilename, string sFolderDest)
     data_file.close();
 }
 
-vector<string> getFilesInFolder(string sDir)
+void getFilesInFolder(string sDir, vector<string> &output)
 {
     ifstream fin;
     int num;
@@ -130,8 +130,6 @@ vector<string> getFilesInFolder(string sDir)
     {
         throw DirNotFound(sDir);
     }
-
-    vector<string> filenames;
 
     while ((dirp = readdir( dp )))
     {
@@ -147,9 +145,8 @@ vector<string> getFilesInFolder(string sDir)
             continue;
         }
 
-        filenames.push_back(readFile);
+        output.push_back(readFile);
     }
-    return filenames;
 }
 
 }

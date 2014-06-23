@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
         {"help",   no_argument,        0, 'h'},
         {"jacobi",   no_argument,        0, 'j'},
         {"plot",   no_argument,        0, 'p'},
-        {"resolve",   no_argument,        0, 'r'},
+        {"resolve",   required_argument,        0, 'r'},
         {"sor",   no_argument,        0, 's'},
         {0,0,0,0},
     };
@@ -71,6 +71,7 @@ int main(int argc, char *argv[])
     extern char *optarg;
     
     int a = 0, f = 0, g = 0, i = 0, j = 0, p = 0, r = 0, s = 0;
+    double dScalar;
     char *folder;
     function_container vFuncContainer;
     SolverMeta smG(iterate_gauss, "gauss/", "images/");
@@ -82,7 +83,9 @@ int main(int argc, char *argv[])
     {
         cout << "Assuming \"-f " << string(argv[1]) << " --gauss" << endl;
         vFuncContainer.push_back(smG);
-        imageSolver.solve(string(argv[1]), vFuncContainer);
+        imageSolver.addFolder(string(argv[1]));
+        imageSolver.solve(vFuncContainer);
+        // imageSolver.solve(string(argv[1]), vFuncContainer);
         // readFolder(string(argv[1]), vFuncContainer);
         plot::plot();
         exit(EXIT_SUCCESS);
@@ -91,7 +94,7 @@ int main(int argc, char *argv[])
 
     while(iarg != -1)
     {
-        iarg = getopt_long(argc, argv, "af:gjhprs", longopts, &index);
+        iarg = getopt_long(argc, argv, "af:gjhpr:s", longopts, &index);
 
         switch (iarg)
         {
@@ -118,6 +121,7 @@ int main(int argc, char *argv[])
 
             case 'r':
                 r++;
+                dScalar = atof(optarg);
                 break;
 
             case 's':
@@ -137,20 +141,31 @@ int main(int argc, char *argv[])
     if(f) {
         if(vFuncContainer.size() < 1)
             cout << "Warning: no iterators chosen" << endl;
-        imageSolver.solve(folder, vFuncContainer);
+        imageSolver.addFolder(folder);
+        imageSolver.solve(vFuncContainer);
         // readFolder(folder, vFuncContainer);
     }
     else //default
     {
         vFuncContainer.push_back(smG);
         string sDir = "../small_media/";
-        imageSolver.solve(sDir, vFuncContainer);
+        imageSolver.addFolder(sDir);
+        imageSolver.solve(vFuncContainer);
         // readFolder(sDir, vFuncContainer);
     }
 
     if(r)
     {
-        // re_solve(folder, vFuncContainer);
+        ImageSolver imageSolver;
+        for (function_container::iterator it = vFuncContainer.begin();
+            it != vFuncContainer.end();
+            ++it)
+        {
+            string sPath = DATA_DIR + (*it).sPath + "/image";
+            imageSolver.addFolder(sPath);
+        }
+
+        imageSolver.solve(vFuncContainer, "re", "re", dScalar);
     }
 
     if(p) 
@@ -167,7 +182,6 @@ int main(int argc, char *argv[])
             calculateAverage((*it).sPath);
         }
     }
-
 
     // //show image(s)
     // // CImg<unsigned char> image("./media/icon_img.png");
