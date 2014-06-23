@@ -20,7 +20,7 @@
 #include <unistd.h>
 
 #include "CImg.h"
-#include "./image.cpp"
+#include "./image2.cpp"
 #include "./file.cpp"
 #include "solvers/iterative_solvers.cpp"
 #include "plot.cpp"
@@ -76,12 +76,14 @@ int main(int argc, char *argv[])
     SolverMeta smG(iterate_gauss, "gauss/", "images/");
     SolverMeta smJ(iterate_jacobi, "jacobi/", "images/");
     SolverMeta smS(iterate_sor, "sor/", "images/");
+    ImageSolver imageSolver;
 
     if(argc == 2)
     {
         cout << "Assuming \"-f " << string(argv[1]) << " --gauss" << endl;
         vFuncContainer.push_back(smG);
-        readFolder(string(argv[1]), vFuncContainer);
+        imageSolver.solve(string(argv[1]), vFuncContainer);
+        // readFolder(string(argv[1]), vFuncContainer);
         plot::plot();
         exit(EXIT_SUCCESS);
     }
@@ -135,18 +137,20 @@ int main(int argc, char *argv[])
     if(f) {
         if(vFuncContainer.size() < 1)
             cout << "Warning: no iterators chosen" << endl;
-        readFolder(folder, vFuncContainer);
+        imageSolver.solve(folder, vFuncContainer);
+        // readFolder(folder, vFuncContainer);
     }
     else //default
     {
         vFuncContainer.push_back(smG);
         string sDir = "../small_media/";
-        readFolder(sDir, vFuncContainer);
+        imageSolver.solve(sDir, vFuncContainer);
+        // readFolder(sDir, vFuncContainer);
     }
 
     if(r)
     {
-        re_solve(folder, vFuncContainer);
+        // re_solve(folder, vFuncContainer);
     }
 
     if(p) 
