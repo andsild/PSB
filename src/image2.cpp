@@ -41,6 +41,25 @@ typedef CImg<double> image_fmt;
 typedef CImgList<double> imageList_fmt;
 typedef vector<SolverMeta> function_container;
 
+
+class ImageException: public exception
+{
+    public:
+        explicit ImageException(const std::string& message):
+            msg_(message)
+         {}
+
+        virtual ~ImageException() throw (){}
+        virtual const char* what() const throw()
+        {
+            string ret = string("") + msg_;
+            return ret.c_str();
+        }
+    protected:
+        std::string msg_;
+};
+
+
 class LoadingBar
 {
     private:
@@ -152,17 +171,6 @@ template <class T> class ImageProcess : CImg<T>
         mapfuncres mapFuncRes;
         d1 image_vec;
 
-        void genImageVec(double dScalar = 1)
-        {
-            for(int iPos = 0; iPos < this->iHeight; iPos++)
-            {
-                for(int jPos = 0; jPos < this->iWidth; jPos++)
-                {
-                    double newVal = (double)this->image(jPos, iPos, 0, 0) * dScalar;
-                    this->image_vec.push_back(newVal);
-                }
-            }
-        }
     double dScalar;
         
         CImg<double> sRGBtoGrayscale()
@@ -187,7 +195,6 @@ template <class T> class ImageProcess : CImg<T>
         void convertImage()
         {
             CImg<double> grayscale;
-            d1 image_vec;
 
             if(this->image.spectrum() == 1)
             {
@@ -198,17 +205,20 @@ template <class T> class ImageProcess : CImg<T>
                 grayscale = sRGBtoGrayscale();
             }
 
+            this->image_vec.reserve(this->iDim);
+
             for(int iPos = 0; iPos < grayscale.height(); iPos++)
             {
                 for(int jPos = 0; jPos < grayscale.width(); jPos++)
                 {
                     double newVal = (double)grayscale(jPos, iPos, 0, 0) * this->dScalar;
-                    image_vec.push_back(newVal);
+                    this->image_vec.push_back(newVal);
                     //TODO: push back makes it bigger than it should be
                     //      (should pre-compute size instead)
                 }
             }
         }
+        vector<string> vOutput;
             
     public:
         double dMaxErr;
@@ -218,30 +228,42 @@ template <class T> class ImageProcess : CImg<T>
                   image(image), dScalar(dScalar)
 
         {
-            this->convertImage();
-            this->genImageVec();
-
             this->iHeight = image.height();
             this->iWidth = image.width();
             this->iSpectrum = image.spectrum();
             this->iDepth = image.depth();
             this->iDim = image.height() * image.width();
 
+            this->convertImage();
         }
-        vector<string> vOutput;
 
         void solve(iterative_function func)
        {
             d1 U = vector<double>(iDim, 0); 
+            if(this->image_vec.size() < 1) 
+            { 
+                throw ImageException("Image vector was not initialized before solving");
+            }
             this->vOutput =  iterative_solve(func,
                                        this->image_vec, U,
-                                       this->dMaxErr, iDim, iWidth);
+                                       this->dMaxErr, this->iWidth);
+
+            if(this->vOutput.size() < 1) 
+            {
+                throw ImageException("Solver had no results from function");
+            }
        }
 
         void writeResultToFile(string fileDir)
         {
             string sFilename = string(this->fileName);
+            try{
             writeToFile(this->vOutput, sFilename, fileDir);
+            }
+            catch(...)
+            {
+                throw ImageException("could not write result file to " + fileDir);
+            }
         }
         void writeImageToFile(const char *fileDir)
         {
@@ -252,12 +274,11 @@ template <class T> class ImageProcess : CImg<T>
 
             if(this->image_vec.size() < 1)
             {
-                cout << "Solver had no results for " << fileName << endl;
-                return;
+                throw ImageException("Solver had no results for " + string(fileName));
             }
 
             for(vector<int>::size_type iPos = 0;
-                    iPos < image_vec.size();
+                    iPos < this->image_vec.size();
                     iPos++) 
             {
                 dImage[iPos] = image_vec.at(iPos);
@@ -348,16 +369,24 @@ class ImageSolver
                 }
 
                 ImageProcess<double> ipImage(image, (*it).c_str(), .9, dScalar);
+                cout << image.width() << endl;
+                cout << image.height() << endl;
 
                 for (function_container::iterator subIt = vIf.begin();
                     subIt != vIf.end();
                     ++subIt)
                 {
                     string sImageDir = DATA_DIR + (*subIt).sPath + string(cImagePath);
-                    ipImage.solve((*subIt).func);
-                    cout << loadBar << endl;
-                    ipImage.writeResultToFile(string(cResultPath) + (*subIt).sPath);
-                    ipImage.writeImageToFile(sImageDir.c_str());
+                    try{
+                        ipImage.solve((*subIt).func);
+                        cout << loadBar << endl;
+                        ipImage.writeResultToFile(string(cResultPath) + (*subIt).sPath);
+                        ipImage.writeImageToFile(sImageDir.c_str());
+                    }
+                    catch(ImageException &ie)
+                    {
+                        cout << ie.what() << endl;
+                    }
                 }                
             }
             // CImgList<double> images = processImages(filenames, vIf, loadBar, dScalar, resolve);
