@@ -66,7 +66,7 @@ void iterate_gauss(d1 F, d1 &U, double iWidthLength,
                            int iLength, double H = 1)
 {
     for(vector<int>::size_type iPos = iWidthLength;
-            iPos < F.size() - iWidthLength;
+            iPos < (int)F.size() - iWidthLength;
             iPos++) 
     {
         U[iPos] = .25 * (getRangeVal(U, F, iPos, iWidthLength, H));
@@ -80,7 +80,7 @@ void iterate_sor(d1 F, d1 &U, double iWidthLength, int iLength, double H = 1)
     double dNotOmega = (1 - omega);
 
     for(vector<int>::size_type iPos = iWidthLength;
-            iPos < F.size() - iWidthLength;
+            iPos < (int)F.size() - iWidthLength;
             iPos++) 
     {
         int xPos = iPos % (int)iWidthLength;
@@ -94,7 +94,7 @@ void iterate_sor(d1 F, d1 &U, double iWidthLength, int iLength, double H = 1)
     }
 
     for(vector<int>::size_type iPos = iWidthLength;
-            iPos < F.size() - iWidthLength;
+            iPos < (int)F.size() - iWidthLength;
             iPos++) 
     {
         int xPos = iPos % (int)iWidthLength;
@@ -213,13 +213,14 @@ void two_grid(double h, d1 &U, d1 &F, int iWidthLength, int iSmoothFactor)
 
 vector<string> iterative_solve(iterative_function function,
                     const d1 solution, d1 &guess,
-                    double dMaxErr, int iLength, int iWidth) 
+                    double dMaxErr, int iWidth) 
 {
     d1 old_guess = guess;
     d1 newGuess;
     double dError = 0;
     int iIterCount = 0;
     vector<string> vOutput;
+    int iLength = solution.size();
     do
     {
         dError = 0;

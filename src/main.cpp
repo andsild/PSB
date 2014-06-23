@@ -156,16 +156,16 @@ int main(int argc, char *argv[])
 
     if(r)
     {
-        ImageSolver imageSolver;
+        ImageSolver imageSolver2;
         for (function_container::iterator it = vFuncContainer.begin();
             it != vFuncContainer.end();
             ++it)
         {
             string sPath = DATA_DIR + (*it).sPath + "/image";
-            imageSolver.addFolder(sPath);
+            imageSolver2.addFolder(sPath);
         }
 
-        imageSolver.solve(vFuncContainer, "re", "re", dScalar);
+        imageSolver2.solve(vFuncContainer, "re", "re", dScalar);
     }
 
     if(p) 
