@@ -255,7 +255,6 @@ template <class T> class ImageProcess : CImg<T>
             this->U.clear();
         }
 
-
         void solve(iterative_function func)
        {
            U.resize(iDim, 0);
@@ -268,16 +267,6 @@ template <class T> class ImageProcess : CImg<T>
                                        this->image_vec, this->U,
                                        this->dMaxErr, this->iWidth);
 
-            int jPos = 0;
-            for(int iPos = 0; iPos < U.size() ; iPos++)
-            {
-                double dEle = U[iPos];
-                if(dEle > 0) { cout << U[iPos] << " "; jPos++; }
-                if(jPos > 20) { break; }
-            }
-            cout << endl;
-
-
             if(this->vOutput.size() < 1) 
             {
                 throw ImageException("Solver had no results from function");
@@ -287,8 +276,26 @@ template <class T> class ImageProcess : CImg<T>
         void computeLine(const char *fileDir, int iRow = -1)
         {
             if(iRow < 0) { iRow = this->iHeight / 2; }
+            int iRowStart = iRow * this->iWidth;
+            vector<string> vOrigImage, vNewImage;
+            for(int iPos = iRowStart; iPos < iRowStart + this->iWidth; iPos++)
+            {
+                vOrigImage.push_back(std::to_string(this->image_vec[iPos]));
+                vNewImage.push_back(std::to_string(this->U[iPos]));
+            }
+            string sFileName = string(this->fileName);
+            trimLeadingFileName(sFileName);
+            string sOrigFile = "orig" + sFileName,
+                   sNewImage = "new" + sFileName;
 
-            // this->vOutput[iRow]
+            try{
+                writeToFile(vOrigImage, sOrigFile, fileDir);
+                writeToFile(vNewImage,  sNewImage, fileDir);
+            }
+            catch(...)
+            {
+                throw ImageException("could not write result file to " + string(fileDir));
+            }
         }
 
         void writeResultToFile(string fileDir)
@@ -371,7 +378,7 @@ class ImageSolver
             this->solve(vIf, cImagePath, cResultPath);
         }
 
-        void solve(function_container vIf,
+        void solve(function_container vIf, bool bComputeLines = false,
                    const char *cImagePath = "/image/", const char *cResultPath = "/./"
                    , double dScalar = 1)
         {
@@ -412,6 +419,7 @@ class ImageSolver
                     try{
                         ipImage.solve((*subIt).func);
                         cout << loadBar << endl;
+                        if(bComputeLines) { ipImage.computeLine("lines"); }
                         ipImage.writeResultToFile(string(cResultPath) + (*subIt).sPath);
                         ipImage.writeImageToFile(sImageDir.c_str());
                         ipImage.clearFuncVectors();

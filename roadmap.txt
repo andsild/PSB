@@ -9,6 +9,10 @@ fix division by pixel size
 
 plot theoretical bounds
 
+I have several cases where I accumulate results in vectors, 
+and then re-iterate over the vector to do my operations.
+Maybe it's clean, but it adds constants to linear execution
+
 does cimg have to grayscale..?  
 cimg has path stuff
 
@@ -23,30 +27,30 @@ gnuplot from c++, not bash
 
 render two images, show plot for these two.
 
- timing different functions / iterations
+timing different functions / iterations
 
- make histograms
+make histograms
     cimg has this
 
- code refactoring
+code refactoring
 
- implement FFT
+implement FFT
 
- Variation of parameters used in functions
-    discretization
-    ω
-
-
- multi-threaded, to be faster per image
-    red black
-    multitraad
+Variation of parameters used in functions
+   discretization
+   ω
 
 
- Detection of convergence, etc
-    http://www.physics.buffalo.edu/phy410-505/2011/topic3/app1/index.html
-        [described in the moddile of the page]
+multi-threaded, to be faster per image
+   red black
+   multitraad
 
- Other optimizations?
+
+Detection of convergence, etc
+   http://www.physics.buffalo.edu/phy410-505/2011/topic3/app1/index.html
+       [described in the moddile of the page]
+
+Other optimizations?
     hvordan ser en matrise ut mot slutten? kan noen deler kuttes ut?
 
 My translation to vector takes about 0.1 seconds for each image - maybe there is
