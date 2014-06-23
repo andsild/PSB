@@ -2,8 +2,6 @@
 
 gongs task: check special images
 
-make OOP to avoid throwing so many variables around
-
  compute line on I and U
     so it is easier to analytically get the solution.
 
