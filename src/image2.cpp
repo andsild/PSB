@@ -213,12 +213,21 @@ template <class T> class ImageProcess : CImg<T>
                 {
                     double newVal = (double)grayscale(jPos, iPos, 0, 0) * this->dScalar;
                     this->image_vec.push_back(newVal);
-                    //TODO: push back makes it bigger than it should be
-                    //      (should pre-compute size instead)
                 }
             }
         }
         vector<string> vOutput;
+        void printImage(image_fmt image)
+        {
+            for(int iPos = 0; iPos < image.height(); iPos++)
+            {
+                for(int jPos = 0; jPos < image.width(); jPos++)
+                {
+                    cout << image(jPos, iPos) << " ";
+                }
+                cout << endl;
+            }
+        }
             
     public:
         double dMaxErr;
@@ -244,6 +253,19 @@ template <class T> class ImageProcess : CImg<T>
             { 
                 throw ImageException("Image vector was not initialized before solving");
             }
+
+            int iPos = 0;
+            for(vector<double>::iterator it = image_vec.begin();
+                it != image_vec.end();
+                it++)
+            {
+                if(*it > 0){
+                    cout << (*it) << " ";
+                    iPos++;}
+                if(iPos > 20) break;
+            }
+            cout << endl;
+
             this->vOutput =  iterative_solve(func,
                                        this->image_vec, U,
                                        this->dMaxErr, this->iWidth);
@@ -264,6 +286,7 @@ template <class T> class ImageProcess : CImg<T>
             {
                 throw ImageException("could not write result file to " + fileDir);
             }
+            this->vOutput.clear();
         }
         void writeImageToFile(const char *fileDir)
         {
@@ -277,6 +300,7 @@ template <class T> class ImageProcess : CImg<T>
                 throw ImageException("Solver had no results for " + string(fileName));
             }
 
+
             for(vector<int>::size_type iPos = 0;
                     iPos < this->image_vec.size();
                     iPos++) 
@@ -287,9 +311,10 @@ template <class T> class ImageProcess : CImg<T>
             cimg::exception_mode(0);
             CImg<double> test(dImage, iWidth, iHeight,
                               1, 1, false);
+            printImage(test);
             try
             {
-                test.save(sFilename.c_str());
+                test.get_normalize(0,255).save(sFilename.c_str());
             }
             catch(CImgIOException &cioe)
             {
@@ -369,8 +394,7 @@ class ImageSolver
                 }
 
                 ImageProcess<double> ipImage(image, (*it).c_str(), .9, dScalar);
-                cout << image.width() << endl;
-                cout << image.height() << endl;
+                cout << "Beginning image " << (*it) << endl;
 
                 for (function_container::iterator subIt = vIf.begin();
                     subIt != vIf.end();
@@ -389,7 +413,6 @@ class ImageSolver
                     }
                 }                
             }
-            // CImgList<double> images = processImages(filenames, vIf, loadBar, dScalar, resolve);
             //make it so that process images do not write .... just solve and return
             cout << loadBar << endl;// if last image has errors, this might be necessary
             // saveImages(filenames, images, vIf);

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="${DIR}/build/output/"
 
 declare -A solvers
 declare -A colors
@@ -19,10 +20,20 @@ cmd="plot"
 
 NAME_FILE_AVERAGE="average.dat"
 
+if [ ! -d ${DIR} ]
+then
+    printf "Could not find dir %s\n" "${DIR}"
+    exit 1
+fi
 
 for solver in "${solvers[@]}"
 do
-    for file in $(find "${DIR}/build/output/${solver}" -type f -name "*${NAME_FILE_AVERAGE}")
+    if [ ! -d ${DIR}${solver} ]
+    then
+        continue
+    fi
+
+    for file in $(find "${DIR}${solver}" -type f -name "*${NAME_FILE_AVERAGE}")
     do
         cmd="${cmd} \"${file}\" using 1 title \"${solver}\" lc rgb \"#${colors["${solver}"]}\"  with lines   ,"
     done
@@ -32,7 +43,11 @@ done
 
 for solver in "${solvers[@]}"
 do
-    for file in $(find "${DIR}/build/output/${solver}" -type f ! -name "*${NAME_FILE_AVERAGE}" -and ! -name "*.png")
+    if [ ! -d ${DIR}${solver} ]
+    then
+        continue
+    fi
+    for file in $(find "${DIR}${solver}" -type f ! -name "*${NAME_FILE_AVERAGE}" -and ! -name "*.png")
     do
         cmd="${cmd} \"${file}\" using 1 with points pointtype ${POINT_TYPE} pointsize ${POINT_SIZE} linecolor rgb \"#${colors["${solver}"]}\" notitle,"
     done
