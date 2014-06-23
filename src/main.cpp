@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
         {"folder",     required_argument,  0, 'f'},
         {"gauss",   no_argument,        0, 'g'},
         {"help",   no_argument,        0, 'h'},
+        {"computeline",   no_argument,        0, 'l'},
         {"jacobi",   no_argument,        0, 'j'},
         {"plot",   no_argument,        0, 'p'},
         {"resolve",   required_argument,        0, 'r'},
@@ -70,7 +71,7 @@ int main(int argc, char *argv[])
     int iarg=0;
     extern char *optarg;
     
-    int a = 0, f = 0, g = 0, i = 0, j = 0, p = 0, r = 0, s = 0;
+    int a = 0, f = 0, g = 0, j = 0, l = 0, p = 0, r = 0, s = 0;
     double dScalar;
     char *folder;
     function_container vFuncContainer;
@@ -94,7 +95,7 @@ int main(int argc, char *argv[])
 
     while(iarg != -1)
     {
-        iarg = getopt_long(argc, argv, "af:gjhpr:s", longopts, &index);
+        iarg = getopt_long(argc, argv, "af:gjlhpr:s", longopts, &index);
 
         switch (iarg)
         {
@@ -117,6 +118,10 @@ int main(int argc, char *argv[])
 
             case 'h':
                 usage();
+                break;
+
+            case 'l':
+                l++;
                 break;
 
             case 'r':
@@ -142,7 +147,7 @@ int main(int argc, char *argv[])
         if(vFuncContainer.size() < 1)
             cout << "Warning: no iterators chosen" << endl;
         imageSolver.addFolder(folder);
-        imageSolver.solve(vFuncContainer);
+        imageSolver.solve(vFuncContainer, l>0);
         // readFolder(folder, vFuncContainer);
     }
     else //default
@@ -150,7 +155,7 @@ int main(int argc, char *argv[])
         vFuncContainer.push_back(smG);
         string sDir = "../small_media/";
         imageSolver.addFolder(sDir);
-        imageSolver.solve(vFuncContainer);
+        imageSolver.solve(vFuncContainer, l>0);
         // readFolder(sDir, vFuncContainer);
     }
 
@@ -165,8 +170,9 @@ int main(int argc, char *argv[])
             imageSolver2.addFolder(sPath);
         }
 
-        imageSolver2.solve(vFuncContainer, "re", "re", dScalar);
+        imageSolver2.solve(vFuncContainer, l>0, "re", "re", dScalar);
     }
+
 
     if(p) 
     { 

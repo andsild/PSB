@@ -53,6 +53,7 @@ do
     done
 done
 
+
 cmd="${cmd%%,}"
 
 LOGSCALE_AXIS="set xlabel \"iterations\" ; set ylabel \"(logscale) error in central difference\" ;
