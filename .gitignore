@@ -27,6 +27,9 @@
 # To build - these are specific for each arch
 build/*
 
+# 
+doc/*
+
 # Large files
 media/
 small_media/*

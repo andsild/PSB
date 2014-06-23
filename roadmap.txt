@@ -1,9 +1,9 @@
 # Specified in order of priority, i.e. top item is done first, last item last
 
-gongs task: check special images
-
  compute line on I and U
-    so it is easier to analytically get the solution.
+    so it is easier to analytically see the solution.
+
+gongs task: check special images
 
 fix division by pixel size
 
@@ -11,7 +11,6 @@ plot theoretical bounds
 
 does cimg have to grayscale..?  
 cimg has path stuff
-
 
 make program user friendly!
     output what is going on
@@ -22,14 +21,7 @@ run on all images with iterative
 gnuplot from c++, not bash
     havily relies on boost
 
-
- Make the graphs loggy
-    easier to see what's going on 
-
-
- render two images, show plot for these two.
-
-
+render two images, show plot for these two.
 
  timing different functions / iterations
 
