@@ -212,7 +212,7 @@ void two_grid(double h, d1 &U, d1 &F, int iWidthLength, int iSmoothFactor)
 
 
 vector<string> iterative_solve(iterative_function function,
-                    const d1 &solution, d1 &guess,
+                    const d1 solution, d1 &guess,
                     double dMaxErr, int iLength, int iWidth) 
 {
     d1 old_guess = guess;
