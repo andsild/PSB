@@ -234,6 +234,7 @@ vector<string> iterative_solve(iterative_function function,
         vOutput.push_back(std::to_string(dError));
     } while(dError > dMaxErr);
 
+    guess = newGuess;
     return vOutput;
 }
 

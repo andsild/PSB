@@ -215,8 +215,12 @@ template <class T> class ImageProcess : CImg<T>
                     this->image_vec.push_back(newVal);
                 }
             }
+
         }
         vector<string> vOutput;
+        d1 U;
+            
+    public:
         void printImage(image_fmt image)
         {
             for(int iPos = 0; iPos < image.height(); iPos++)
@@ -228,8 +232,7 @@ template <class T> class ImageProcess : CImg<T>
                 cout << endl;
             }
         }
-            
-    public:
+
         double dMaxErr;
         ImageProcess(image_fmt image, const char *fileName, double dMaxErr,
                      double dScalar)
@@ -246,35 +249,47 @@ template <class T> class ImageProcess : CImg<T>
             this->convertImage();
         }
 
+        void clearFuncVectors()
+        {
+            this->vOutput.clear();
+            this->U.clear();
+        }
+
+
         void solve(iterative_function func)
        {
-            d1 U = vector<double>(iDim, 0); 
+           U.resize(iDim, 0);
             if(this->image_vec.size() < 1) 
             { 
                 throw ImageException("Image vector was not initialized before solving");
             }
 
-            int iPos = 0;
-            for(vector<double>::iterator it = image_vec.begin();
-                it != image_vec.end();
-                it++)
+            this->vOutput =  iterative_solve(func,
+                                       this->image_vec, this->U,
+                                       this->dMaxErr, this->iWidth);
+
+            int jPos = 0;
+            for(int iPos = 0; iPos < U.size() ; iPos++)
             {
-                if(*it > 0){
-                    cout << (*it) << " ";
-                    iPos++;}
-                if(iPos > 20) break;
+                double dEle = U[iPos];
+                if(dEle > 0) { cout << U[iPos] << " "; jPos++; }
+                if(jPos > 20) { break; }
             }
             cout << endl;
 
-            this->vOutput =  iterative_solve(func,
-                                       this->image_vec, U,
-                                       this->dMaxErr, this->iWidth);
 
             if(this->vOutput.size() < 1) 
             {
                 throw ImageException("Solver had no results from function");
             }
        }
+
+        void computeLine(const char *fileDir, int iRow = -1)
+        {
+            if(iRow < 0) { iRow = this->iHeight / 2; }
+
+            // this->vOutput[iRow]
+        }
 
         void writeResultToFile(string fileDir)
         {
@@ -286,32 +301,25 @@ template <class T> class ImageProcess : CImg<T>
             {
                 throw ImageException("could not write result file to " + fileDir);
             }
-            this->vOutput.clear();
         }
         void writeImageToFile(const char *fileDir)
         {
-            double *dImage = new double[image_vec.size()];
+            double *dImage = new double[this->U.size()];
             string sFileName = string(this->fileName);
             trimLeadingFileName(sFileName);
             string sFilename = string(fileDir) + "/" + sFileName;
 
-            if(this->image_vec.size() < 1)
-            {
-                throw ImageException("Solver had no results for " + string(fileName));
-            }
-
-
             for(vector<int>::size_type iPos = 0;
-                    iPos < this->image_vec.size();
+                    iPos < this->U.size();
                     iPos++) 
             {
-                dImage[iPos] = image_vec.at(iPos);
+                dImage[iPos] = U.at(iPos);
             }
 
             cimg::exception_mode(0);
             CImg<double> test(dImage, iWidth, iHeight,
                               1, 1, false);
-            printImage(test);
+            // printImage(test);
             try
             {
                 test.get_normalize(0,255).save(sFilename.c_str());
@@ -406,6 +414,7 @@ class ImageSolver
                         cout << loadBar << endl;
                         ipImage.writeResultToFile(string(cResultPath) + (*subIt).sPath);
                         ipImage.writeImageToFile(sImageDir.c_str());
+                        ipImage.clearFuncVectors();
                     }
                     catch(ImageException &ie)
                     {
