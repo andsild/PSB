@@ -1,11 +1,15 @@
 # Specified in order of priority, i.e. top item is done first, last item last
+# ...note that priorites might change.
 
- compute line on I and U
-    so it is easier to analytically see the solution.
+make histograms
+    cimg has this, but only for a single image ...
+        I can start with for all 
+            take every in orig dir
+                 then every for output dirs
 
-gongs task: check special images
-
-fix division by pixel size
+Variation of parameters used in functions
+   discretization
+   ω
 
 plot theoretical bounds
 
@@ -20,25 +24,20 @@ make program user friendly!
     output what is going on
     estimate a total loading time betterly
 
+fix division by pixel size 
+    not so easy to say how..
+
 run on all images with iterative
 
 gnuplot from c++, not bash
     havily relies on boost
 
-render two images, show plot for these two.
-
 timing different functions / iterations
-
-make histograms
-    cimg has this
 
 code refactoring
 
 implement FFT
 
-Variation of parameters used in functions
-   discretization
-   ω
 
 
 multi-threaded, to be faster per image

@@ -35,6 +35,15 @@ using namespace plot;
 namespace image_psb
 {
 
+void renderImage(CImgDisplay disp)
+{
+    disp.show();
+    while(!disp.is_closed() && ! disp.is_keyQ() )
+    {
+        disp.wait();
+    }
+}
+
 class SolverMeta;
 
 typedef CImg<double> image_fmt;
@@ -221,6 +230,7 @@ template <class T> class ImageProcess : CImg<T>
         d1 U;
             
     public:
+
         void printImage(image_fmt image)
         {
             for(int iPos = 0; iPos < image.height(); iPos++)
@@ -350,12 +360,6 @@ class ImageSolver
     public:
         LoadingBar loadBar;
         vector<string> filenames;
-        ImageSolver(string sReadFromFolder, function_container vIf,
-                   const char *cImagePath = "/image/", const char *cResultPath = "/./")
-        {
-            // this->solve(sReadFromFolder, vIf, cImagePath, cResultPath);
-        }
-
         void addFolder(string sFolder, const char *errMsg = "")
         {
             try{
@@ -433,9 +437,15 @@ class ImageSolver
             return true;
         }
 
+        void clearFolders()
+        {
+            this->filenames.clear();
+        }
+
         void doImageDisplay(map_gallery &mapFiles, string sImageRoot)
         {
             map_gallery::iterator it = mapFiles.begin();
+
 
             vector<string> out = it->second;
             string mainFile = it->first;
@@ -450,7 +460,6 @@ class ImageSolver
             CImgDisplay main_disp(main_image, mainFile.c_str() ,0);	
             CImgDisplay mask_disp(solved_image, out[iIndex].c_str() ,0);	
             CImgDisplay graph_disp(visu, "Color intensities" ,0);	
-
 
             while (!main_disp.is_closed() && !mask_disp.is_closed() && !graph_disp.is_closed())
             {
@@ -470,22 +479,20 @@ class ImageSolver
                 switch (main_disp.key()) 
                 {
                     case cimg::keyARROWUP:
-                        //TODO: if all images are invalid, we're in trouble
-                        if(it == mapFiles.end()) { it = mapFiles.begin(); it--; }
-                        it++;
-                        out = it->second;
+                        if(it != mapFiles.end()) {it++;}
+                        else{  it = mapFiles.begin(); }
                         mainFile = it->first;
+                        out = it->second;
                         sImageDest = sImageRoot + it->first;
-                        if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { it++; break; }
+                        if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { break; }
                         main_disp = main_image;
                         mask_disp = solved_image;
                         break;
                     case cimg::keyARROWDOWN:
-                        //TODO: if all images are invalid, we're in trouble
-                        if(it == mapFiles.begin()) { it = mapFiles.end(); it++; }
-                        it--;
-                        out = it->second;
+                        if(it == mapFiles.begin()) { it = mapFiles.end(); }
+                        else{ it--; }
                         mainFile = it->first;
+                        out = it->second;
                         sImageDest = sImageRoot + it->first;
                         if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { it--; break; }
                         main_disp = main_image;
@@ -496,12 +503,14 @@ class ImageSolver
                         iIndex--;
                         if(!loadImage(out[iIndex], solved_image)) {break; }
                         mask_disp = solved_image;
+                        mask_disp.set_title(out[iIndex].c_str());
                         break;
                     case cimg::keyARROWRIGHT:
                         if(iIndex == out.size() - 1) { iIndex = -1; }
                         iIndex++;
                         if(!loadImage(out[iIndex], solved_image)) {break; }
                         mask_disp = solved_image;
+                        mask_disp.set_title(out[iIndex].c_str());
                         break;
                     case cimg::keyQ:
                         return;
@@ -512,6 +521,30 @@ class ImageSolver
 
         }
 
+        CImgDisplay histogram(string sDir, function_container vIf)
+        {
+
+            // for (function_container::iterator subIt = vIf.begin();
+            //     subIt != vIf.end();
+            //     ++subIt)
+            // {
+            image_fmt bigImg;
+
+            for(vector<string>::iterator it = filenames.begin();
+                it != filenames.end();
+                it++)
+            {
+                cimg::exception_mode(0);
+                image_fmt image;
+                if(!loadImage((*it), image)) 
+                {
+                    continue;
+                }
+                bigImg.append(image, 'x');
+            }
+            CImgDisplay ret(bigImg, "histogram", 0);
+            return ret;
+        }
 
         void solve(function_container vIf, bool bComputeLines = false,
                    const char *cImagePath = "/image/", const char *cResultPath = "/./"
@@ -568,7 +601,6 @@ class ImageSolver
                 }                
             }
             cout << loadBar << endl;// if last image has errors, this might be necessary
-            
         }
 };
 

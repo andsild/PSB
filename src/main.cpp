@@ -12,6 +12,7 @@
 #include <map>
 #include <sstream> 
 #include <string>
+#include <thread>
 
 #include <dirent.h>
 #include <getopt.h>
@@ -51,6 +52,7 @@ void usage()
     exit(EXIT_FAILURE);
 }
 
+
 int main(int argc, char *argv[]) 
 {
     const struct option longopts[] =
@@ -66,6 +68,7 @@ int main(int argc, char *argv[])
         {"plot",   no_argument,        0, 'p'},
         {"resolve",   required_argument,        0, 'r'},
         {"sor",   no_argument,        0, 's'},
+        {"values-histogram",   no_argument,        0, 'v'},
         {0,0,0,0},
     };
 
@@ -73,7 +76,8 @@ int main(int argc, char *argv[])
     int iarg=0;
     extern char *optarg;
     
-    int a = 0, c = 0, f = 0, g = 0, j = 0, l = 0, n = 0, p = 0, r = 0, s = 0;
+    int a = 0, c = 0, f = 0, g = 0, j = 0, l = 0, n = 0, p = 0, r = 0, s = 0,
+        v = 0;
     double dScalar;
     char *folder;
     function_container vFuncContainer;
@@ -82,7 +86,7 @@ int main(int argc, char *argv[])
     SolverMeta smS(iterate_sor, "sor/", "images/");
     ImageSolver imageSolver;
 
-    if(argc == 2)
+    if(argc == 2)// && ! ( strcmp(argv[1], "-p") || strcmp(argv[1], "-n")))
     {
         cout << "Assuming \"-f " << string(argv[1]) << " --gauss --plot" << endl;
         vFuncContainer.push_back(smG);
@@ -95,7 +99,7 @@ int main(int argc, char *argv[])
 
     while(iarg != -1)
     {
-        iarg = getopt_long(argc, argv, "acf:gjlhnpr:s", longopts, &index);
+        iarg = getopt_long(argc, argv, "acf:gjlhnpr:sv", longopts, &index);
 
         switch (iarg)
         {
@@ -143,6 +147,9 @@ int main(int argc, char *argv[])
             case 'p':
                 p++;
                 break;
+            case 'v':
+                v++;
+                break;
 
             default: 
                 // usage();
@@ -157,13 +164,8 @@ int main(int argc, char *argv[])
         if(!n)
             imageSolver.solve(vFuncContainer, l>0);
     }
-    else //default
-    {
-        vFuncContainer.push_back(smG);
-        string sDir = "../small_media/";
-        imageSolver.addFolder(sDir);
-        if(!n)
-            imageSolver.solve(vFuncContainer, l>0);
+    else {
+        cout << "Warning: no media folder given" << endl;
     }
 
     if(r)
@@ -180,12 +182,6 @@ int main(int argc, char *argv[])
         imageSolver2.solve(vFuncContainer, l>0, "re", "re", dScalar);
     }
 
-
-    if(p) 
-    { 
-        plot::plot();
-    }
-
     if(a)
     {
         for (function_container::iterator it = vFuncContainer.begin();
@@ -196,11 +192,29 @@ int main(int argc, char *argv[])
         }
     }
 
+    if(v)
+    {
+        CImgDisplay histo = imageSolver.histogram(folder, vFuncContainer);
+        histo.show();
+        // std::thread histoLoop(
+    }
+
+
+
+    if(p) 
+    { 
+        plot::plot();
+        image_fmt imgPlot("graph.png");
+        CImgDisplay plot_disp(imgPlot, "graph.png : graph for all images in folder" ,0, false, false);	
+        std::thread plotLoop(renderImage, plot_disp);
+    }
+
+
     if(c && f)
     {
-        ImageSolver imageSolver2;
-        imageSolver2.addFolder(folder, "when trying to show rendered images (-c flag)");
-        imageSolver2.renderImages(folder, vFuncContainer);
+        imageSolver.clearFolders();
+        imageSolver.addFolder(folder, "when trying to show rendered images (-c flag)");
+        imageSolver.renderImages(folder, vFuncContainer);
     }
 
     return 0;
