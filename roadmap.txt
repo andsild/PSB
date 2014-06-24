@@ -1,5 +1,8 @@
 # Specified in order of priority, i.e. top item is done first, last item last
 
+render two and two images
+    old one and new one side by side
+
  compute line on I and U
     so it is easier to analytically see the solution.
 
