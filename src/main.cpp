@@ -56,11 +56,13 @@ int main(int argc, char *argv[])
     const struct option longopts[] =
     {
         {"average", no_argument,  0, 'a'},
+        {"compare", no_argument,  0, 'c'},
         {"folder",     required_argument,  0, 'f'},
         {"gauss",   no_argument,        0, 'g'},
         {"help",   no_argument,        0, 'h'},
         {"computeline",   no_argument,        0, 'l'},
         {"jacobi",   no_argument,        0, 'j'},
+        {"nosolve",   no_argument,        0, 'n'},
         {"plot",   no_argument,        0, 'p'},
         {"resolve",   required_argument,        0, 'r'},
         {"sor",   no_argument,        0, 's'},
@@ -71,7 +73,7 @@ int main(int argc, char *argv[])
     int iarg=0;
     extern char *optarg;
     
-    int a = 0, f = 0, g = 0, j = 0, l = 0, p = 0, r = 0, s = 0;
+    int a = 0, c = 0, f = 0, g = 0, j = 0, l = 0, n = 0, p = 0, r = 0, s = 0;
     double dScalar;
     char *folder;
     function_container vFuncContainer;
@@ -82,12 +84,10 @@ int main(int argc, char *argv[])
 
     if(argc == 2)
     {
-        cout << "Assuming \"-f " << string(argv[1]) << " --gauss" << endl;
+        cout << "Assuming \"-f " << string(argv[1]) << " --gauss --plot" << endl;
         vFuncContainer.push_back(smG);
         imageSolver.addFolder(string(argv[1]));
-        imageSolver.solve(vFuncContainer);
-        // imageSolver.solve(string(argv[1]), vFuncContainer);
-        // readFolder(string(argv[1]), vFuncContainer);
+        imageSolver.solve(vFuncContainer, false);
         plot::plot();
         exit(EXIT_SUCCESS);
     }
@@ -95,12 +95,16 @@ int main(int argc, char *argv[])
 
     while(iarg != -1)
     {
-        iarg = getopt_long(argc, argv, "af:gjlhpr:s", longopts, &index);
+        iarg = getopt_long(argc, argv, "acf:gjlhnpr:s", longopts, &index);
 
         switch (iarg)
         {
             case 'a':
                 a++;
+                break;
+
+            case 'c':
+                c++;
                 break;
 
             case 'f':
@@ -123,6 +127,9 @@ int main(int argc, char *argv[])
             case 'l':
                 l++;
                 break;
+            case 'n':
+                n++;
+                break;
 
             case 'r':
                 r++;
@@ -144,19 +151,19 @@ int main(int argc, char *argv[])
     } 
 
     if(f) {
-        if(vFuncContainer.size() < 1)
+        if(vFuncContainer.size() < 1 && !n)
             cout << "Warning: no iterators chosen" << endl;
         imageSolver.addFolder(folder);
-        imageSolver.solve(vFuncContainer, l>0);
-        // readFolder(folder, vFuncContainer);
+        if(!n)
+            imageSolver.solve(vFuncContainer, l>0);
     }
     else //default
     {
         vFuncContainer.push_back(smG);
         string sDir = "../small_media/";
         imageSolver.addFolder(sDir);
-        imageSolver.solve(vFuncContainer, l>0);
-        // readFolder(sDir, vFuncContainer);
+        if(!n)
+            imageSolver.solve(vFuncContainer, l>0);
     }
 
     if(r)
@@ -189,18 +196,14 @@ int main(int argc, char *argv[])
         }
     }
 
-    // //show image(s)
-    // // CImg<unsigned char> image("./media/icon_img.png");
-	// // CImgDisplay main_disp(image,"Image",0);	
-	// // CImgDisplay mask_disp(x2,"Image",0);	
-    // //
-    // // while (!main_disp.is_closed() && 
-    // //        !main_disp.is_keyESC() &&
-    // //        !main_disp.is_keyQ()) {
-    // //     main_disp.wait();
-    // // }
-    // //
-    // return 0;
+    if(c && f)
+    {
+        ImageSolver imageSolver2;
+        imageSolver2.addFolder(folder, "when trying to show rendered images (-c flag)");
+        imageSolver2.renderImages(folder, vFuncContainer);
+    }
+
+    return 0;
 }
 
 #endif /* _MAIN.cpp */

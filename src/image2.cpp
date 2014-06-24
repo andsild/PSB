@@ -343,6 +343,9 @@ template <class T> class ImageProcess : CImg<T>
 class ImageSolver
 {
     private:
+        static constexpr int NEXT_IMAGE = 0, PREV_IMAGE = 1, NEXT_SOLVER = 2, PREV_SOLVER = 3,
+                EXIT = 10;
+        typedef map<string, vector<string> > map_gallery;
 
     public:
         LoadingBar loadBar;
@@ -353,40 +356,162 @@ class ImageSolver
             // this->solve(sReadFromFolder, vIf, cImagePath, cResultPath);
         }
 
-        void addFolder(string sFolder)
+        void addFolder(string sFolder, const char *errMsg = "")
         {
             try{
                 getFilesInFolder(sFolder, this->filenames);
             }
             catch(const file_IO::DirNotFound& f)
             {
-                cout << f.what() << endl;
+                cout << f.what() << " " << errMsg << endl;
                 exit(EXIT_FAILURE);
             }
         }
+
         ImageSolver() { }
-        void multiFolderSolve(vector<string> vInputFolders, function_container vIf,
-                   const char *cImagePath = "/image/", const char *cResultPath = "/./")
+
+
+        void renderImages(string sImageRoot, function_container vIf, const char *cImagePath = "/image/")
         {
-            for(vector<string>::iterator it = vInputFolders.begin();
-                it != vInputFolders.end();
-                it++)
-            {
-                this->addFolder((*it));
+            if(this->filenames.size() < 1) 
+            { 
+                cout << "No files added!" << endl;
+                exit(EXIT_FAILURE); 
             }
 
-            this->solve(vIf, cImagePath, cResultPath);
+            // sort the list of filenames
+            vector<string>::const_iterator it = this->filenames.begin();
+
+            map_gallery mapFiles;
+
+            cimg::exception_mode(0);
+            for(vector<string>::iterator it = filenames.begin();
+                it != filenames.end();
+                it++)
+            {
+                string s = (*it);
+                trimLeadingFileName(s);
+                vector<string> vOutputs;
+                mapFiles[s] = vOutputs;
+            }
+
+            this->filenames.clear();
+
+            for (function_container::iterator subIt = vIf.begin();
+                subIt != vIf.end();
+                ++subIt)
+            {
+                string sImageDir = DATA_DIR + (*subIt).sPath + string(cImagePath);
+                this->addFolder(sImageDir, "when trying to show rendered images (-c flag)");
+            }
+
+            for(vector<string>::iterator it = filenames.begin();
+                it != filenames.end();
+                it++)
+            {
+                string s = (*it);
+                trimLeadingFileName(s);
+                mapFiles[s].push_back(*it);
+            }
+
+            doImageDisplay(mapFiles, sImageRoot);
+
         }
+
+        bool loadImage(string sFileDest, image_fmt &image)
+        {
+            cimg::exception_mode(0);
+            try {
+                image.load(sFileDest.c_str());
+            }
+            catch(CImgIOException cioe)
+            {
+                cout << cioe.what() << endl;
+                return false;
+            }
+
+            return true;
+        }
+
+        void doImageDisplay(map_gallery &mapFiles, string sImageRoot)
+        {
+            map_gallery::iterator it = mapFiles.begin();
+
+            vector<string> out = it->second;
+            string mainFile = it->first;
+            image_fmt main_image, solved_image;
+            int iIndex = 0;
+
+            string sImageDest = sImageRoot + it->first;
+            if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) return;
+
+            CImgDisplay main_disp(main_image, mainFile.c_str() ,0);	
+            CImgDisplay mask_disp(solved_image, out[iIndex].c_str() ,0);	
+
+
+            while (!main_disp.is_closed() && !mask_disp.is_closed())
+            {
+                switch (main_disp.key()) 
+                {
+                    case cimg::keyARROWUP:
+                        //TODO: if all images are invalid, we're in trouble
+                        if(it == mapFiles.end()) { it = mapFiles.begin(); it--; }
+                        it++;
+                        out = it->second;
+                        mainFile = it->first;
+                        sImageDest = sImageRoot + it->first;
+                        if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { it++; break; }
+                        main_disp = main_image;
+                        mask_disp = solved_image;
+                        break;
+                    case cimg::keyARROWDOWN:
+                        //TODO: if all images are invalid, we're in trouble
+                        if(it == mapFiles.begin()) { it = mapFiles.end(); it++; }
+                        it--;
+                        out = it->second;
+                        mainFile = it->first;
+                        sImageDest = sImageRoot + it->first;
+                        if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { it--; break; }
+                        main_disp = main_image;
+                        mask_disp = solved_image;
+                        break;
+                    case cimg::keyARROWLEFT:
+                        if(iIndex == 0) { iIndex = out.size(); }
+                        iIndex--;
+                        if(!loadImage(out[iIndex], solved_image)) {break; }
+                        mask_disp = solved_image;
+                        break;
+                    case cimg::keyARROWRIGHT:
+                        if(iIndex == out.size() - 1) { iIndex = -1; }
+                        iIndex++;
+                        if(!loadImage(out[iIndex], solved_image)) {break; }
+                        mask_disp = solved_image;
+                        break;
+                    case cimg::keyQ:
+                        return;
+                }
+                main_disp.wait();
+
+            }
+
+        }
+
 
         void solve(function_container vIf, bool bComputeLines = false,
                    const char *cImagePath = "/image/", const char *cResultPath = "/./"
                    , double dScalar = 1)
         {
+            if(this->filenames.size() < 1
+            || vIf.size() < 1) {
+                cout << "Solve called without files (or functions?)" << endl;
+                return;
+            }
+
             int iTotalIterations;
             double dProgress = 0;
             double dStepSize;
 
-            iTotalIterations = filenames.size() * vIf.size();
+            iTotalIterations = this->filenames.size() * vIf.size();
             dStepSize = ((double)100 / iTotalIterations);
             int iTimeRemaining = filenames.size() * vIf.size();
             loadBar.initialize(iTotalIterations);
@@ -397,12 +522,8 @@ class ImageSolver
             {
                 cimg::exception_mode(0);
                 image_fmt image;
-                try {
-                image.load((*it).c_str());
-                }
-                catch(CImgIOException cioe)
+                if(!loadImage((*it), image)) 
                 {
-                    cout << cioe.what() << endl;
                     loadBar.increaseProgress(vIf.size() - 1);
                     cout << loadBar << endl;
                     continue;
@@ -430,9 +551,7 @@ class ImageSolver
                     }
                 }                
             }
-            //make it so that process images do not write .... just solve and return
             cout << loadBar << endl;// if last image has errors, this might be necessary
-            // saveImages(filenames, images, vIf);
             
         }
 };
