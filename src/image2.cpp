@@ -445,12 +445,28 @@ class ImageSolver
             string sImageDest = sImageRoot + it->first;
             if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) return;
 
+            const double blackWhite[] = {255};
+            image_fmt visu(500, 400, 1, 1, 0);
             CImgDisplay main_disp(main_image, mainFile.c_str() ,0);	
             CImgDisplay mask_disp(solved_image, out[iIndex].c_str() ,0);	
+            CImgDisplay graph_disp(visu, "Color intensities" ,0);	
 
 
-            while (!main_disp.is_closed() && !mask_disp.is_closed())
+            while (!main_disp.is_closed() && !mask_disp.is_closed() && !graph_disp.is_closed())
             {
+                if (main_disp.button() && main_disp.mouse_y()>=0) 
+                {
+                    const int yPos = main_disp.mouse_y();
+                    image_fmt main_cropped =  main_image.get_crop(
+                            0, yPos, 0, 0, main_image.width()-1, yPos, 0, 0);
+                    image_fmt side_cropped = solved_image.get_crop(
+                            0, yPos, 0, 0, solved_image.width()-1, yPos, 0, 0);
+
+                    // data, color, opacity, plot_type, verttex_type, ymin
+                    visu.fill(0).draw_graph(main_cropped, blackWhite, 1, 1, 0, 255, 0);
+                    visu.draw_graph(side_cropped, blackWhite, 1, 1, 0, 255, 0);
+                    visu.display(graph_disp);
+                }
                 switch (main_disp.key()) 
                 {
                     case cimg::keyARROWUP:
