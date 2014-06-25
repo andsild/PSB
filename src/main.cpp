@@ -201,12 +201,13 @@ int main(int argc, char *argv[])
 
 
 
+    std::thread plotLoop;
     if(p) 
     { 
         plot::plot();
         image_fmt imgPlot("graph.png");
-        CImgDisplay plot_disp(imgPlot, "graph.png : graph for all images in folder" ,0, false, false);	
-        std::thread plotLoop(renderImage, plot_disp);
+        CImgDisplay plot_disp(imgPlot, "graph.png : graph for all images in folder",0, false, true);	
+        plotLoop = thread(renderImage, plot_disp);
     }
 
 
@@ -216,6 +217,8 @@ int main(int argc, char *argv[])
         imageSolver.addFolder(folder, "when trying to show rendered images (-c flag)");
         imageSolver.renderImages(folder, vFuncContainer);
     }
+
+    plotLoop.join();
 
     return 0;
 }
