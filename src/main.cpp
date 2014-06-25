@@ -86,7 +86,8 @@ int main(int argc, char *argv[])
     SolverMeta smS(iterate_sor, "sor/", "images/");
     ImageSolver imageSolver;
 
-    if(argc == 2)// && ! ( strcmp(argv[1], "-p") || strcmp(argv[1], "-n")))
+    if(argc == 2 && ! (strcmp(argv[1], "-p") || strcmp(argv[1], "-n") 
+                       || strcmp(argv[1], "-h")))
     {
         cout << "Assuming \"-f " << string(argv[1]) << " --gauss --plot" << endl;
         vFuncContainer.push_back(smG);
@@ -192,12 +193,19 @@ int main(int argc, char *argv[])
         }
     }
 
-    if(v)
-    {
-        CImgDisplay histo = imageSolver.histogram(folder, vFuncContainer);
-        histo.show();
-        // std::thread histoLoop(
-    }
+    std::thread histLoop;
+    // if(v)
+    // {
+    //     imageSolver.clearFolders();
+    //     imageSolver.addFolder(folder);
+    //     imageList_fmt histogram = imageSolver.histogram(folder, vFuncContainer);
+        // CImgDisplay hist_disp(histogram, "histogram", 0,  false,true);
+        // cout << "SIZE " << histogram.size() << endl;
+        //histLoop = thread(display_histogram, histogram);
+        // cout << histogram.width() << endl;
+        // cout << histogram.height() << endl;
+        // histLoop = thread(renderImage, hist_disp);
+    // }
 
 
 
@@ -218,7 +226,11 @@ int main(int argc, char *argv[])
         imageSolver.renderImages(folder, vFuncContainer);
     }
 
-    plotLoop.join();
+    if(plotLoop.joinable())
+        plotLoop.join();
+
+    if(histLoop.joinable())
+        histLoop.join();
 
     return 0;
 }

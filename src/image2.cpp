@@ -35,6 +35,12 @@ using namespace plot;
 namespace image_psb
 {
 
+class SolverMeta;
+
+typedef CImg<double> image_fmt;
+typedef CImgList<double> imageList_fmt;
+typedef vector<SolverMeta> function_container;
+
 void renderImage(CImgDisplay disp)
 {
     disp.show();
@@ -44,11 +50,23 @@ void renderImage(CImgDisplay disp)
     }
 }
 
-class SolverMeta;
+void display_histogram(image_fmt image)
+{
+    image.display_graph("Histogram", 3);
+}
 
-typedef CImg<double> image_fmt;
-typedef CImgList<double> imageList_fmt;
-typedef vector<SolverMeta> function_container;
+
+void printImage(image_fmt image)
+{
+    for(int iPos = 0; iPos < image.height(); iPos++)
+    {
+        for(int jPos = 0; jPos < image.width(); jPos++)
+        {
+            cout << image(jPos, iPos) << " ";
+        }
+        cout << endl;
+    }
+}
 
 
 class ImageException: public exception
@@ -231,17 +249,6 @@ template <class T> class ImageProcess : CImg<T>
             
     public:
 
-        void printImage(image_fmt image)
-        {
-            for(int iPos = 0; iPos < image.height(); iPos++)
-            {
-                for(int jPos = 0; jPos < image.width(); jPos++)
-                {
-                    cout << image(jPos, iPos) << " ";
-                }
-                cout << endl;
-            }
-        }
 
         double dMaxErr;
         ImageProcess(image_fmt image, const char *fileName, double dMaxErr,
@@ -336,7 +343,6 @@ template <class T> class ImageProcess : CImg<T>
             cimg::exception_mode(0);
             CImg<double> test(dImage, iWidth, iHeight,
                               1, 1, false);
-            // printImage(test);
             try
             {
                 test.get_normalize(0,255).save(sFilename.c_str());
@@ -521,7 +527,7 @@ class ImageSolver
 
         }
 
-        CImgDisplay histogram(string sDir, function_container vIf)
+        imageList_fmt histogram(string sDir, function_container vIf)
         {
 
             // for (function_container::iterator subIt = vIf.begin();
@@ -529,12 +535,13 @@ class ImageSolver
             //     ++subIt)
             // {
             image_fmt bigImg;
+            imageList_fmt images;
+            cimg::exception_mode(0);
 
             for(vector<string>::iterator it = filenames.begin();
                 it != filenames.end();
                 it++)
             {
-                cimg::exception_mode(0);
                 image_fmt image;
                 if(!loadImage((*it), image)) 
                 {
@@ -542,8 +549,33 @@ class ImageSolver
                 }
                 bigImg.append(image, 'x');
             }
-            CImgDisplay ret(bigImg, "histogram", 0);
-            return ret;
+            images.push_back(bigImg.histogram(256));
+
+
+            for (function_container::iterator it = vIf.begin();
+                it != vIf.end();
+                ++it)
+            {
+                this->filenames.clear();
+                string sImageDir = DATA_DIR + (*it).sPath + string("image/");
+                this->addFolder(sImageDir);
+                image_fmt appender;
+
+                for(vector<string>::iterator subIt = filenames.begin();
+                    subIt != filenames.end();
+                    subIt++)
+                {
+                    image_fmt image;
+                    if(!loadImage((*subIt), image)) 
+                    {
+                        continue;
+                    }
+                    appender.append(image, 'x');
+                }
+                images.push_back(appender.histogram(256));
+            }
+
+            return images;
         }
 
         void solve(function_container vIf, bool bComputeLines = false,
