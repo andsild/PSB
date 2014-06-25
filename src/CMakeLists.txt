@@ -250,6 +250,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CIMG_CFLAGS} -g -std=c++11 -lpthread -
 
 
 SET(CIMG_FILES main
+    make_test_image
   )
 
 foreach(program ${CIMG_FILES})
