@@ -1,0 +1,29 @@
+################
+Thu 12 Jun 2014
+################
+Changed from CImg<T> to vector<T>. The translation from CImg to vector
+takes some time, but it is much faster to iterate over a 1d vector.
+This NEEDS to be TESTED later
+
+################
+Mon 23 Jun 2014 
+################
+Changed from declarative style to OOP, which makes it easier to develop the 
+program.
+
+
+#################
+Wed 25 Jun 2014 
+#################
+Changed from difference with averages of absolute differences
+in U_{k} and U_{k+1}, to getting the max of absolute differences.
+
+
+################
+################
+
+################
+################
+
+################
+################
