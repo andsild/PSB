@@ -1,0 +1,68 @@
+### INTRODUCTION
+
+What methods will reduce errors most effectively when iterating over
+images?
+
+The program is written in C++ for speed, however, concepts like threading
+and multigrids are currently avoided for ease of coding.
+
+### EDITIONS
+
+"PSB" is a work in progress, so the structure of the code is changed from
+time to time. Do frequent "git pull" if you intend to use it.
+
+#### PSB
+
+* LIST FEATURES HERE
+* PSB keeps it simple, so **you** can modify the code to your needs.
+
+#### CImg
+
+* Open-source
+* Minimalistic, only include "CImg.h"
+* Lot of features
+
+See http://cimg.sourceforge.net/
+
+### Gnuplot
+* Open-source
+* Simple
+* Can be operated from the command line and through open-source interfaces in
+  C++
+
+See http://www.gnuplot.info/
+
+### CONFIGURATION / CONTROL:
+
+PSB is written to be operated from the command line. 
+It will per default write to "./output" in the ${PWD} from which it is invoked.
+
+### COMMAND SYNTAX
+
+Please refer to the manpage in our "doc" folder, by "man -l PSB.1"
+
+* <Arrow UP> : next image
+* <Arrow DOWN> : previous image
+* <Arrow LEFT> : next solver (if any)
+* <Arrow RIGHT> : previous solver (if any)
+
+### VARIABLES AND CONSTANTS
+
+#### Variables
+
+#### Constants (not dumpable or writeable)
+TODO
+
+### Plot.sh
+
+The script that does the plotting (can also be invoked from the PSB-source code)
+
+It is currently a series of for-loops with UNIX's "find" 
+
+### COMMAND LINE ARGUMENTS
+
+Please refer to the manpage in our "doc" folder, by "man -l PSB.1"
+
+### BUGS
+
+Please report new issues to the github mainpage or the developer @ andsild@gmail.com
