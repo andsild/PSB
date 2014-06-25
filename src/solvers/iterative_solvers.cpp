@@ -30,11 +30,11 @@ double getRangeVal(const d1 &U, const d1 &F,
 {
     int xPos = iIndex % (int)iWidthLength;
     /* Skip the first and last column */
-    if(xPos < 1 || xPos >= iWidthLength - 1) { return 0; }
+    if(xPos < 1 || xPos > iWidthLength - 2) { return U[iIndex]; }
     /* XXX: Row-wise skips are made in external for-loops */
 
-    int iIndexPixelAbove = iIndex - iWidthLength;
-    int iIndexPixelBelow = iIndex + iWidthLength;
+    int iIndexPixelAbove = iIndex + iWidthLength;
+    int iIndexPixelBelow = iIndex - iWidthLength;
 
     return (U[iIndex+1] + U[iIndex-1]
             + U[iIndexPixelAbove]
@@ -53,7 +53,10 @@ void iterate_jacobi(d1 F, d1 &U, double iWidthLength,
             iPos < F.size() - iWidthLength;
             iPos++) 
     {
-        U[iPos] = .25 * (getRangeVal(copyU, F, iPos, iWidthLength));
+        double dNewVal = getRangeVal(copyU, F, iPos, iWidthLength);
+        if(dNewVal==U[iPos]) continue;
+        U[iPos] = (double)(.25 * (dNewVal));
+
     }
 }
 
@@ -62,7 +65,7 @@ void iterate_jacobi(d1 F, d1 &U, double iWidthLength,
 /** Gauss-seidel iteration
  *
  */
-void iterate_gauss(d1 F, d1 &U, double iWidthLength,
+void iterate_gauss(const d1 F, d1 &U, double iWidthLength,
                            int iLength, double H = 1)
 {
     for(vector<int>::size_type iPos = iWidthLength;
@@ -73,7 +76,7 @@ void iterate_gauss(d1 F, d1 &U, double iWidthLength,
     }
 }
 
-void iterate_sor(d1 F, d1 &U, double iWidthLength, int iLength, double H = 1)
+void iterate_sor(const d1 F, d1 &U, double iWidthLength, int iLength, double H = 1)
 {
     double omega = 2 / (1 + (3.14 / iWidthLength));
     double dOmegaConstant = omega / 4;
@@ -83,23 +86,6 @@ void iterate_sor(d1 F, d1 &U, double iWidthLength, int iLength, double H = 1)
             iPos < (int)F.size() - iWidthLength;
             iPos++) 
     {
-        int xPos = iPos % (int)iWidthLength;
-        int yPos = iPos / (int)iWidthLength;
-        if ((xPos+yPos) % 2 == 0)
-        {
-            U[iPos] = (dNotOmega * U[iPos])
-                     + dOmegaConstant
-                     * getRangeVal(U, F, iPos, iWidthLength);
-        }
-    }
-
-    for(vector<int>::size_type iPos = iWidthLength;
-            iPos < (int)F.size() - iWidthLength;
-            iPos++) 
-    {
-        int xPos = iPos % (int)iWidthLength;
-        int yPos = iPos / (int)iWidthLength;
-        if ((xPos+yPos) % 2 != 0)
         {
             U[iPos] = (dNotOmega * U[iPos])
                      + dOmegaConstant
@@ -108,23 +94,27 @@ void iterate_sor(d1 F, d1 &U, double iWidthLength, int iLength, double H = 1)
     }
 }
 
-// TODO: should this be max? (or get max() from diffs in vector?)
 double findError(const d1 origData, const d1 newData, int iLength)
 {
-    double dError = 0;
+    double *dTmp = new double[origData.size()];
+
     for(std::vector<int>::size_type iPos = 0; iPos != origData.size(); iPos++)
     {
-        dError += calculateError(origData[iPos],
+        if(newData[iPos] == 0) continue;
+        dTmp[iPos] = calculateError(origData[iPos],
                                  newData[iPos]);
+        // cout << dTmp[iPos] << " ";
+        // cout << newData[iPos] << " "; 
     }
-    return dError /= iLength;
 
+    return *std::max_element(dTmp, dTmp+origData.size());
 }
 
 double calculateError(const double dOriginal, const double dNew)
 {
     if(dNew == 0) { return 0; }
-    return abs( (dNew - dOriginal) / dNew) * 100;
+    // return abs( (dNew - dOriginal) );
+    return (double)abs( (dNew - dOriginal) / dNew) * 100;
 }
 
 void two_grid(double h, d1 &U, d1 &F, int iWidthLength, int iSmoothFactor)
@@ -210,6 +200,49 @@ void two_grid(double h, d1 &U, d1 &F, int iWidthLength, int iSmoothFactor)
     }
 }
 
+double meanDifference(const d1 origData, const d1 newData, int iLength)
+{
+    double dError = 0;
+    for(std::vector<int>::size_type iPos = 0; iPos != origData.size(); iPos++)
+    {
+        double dRes = calculateError(origData[iPos],
+                                 newData[iPos]);
+        // if(dRes == 0) { iLength -= 1; continue; }
+        dError += calculateError(origData[iPos],
+                                 newData[iPos]);
+    }
+    return dError /= (double)iLength;
+
+}
+
+d1 computeField(const d1 &orig, const d1 &guess, int iWidthLength)
+{
+    d1 rho(orig.size());
+    for(vector<int>::size_type iPos = iWidthLength;
+            iPos < (int)orig.size() - iWidthLength;
+            iPos++) 
+    {
+        int iIndexPixelAbove = iPos + iWidthLength;
+        int iIndexPixelBelow = iPos - iWidthLength;
+
+        rho[iPos] = guess[iIndexPixelAbove] + guess[iIndexPixelBelow]
+                    + guess[iPos + 1] + guess[iPos - 1] 
+                    + (4 * orig[iPos] );
+    }
+    
+    return rho;
+}
+
+void printAsImage(d1 vec, int iW)
+{
+    for(int iPos = 0; iPos < vec.size(); iPos++)
+    {
+        if(iPos % iW == 0) cout << endl;
+        cout << vec[iPos] << " ";
+    }
+    cout << endl << flush;
+}
+
 
 vector<string> iterative_solve(iterative_function function,
                     const d1 solution, d1 &guess,
@@ -221,20 +254,33 @@ vector<string> iterative_solve(iterative_function function,
     int iIterCount = 0;
     vector<string> vOutput;
     int iLength = solution.size();
+    int iPos = 0;
+    d1 rho = computeField(solution, guess, iWidth);
+    cout << flush;
     do
     {
-        dError = 0;
         newGuess = old_guess;
-        function(solution, newGuess, iWidth, iLength, 1);
+        printAsImage(old_guess, iWidth);
+        function(rho, newGuess, iWidth, iLength, 1);
 
+        //TODO: or is it the other way around?
         dError = findError(old_guess, newGuess, iLength);
+        // dError = findError(newGuess, old_guess, iLength);
+        //TODO: or is it the other way around?
+        double dDiff = meanDifference(solution, newGuess, iLength);
         old_guess = newGuess;
         iIterCount++;
 
-        vOutput.push_back(std::to_string(dError));
+        // cout << "Iteration diff(max): " << dError << endl;
+        // cout << "Image diff(mean): " << dDiff << endl;
+        vOutput.push_back(std::to_string(dDiff));
+        iPos++;
+        // if(iPos > 2) break;
     } while(dError > dMaxErr);
 
+    // cout << vOutput.size() << " iterations" << endl;
     guess = newGuess;
+
     return vOutput;
 }
 

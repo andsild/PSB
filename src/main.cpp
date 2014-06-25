@@ -21,8 +21,8 @@
 #include <unistd.h>
 
 #include "CImg.h"
-#include "./image2.cpp"
 #include "./file.cpp"
+#include "./image2.cpp"
 #include "solvers/iterative_solvers.cpp"
 #include "plot.cpp"
 // #include "solvers/FFT.cpp"

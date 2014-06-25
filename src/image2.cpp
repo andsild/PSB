@@ -337,15 +337,17 @@ template <class T> class ImageProcess : CImg<T>
                     iPos < this->U.size();
                     iPos++) 
             {
-                dImage[iPos] = U.at(iPos);
+                dImage[iPos] = U[iPos];
             }
 
             cimg::exception_mode(0);
             CImg<double> test(dImage, iWidth, iHeight,
                               1, 1, false);
+            printImage(image);
             try
             {
-                test.get_normalize(0,255).save(sFilename.c_str());
+                // test.get_normalize(0,255).save(sFilename.c_str());
+                test.save(sFilename.c_str());
             }
             catch(CImgIOException &cioe)
             {
@@ -610,7 +612,9 @@ class ImageSolver
                     continue;
                 }
 
-                ImageProcess<double> ipImage(image, (*it).c_str(), .9, dScalar);
+                double ERROR_TOLERANCE = 0.5;
+                ImageProcess<double> ipImage(image, (*it).c_str(), ERROR_TOLERANCE, dScalar);
+                printImage(image);
                 cout << "Beginning image " << (*it) << endl;
 
                 for (function_container::iterator subIt = vIf.begin();

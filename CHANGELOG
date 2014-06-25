@@ -18,6 +18,7 @@ Wed 25 Jun 2014
 Changed from difference with averages of absolute differences
 in U_{k} and U_{k+1}, to getting the max of absolute differences.
 
+Realized that I was confusing stopping criteria with relative differences
 
 ################
 ################
