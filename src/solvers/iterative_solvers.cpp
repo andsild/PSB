@@ -30,11 +30,7 @@ double getRangeVal(const d1 &U, const d1 &F,
 {
     int xPos = iIndex % (int)iWidthLength;
     /* Skip the first and last column */
-    if(xPos < 1 || xPos > iWidthLength - 2) {
-        if(F[iIndex] != U[iIndex]) {
-            cout << "Error in border!" << endl;
-            exit(EXIT_FAILURE);}
-        return F[iIndex]; }
+    if(xPos < 1 || xPos > iWidthLength - 2) { return -999;}// return F[iIndex]; }
     /* XXX: Row-wise skips are made in external for-loops */
 
     int iIndexPixelAbove = iIndex + iWidthLength;
@@ -58,7 +54,7 @@ void iterate_jacobi(const d1 &F, d1 &U, double iWidthLength,
             iPos++) 
     {
         double dNewVal = getRangeVal(copyU, F, iPos, iWidthLength);
-        // if(dNewVal==U[iPos]) continue;
+        if(dNewVal==-999) continue;
         U[iPos] = (double)(.25 * (dNewVal));
     }
 }
@@ -284,11 +280,11 @@ vector<string> iterative_solve(iterative_function function,
 
 
     cout << "Initial image" << endl;
-    printAsImage(solution, iWidth) ;
+    // printAsImage(solution, iWidth) ;
     cout << "Initial guess" << endl;
-    printAsImage(guess, iWidth) ;
+    // printAsImage(guess, iWidth) ;
     cout << "Initial rho" << endl;
-    printAsImage(rho, iWidth);
+    // printAsImage(rho, iWidth);
     cout << "Entering loop..." << endl;
 
     int iIter = 0;

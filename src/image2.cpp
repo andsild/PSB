@@ -240,13 +240,7 @@ template <class T> class ImageProcess : CImg<T>
                 for(int xPos = 0; xPos < grayscale.width(); xPos++)
                 {
                     double newVal = (double)grayscale(xPos, yPos, 0, 0) * this->dScalar;
-                    if(yPos == 31 && xPos == 0)
-                        cout << grayscale(xPos, yPos, 1, 1) << " " <<
-                            (double)grayscale(xPos, yPos, 1, 1) << " " <<
-                            grayscale(xPos, yPos, 0, 0) << " " << 
-                            (double)grayscale(xPos, yPos, 0, 0) << " " << 
-                            newVal <<
-                            endl; 
+                    if(yPos == 29 && xPos == 0) {}
                     this->image_vec.push_back(newVal);
                 }
             }
@@ -292,23 +286,21 @@ template <class T> class ImageProcess : CImg<T>
            if(!bExtractBordes) { return ; }
            
            /* Upper border */
-           for(vector<int>::size_type iPos = 0;
-                iPos < this->iWidth;
-                iPos++) 
+           for(int iPos = 0; iPos < this->iWidth; iPos++) 
             {
                 U[iPos] = this->image_vec[iPos];                                
             }
 
            /* Bottom border */
-           for(vector<int>::size_type iPos = (int)this->image_vec.size() - iWidth;
-                iPos < (int)this->image_vec.size();
+           for(int iPos = (int)this->image_vec.size() - iWidth;
+                iPos < this->image_vec.size();
                 iPos++) 
             {
                 U[iPos] = this->image_vec[iPos];
             }
 
            /* Left border */
-           for(vector<int>::size_type iPos = 0;
+           for(int iPos = 0;
                 iPos < (int)this->image_vec.size();
                 iPos+= this->iWidth) 
             {
@@ -316,7 +308,7 @@ template <class T> class ImageProcess : CImg<T>
             }
 
            /* Right border */
-           for(vector<int>::size_type iPos = this->iWidth - 1;
+           for(int iPos = this->iWidth - 1;
                 iPos < (int)this->image_vec.size();
                 iPos+= this->iWidth) 
             {
