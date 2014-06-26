@@ -21,7 +21,7 @@ namespace pe_solver //[p]oison-[e]quation
 {
 
 typedef vector<double> d1;
-typedef void (*iterative_function)(d1, d1 &arg, double, int, double) ;
+typedef void (*iterative_function)(const d1 &arg1, d1 &arg, double, int, double) ;
 
 double calculateError(double, double);
 
@@ -30,7 +30,11 @@ double getRangeVal(const d1 &U, const d1 &F,
 {
     int xPos = iIndex % (int)iWidthLength;
     /* Skip the first and last column */
-    if(xPos < 1 || xPos > iWidthLength - 2) { return U[iIndex]; }
+    if(xPos < 1 || xPos > iWidthLength - 2) {
+        if(F[iIndex] != U[iIndex]) {
+            cout << "Error in border!" << endl;
+            exit(EXIT_FAILURE);}
+        return F[iIndex]; }
     /* XXX: Row-wise skips are made in external for-loops */
 
     int iIndexPixelAbove = iIndex + iWidthLength;
@@ -45,7 +49,7 @@ double getRangeVal(const d1 &U, const d1 &F,
 /** jacobi iteration
  *
  */
-void iterate_jacobi(const d1 F, d1 &U, double iWidthLength,
+void iterate_jacobi(const d1 &F, d1 &U, double iWidthLength,
                     int iLength, double H = 1)
 {
     d1 copyU = U;
@@ -54,9 +58,8 @@ void iterate_jacobi(const d1 F, d1 &U, double iWidthLength,
             iPos++) 
     {
         double dNewVal = getRangeVal(copyU, F, iPos, iWidthLength);
-        if(dNewVal==U[iPos]) continue;
+        // if(dNewVal==U[iPos]) continue;
         U[iPos] = (double)(.25 * (dNewVal));
-
     }
 }
 
@@ -65,7 +68,7 @@ void iterate_jacobi(const d1 F, d1 &U, double iWidthLength,
 /** Gauss-seidel iteration
  *
  */
-void iterate_gauss(const d1 F, d1 &U, double iWidthLength,
+void iterate_gauss(const d1 &F, d1 &U, double iWidthLength,
                            int iLength, double H = 1)
 {
     for(vector<int>::size_type iPos = iWidthLength;
@@ -76,7 +79,7 @@ void iterate_gauss(const d1 F, d1 &U, double iWidthLength,
     }
 }
 
-void iterate_sor(const d1 F, d1 &U, double iWidthLength, int iLength, double H = 1)
+void iterate_sor(const d1 &F, d1 &U, double iWidthLength, int iLength, double H = 1)
 {
     double omega = 2 / (1 + (3.14 / iWidthLength));
     double dOmegaConstant = omega / 4;
@@ -196,7 +199,9 @@ double findRelativeError(const d1 origData, const d1 newData, int iWidthLength)
                                  newData[iPos]);
         dTmp[iPos] = dRet;
     }
-    return *std::max_element(dTmp, dTmp+origData.size());
+    double dMax = *std::max_element(dTmp, dTmp+origData.size());
+    delete dTmp;
+    return dMax;
 }
 
 double l2norm(const d1 data)
@@ -279,23 +284,24 @@ vector<string> iterative_solve(iterative_function function,
 
 
     cout << "Initial image" << endl;
-    // printAsImage(solution, iWidth) ;
+    printAsImage(solution, iWidth) ;
     cout << "Initial guess" << endl;
-    // printAsImage(guess, iWidth) ;
+    printAsImage(guess, iWidth) ;
     cout << "Initial rho" << endl;
-    // printAsImage(rho, iWidth);
+    printAsImage(rho, iWidth);
     cout << "Entering loop..." << endl;
 
-
+    int iIter = 0;
     do
     {
+        iIter++;
+        double dTmp = dRelativeError;
         newGuess = old_guess;
-        function(rho, newGuess, iWidth, iLength, 1);
+        function(rho, newGuess, iWidth, iLength, 1); // not fast enough
         // cout << "New guess:" << endl;
         // printAsImage(newGuess, iWidth);
 
         dRelativeError = findRelativeError(old_guess, newGuess, iWidth);
-        //TODO: or is it the other way around?
         double dDiff = meanDifference(solution, newGuess, iWidth);
         old_guess = newGuess;
 

@@ -1,6 +1,8 @@
 # Specified in order of priority, i.e. top item is done first, last item last
 # ...note that priorites might change.
 
+Avoid manymanymany iterations by calculating error as you go...?
+
 Add verbose parameter to enable debugging
 
 Write test-cases to assert some correctness
