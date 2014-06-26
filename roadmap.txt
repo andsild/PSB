@@ -1,11 +1,9 @@
 # Specified in order of priority, i.e. top item is done first, last item last
 # ...note that priorites might change.
 
-make histograms
-    cimg has this, but only for a single image ...
-        I can start with for all 
-            take every in orig dir
-                 then every for output dirs
+Add verbose parameter to enable debugging
+
+Write test-cases to assert some correctness
 
 Variation of parameters used in functions
    discretization
