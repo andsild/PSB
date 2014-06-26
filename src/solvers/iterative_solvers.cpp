@@ -39,7 +39,7 @@ double getRangeVal(const d1 &U, const d1 &F,
     return (U[iIndex+1] + U[iIndex-1]
             + U[iIndexPixelAbove]
             + U[iIndexPixelBelow]
-            - F[iIndex] * H * H );
+            + F[iIndex] * H * H );
 }
 
 /** jacobi iteration
@@ -237,8 +237,8 @@ d1 computeFieldRho(const d1 &orig, const d1 &guess, int iWidthLength)
     {
         int xPos = iPos % (iWidthLength);
         if(xPos < 1 || xPos > iWidthLength - 2) { continue; }
-        int iIndexPixelAbove = iPos + iWidthLength;
-        int iIndexPixelBelow = iPos - iWidthLength;
+        int iIndexPixelAbove = iPos - iWidthLength;
+        int iIndexPixelBelow = iPos + iWidthLength;
 
         //Symmetric finite difference with simple kernel 
         // rho[iPos] = //-1 *
@@ -260,6 +260,7 @@ void printAsImage(d1 vec, int iW)
     for(int iPos = 0; iPos < vec.size(); iPos++)
     {
         if(iPos % iW == 0) cout << endl;
+        // if(vec[iPos] == 0) continue;
         printf("%5.0f ",vec[iPos]);
     }
     cout << endl << flush;
@@ -278,11 +279,11 @@ vector<string> iterative_solve(iterative_function function,
 
 
     cout << "Initial image" << endl;
-    printAsImage(solution, iWidth) ;
+    // printAsImage(solution, iWidth) ;
     cout << "Initial guess" << endl;
-    printAsImage(guess, iWidth) ;
+    // printAsImage(guess, iWidth) ;
     cout << "Initial rho" << endl;
-    printAsImage(rho, iWidth);
+    // printAsImage(rho, iWidth);
     cout << "Entering loop..." << endl;
 
 
