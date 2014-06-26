@@ -46,7 +46,16 @@ using namespace test;
 int main(int argc, char *argv[]) 
 {
     double D1[] = {0,0,0, 0,8,0, 0,0,0};
-    createImage(D1, 3, 3, "a");
+    double D2[] = {0,1,0, 1,-4,1, 0,1,0};
+    double D4[] = {1,1,1, 1,-0,1, 1,1,1};
+
+    double D3[] = {1,1,1,1,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1,  1,1,1,1,1};
+
+
+    createImage(D1, 3, 3, "simpleTest");
+    createImage(D2, 3, 3, "kernel matrix");
+    createImage(D3, 5, 5, "5x5border");
+    createImage(D4, 3, 3, "simpleTestDense");
 }
 
 

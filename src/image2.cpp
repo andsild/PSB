@@ -62,7 +62,8 @@ void printImage(image_fmt image)
     {
         for(int jPos = 0; jPos < image.width(); jPos++)
         {
-            cout << image(jPos, iPos) << " ";
+            printf("%3f ",image(jPos,iPos));
+            // cout << image(jPos, iPos) << " ";
         }
         cout << endl;
     }
@@ -248,6 +249,7 @@ template <class T> class ImageProcess : CImg<T>
         d1 U;
             
     public:
+        d1 getGuess() { return this->U; }
 
 
         double dMaxErr;
@@ -271,15 +273,55 @@ template <class T> class ImageProcess : CImg<T>
             this->vOutput.clear();
             this->U.clear();
         }
+        void makeInitialGuess(bool bExtractBordes = true)
+        {
+            if(this->image_vec.size() < 1) 
+            { 
+                throw ImageException("Image vector was not initialized before creating border");
+            }
+
+           U.resize(iDim, 0);
+
+           if(!bExtractBordes) { return ; }
+           
+           /* Upper border */
+           for(vector<int>::size_type iPos = 0;
+                iPos < this->iWidth;
+                iPos++) 
+            {
+                U[iPos] = this->image_vec[iPos];                                
+            }
+
+           /* Bottom border */
+           for(vector<int>::size_type iPos = (int)this->image_vec.size() - iWidth;
+                iPos < (int)this->image_vec.size();
+                iPos++) 
+            {
+                U[iPos] = this->image_vec[iPos];
+            }
+
+           /* Left border */
+           for(vector<int>::size_type iPos = 0;
+                iPos < (int)this->image_vec.size();
+                iPos+= this->iWidth) 
+            {
+                // vector<T>.at() ensures that iPos is in range
+                U.at(iPos) = this->image_vec.at(iPos);
+            }
+
+           /* Right border */
+           for(vector<int>::size_type iPos = this->iWidth - 1;
+                iPos < (int)this->image_vec.size();
+                iPos+= this->iWidth) 
+            {
+                // vector<T>.at() ensures that iPos is in range
+                U.at(iPos) = this->image_vec.at(iPos);
+            }
+
+        }
 
         void solve(iterative_function func)
        {
-           U.resize(iDim, 0);
-            if(this->image_vec.size() < 1) 
-            { 
-                throw ImageException("Image vector was not initialized before solving");
-            }
-
             this->vOutput =  iterative_solve(func,
                                        this->image_vec, this->U,
                                        this->dMaxErr, this->iWidth);
@@ -343,7 +385,7 @@ template <class T> class ImageProcess : CImg<T>
             cimg::exception_mode(0);
             CImg<double> test(dImage, iWidth, iHeight,
                               1, 1, false);
-            printImage(image);
+            // printImage(image);
             try
             {
                 // test.get_normalize(0,255).save(sFilename.c_str());
@@ -612,9 +654,8 @@ class ImageSolver
                     continue;
                 }
 
-                double ERROR_TOLERANCE = 0.5;
+                double ERROR_TOLERANCE = 0.1;
                 ImageProcess<double> ipImage(image, (*it).c_str(), ERROR_TOLERANCE, dScalar);
-                printImage(image);
                 cout << "Beginning image " << (*it) << endl;
 
                 for (function_container::iterator subIt = vIf.begin();
@@ -623,6 +664,7 @@ class ImageSolver
                 {
                     string sImageDir = DATA_DIR + (*subIt).sPath + string(cImagePath);
                     try{
+                        ipImage.makeInitialGuess(true);
                         ipImage.solve((*subIt).func);
                         cout << loadBar << endl;
                         if(bComputeLines) { ipImage.computeLine("lines"); }

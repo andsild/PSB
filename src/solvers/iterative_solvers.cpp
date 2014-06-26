@@ -39,13 +39,13 @@ double getRangeVal(const d1 &U, const d1 &F,
     return (U[iIndex+1] + U[iIndex-1]
             + U[iIndexPixelAbove]
             + U[iIndexPixelBelow]
-            + F[iIndex] * H * H );
+            - F[iIndex] * H * H );
 }
 
 /** jacobi iteration
  *
  */
-void iterate_jacobi(d1 F, d1 &U, double iWidthLength,
+void iterate_jacobi(const d1 F, d1 &U, double iWidthLength,
                     int iLength, double H = 1)
 {
     d1 copyU = U;
@@ -94,28 +94,7 @@ void iterate_sor(const d1 F, d1 &U, double iWidthLength, int iLength, double H =
     }
 }
 
-double findError(const d1 origData, const d1 newData, int iLength)
-{
-    double *dTmp = new double[origData.size()];
 
-    for(std::vector<int>::size_type iPos = 0; iPos != origData.size(); iPos++)
-    {
-        if(newData[iPos] == 0) continue;
-        dTmp[iPos] = calculateError(origData[iPos],
-                                 newData[iPos]);
-        // cout << dTmp[iPos] << " ";
-        // cout << newData[iPos] << " "; 
-    }
-
-    return *std::max_element(dTmp, dTmp+origData.size());
-}
-
-double calculateError(const double dOriginal, const double dNew)
-{
-    if(dNew == 0) { return 0; }
-    // return abs( (dNew - dOriginal) );
-    return (double)abs( (dNew - dOriginal) / dNew) * 100;
-}
 
 void two_grid(double h, d1 &U, d1 &F, int iWidthLength, int iSmoothFactor)
 {
@@ -200,34 +179,77 @@ void two_grid(double h, d1 &U, d1 &F, int iWidthLength, int iSmoothFactor)
     }
 }
 
-double meanDifference(const d1 origData, const d1 newData, int iLength)
+double calculateError(const double dOriginal, const double dNew)
 {
-    double dError = 0;
+    if(dNew== 0) { return dOriginal * 100; }
+    // return abs( (dNew - dOriginal) );
+    return (double)abs( (dNew - dOriginal) / dNew) * 100;
+}
+
+double findRelativeError(const d1 origData, const d1 newData, int iWidthLength)
+{
+    double *dTmp = new double[origData.size()];
+
     for(std::vector<int>::size_type iPos = 0; iPos != origData.size(); iPos++)
     {
+        double dRet = calculateError(origData[iPos],
+                                 newData[iPos]);
+        dTmp[iPos] = dRet;
+    }
+    return *std::max_element(dTmp, dTmp+origData.size());
+}
+
+double l2norm(const d1 data)
+{
+    double dTot = 0;
+    for(d1::const_iterator it = data.begin(); it != data.end(); it++)
+    {
+        dTot += pow(*it, 2);
+    }
+    return sqrt(dTot);
+}
+
+double meanDifference(const d1 origData, const d1 newData, int iWidthLength)
+{
+    double dRelativeError = 0;
+    // for(std::vector<int>::size_type iPos = 0; iPos != origData.size(); iPos++)
+    for(std::vector<int>::size_type iPos = iWidthLength; iPos != origData.size() - iWidthLength; iPos++)
+    {
+        int xPos = iPos % (iWidthLength);
+        if(xPos < 1 || xPos > iWidthLength - 2) { continue; }
         double dRes = calculateError(origData[iPos],
                                  newData[iPos]);
-        // if(dRes == 0) { iLength -= 1; continue; }
-        dError += calculateError(origData[iPos],
-                                 newData[iPos]);
+        // if(dRes == CHANGE_FROM_ZERO) { iLength--; continue; }
+        dRelativeError += dRes;
+        // dRelativeError += calculateError(origData[iPos],
+        //                          newData[iPos]);
     }
-    return dError /= (double)iLength;
+    return dRelativeError /= (double)origData.size();
 
 }
 
-d1 computeField(const d1 &orig, const d1 &guess, int iWidthLength)
+d1 computeFieldRho(const d1 &orig, const d1 &guess, int iWidthLength)
 {
-    d1 rho(orig.size());
+    d1 rho = orig;
     for(vector<int>::size_type iPos = iWidthLength;
             iPos < (int)orig.size() - iWidthLength;
             iPos++) 
     {
+        int xPos = iPos % (iWidthLength);
+        if(xPos < 1 || xPos > iWidthLength - 2) { continue; }
         int iIndexPixelAbove = iPos + iWidthLength;
         int iIndexPixelBelow = iPos - iWidthLength;
 
-        rho[iPos] = guess[iIndexPixelAbove] + guess[iIndexPixelBelow]
-                    + guess[iPos + 1] + guess[iPos - 1] 
-                    + (4 * orig[iPos] );
+        //Symmetric finite difference with simple kernel 
+        // rho[iPos] = //-1 *
+        //             (guess[iIndexPixelAbove] + guess[iIndexPixelBelow]
+        //             + guess[iPos + 1] + guess[iPos - 1] 
+        //             - (4 * orig[iPos] ));
+        rho[iPos] = //-1 *
+                    (orig[iIndexPixelAbove] + orig[iIndexPixelBelow]
+                    + orig[iPos + 1] + orig[iPos - 1] 
+                    - (4 * orig[iPos] ));
+                    // - (4 * guess[iPos] ));
     }
     
     return rho;
@@ -238,7 +260,7 @@ void printAsImage(d1 vec, int iW)
     for(int iPos = 0; iPos < vec.size(); iPos++)
     {
         if(iPos % iW == 0) cout << endl;
-        cout << vec[iPos] << " ";
+        printf("%5.0f ",vec[iPos]);
     }
     cout << endl << flush;
 }
@@ -248,37 +270,40 @@ vector<string> iterative_solve(iterative_function function,
                     const d1 solution, d1 &guess,
                     double dMaxErr, int iWidth) 
 {
-    d1 old_guess = guess;
-    d1 newGuess;
-    double dError = 0;
-    int iIterCount = 0;
+    d1 old_guess = guess, newGuess;
+    double dRelativeError = 0;
     vector<string> vOutput;
     int iLength = solution.size();
-    int iPos = 0;
-    d1 rho = computeField(solution, guess, iWidth);
-    cout << flush;
+    d1 rho = computeFieldRho(solution, guess, iWidth);
+
+
+    cout << "Initial image" << endl;
+    printAsImage(solution, iWidth) ;
+    cout << "Initial guess" << endl;
+    printAsImage(guess, iWidth) ;
+    cout << "Initial rho" << endl;
+    printAsImage(rho, iWidth);
+    cout << "Entering loop..." << endl;
+
+
     do
     {
         newGuess = old_guess;
-        printAsImage(old_guess, iWidth);
         function(rho, newGuess, iWidth, iLength, 1);
+        // cout << "New guess:" << endl;
+        // printAsImage(newGuess, iWidth);
 
+        dRelativeError = findRelativeError(old_guess, newGuess, iWidth);
         //TODO: or is it the other way around?
-        dError = findError(old_guess, newGuess, iLength);
-        // dError = findError(newGuess, old_guess, iLength);
-        //TODO: or is it the other way around?
-        double dDiff = meanDifference(solution, newGuess, iLength);
+        double dDiff = meanDifference(solution, newGuess, iWidth);
         old_guess = newGuess;
-        iIterCount++;
 
-        // cout << "Iteration diff(max): " << dError << endl;
+        // cout << "Iteration diff(max): " << dRelativeError << endl;
         // cout << "Image diff(mean): " << dDiff << endl;
         vOutput.push_back(std::to_string(dDiff));
-        iPos++;
-        // if(iPos > 2) break;
-    } while(dError > dMaxErr);
+    } while(dRelativeError > dMaxErr);
 
-    // cout << vOutput.size() << " iterations" << endl;
+    cout << vOutput.size() << " iterations" << endl;
     guess = newGuess;
 
     return vOutput;
