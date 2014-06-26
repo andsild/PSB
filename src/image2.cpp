@@ -235,11 +235,18 @@ template <class T> class ImageProcess : CImg<T>
 
             this->image_vec.reserve(this->iDim);
 
-            for(int iPos = 0; iPos < grayscale.height(); iPos++)
+            for(int yPos = 0; yPos < grayscale.height(); yPos++)
             {
-                for(int jPos = 0; jPos < grayscale.width(); jPos++)
+                for(int xPos = 0; xPos < grayscale.width(); xPos++)
                 {
-                    double newVal = (double)grayscale(jPos, iPos, 0, 0) * this->dScalar;
+                    double newVal = (double)grayscale(xPos, yPos, 0, 0) * this->dScalar;
+                    if(yPos == 31 && xPos == 0)
+                        cout << grayscale(xPos, yPos, 1, 1) << " " <<
+                            (double)grayscale(xPos, yPos, 1, 1) << " " <<
+                            grayscale(xPos, yPos, 0, 0) << " " << 
+                            (double)grayscale(xPos, yPos, 0, 0) << " " << 
+                            newVal <<
+                            endl; 
                     this->image_vec.push_back(newVal);
                 }
             }
@@ -305,8 +312,7 @@ template <class T> class ImageProcess : CImg<T>
                 iPos < (int)this->image_vec.size();
                 iPos+= this->iWidth) 
             {
-                // vector<T>.at() ensures that iPos is in range
-                U.at(iPos) = this->image_vec.at(iPos);
+                U[iPos] = this->image_vec[iPos];
             }
 
            /* Right border */
@@ -314,8 +320,7 @@ template <class T> class ImageProcess : CImg<T>
                 iPos < (int)this->image_vec.size();
                 iPos+= this->iWidth) 
             {
-                // vector<T>.at() ensures that iPos is in range
-                U.at(iPos) = this->image_vec.at(iPos);
+                U[iPos] = this->image_vec[iPos];
             }
 
         }
@@ -386,9 +391,11 @@ template <class T> class ImageProcess : CImg<T>
             CImg<double> test(dImage, iWidth, iHeight,
                               1, 1, false);
             // printImage(image);
+            delete dImage;
             try
             {
                 // test.get_normalize(0,255).save(sFilename.c_str());
+                // test.get_quantize(256).save(sFilename.c_str());
                 test.save(sFilename.c_str());
             }
             catch(CImgIOException &cioe)
@@ -397,6 +404,7 @@ template <class T> class ImageProcess : CImg<T>
                 mkdirp(fileDir);
                 test.save(sFilename.c_str());
             }
+
         }
 };
 
@@ -654,7 +662,7 @@ class ImageSolver
                     continue;
                 }
 
-                double ERROR_TOLERANCE = 0.1;
+                double ERROR_TOLERANCE = 1.0;
                 ImageProcess<double> ipImage(image, (*it).c_str(), ERROR_TOLERANCE, dScalar);
                 cout << "Beginning image " << (*it) << endl;
 
