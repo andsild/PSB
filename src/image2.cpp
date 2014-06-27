@@ -62,7 +62,7 @@ void printImage(image_fmt image)
     {
         for(int jPos = 0; jPos < image.width(); jPos++)
         {
-            printf("%3f ",image(jPos,iPos));
+            printf("%3.1f ",image(jPos,iPos));
             // cout << image(jPos, iPos) << " ";
         }
         cout << endl;
@@ -382,7 +382,7 @@ template <class T> class ImageProcess : CImg<T>
             cimg::exception_mode(0);
             CImg<double> test(dImage, iWidth, iHeight,
                               1, 1, false);
-            // printImage(image);
+            printImage(test);
             delete dImage;
             try
             {

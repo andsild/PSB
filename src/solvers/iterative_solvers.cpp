@@ -242,15 +242,10 @@ d1 computeFieldRho(const d1 &orig, const d1 &guess, int iWidthLength)
         int iIndexPixelBelow = iPos + iWidthLength;
 
         //Symmetric finite difference with simple kernel 
-        // rho[iPos] = //-1 *
-        //             (guess[iIndexPixelAbove] + guess[iIndexPixelBelow]
-        //             + guess[iPos + 1] + guess[iPos - 1] 
-        //             - (4 * orig[iPos] ));
-        rho[iPos] = //-1 *
+        rho[iPos] = -1 *
                     (orig[iIndexPixelAbove] + orig[iIndexPixelBelow]
                     + orig[iPos + 1] + orig[iPos - 1] 
                     - (4 * orig[iPos] ));
-                    // - (4 * guess[iPos] ));
     }
     
     return rho;
@@ -262,7 +257,7 @@ void printAsImage(d1 vec, int iW)
     {
         if(iPos % iW == 0) cout << endl;
         // if(vec[iPos] == 0) continue;
-        printf("%5.0f ",vec[iPos]);
+        printf("%5.1f ",vec[iPos]);
     }
     cout << endl << flush;
 }
@@ -280,22 +275,23 @@ vector<string> iterative_solve(iterative_function function,
 
 
     cout << "Initial image" << endl;
-    // printAsImage(solution, iWidth) ;
+    printAsImage(solution, iWidth) ;
     cout << "Initial guess" << endl;
-    // printAsImage(guess, iWidth) ;
+    printAsImage(guess, iWidth) ;
     cout << "Initial rho" << endl;
-    // printAsImage(rho, iWidth);
+    printAsImage(rho, iWidth);
     cout << "Entering loop..." << endl;
 
     int iIter = 0;
     do
     {
+        break;
         iIter++;
         double dTmp = dRelativeError;
         newGuess = old_guess;
         function(rho, newGuess, iWidth, iLength, 1); // not fast enough
         // cout << "New guess:" << endl;
-        // printAsImage(newGuess, iWidth);
+        printAsImage(newGuess, iWidth);
 
         dRelativeError = findRelativeError(old_guess, newGuess, iWidth);
         double dDiff = meanDifference(solution, newGuess, iWidth);
