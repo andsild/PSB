@@ -21,7 +21,7 @@ namespace pe_solver //[p]oison-[e]quation
 {
 
 typedef vector<double> d1;
-typedef void (*iterative_function)(const d1 &arg1, d1 &arg, double, int, double) ;
+typedef void (*iterative_function)(const d1 &arg1, d1 &arg2, double, int, double) ;
 
 double calculateError(double, double);
 
@@ -262,16 +262,15 @@ void printAsImage(d1 vec, int iW)
     cout << endl << flush;
 }
 
-
 vector<string> iterative_solve(iterative_function function,
-                    const d1 solution, d1 &guess,
+                    const d1 solution, d1 &guess, d1 rho,
                     double dMaxErr, int iWidth) 
 {
     d1 old_guess = guess, newGuess;
     double dRelativeError = 0;
     vector<string> vOutput;
     int iLength = solution.size();
-    d1 rho = computeFieldRho(solution, guess, iWidth);
+    // d1 rho = computeFieldRho(solution, guess, iWidth);
 
 
     cout << "Initial image" << endl;

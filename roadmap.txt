@@ -1,10 +1,9 @@
 # Specified in order of priority, i.e. top item is done first, last item last
 # ...note that priorites might change.
 
-Transition to CImg loops
+timing different functions / iterations
 
-Avoid manymanymany iterations by calculating error as you go...?
-    like, a thread.. using references
+Transition to CImg loops
 
 Add verbose parameter to enable debugging
 
@@ -29,9 +28,8 @@ fix division by pixel size
 run on all images with iterative
 
 gnuplot from c++, not bash
-    havily relies on boost
+    heavily relies on boost
 
-timing different functions / iterations
 
 code refactoring
 
