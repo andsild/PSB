@@ -14,48 +14,74 @@
 
 #include "../main.cpp"
 #include "../file.cpp"
+#include "../image2.cpp"
 
+#include "CImg.h"
+using namespace cimg_library;
 using namespace std;
 
 namespace pe_solver //[p]oison-[e]quation
 {
 
-typedef vector<double> d1;
-typedef void (*iterative_function)(const d1 &arg1, d1 &arg2, double, int, double) ;
+
+void printer(CImg<double> image)
+{
+    for(int iPos = 0; iPos < image.height(); iPos++)
+    {
+        for(int jPos = 0; jPos < image.width(); jPos++)
+        {
+            printf("%5.1f ",image(jPos,iPos));
+        }
+        cout << endl;
+    }
+}
+
+
+typedef void (*iterative_function)(const CImg<double> &arg1, CImg<double> &arg2,
+                                   double, int, double &arg3, double) ;
 
 double calculateError(double, double);
 
-double getRangeVal(const d1 &U, const d1 &F,
+double getRangeVal(const CImg<double> &U, const CImg<double> &F,
         const int iIndex, const int iWidthLength, const double H = 1.0)
 {
-    int xPos = iIndex % (int)iWidthLength;
-    /* Skip the first and last column */
-    if(xPos < 1 || xPos > iWidthLength - 2) { return -999;}// return F[iIndex]; }
-    /* XXX: Row-wise skips are made in external for-loops */
-
-    int iIndexPixelAbove = iIndex + iWidthLength;
-    int iIndexPixelBelow = iIndex - iWidthLength;
-
-    return (U[iIndex+1] + U[iIndex-1]
-            + U[iIndexPixelAbove]
-            + U[iIndexPixelBelow]
-            + F[iIndex] * H * H );
+    // int xPos = iIndex % (int)iWidthLength;
+    // /* Skip the first and last column */
+    // if(xPos < 1 || xPos > iWidthLength - 2) { return -999;}// return F[iIndex]; }
+    // /* XXX: Row-wise skips are made in external for-loops */
+    //
+    // int iIndexPixelAbove = iIndex + iWidthLength;
+    // int iIndexPixelBelow = iIndex - iWidthLength;
+    //
+    // return (U[iIndex+1] + U[iIndex-1]
+    //         + U[iIndexPixelAbove]
+    //         + U[iIndexPixelBelow]
+    //         + F[iIndex] * H * H );
+    return 5;
 }
 
 /** jacobi iteration
  *
  */
-void iterate_jacobi(const d1 &F, d1 &U, double iWidthLength,
-                    int iLength, double H = 1)
+void iterate_jacobi(const CImg<double> &F, CImg<double> &U, double iWidthLength,
+                    int iLength, double &dDiff, double H = 1)
 {
-    d1 copyU = U;
-    for(vector<int>::size_type iPos = iWidthLength;
-            iPos < F.size() - iWidthLength;
-            iPos++) 
+    dDiff = 0;
+    int BORDER_SIZE = 1;
+    CImg<double> copyU = U;
+    CImg_3x3(I,double);
+
+    cimg_for_in3x3(copyU, BORDER_SIZE, BORDER_SIZE,
+                   U.width() - BORDER_SIZE - 1, U.height() - BORDER_SIZE - 1,
+                   x,y,0,0,I,double) // uses Neumann borders
+    // cimg_for3x3(copyU,x,y,0,0,I,double) // uses Neumann borders
     {
-        double dNewVal = getRangeVal(copyU, F, iPos, iWidthLength);
-        if(dNewVal==-999) continue;
-        U[iPos] = (double)(.25 * (dNewVal));
+        double dOldVal = U(x,y);
+        double dNewVal = .25 * (Icn + Icp + Ipc + Inc + F(x,y) * H * H);
+        U(x,y) = dNewVal;
+        double dCurDiff = (abs(dOldVal - dNewVal));
+        if( dCurDiff > dDiff)
+            dDiff = dCurDiff;
     }
 }
 
@@ -64,8 +90,8 @@ void iterate_jacobi(const d1 &F, d1 &U, double iWidthLength,
 /** Gauss-seidel iteration
  *
  */
-void iterate_gauss(const d1 &F, d1 &U, double iWidthLength,
-                           int iLength, double H = 1)
+void iterate_gauss(const CImg<double> &F, CImg<double> &U, double iWidthLength,
+                           int iLength, double &dDiff, double H = 1)
 {
     for(vector<int>::size_type iPos = iWidthLength;
             iPos < (int)F.size() - iWidthLength;
@@ -75,7 +101,8 @@ void iterate_gauss(const d1 &F, d1 &U, double iWidthLength,
     }
 }
 
-void iterate_sor(const d1 &F, d1 &U, double iWidthLength, int iLength, double H = 1)
+void iterate_sor(const CImg<double> &F, CImg<double> &U,
+                 double iWidthLength, int iLength, double &dDiff, double H = 1)
 {
     double omega = 2 / (1 + (3.14 / iWidthLength));
     double dOmegaConstant = omega / 4;
@@ -95,12 +122,12 @@ void iterate_sor(const d1 &F, d1 &U, double iWidthLength, int iLength, double H 
 
 
 
-void two_grid(double h, d1 &U, d1 &F, int iWidthLength, int iSmoothFactor)
+void two_grid(double h, CImg<double> &U, CImg<double> &F, int iWidthLength, int iSmoothFactor)
 {
     double H = 2 * h;
-    d1 r(iWidthLength*2);
-    d1 R(iWidthLength);
-    d1 V(iWidthLength);
+    CImg<double> r(iWidthLength*2);
+    CImg<double> R(iWidthLength);
+    CImg<double> V(iWidthLength);
     int L2 = iWidthLength / 2;
 
     // solve exactly if there is only one interior point
@@ -147,7 +174,7 @@ void two_grid(double h, d1 &U, d1 &F, int iWidthLength, int iSmoothFactor)
     }
 
     two_grid(H, V, R, L2, iSmoothFactor);
-    d1 v(iWidthLength*2);
+    CImg<double> v(iWidthLength*2);
 
     for (int yPos = iWidthLength; yPos <= L2; yPos += iWidthLength)
     {
@@ -185,121 +212,60 @@ double calculateError(const double dOriginal, const double dNew)
     return (double)abs( (dNew - dOriginal) / dNew) * 100;
 }
 
-double findRelativeError(const d1 origData, const d1 newData, int iWidthLength)
-{
-    double *dTmp = new double[origData.size()];
-
-    for(std::vector<int>::size_type iPos = 0; iPos != origData.size(); iPos++)
-    {
-        double dRet = calculateError(origData[iPos],
-                                 newData[iPos]);
-        dTmp[iPos] = dRet;
-    }
-    double dMax = *std::max_element(dTmp, dTmp+origData.size());
-    delete dTmp;
-    return dMax;
-}
-
-double l2norm(const d1 data)
-{
-    double dTot = 0;
-    for(d1::const_iterator it = data.begin(); it != data.end(); it++)
-    {
-        dTot += pow(*it, 2);
-    }
-    return sqrt(dTot);
-}
-
-double meanDifference(const d1 origData, const d1 newData, int iWidthLength)
-{
-    double dRelativeError = 0;
-    // for(std::vector<int>::size_type iPos = 0; iPos != origData.size(); iPos++)
-    for(std::vector<int>::size_type iPos = iWidthLength; iPos != origData.size() - iWidthLength; iPos++)
-    {
-        int xPos = iPos % (iWidthLength);
-        if(xPos < 1 || xPos > iWidthLength - 2) { continue; }
-        double dRes = calculateError(origData[iPos],
-                                 newData[iPos]);
-        // if(dRes == CHANGE_FROM_ZERO) { iLength--; continue; }
-        dRelativeError += dRes;
-        // dRelativeError += calculateError(origData[iPos],
-        //                          newData[iPos]);
-    }
-    return dRelativeError /= (double)origData.size();
-
-}
-
-d1 computeFieldRho(const d1 &orig, const d1 &guess, int iWidthLength)
-{
-    d1 rho = orig;
-    for(vector<int>::size_type iPos = iWidthLength;
-            iPos < (int)orig.size() - iWidthLength;
-            iPos++) 
-    {
-        int xPos = iPos % (iWidthLength);
-        if(xPos < 1 || xPos > iWidthLength - 2) { continue; }
-        int iIndexPixelAbove = iPos - iWidthLength;
-        int iIndexPixelBelow = iPos + iWidthLength;
-
-        //Symmetric finite difference with simple kernel 
-        rho[iPos] = -1 *
-                    (orig[iIndexPixelAbove] + orig[iIndexPixelBelow]
-                    + orig[iPos + 1] + orig[iPos - 1] 
-                    - (4 * orig[iPos] ));
-    }
-    
-    return rho;
-}
-
-void printAsImage(d1 vec, int iW)
-{
-    for(int iPos = 0; iPos < vec.size(); iPos++)
-    {
-        if(iPos % iW == 0) cout << endl;
-        // if(vec[iPos] == 0) continue;
-        printf("%5.1f ",vec[iPos]);
-    }
-    cout << endl << flush;
-}
+// double meanDifference(const CImg<double> origData, const CImg<double> newData, int iWidthLength)
+// {
+//     double dRelativeError = 0;
+//     // for(std::vector<int>::size_type iPos = 0; iPos != origData.size(); iPos++)
+//     for(std::vector<int>::size_type iPos = iWidthLength; iPos != origData.size() - iWidthLength; iPos++)
+//     {
+//         int xPos = iPos % (iWidthLength);
+//         if(xPos < 1 || xPos > iWidthLength - 2) { continue; }
+//         double dRes = calculateError(origData[iPos],
+//                                  newData[iPos]);
+//         // if(dRes == CHANGE_FROM_ZERO) { iLength--; continue; }
+//         dRelativeError += dRes;
+//         // dRelativeError += calculateError(origData[iPos],
+//         //                          newData[iPos]);
+//     }
+//     return dRelativeError /= (double)origData.size();
+//
+// }
 
 vector<string> iterative_solve(iterative_function function,
-                    const d1 solution, d1 &guess, d1 rho,
+                    const CImg<double> solution, CImg<double> &guess, CImg<double> rho,
                     double dMaxErr, int iWidth) 
 {
-    d1 old_guess = guess, newGuess;
+    CImg<double> old_guess = guess, newGuess = guess;
     double dRelativeError = 0;
     vector<string> vOutput;
-    int iLength = solution.size();
-    // d1 rho = computeFieldRho(solution, guess, iWidth);
+    int iLength = solution.width() * solution.height();
 
 
-    cout << "Initial image" << endl;
-    // printAsImage(solution, iWidth) ;
-    cout << "Initial guess" << endl;
-    printAsImage(guess, iWidth) ;
-    cout << "Initial rho" << endl;
-    printAsImage(rho, iWidth);
-    cout << "Entering loop..." << endl;
-
+    // cout << "Initial image" << endl;
+    // // printAsImage(solution, iWidth) ;
+    // cout << "Initial guess" << endl;
+    // printAsImage(guess, iWidth) ;
+    // cout << "Initial rho" << endl;
+    // printAsImage(rho, iWidth);
+    // cout << "Entering loop..." << endl;
+    //
     int iIter = 0;
     do
     {
-        iIter++;
-        if(iIter % 1000 == 0) { cout << "=== [ solving: " << dRelativeError 
-                                     << " ] ===" << endl;}
-        double dTmp = dRelativeError;
-        newGuess = old_guess;
-        function(rho, newGuess, iWidth, iLength, 1); // not fast enough
-        // cout << "New guess:" << endl;
-        // printAsImage(newGuess, iWidth);
+        // newGuess = old_guess;
+        function(rho, newGuess, iWidth, iLength, dRelativeError, 1);
+        cout << "New guess:" << endl;
+        printer(newGuess);
 
-        dRelativeError = findRelativeError(old_guess, newGuess, iWidth);
-        double dDiff = meanDifference(solution, newGuess, iWidth);
+        iIter++;
+        if(iIter % 1 == 0) { cout << "=== [ solving: " << dRelativeError 
+                                     << " ] ===" << endl;}
+        double dMSE = newGuess.MSE(solution);
         old_guess = newGuess;
 
-        // cout << "Iteration diff(max): " << dRelativeError << endl;
-        // cout << "Image diff(mean): " << dDiff << endl;
-        vOutput.push_back(std::to_string(dDiff));
+        cout << "Iteration diff(max): " << dRelativeError << endl;
+        cout << "Image diff(mean): " << dMSE << endl;
+        vOutput.push_back(std::to_string(dMSE));
     } while(dRelativeError > dMaxErr);
 
     cout << vOutput.size() << " iterations" << endl;

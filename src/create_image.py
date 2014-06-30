@@ -21,7 +21,7 @@ im = Image.new('L', (width,height))
 pixels = im.load()
 
 def getVal(xPos, yPos):
-    # return 100
+    return 100
     return (xPos % COLOR_RANGE) + startVal
 
 
