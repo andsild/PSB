@@ -31,13 +31,13 @@ using namespace pe_solver;
 using namespace file_IO;
 using namespace plot;
 
+typedef CImg<double> image_fmt;
 
 namespace image_psb
 {
 
 class SolverMeta;
 
-typedef CImg<double> image_fmt;
 typedef CImgList<double> imageList_fmt;
 typedef vector<SolverMeta> function_container;
 
@@ -63,7 +63,6 @@ void printImage(image_fmt image)
         for(int jPos = 0; jPos < image.width(); jPos++)
         {
             printf("%5.1f ",image(jPos,iPos));
-            // cout << image(jPos, iPos) << " ";
         }
         cout << endl;
     }
@@ -197,30 +196,42 @@ template <class T> class ImageProcess : CImg<T>
         int iHeight, iWidth, iDepth, iSpectrum, iDim;
         const char *fileName;
         mapfuncres mapFuncRes;
-        d1 image_vec;
-
-    double dScalar;
+        vector<string> vOutput;
+        image_fmt U;
+        image_fmt rho;
         
         image_fmt sRGBtoGrayscale()
         {
-            this->image.sRGBtoRGB();
-            for(int iPos = 0; iPos < this->image.width(); iPos++)
-            {
-                for(int jPos = 0; jPos < this->image.height(); jPos++)
-                {
-                    double r = this->image(iPos, jPos, 0, 0); // First channel RED
-                    double g = this->image(iPos, jPos, 0, 1);
-                    double b = this->image(iPos, jPos, 0, 2);
-
-                    double grayValue = (r + g + b) / 3 ;
-                    image(jPos, iPos) = (r / 3)  ;
-                }
-            }
-
-            return image;
+            return this->image.get_norm();
+            // this->image.sRGBtoRGB();
+            // for(int iPos = 0; iPos < this->image.width(); iPos++)
+            // {
+            //     for(int jPos = 0; jPos < this->image.height(); jPos++)
+            //     {
+            //         double r = this->image(iPos, jPos, 0, 0); // First channel RED
+            //         double g = this->image(iPos, jPos, 0, 1);
+            //         double b = this->image(iPos, jPos, 0, 2);
+            //
+            //         double grayValue = (r + g + b) / 3 ;
+            //         image(jPos, iPos) = (r / 3)  ;
+            //     }
+            // }
+            //
+            // return image;
         }
 
-        void convertImage()
+            
+    public:
+        image_fmt getGuess() { return this->U; }
+        image_fmt getImage () { return this->image; }
+        int getWidth() { return this->iWidth; }
+
+        void multiply(double dScalar)
+        {
+            this->image *= dScalar;
+        }
+
+        void toGrayScale()
         {
             image_fmt grayscale(this->image.width(), this->image.height(),1, 1, 0);
 
@@ -234,33 +245,14 @@ template <class T> class ImageProcess : CImg<T>
                 // grayscale = sRGBtoGrayscale();
             }
 
-            this->image_vec.reserve(this->iDim);
-
-            if(this->dScalar == 1.0)
-            {
-                for(int yPos = 0; yPos < grayscale.height(); yPos++)
-                {
-                    for(int xPos = 0; xPos < grayscale.width(); xPos++)
-                    {
-                        double newVal = (double)grayscale(xPos, yPos, 0, 0) * this->dScalar;
-                        this->image_vec.push_back(newVal);
-                    }
-                }
-            }
-
         }
-        vector<string> vOutput;
-        d1 U;
-            
-    public:
-        d1 getGuess() { return this->U; }
+
 
 
         double dMaxErr;
-        ImageProcess(image_fmt image, const char *fileName, double dMaxErr,
-                     double dScalar)
+        ImageProcess(image_fmt image, const char *fileName, double dMaxErr)
                 : fileName(fileName), dMaxErr(dMaxErr),
-                  image(image), dScalar(dScalar)
+                  image(image)
 
         {
             this->iHeight = image.height();
@@ -268,63 +260,55 @@ template <class T> class ImageProcess : CImg<T>
             this->iSpectrum = image.spectrum();
             this->iDepth = image.depth();
             this->iDim = image.height() * image.width();
-
-            this->convertImage();
         }
 
         void clearFuncVectors()
         {
             this->vOutput.clear();
-            this->U.clear();
+            // this->U.clear();
         }
         void makeInitialGuess(bool bExtractBordes = true)
         {
-            if(this->image_vec.size() < 1) 
+            if(this->image.size() < 1) 
             { 
-                throw ImageException("Image vector was not initialized before creating border");
+                throw ImageException("Image vector was not initialized"
+                                     " before creating border");
             }
 
-           U.resize(iDim, 0);
+            int BORDER_SIZE = 1;
+            this->U.assign(this->image, "xyz", 0);
 
-           if(!bExtractBordes) { return ; }
-           
-           /* Upper border */
-           for(int iPos = 0; iPos < this->iWidth; iPos++) 
+            cimg_for_borderXY(this->image,x,y,BORDER_SIZE)
             {
-                U[iPos] = this->image_vec[iPos];                                
+                this->U(x,y) = this->image(x,y); 
             }
+        }
 
-           /* Bottom border */
-           for(int iPos = (int)this->image_vec.size() - iWidth;
-                iPos < this->image_vec.size();
-                iPos++) 
+        void makeRho()
+        {
+            int iKernDim = 3;
+            // image_fmt kernel(iKernDim, iKernDim, 1, 1,
+            //                  0,1,0,
+            //                  1,-4,1,
+            //                  0,1,0);
+            image_fmt kernel(iKernDim, iKernDim, 1, 1,
+                             0,-1,0,
+                             -1,4,-1,
+                             0,-1,0);
+            this->rho = this->image.get_correlate(kernel, 0);
+            //TODO: meh, no skipping this in correlate?
+            int BORDER_SIZE = 1;
+            cimg_for_borderXY(this->image,x,y,BORDER_SIZE)
             {
-                U[iPos] = this->image_vec[iPos];
+                this->rho(x,y) = this->image(x,y); 
             }
-
-           /* Left border */
-           for(int iPos = 0;
-                iPos < (int)this->image_vec.size();
-                iPos+= this->iWidth) 
-            {
-                U[iPos] = this->image_vec[iPos];
-            }
-
-           /* Right border */
-           for(int iPos = this->iWidth - 1;
-                iPos < (int)this->image_vec.size();
-                iPos+= this->iWidth) 
-            {
-                U[iPos] = this->image_vec[iPos];
-            }
-
+            printImage(rho);
         }
 
         void solve(iterative_function func)
        {
-           d1 rho = computeFieldRho(this->image_vec, this->U, this->iWidth);
             this->vOutput =  iterative_solve(func,
-                                       this->image_vec, this->U, rho,
+                                       this->image, this->U, this->rho,
                                        this->dMaxErr, this->iWidth);
 
             if(this->vOutput.size() < 1) 
@@ -335,27 +319,27 @@ template <class T> class ImageProcess : CImg<T>
 
         void computeLine(const char *fileDir, int iRow = -1)
         {
-            if(iRow < 0) { iRow = this->iHeight / 2; }
-            int iRowStart = iRow * this->iWidth;
-            vector<string> vOrigImage, vNewImage;
-            for(int iPos = iRowStart; iPos < iRowStart + this->iWidth; iPos++)
-            {
-                vOrigImage.push_back(std::to_string(this->image_vec[iPos]));
-                vNewImage.push_back(std::to_string(this->U[iPos]));
-            }
-            string sFileName = string(this->fileName);
-            trimLeadingFileName(sFileName);
-            string sOrigFile = "orig" + sFileName,
-                   sNewImage = "new" + sFileName;
-
-            try{
-                writeToFile(vOrigImage, sOrigFile, fileDir);
-                writeToFile(vNewImage,  sNewImage, fileDir);
-            }
-            catch(...)
-            {
-                throw ImageException("could not write result file to " + string(fileDir));
-            }
+            // if(iRow < 0) { iRow = this->iHeight / 2; }
+            // int iRowStart = iRow * this->iWidth;
+            // vector<string> vOrigImage, vNewImage;
+            // for(int iPos = iRowStart; iPos < iRowStart + this->iWidth; iPos++)
+            // {
+            //     vOrigImage.push_back(std::to_string(this->image_vec[iPos]));
+            //     vNewImage.push_back(std::to_string(this->U[iPos]));
+            // }
+            // string sFileName = string(this->fileName);
+            // trimLeadingFileName(sFileName);
+            // string sOrigFile = "orig" + sFileName,
+            //        sNewImage = "new" + sFileName;
+            //
+            // try{
+            //     writeToFile(vOrigImage, sOrigFile, fileDir);
+            //     writeToFile(vNewImage,  sNewImage, fileDir);
+            // }
+            // catch(...)
+            // {
+            //     throw ImageException("could not write result file to " + string(fileDir));
+            // }
         }
 
         void writeResultToFile(string fileDir)
@@ -668,8 +652,16 @@ class ImageSolver
                     continue;
                 }
 
-                double ERROR_TOLERANCE = 0.01;
-                ImageProcess<double> ipImage(image, (*it).c_str(), ERROR_TOLERANCE, dScalar);
+                double ERROR_TOLERANCE = 0.06;
+                ImageProcess<double> ipImage(image, (*it).c_str(), ERROR_TOLERANCE);
+                ipImage.toGrayScale();
+                cout << "Initial Guess" << endl;
+                ipImage.makeInitialGuess(true);
+                printImage(ipImage.getGuess());
+                cout << "Initial rho" << endl;
+                ipImage.makeRho();
+
+                if(dScalar != 1.0) { ipImage.multiply(dScalar); }
                 cout << "Beginning image " << (*it) << endl;
 
                 for (function_container::iterator subIt = vIf.begin();
@@ -678,13 +670,12 @@ class ImageSolver
                 {
                     string sImageDir = DATA_DIR + (*subIt).sPath + string(cImagePath);
                     try{
-                        ipImage.makeInitialGuess(true);
                         ipImage.solve((*subIt).func);
                         cout << loadBar << endl;
                         if(bComputeLines) { ipImage.computeLine("lines"); }
-                        ipImage.writeResultToFile(string(cResultPath) + (*subIt).sPath);
-                        ipImage.writeImageToFile(sImageDir.c_str());
-                        ipImage.clearFuncVectors();
+                        // ipImage.writeResultToFile(string(cResultPath) + (*subIt).sPath);
+                        // ipImage.writeImageToFile(sImageDir.c_str());
+                        // ipImage.clearFuncVectors();
                     }
                     catch(ImageException &ie)
                     {
@@ -699,70 +690,70 @@ class ImageSolver
 
 void calculateAverage(string sFilePath)
 {
-    vector<string> files;
-
-    string sReadFolder = DATA_DIR + sFilePath;
-
-    try
-    {
-        getFilesInFolder(sReadFolder.c_str(), files);
-    }
-    catch(file_IO::DirNotFound &f)
-    {
-        cout << f.what() << endl;
-        exit(EXIT_FAILURE);
-    }
-
-    d1 average; // can give undererror
-    int iLineCount = numeric_limits<int>::max();
-    string avoid = "average";
-    double dValidFiles = 0;
-    list<int> lLengths;
-    for (vector<string>::iterator it = files.begin();
-        it != files.end();
-        ++it)
-    {
-        size_t found = (*it).find(avoid);
-        if(found!=string::npos) 
-        {
-           cout << "average: skipping file " << *it << endl;
-            continue;
-        }
-        dValidFiles++;
-
-        ifstream infile;
-        int iPos = 0;
-        double dNum;
-        infile.open(*it);
-
-        while(infile >> dNum) // read whole file or stop
-        {
-            if(iPos >= average.size()) 
-                average.push_back(dNum);
-            else
-                average[iPos] += dNum;
-            iPos++;
-        }
-
-        lLengths.push_back(iPos);
-    }
-
-    lLengths.sort();
-    for(vector<int>::size_type iPos = 0;
-            iPos < (int)(average.size());
-            iPos++) 
-    {
-        if(lLengths.size() > 0 &&
-            iPos >= lLengths.front()) //XXX: or iPos >= ?
-        {
-            lLengths.pop_front();
-            dValidFiles--;
-        }
-        average[iPos] /= dValidFiles;
-    }
-
-    string sFilename = string("average") + DATA_EXTENSION;
-    writeToFile(average, sFilename, sFilePath);
+    // vector<string> files;
+    //
+    // string sReadFolder = DATA_DIR + sFilePath;
+    //
+    // try
+    // {
+    //     getFilesInFolder(sReadFolder.c_str(), files);
+    // }
+    // catch(file_IO::DirNotFound &f)
+    // {
+    //     cout << f.what() << endl;
+    //     exit(EXIT_FAILURE);
+    // }
+    //
+    // d1 average; // can give undererror
+    // int iLineCount = numeric_limits<int>::max();
+    // string avoid = "average";
+    // double dValidFiles = 0;
+    // list<int> lLengths;
+    // for (vector<string>::iterator it = files.begin();
+    //     it != files.end();
+    //     ++it)
+    // {
+    //     size_t found = (*it).find(avoid);
+    //     if(found!=string::npos) 
+    //     {
+    //        cout << "average: skipping file " << *it << endl;
+    //         continue;
+    //     }
+    //     dValidFiles++;
+    //
+    //     ifstream infile;
+    //     int iPos = 0;
+    //     double dNum;
+    //     infile.open(*it);
+    //
+    //     while(infile >> dNum) // read whole file or stop
+    //     {
+    //         if(iPos >= average.size()) 
+    //             average.push_back(dNum);
+    //         else
+    //             average[iPos] += dNum;
+    //         iPos++;
+    //     }
+    //
+    //     lLengths.push_back(iPos);
+    // }
+    //
+    // lLengths.sort();
+    // for(vector<int>::size_type iPos = 0;
+    //         iPos < (int)(average.size());
+    //         iPos++) 
+    // {
+    //     if(lLengths.size() > 0 &&
+    //         iPos >= lLengths.front()) //XXX: or iPos >= ?
+    //     {
+    //         lLengths.pop_front();
+    //         dValidFiles--;
+    //     }
+    //     average[iPos] /= dValidFiles;
+    // }
+    //
+    // string sFilename = string("average") + DATA_EXTENSION;
+    // writeToFile(average, sFilename, sFilePath);
 }
 
 
