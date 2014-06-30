@@ -275,7 +275,7 @@ vector<string> iterative_solve(iterative_function function,
 
 
     cout << "Initial image" << endl;
-    printAsImage(solution, iWidth) ;
+    // printAsImage(solution, iWidth) ;
     cout << "Initial guess" << endl;
     printAsImage(guess, iWidth) ;
     cout << "Initial rho" << endl;
@@ -285,13 +285,14 @@ vector<string> iterative_solve(iterative_function function,
     int iIter = 0;
     do
     {
-        break;
         iIter++;
+        if(iIter % 1000 == 0) { cout << "=== [ solving: " << dRelativeError 
+                                     << " ] ===" << endl;}
         double dTmp = dRelativeError;
         newGuess = old_guess;
         function(rho, newGuess, iWidth, iLength, 1); // not fast enough
         // cout << "New guess:" << endl;
-        printAsImage(newGuess, iWidth);
+        // printAsImage(newGuess, iWidth);
 
         dRelativeError = findRelativeError(old_guess, newGuess, iWidth);
         double dDiff = meanDifference(solution, newGuess, iWidth);
