@@ -77,7 +77,7 @@ void iterate_jacobi(const CImg<double> &F, CImg<double> &U, double iWidthLength,
     // cimg_for3x3(copyU,x,y,0,0,I,double) // uses Neumann borders
     {
         double dOldVal = U(x,y);
-        double dNewVal = .25 * (Icn + Icp + Ipc + Inc + F(x,y) * H * H);
+        double dNewVal = .25 * (Icn + Icp + Ipc + Inc - F(x,y) * H * H);
         U(x,y) = dNewVal;
         double dCurDiff = (abs(dOldVal - dNewVal));
         if( dCurDiff > dDiff)
@@ -254,17 +254,17 @@ vector<string> iterative_solve(iterative_function function,
     {
         // newGuess = old_guess;
         function(rho, newGuess, iWidth, iLength, dRelativeError, 1);
-        cout << "New guess:" << endl;
-        printer(newGuess);
+        // cout << "New guess:" << endl;
+        // printer(newGuess);
 
         iIter++;
-        if(iIter % 1 == 0) { cout << "=== [ solving: " << dRelativeError 
+        if(iIter % 100 == 0) { cout << "=== [ solving: " << dRelativeError 
                                      << " ] ===" << endl;}
         double dMSE = newGuess.MSE(solution);
         old_guess = newGuess;
 
-        cout << "Iteration diff(max): " << dRelativeError << endl;
-        cout << "Image diff(mean): " << dMSE << endl;
+        // cout << "Iteration diff(max): " << dRelativeError << endl;
+        // cout << "Image diff(mean): " << dMSE << endl;
         vOutput.push_back(std::to_string(dMSE));
     } while(dRelativeError > dMaxErr);
 

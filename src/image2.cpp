@@ -167,6 +167,23 @@ ostream& operator<< (ostream &str, const LoadingBar& obj)
     return str;
 }
 
+void toGrayScale(image_fmt &image)
+{
+    if(image.spectrum() == 1)
+    {
+        return;
+    }
+    image_fmt grayscale(image.width(), image.height(),1, 1, 0);
+
+        // image = image.get_sRGBtoRGB();
+        // image.sRGBtoRGB();
+        grayscale = image.get_norm().normalize(0,255);
+        // grayscale = image.get_sRGBtoRGB().RGBtoHSI().get_channel(2);
+        // grayscale = sRGBtoGrayscale();
+
+    image = grayscale;
+}
+
 class SolverMeta
 {
     public:
@@ -231,21 +248,6 @@ template <class T> class ImageProcess : CImg<T>
             this->image *= dScalar;
         }
 
-        void toGrayScale()
-        {
-            image_fmt grayscale(this->image.width(), this->image.height(),1, 1, 0);
-
-            if(this->image.spectrum() == 1)
-            {
-               grayscale = this->image;
-            }
-            else
-            {
-                grayscale = this->image.RGBtoHSI().get_channel(2);
-                // grayscale = sRGBtoGrayscale();
-            }
-
-        }
 
 
 
@@ -262,10 +264,10 @@ template <class T> class ImageProcess : CImg<T>
             this->iDim = image.height() * image.width();
         }
 
-        void clearFuncVectors()
+        void clearImages()
         {
+            this->U.clear();
             this->vOutput.clear();
-            // this->U.clear();
         }
         void makeInitialGuess(bool bExtractBordes = true)
         {
@@ -287,14 +289,14 @@ template <class T> class ImageProcess : CImg<T>
         void makeRho()
         {
             int iKernDim = 3;
-            // image_fmt kernel(iKernDim, iKernDim, 1, 1,
-            //                  0,1,0,
-            //                  1,-4,1,
-            //                  0,1,0);
             image_fmt kernel(iKernDim, iKernDim, 1, 1,
-                             0,-1,0,
-                             -1,4,-1,
-                             0,-1,0);
+                             0,1,0,
+                             1,-4,1,
+                             0,1,0);
+            // image_fmt kernel(iKernDim, iKernDim, 1, 1,
+            //                  0,-1,0,
+            //                  -1,4,-1,
+            //                  0,-1,0);
             this->rho = this->image.get_correlate(kernel, 0);
             //TODO: meh, no skipping this in correlate?
             int BORDER_SIZE = 1;
@@ -302,7 +304,7 @@ template <class T> class ImageProcess : CImg<T>
             {
                 this->rho(x,y) = this->image(x,y); 
             }
-            printImage(rho);
+            // printImage(rho);
         }
 
         void solve(iterative_function func)
@@ -355,34 +357,20 @@ template <class T> class ImageProcess : CImg<T>
         }
         void writeImageToFile(const char *fileDir)
         {
-            double *dImage = new double[this->U.size()];
             string sFileName = string(this->fileName);
             trimLeadingFileName(sFileName);
             string sFilename = string(fileDir) + "/" + sFileName;
-
-            for(vector<int>::size_type iPos = 0;
-                    iPos < this->U.size();
-                    iPos++) 
-            {
-                dImage[iPos] = abs(U[iPos]);
-            }
-
             cimg::exception_mode(0);
-            CImg<double> test(dImage, iWidth, iHeight,
-                              1, 1, false);
-            printImage(test);
-            delete dImage;
+            printImage(this->U);
             try
             {
-                // test.get_normalize(0,255).save(sFilename.c_str());
-                // test.get_quantize(256).save(sFilename.c_str());
                 mkdirp(fileDir);
-                test.save(sFilename.c_str());
+                this->U.save(sFilename.c_str());
             }
             catch(CImgIOException &cioe)
             {
                 cout << cioe.what() << endl;
-                test.save(sFilename.c_str());
+                this->U.save(sFilename.c_str());
             }
 
         }
@@ -465,6 +453,7 @@ class ImageSolver
             cimg::exception_mode(0);
             try {
                 image.load(sFileDest.c_str());
+                toGrayScale(image);
             }
             catch(CImgIOException cioe)
             {
@@ -535,11 +524,10 @@ class ImageSolver
                         mainFile = it->first;
                         out = it->second;
                         
-                        if(iImageIndex == 0) {it = mapFiles.end(); iImageIndex = mapFiles.size() - 1 ;}
-                        else{ iImageIndex-- ; }
-                        it--;
+                        if(it == mapFiles.begin()) {it = mapFiles.end(); it--; iImageIndex = mapFiles.size() - 1;}
+                        else{ it--; iImageIndex--; }
 
-                        sImageDest = sImageRoot + it->first;
+                        sImageDest = sImageRoot + mainFile;
                         if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { it--; break; }
                         main_disp = main_image;
                         main_disp.set_title(mainFile.c_str());
@@ -652,12 +640,12 @@ class ImageSolver
                     continue;
                 }
 
-                double ERROR_TOLERANCE = 0.06;
+                double ERROR_TOLERANCE = 0.001;
                 ImageProcess<double> ipImage(image, (*it).c_str(), ERROR_TOLERANCE);
-                ipImage.toGrayScale();
+                // toGrayScale(ipImage.getImage());
                 cout << "Initial Guess" << endl;
                 ipImage.makeInitialGuess(true);
-                printImage(ipImage.getGuess());
+                // printImage(ipImage.getGuess());
                 cout << "Initial rho" << endl;
                 ipImage.makeRho();
 
@@ -673,9 +661,9 @@ class ImageSolver
                         ipImage.solve((*subIt).func);
                         cout << loadBar << endl;
                         if(bComputeLines) { ipImage.computeLine("lines"); }
-                        // ipImage.writeResultToFile(string(cResultPath) + (*subIt).sPath);
-                        // ipImage.writeImageToFile(sImageDir.c_str());
-                        // ipImage.clearFuncVectors();
+                        ipImage.writeResultToFile(string(cResultPath) + (*subIt).sPath);
+                        ipImage.writeImageToFile(sImageDir.c_str());
+                        ipImage.clearImages();
                     }
                     catch(ImageException &ie)
                     {
