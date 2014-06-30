@@ -201,7 +201,7 @@ template <class T> class ImageProcess : CImg<T>
 
     double dScalar;
         
-        CImg<double> sRGBtoGrayscale()
+        image_fmt sRGBtoGrayscale()
         {
             this->image.sRGBtoRGB();
             for(int iPos = 0; iPos < this->image.width(); iPos++)
@@ -222,7 +222,7 @@ template <class T> class ImageProcess : CImg<T>
 
         void convertImage()
         {
-            CImg<double> grayscale;
+            image_fmt grayscale(this->image.width(), this->image.height(),1, 1, 0);
 
             if(this->image.spectrum() == 1)
             {
@@ -230,18 +230,21 @@ template <class T> class ImageProcess : CImg<T>
             }
             else
             {
-                grayscale = sRGBtoGrayscale();
+                grayscale = this->image.RGBtoHSI().get_channel(2);
+                // grayscale = sRGBtoGrayscale();
             }
 
             this->image_vec.reserve(this->iDim);
 
-            for(int yPos = 0; yPos < grayscale.height(); yPos++)
+            if(this->dScalar == 1.0)
             {
-                for(int xPos = 0; xPos < grayscale.width(); xPos++)
+                for(int yPos = 0; yPos < grayscale.height(); yPos++)
                 {
-                    double newVal = (double)grayscale(xPos, yPos, 0, 0) * this->dScalar;
-                    if(yPos == 29 && xPos == 0) {}
-                    this->image_vec.push_back(newVal);
+                    for(int xPos = 0; xPos < grayscale.width(); xPos++)
+                    {
+                        double newVal = (double)grayscale(xPos, yPos, 0, 0) * this->dScalar;
+                        this->image_vec.push_back(newVal);
+                    }
                 }
             }
 
@@ -502,6 +505,7 @@ class ImageSolver
             string mainFile = it->first;
             image_fmt main_image, solved_image;
             int iIndex = 0;
+            int iImageIndex = 0;
 
             string sImageDest = sImageRoot + it->first;
             if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) return;
@@ -530,10 +534,12 @@ class ImageSolver
                 switch (main_disp.key()) 
                 {
                     case cimg::keyARROWUP:
-                        if(it != mapFiles.end()) {it++;}
-                        else{  it = mapFiles.begin(); }
                         mainFile = it->first;
                         out = it->second;
+                        
+                        if(iImageIndex == mapFiles.size() - 1) {it = mapFiles.begin(); iImageIndex = 0;}
+                        else{ iImageIndex++ ; it++; }
+
                         sImageDest = sImageRoot + mainFile;
                         if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { break; }
                         main_disp = main_image;
@@ -542,10 +548,13 @@ class ImageSolver
                         mask_disp.set_title(out[iIndex].c_str());
                         break;
                     case cimg::keyARROWDOWN:
-                        if(it == mapFiles.begin()) { it = mapFiles.end(); }
-                        else{ it--; }
                         mainFile = it->first;
                         out = it->second;
+                        
+                        if(iImageIndex == 0) {it = mapFiles.end(); iImageIndex = mapFiles.size() - 1 ;}
+                        else{ iImageIndex-- ; }
+                        it--;
+
                         sImageDest = sImageRoot + it->first;
                         if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { it--; break; }
                         main_disp = main_image;
@@ -659,7 +668,7 @@ class ImageSolver
                     continue;
                 }
 
-                double ERROR_TOLERANCE = 1.0;
+                double ERROR_TOLERANCE = 0.01;
                 ImageProcess<double> ipImage(image, (*it).c_str(), ERROR_TOLERANCE, dScalar);
                 cout << "Beginning image " << (*it) << endl;
 
