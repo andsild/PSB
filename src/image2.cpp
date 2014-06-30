@@ -319,8 +319,9 @@ template <class T> class ImageProcess : CImg<T>
 
         void solve(iterative_function func)
        {
+           d1 rho = computeFieldRho(this->image_vec, this->U, this->iWidth);
             this->vOutput =  iterative_solve(func,
-                                       this->image_vec, this->U,
+                                       this->image_vec, this->U, rho,
                                        this->dMaxErr, this->iWidth);
 
             if(this->vOutput.size() < 1) 
@@ -394,6 +395,7 @@ template <class T> class ImageProcess : CImg<T>
             catch(CImgIOException &cioe)
             {
                 cout << cioe.what() << endl;
+                test.save(sFilename.c_str());
             }
 
         }
@@ -532,10 +534,12 @@ class ImageSolver
                         else{  it = mapFiles.begin(); }
                         mainFile = it->first;
                         out = it->second;
-                        sImageDest = sImageRoot + it->first;
+                        sImageDest = sImageRoot + mainFile;
                         if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { break; }
                         main_disp = main_image;
+                        main_disp.set_title(mainFile.c_str());
                         mask_disp = solved_image;
+                        mask_disp.set_title(out[iIndex].c_str());
                         break;
                     case cimg::keyARROWDOWN:
                         if(it == mapFiles.begin()) { it = mapFiles.end(); }
@@ -545,7 +549,9 @@ class ImageSolver
                         sImageDest = sImageRoot + it->first;
                         if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { it--; break; }
                         main_disp = main_image;
+                        main_disp.set_title(mainFile.c_str());
                         mask_disp = solved_image;
+                        mask_disp.set_title(out[iIndex].c_str());
                         break;
                     case cimg::keyARROWLEFT:
                         if(iIndex == 0) { iIndex = out.size(); }
