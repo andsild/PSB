@@ -62,7 +62,7 @@ void printImage(image_fmt image)
     {
         for(int jPos = 0; jPos < image.width(); jPos++)
         {
-            printf("%3.1f ",image(jPos,iPos));
+            printf("%5.1f ",image(jPos,iPos));
             // cout << image(jPos, iPos) << " ";
         }
         cout << endl;
@@ -376,7 +376,7 @@ template <class T> class ImageProcess : CImg<T>
                     iPos < this->U.size();
                     iPos++) 
             {
-                dImage[iPos] = U[iPos];
+                dImage[iPos] = abs(U[iPos]);
             }
 
             cimg::exception_mode(0);
@@ -388,13 +388,12 @@ template <class T> class ImageProcess : CImg<T>
             {
                 // test.get_normalize(0,255).save(sFilename.c_str());
                 // test.get_quantize(256).save(sFilename.c_str());
+                mkdirp(fileDir);
                 test.save(sFilename.c_str());
             }
             catch(CImgIOException &cioe)
             {
                 cout << cioe.what() << endl;
-                mkdirp(fileDir);
-                test.save(sFilename.c_str());
             }
 
         }
