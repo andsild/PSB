@@ -41,12 +41,16 @@ void usage()
 {
     cout << "Usage: main <folder>" << endl;
 
-    printf("\t -%c, %s\t%s\n", 'f', "--folder", "folder with images");
+    printf("\t -%c, %s\t%s\n", 'a', "--average", "compute average errors for solvers");
+    printf("\t -%c, %s\t%s\n", 'c', "--compare", "visual comparison of solved images vs original image");
+    printf("\t -%c, %s\t%s\n", 'd', "--directory", "directory with images");
     printf("\t -%c, %s\t%s\n", 'g', "--gauss", "perform gauss-seidel iteration");
     printf("\t -%c, %s\t%s\n", 'h', "--help", "view this text");
     printf("\t -%c, %s\t%s\n", 'j', "--jacobi", "perform jacobi iteration");
+    printf("\t -%c, %s\t%s\n", 'n', "--nosolve", "do not invoke any solvers on the image");
     printf("\t -%c, %s\t%s\n", 'p', "--plot", "generate plots for graphs");
     printf("\t -%c, %s\t%s\n", 's', "--sor", "perform sor iteration");
+    printf("\t -%c, %s\t%s\n", 't', "--tolerance", "set the error tolerance between iterations");
     printf("\n");
 
     exit(EXIT_FAILURE);
@@ -57,18 +61,20 @@ int main(int argc, char *argv[])
 {
     const struct option longopts[] =
     {
-        {"average", no_argument,  0, 'a'},
-        {"compare", no_argument,  0, 'c'},
-        {"folder",     required_argument,  0, 'f'},
-        {"gauss",   no_argument,        0, 'g'},
-        {"help",   no_argument,        0, 'h'},
-        {"computeline",   no_argument,        0, 'l'},
-        {"jacobi",   no_argument,        0, 'j'},
-        {"nosolve",   no_argument,        0, 'n'},
-        {"plot",   no_argument,        0, 'p'},
-        {"resolve",   required_argument,        0, 'r'},
-        {"sor",   no_argument,        0, 's'},
-        {"values-histogram",   no_argument,        0, 'v'},
+        {"average"          , no_argument       , 0, 'a'},
+        {"compare"          , no_argument       , 0, 'c'},
+        {"directory"        , required_argument , 0, 'd'},
+        {"fft"              , no_argument       , 0, 'f'},
+        {"gauss"            , no_argument       , 0, 'g'},
+        {"help"             , no_argument       , 0, 'h'},
+        {"computeline"      , no_argument       , 0, 'l'},
+        {"jacobi"           , no_argument       , 0, 'j'},
+        {"nosolve"          , no_argument       , 0, 'n'},
+        {"plot"             , no_argument       , 0, 'p'},
+        {"resolve"          , required_argument , 0, 'r'},
+        {"tolerance"        , no_argument       , 0, 't'},
+        {"sor"              , no_argument       , 0, 's'},
+        {"values-histogram" , no_argument       , 0, 'v'},
         {0,0,0,0},
     };
 
@@ -76,9 +82,9 @@ int main(int argc, char *argv[])
     int iarg=0;
     extern char *optarg;
     
-    int a = 0, c = 0, f = 0, g = 0, j = 0, l = 0, n = 0, p = 0, r = 0, s = 0,
+    int a = 0, c = 0, d = 0, f = 0, g = 0, j = 0, l = 0, n = 0, p = 0, r = 0, s = 0,
         v = 0;
-    double dScalar;
+    double dScalar, dTolerance = 0.5;
     char *folder;
     function_container vFuncContainer;
     SolverMeta smG(iterate_gauss, "gauss/", "images/");
@@ -89,10 +95,10 @@ int main(int argc, char *argv[])
     if(argc == 2 && ! (strcmp(argv[1], "-p") || strcmp(argv[1], "-n") 
                        || strcmp(argv[1], "-h")))
     {
-        cout << "Assuming \"-f " << string(argv[1]) << " --gauss --plot" << endl;
+        cout << "Assuming \"-d " << string(argv[1]) << " --gauss --plot" << endl;
         vFuncContainer.push_back(smG);
         imageSolver.addFolder(string(argv[1]));
-        imageSolver.solve(vFuncContainer, false);
+        imageSolver.solve(vFuncContainer);
         plot::plot();
         exit(EXIT_SUCCESS);
     }
@@ -100,7 +106,7 @@ int main(int argc, char *argv[])
 
     while(iarg != -1)
     {
-        iarg = getopt_long(argc, argv, "acf:gjlhnpr:sv", longopts, &index);
+        iarg = getopt_long(argc, argv, "acd:fgjlhnpr:st:v", longopts, &index);
 
         switch (iarg)
         {
@@ -112,9 +118,13 @@ int main(int argc, char *argv[])
                 c++;
                 break;
 
+            case 'd':
+                d++;
+                folder = optarg;
+                break;
+
             case 'f':
                 f++;
-                folder = optarg;
                 break;
 
             case 'g':
@@ -145,6 +155,10 @@ int main(int argc, char *argv[])
                 vFuncContainer.push_back(smS);
                 break;
 
+            case 't':
+                dTolerance = atof(optarg);
+                break;
+
             case 'p':
                 p++;
                 break;
@@ -158,7 +172,7 @@ int main(int argc, char *argv[])
         }
     } 
 
-    if(f) {
+    if(d) {
         if(vFuncContainer.size() < 1 && !n)
             cout << "Warning: no iterators chosen" << endl;
         imageSolver.addFolder(folder);
@@ -180,7 +194,7 @@ int main(int argc, char *argv[])
             imageSolver2.addFolder(sPath);
         }
 
-        imageSolver2.solve(vFuncContainer, l>0, "re", "re", dScalar);
+        imageSolver2.solve(vFuncContainer, l>0, dTolerance, "re", "re", dScalar);
     }
 
     if(a)
@@ -219,7 +233,7 @@ int main(int argc, char *argv[])
     }
 
 
-    if(c && f)
+    if(c && d)
     {
         imageSolver.clearFolders();
         imageSolver.addFolder(folder, "when trying to show rendered images (-c flag)");

@@ -21,7 +21,9 @@ in U_{k} and U_{k+1}, to getting the max of absolute differences.
 Realized that I was confusing stopping criteria with relative differences
 
 ################
+Mon 01 Jul 2014
 ################
+Changed from 1d std::vector to Cimg macro-loops, which was much faster
 
 ################
 ################
