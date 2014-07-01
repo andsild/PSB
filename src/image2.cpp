@@ -305,11 +305,11 @@ template <class T> class ImageProcess
             // this->rho = this->image.get_correlate(kernel, 0);
             this->rho = this->image.get_convolve(kernel, 0);
             int BORDER_SIZE = 1;
-            cimg_for_borderXY(this->image,x,y,BORDER_SIZE)
-            {
-                // this->rho(x,y) = this->image(x,y); 
-                this->rho(x,y) = NAN;
-            }
+            // cimg_for_borderXY(this->image,x,y,BORDER_SIZE)
+            // {
+            //     // this->rho(x,y) = this->image(x,y); 
+            //     this->rho(x,y) = NAN;
+            // }
             // printImage(rho);
         }
 
@@ -353,7 +353,7 @@ template <class T> class ImageProcess
         void writeInitdata(string filename)
         {
             string sAscii = filename + "RHO.txt";
-            this->rho.get_round(2).save_ascii(sAscii.c_str());
+            this->rho.get_round(2).get_crop(1,1,0,0,rho.width() - 1, rho.height() - 1, rho.depth(), rho.spectrum()).save_ascii(sAscii.c_str());
             string sImage = filename + "IMAGE.txt";
             this->image.get_round(2).save_ascii(sImage.c_str());
             string sInitGuess = filename + "GUESS.txt";
