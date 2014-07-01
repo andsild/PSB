@@ -293,24 +293,35 @@ template <class T> class ImageProcess
 
         void makeRho()
         {
-            int iKernDim = 3;
-            image_fmt kernel(iKernDim, iKernDim, 1, 1,
-                             0,1,0,
-                             1,-4,1,
-                             0,1,0);
+            // int iKernDim = 3;
+            // image_fmt kernel(iKernDim, iKernDim, 1, 1,
+            //                  0,1,0,
+            //                  1,-4,1,
+            //                  0,1,0);
             // image_fmt kernel(iKernDim, iKernDim, 1, 1,
             //                  0,-1,0,
             //                  -1,4,-1,
             //                  0,-1,0);
             // this->rho = this->image.get_correlate(kernel, 0);
-            this->rho = this->image.get_convolve(kernel, 0);
-            int BORDER_SIZE = 1;
+            // this->rho = this->image.get_convolve(kernel, 1);
+            // int BORDER_SIZE = 1;
             // cimg_for_borderXY(this->image,x,y,BORDER_SIZE)
             // {
             //     // this->rho(x,y) = this->image(x,y); 
             //     this->rho(x,y) = NAN;
             // }
             // printImage(rho);
+            //
+            rho.assign(this->image, "xyz", 0);
+            int BORDER_SIZE = 0;
+            CImg_3x3(I,double);
+            cimg_for_in3x3(this->image, BORDER_SIZE, BORDER_SIZE,
+                           this->image.width() - BORDER_SIZE - 1, this->image.height() - BORDER_SIZE - 1,
+                           x,y,0,0,I,double) // uses Neumann borders
+            {
+                double dNewVal = (Icn + Icp + Ipc + Inc - (4 * Icc));
+                this->rho(x,y) = dNewVal;
+            }
         }
 
         void solve(iterative_function func)

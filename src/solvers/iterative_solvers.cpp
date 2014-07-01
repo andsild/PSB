@@ -82,7 +82,7 @@ void iterate_gauss(const CImg<double> &F, CImg<double> &U, double iWidthLength,
                    x,y,0,0,I,double) // uses Neumann borders
     {
         double dOldVal = U(x,y);
-        double dNewVal = .25 * (Icn + Icp + Ipc + Inc - F(x,y) * H * H);
+        double dNewVal = .25 * ( Icn + Icp + Ipc + Inc - F(x,y) * H * H);
         U(x,y) = dNewVal;
         double dCurDiff = (abs(dOldVal - dNewVal));
         if( dCurDiff > dDiff)
