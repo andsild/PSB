@@ -93,7 +93,7 @@ void iterate_gauss(const CImg<double> &F, CImg<double> &U, double iWidthLength,
 void iterate_sor(const CImg<double> &F, CImg<double> &U,
                  double iWidthLength, int iLength, double &dDiff, double H = 1)
 {
-    static double omega = 2 / (1 + (3.14 / iWidthLength));
+    static double omega = 2 / (1 + (3.14 / iWidthLength ));
     static double dOmegaConstant = omega / 4;
     static double dNotOmega = (1 - omega);
 
@@ -106,6 +106,7 @@ void iterate_sor(const CImg<double> &F, CImg<double> &U,
                    x,y,0,0,I,double) // uses Neumann borders
     {
         double dOldVal = U(x,y);
+        cout << F(x,y) << endl;
         double dNewVal = (dNotOmega * Icc)
                           + (dOmegaConstant)
                           * (Icn + Icp + Ipc + Inc - F(x,y) * H * H);

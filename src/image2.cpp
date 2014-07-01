@@ -279,8 +279,8 @@ template <class T> class ImageProcess
             }
 
             int BORDER_SIZE = 1;
-            int DEFAULT_BORDER_VAL = 0;
-            this->U.assign(this->image, "xyz", DEFAULT_BORDER_VAL);
+            int DEFAULT_GUESS_VAL = 120;
+            this->U.assign(this->image, "xyz", DEFAULT_GUESS_VAL);
 
             if(bExtractBordes == true)
             {
