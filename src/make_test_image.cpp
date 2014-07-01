@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
     zeroBorder(D5, iDim, iDim);
 
     createImage(D1, 3, 3, "simpleTest");
-    createImage(D2, 3, 3, "kernel matrix");
+    createImage(D2, 3, 3, "kernelmatrix");
     createImage(D3, 5, 5, "5x5border");
     createImage(D4, 3, 3, "simpleTestDense");
     createImage(D5, iDim, iDim, "increasing");
