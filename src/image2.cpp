@@ -205,7 +205,7 @@ class SolverMeta
         }
 };
 
-template <class T> class ImageProcess : CImg<T>
+template <class T> class ImageProcess 
 {
     private:
     typedef map<iterative_function,vector<string> > mapfuncres;
@@ -241,6 +241,7 @@ template <class T> class ImageProcess : CImg<T>
     public:
         image_fmt getGuess() { return this->U; }
         image_fmt getImage () { return this->image; }
+        image_fmt getRho() { return this->rho; }
         int getWidth() { return this->iWidth; }
 
         void multiply(double dScalar)
@@ -278,11 +279,15 @@ template <class T> class ImageProcess : CImg<T>
             }
 
             int BORDER_SIZE = 1;
-            this->U.assign(this->image, "xyz", 0);
+            int DEFAULT_BORDER_VAL = 0;
+            this->U.assign(this->image, "xyz", DEFAULT_BORDER_VAL);
 
-            cimg_for_borderXY(this->image,x,y,BORDER_SIZE)
+            if(bExtractBordes == true)
             {
-                this->U(x,y) = this->image(x,y); 
+                cimg_for_borderXY(this->image,x,y,BORDER_SIZE)
+                {
+                    this->U(x,y) = this->image(x,y); 
+                }
             }
         }
 
@@ -298,11 +303,11 @@ template <class T> class ImageProcess : CImg<T>
             //                  -1,4,-1,
             //                  0,-1,0);
             this->rho = this->image.get_correlate(kernel, 0);
-            //TODO: meh, no skipping this in correlate?
             int BORDER_SIZE = 1;
             cimg_for_borderXY(this->image,x,y,BORDER_SIZE)
             {
-                this->rho(x,y) = this->image(x,y); 
+                // this->rho(x,y) = this->image(x,y); 
+                this->rho(x,y) = NAN;
             }
             // printImage(rho);
         }
@@ -344,6 +349,16 @@ template <class T> class ImageProcess : CImg<T>
             // }
         }
 
+        void writeInitdata(string filename)
+        {
+            string sAscii = filename + "RHO.txt";
+            this->rho.save_ascii(sAscii.c_str());
+            string sImage = filename + "IMAGE.txt";
+            this->image.save_ascii(sImage.c_str());
+            string sInitGuess = filename + "GUESS.txt";
+            this->U.save_ascii(sInitGuess.c_str());
+        }
+
         void writeResultToFile(string fileDir)
         {
             string sFilename = string(this->fileName);
@@ -355,26 +370,32 @@ template <class T> class ImageProcess : CImg<T>
                 throw ImageException("could not write result file to " + fileDir);
             }
         }
+
+        void roundValues()
+        {
+            this->U.round(0);
+            this->U.cut(0, 255);
+        }
         void writeImageToFile(const char *fileDir)
         {
             string sFileName = string(this->fileName);
             trimLeadingFileName(sFileName);
             string sFilename = string(fileDir) + "/" + sFileName;
             cimg::exception_mode(0);
-            printImage(this->U);
             try
             {
                 mkdirp(fileDir);
                 this->U.save(sFilename.c_str());
+                // this->U.get_normalize(0,255).save(sFilename.c_str());
             }
             catch(CImgIOException &cioe)
             {
                 cout << cioe.what() << endl;
-                this->U.save(sFilename.c_str());
             }
 
         }
 };
+
 
 class ImageSolver
 {
@@ -453,7 +474,10 @@ class ImageSolver
             cimg::exception_mode(0);
             try {
                 image.load(sFileDest.c_str());
+                cout << "Loaded image " << sFileDest << " to code format at " 
+                     << &image << endl;
                 toGrayScale(image);
+                cout << "Converted " << sFileDest << " to grayscale" << endl;
             }
             catch(CImgIOException cioe)
             {
@@ -609,6 +633,7 @@ class ImageSolver
         }
 
         void solve(function_container vIf, bool bComputeLines = false,
+                    double dTolerance = 1.0,
                    const char *cImagePath = "/image/", const char *cResultPath = "/./"
                    , double dScalar = 1)
         {
@@ -626,7 +651,6 @@ class ImageSolver
             dStepSize = ((double)100 / iTotalIterations);
             int iTimeRemaining = filenames.size() * vIf.size();
             loadBar.initialize(iTotalIterations);
-
             for(vector<string>::iterator it = filenames.begin();
                 it != filenames.end();
                 it++)
@@ -640,17 +664,12 @@ class ImageSolver
                     continue;
                 }
 
-                double ERROR_TOLERANCE = 0.001;
-                ImageProcess<double> ipImage(image, (*it).c_str(), ERROR_TOLERANCE);
+                ImageProcess<double> ipImage(image, (*it).c_str(), dTolerance);
                 // toGrayScale(ipImage.getImage());
-                cout << "Initial Guess" << endl;
-                ipImage.makeInitialGuess(true);
-                // printImage(ipImage.getGuess());
-                cout << "Initial rho" << endl;
                 ipImage.makeRho();
 
                 if(dScalar != 1.0) { ipImage.multiply(dScalar); }
-                cout << "Beginning image " << (*it) << endl;
+                bool BORDERS=true;
 
                 for (function_container::iterator subIt = vIf.begin();
                     subIt != vIf.end();
@@ -658,10 +677,19 @@ class ImageSolver
                 {
                     string sImageDir = DATA_DIR + (*subIt).sPath + string(cImagePath);
                     try{
+                        cout << "Initial image" << endl;
+                        // printImage(ipImage.getImage());
+                        ipImage.makeInitialGuess(BORDERS);
+                        cout << "instantiated initial guess for " << (*it) << endl;
+                        // printImage(ipImage.getGuess());
+                        cout << endl << "Initial; rho" << endl;
+                        printImage(ipImage.getRho());
+                        cout << "Beginning solver " << (*subIt).sPath << endl;
                         ipImage.solve((*subIt).func);
                         cout << loadBar << endl;
                         if(bComputeLines) { ipImage.computeLine("lines"); }
                         ipImage.writeResultToFile(string(cResultPath) + (*subIt).sPath);
+                        ipImage.roundValues();
                         ipImage.writeImageToFile(sImageDir.c_str());
                         ipImage.clearImages();
                     }
@@ -670,6 +698,13 @@ class ImageSolver
                         cout << ie.what() << endl;
                     }
                 }                
+
+                string stmp = (*it);
+                trimLeadingFileName(stmp);
+                trimTrailingFilename(stmp);
+                string sInitDataFile = DATA_DIR + stmp;
+                ipImage.makeInitialGuess(BORDERS);
+                ipImage.writeInitdata(sInitDataFile);
             }
             cout << loadBar << endl;// if last image has errors, this might be necessary
         }
@@ -678,70 +713,70 @@ class ImageSolver
 
 void calculateAverage(string sFilePath)
 {
-    // vector<string> files;
-    //
-    // string sReadFolder = DATA_DIR + sFilePath;
-    //
-    // try
-    // {
-    //     getFilesInFolder(sReadFolder.c_str(), files);
-    // }
-    // catch(file_IO::DirNotFound &f)
-    // {
-    //     cout << f.what() << endl;
-    //     exit(EXIT_FAILURE);
-    // }
-    //
-    // d1 average; // can give undererror
-    // int iLineCount = numeric_limits<int>::max();
-    // string avoid = "average";
-    // double dValidFiles = 0;
-    // list<int> lLengths;
-    // for (vector<string>::iterator it = files.begin();
-    //     it != files.end();
-    //     ++it)
-    // {
-    //     size_t found = (*it).find(avoid);
-    //     if(found!=string::npos) 
-    //     {
-    //        cout << "average: skipping file " << *it << endl;
-    //         continue;
-    //     }
-    //     dValidFiles++;
-    //
-    //     ifstream infile;
-    //     int iPos = 0;
-    //     double dNum;
-    //     infile.open(*it);
-    //
-    //     while(infile >> dNum) // read whole file or stop
-    //     {
-    //         if(iPos >= average.size()) 
-    //             average.push_back(dNum);
-    //         else
-    //             average[iPos] += dNum;
-    //         iPos++;
-    //     }
-    //
-    //     lLengths.push_back(iPos);
-    // }
-    //
-    // lLengths.sort();
-    // for(vector<int>::size_type iPos = 0;
-    //         iPos < (int)(average.size());
-    //         iPos++) 
-    // {
-    //     if(lLengths.size() > 0 &&
-    //         iPos >= lLengths.front()) //XXX: or iPos >= ?
-    //     {
-    //         lLengths.pop_front();
-    //         dValidFiles--;
-    //     }
-    //     average[iPos] /= dValidFiles;
-    // }
-    //
-    // string sFilename = string("average") + DATA_EXTENSION;
-    // writeToFile(average, sFilename, sFilePath);
+    vector<string> files;
+
+    string sReadFolder = DATA_DIR + sFilePath;
+
+    try
+    {
+        getFilesInFolder(sReadFolder.c_str(), files);
+    }
+    catch(file_IO::DirNotFound &f)
+    {
+        cout << f.what() << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    vector<double> average; // can give undererror
+    int iLineCount = numeric_limits<int>::max();
+    string avoid = "average";
+    double dValidFiles = 0;
+    list<int> lLengths;
+    for (vector<string>::iterator it = files.begin();
+        it != files.end();
+        ++it)
+    {
+        size_t found = (*it).find(avoid);
+        if(found!=string::npos) 
+        {
+           cout << "average: skipping file " << *it << endl;
+            continue;
+        }
+        dValidFiles++;
+
+        ifstream infile;
+        int iPos = 0;
+        double dNum;
+        infile.open(*it);
+
+        while(infile >> dNum) // read whole file or stop
+        {
+            if(iPos >= average.size()) 
+                average.push_back(dNum);
+            else
+                average[iPos] += dNum;
+            iPos++;
+        }
+
+        lLengths.push_back(iPos);
+    }
+
+    lLengths.sort();
+    for(vector<int>::size_type iPos = 0;
+            iPos < (int)(average.size());
+            iPos++) 
+    {
+        if(lLengths.size() > 0 &&
+            iPos >= lLengths.front()) //XXX: or iPos >= ?
+        {
+            lLengths.pop_front();
+            dValidFiles--;
+        }
+        average[iPos] /= dValidFiles;
+    }
+
+    string sFilename = string("average") + DATA_EXTENSION;
+    writeToFile(average, sFilename, sFilePath);
 }
 
 

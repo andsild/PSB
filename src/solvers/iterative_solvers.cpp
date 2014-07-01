@@ -40,26 +40,6 @@ void printer(CImg<double> image)
 typedef void (*iterative_function)(const CImg<double> &arg1, CImg<double> &arg2,
                                    double, int, double &arg3, double) ;
 
-double calculateError(double, double);
-
-double getRangeVal(const CImg<double> &U, const CImg<double> &F,
-        const int iIndex, const int iWidthLength, const double H = 1.0)
-{
-    // int xPos = iIndex % (int)iWidthLength;
-    // /* Skip the first and last column */
-    // if(xPos < 1 || xPos > iWidthLength - 2) { return -999;}// return F[iIndex]; }
-    // /* XXX: Row-wise skips are made in external for-loops */
-    //
-    // int iIndexPixelAbove = iIndex + iWidthLength;
-    // int iIndexPixelBelow = iIndex - iWidthLength;
-    //
-    // return (U[iIndex+1] + U[iIndex-1]
-    //         + U[iIndexPixelAbove]
-    //         + U[iIndexPixelBelow]
-    //         + F[iIndex] * H * H );
-    return 5;
-}
-
 /** jacobi iteration
  *
  */
@@ -93,30 +73,46 @@ void iterate_jacobi(const CImg<double> &F, CImg<double> &U, double iWidthLength,
 void iterate_gauss(const CImg<double> &F, CImg<double> &U, double iWidthLength,
                            int iLength, double &dDiff, double H = 1)
 {
-    for(vector<int>::size_type iPos = iWidthLength;
-            iPos < (int)F.size() - iWidthLength;
-            iPos++) 
+    dDiff = 0;
+    int BORDER_SIZE = 1;
+    CImg_3x3(I,double);
+
+    cimg_for_in3x3(U, BORDER_SIZE, BORDER_SIZE,
+                   U.width() - BORDER_SIZE - 1, U.height() - BORDER_SIZE - 1,
+                   x,y,0,0,I,double) // uses Neumann borders
     {
-        U[iPos] = .25 * (getRangeVal(U, F, iPos, iWidthLength, H));
+        double dOldVal = U(x,y);
+        double dNewVal = .25 * (Icn + Icp + Ipc + Inc - F(x,y) * H * H);
+        U(x,y) = dNewVal;
+        double dCurDiff = (abs(dOldVal - dNewVal));
+        if( dCurDiff > dDiff)
+            dDiff = dCurDiff;
     }
 }
 
 void iterate_sor(const CImg<double> &F, CImg<double> &U,
                  double iWidthLength, int iLength, double &dDiff, double H = 1)
 {
-    double omega = 2 / (1 + (3.14 / iWidthLength));
-    double dOmegaConstant = omega / 4;
-    double dNotOmega = (1 - omega);
+    static double omega = 2 / (1 + (3.14 / iWidthLength));
+    static double dOmegaConstant = omega / 4;
+    static double dNotOmega = (1 - omega);
 
-    for(vector<int>::size_type iPos = iWidthLength;
-            iPos < (int)F.size() - iWidthLength;
-            iPos++) 
+    dDiff = 0;
+    int BORDER_SIZE = 1;
+    CImg_3x3(I,double);
+
+    cimg_for_in3x3(U, BORDER_SIZE, BORDER_SIZE,
+                   U.width() - BORDER_SIZE - 1, U.height() - BORDER_SIZE - 1,
+                   x,y,0,0,I,double) // uses Neumann borders
     {
-        {
-            U[iPos] = (dNotOmega * U[iPos])
-                     + dOmegaConstant
-                     * getRangeVal(U, F, iPos, iWidthLength);
-        }
+        double dOldVal = U(x,y);
+        double dNewVal = (dNotOmega * Icc)
+                          + (dOmegaConstant)
+                          * (Icn + Icp + Ipc + Inc + F(x,y) * H * H);
+        U(x,y) = dNewVal;
+        double dCurDiff = (abs(dOldVal - dNewVal));
+        if( dCurDiff > dDiff)
+            dDiff = dCurDiff;
     }
 }
 
@@ -205,32 +201,6 @@ void two_grid(double h, CImg<double> &U, CImg<double> &F, int iWidthLength, int 
     }
 }
 
-double calculateError(const double dOriginal, const double dNew)
-{
-    if(dNew== 0) { return dOriginal * 100; }
-    // return abs( (dNew - dOriginal) );
-    return (double)abs( (dNew - dOriginal) / dNew) * 100;
-}
-
-// double meanDifference(const CImg<double> origData, const CImg<double> newData, int iWidthLength)
-// {
-//     double dRelativeError = 0;
-//     // for(std::vector<int>::size_type iPos = 0; iPos != origData.size(); iPos++)
-//     for(std::vector<int>::size_type iPos = iWidthLength; iPos != origData.size() - iWidthLength; iPos++)
-//     {
-//         int xPos = iPos % (iWidthLength);
-//         if(xPos < 1 || xPos > iWidthLength - 2) { continue; }
-//         double dRes = calculateError(origData[iPos],
-//                                  newData[iPos]);
-//         // if(dRes == CHANGE_FROM_ZERO) { iLength--; continue; }
-//         dRelativeError += dRes;
-//         // dRelativeError += calculateError(origData[iPos],
-//         //                          newData[iPos]);
-//     }
-//     return dRelativeError /= (double)origData.size();
-//
-// }
-
 vector<string> iterative_solve(iterative_function function,
                     const CImg<double> solution, CImg<double> &guess, CImg<double> rho,
                     double dMaxErr, int iWidth) 
@@ -240,35 +210,36 @@ vector<string> iterative_solve(iterative_function function,
     vector<string> vOutput;
     int iLength = solution.width() * solution.height();
 
-
-    // cout << "Initial image" << endl;
-    // // printAsImage(solution, iWidth) ;
-    // cout << "Initial guess" << endl;
-    // printAsImage(guess, iWidth) ;
-    // cout << "Initial rho" << endl;
-    // printAsImage(rho, iWidth);
-    // cout << "Entering loop..." << endl;
-    //
     int iIter = 0;
     do
     {
         // newGuess = old_guess;
+        double dOld = dRelativeError;
         function(rho, newGuess, iWidth, iLength, dRelativeError, 1);
-        // cout << "New guess:" << endl;
-        // printer(newGuess);
+        // if (dOld == dRelativeError)
+        // {
+        //     cout << "Method converged (no change in iteration) with value: "
+        //          << dOld << endl;
+        //     break;
+        // }
 
-        iIter++;
-        if(iIter % 100 == 0) { cout << "=== [ solving: " << dRelativeError 
-                                     << " ] ===" << endl;}
-        double dMSE = newGuess.MSE(solution);
+        // cout << "New guess:" << endl; printer(newGuess);
+
+        if(iIter % 50 == 0) 
+        {
+           cout << "=== [ solving: " << dRelativeError << " ] ===" << endl;
+        }
+
+       double dMSE = newGuess.MSE(solution);
+       vOutput.push_back(std::to_string(dMSE));
+       cout << "Image diff(mean): " << dMSE << endl;
         old_guess = newGuess;
+        iIter++;
 
         // cout << "Iteration diff(max): " << dRelativeError << endl;
-        // cout << "Image diff(mean): " << dMSE << endl;
-        vOutput.push_back(std::to_string(dMSE));
     } while(dRelativeError > dMaxErr);
 
-    cout << vOutput.size() << " iterations" << endl;
+    cout << iIter << " iterations" << endl;
     guess = newGuess;
 
     return vOutput;
