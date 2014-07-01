@@ -108,7 +108,7 @@ void iterate_sor(const CImg<double> &F, CImg<double> &U,
         double dOldVal = U(x,y);
         double dNewVal = (dNotOmega * Icc)
                           + (dOmegaConstant)
-                          * (Icn + Icp + Ipc + Inc + F(x,y) * H * H);
+                          * (Icn + Icp + Ipc + Inc - F(x,y) * H * H);
         U(x,y) = dNewVal;
         double dCurDiff = (abs(dOldVal - dNewVal));
         if( dCurDiff > dDiff)
@@ -232,7 +232,7 @@ vector<string> iterative_solve(iterative_function function,
 
        double dMSE = newGuess.MSE(solution);
        vOutput.push_back(std::to_string(dMSE));
-       cout << "Image diff(mean): " << dMSE << endl;
+       // cout << "Image diff(mean): " << dMSE << endl;
         old_guess = newGuess;
         iIter++;
 

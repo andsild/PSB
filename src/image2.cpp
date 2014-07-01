@@ -508,9 +508,12 @@ class ImageSolver
             if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) return;
 
             const double blackWhite[] = {255};
-            image_fmt visu(500, 400, 1, 1, 0);
             CImgDisplay main_disp(main_image, mainFile.c_str() ,0);	
             CImgDisplay mask_disp(solved_image, out[iIndex].c_str() ,0);	
+            // main_disp.resize();
+            // mask_disp.resize();
+            image_fmt visu(500, 300, 1, 1, 0);
+            // image_fmt visu(main_disp);
             CImgDisplay graph_disp(visu, "Color intensities" ,0);	
 
             while (!main_disp.is_closed() && !mask_disp.is_closed() && !graph_disp.is_closed())
@@ -531,11 +534,12 @@ class ImageSolver
                 switch (main_disp.key()) 
                 {
                     case cimg::keyARROWUP:
+                        if(iImageIndex == mapFiles.size() - 1) {it = mapFiles.begin(); iImageIndex = 0;}
+                        else{ iImageIndex++ ; it++; }
+
                         mainFile = it->first;
                         out = it->second;
                         
-                        if(iImageIndex == mapFiles.size() - 1) {it = mapFiles.begin(); iImageIndex = 0;}
-                        else{ iImageIndex++ ; it++; }
 
                         sImageDest = sImageRoot + mainFile;
                         if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { break; }
@@ -543,13 +547,16 @@ class ImageSolver
                         main_disp.set_title(mainFile.c_str());
                         mask_disp = solved_image;
                         mask_disp.set_title(out[iIndex].c_str());
+                        // main_disp.resize();
+                        // mask_disp.resize();
                         break;
                     case cimg::keyARROWDOWN:
+                        if(it == mapFiles.begin()) {it = mapFiles.end(); it--; iImageIndex = mapFiles.size() - 1;}
+                        else{ it--; iImageIndex--; }
+
                         mainFile = it->first;
                         out = it->second;
                         
-                        if(it == mapFiles.begin()) {it = mapFiles.end(); it--; iImageIndex = mapFiles.size() - 1;}
-                        else{ it--; iImageIndex--; }
 
                         sImageDest = sImageRoot + mainFile;
                         if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { it--; break; }
@@ -557,6 +564,8 @@ class ImageSolver
                         main_disp.set_title(mainFile.c_str());
                         mask_disp = solved_image;
                         mask_disp.set_title(out[iIndex].c_str());
+                        // main_disp.resize();
+                        // mask_disp.resize();
                         break;
                     case cimg::keyARROWLEFT:
                         if(iIndex == 0) { iIndex = out.size(); }
@@ -564,6 +573,7 @@ class ImageSolver
                         if(!loadImage(out[iIndex], solved_image)) {break; }
                         mask_disp = solved_image;
                         mask_disp.set_title(out[iIndex].c_str());
+                        // mask_disp.resize();
                         break;
                     case cimg::keyARROWRIGHT:
                         if(iIndex == out.size() - 1) { iIndex = -1; }
@@ -571,6 +581,7 @@ class ImageSolver
                         if(!loadImage(out[iIndex], solved_image)) {break; }
                         mask_disp = solved_image;
                         mask_disp.set_title(out[iIndex].c_str());
+                        // mask_disp.resize();
                         break;
                     case cimg::keyQ:
                         return;
@@ -633,7 +644,7 @@ class ImageSolver
         }
 
         void solve(function_container vIf, bool bComputeLines = false,
-                    double dTolerance = 1.0,
+                    double dTolerance = 0.3,
                    const char *cImagePath = "/image/", const char *cResultPath = "/./"
                    , double dScalar = 1)
         {

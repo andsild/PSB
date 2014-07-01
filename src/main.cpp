@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
             cout << "Warning: no iterators chosen" << endl;
         imageSolver.addFolder(folder);
         if(!n)
-            imageSolver.solve(vFuncContainer, l>0);
+            imageSolver.solve(vFuncContainer, l>0, dTolerance);
     }
     else {
         cout << "Warning: no media folder given" << endl;
