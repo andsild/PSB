@@ -1,11 +1,11 @@
 # Specified in order of priority, i.e. top item is done first, last item last
 # ...note that priorites might change.
 
-timing different functions / iterations
-
-Transition to CImg loops
-
 Add verbose parameter to enable debugging
+
+Change from unistd to cimg_option
+
+timing different functions / iterations
 
 Write test-cases to assert some correctness
 
@@ -14,9 +14,6 @@ Variation of parameters used in functions
    ω
 
 plot theoretical bounds
-
-does cimg have to grayscale..?  
-cimg has path stuff
 
 make program user friendly!
     output what is going on
@@ -30,14 +27,9 @@ run on all images with iterative
 gnuplot from c++, not bash
     heavily relies on boost
 
-
 code refactoring
 
 implement FFT
-
-I have several cases where I accumulate results in vectors, 
-and then re-iterate over the vector to do my operations.
-Maybe it's clean, but it adds constants to linear execution
 
 multi-threaded, to be faster per image
    red black
@@ -49,9 +41,6 @@ Detection of convergence, etc
 
 Other optimizations?
     hvordan ser en matrise ut mot slutten? kan noen deler kuttes ut?
-
-My translation to vector takes about 0.1 seconds for each image - maybe there is
-    better way
 
 # Gong ville gjoore dette 
 ((adding some of the more advanced))

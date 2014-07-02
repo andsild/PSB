@@ -43,7 +43,7 @@ typedef void (*iterative_function)(const CImg<double> &arg1, CImg<double> &arg2,
 /** jacobi iteration
  *
  */
-void iterate_jacobi(const CImg<double> &F, CImg<double> &U, double iWidthLength,
+inline void iterate_jacobi(const CImg<double> &F, CImg<double> &U, double iWidthLength,
                     int iLength, double &dDiff, double H = 1)
 {
     dDiff = 0;
@@ -70,7 +70,7 @@ void iterate_jacobi(const CImg<double> &F, CImg<double> &U, double iWidthLength,
 /** Gauss-seidel iteration
  *
  */
-void iterate_gauss(const CImg<double> &F, CImg<double> &U, double iWidthLength,
+inline void iterate_gauss(const CImg<double> &F, CImg<double> &U, double iWidthLength,
                            int iLength, double &dDiff, double H = 1)
 {
     dDiff = 0;
@@ -90,7 +90,7 @@ void iterate_gauss(const CImg<double> &F, CImg<double> &U, double iWidthLength,
     }
 }
 
-void iterate_sor(const CImg<double> &F, CImg<double> &U,
+inline void iterate_sor(const CImg<double> &F, CImg<double> &U,
                  double iWidthLength, int iLength, double &dDiff, double H = 1)
 {
     static double omega = 2 / (1 + (3.14 / iWidthLength ));
@@ -106,7 +106,6 @@ void iterate_sor(const CImg<double> &F, CImg<double> &U,
                    x,y,0,0,I,double) // uses Neumann borders
     {
         double dOldVal = U(x,y);
-        cout << F(x,y) << endl;
         double dNewVal = (dNotOmega * Icc)
                           + (dOmegaConstant)
                           * (Icn + Icp + Ipc + Inc - F(x,y) * H * H);
@@ -204,7 +203,7 @@ void two_grid(double h, CImg<double> &U, CImg<double> &F, int iWidthLength, int 
 
 vector<string> iterative_solve(iterative_function function,
                     const CImg<double> solution, CImg<double> &guess, CImg<double> rho,
-                    double dMaxErr, int iWidth) 
+                    double dMaxErr, int iWidth, const char *filename) 
 {
     CImg<double> old_guess = guess, newGuess = guess;
     double dRelativeError = 0;
