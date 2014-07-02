@@ -5,9 +5,12 @@
 #define DATA_EXTENSION ".dat"
 #define PRECISION 20
 
+#define LOG_DIR "./log/"
 #define LOG(x) (log_inst.print< x >)
 #define CLOG(x) (log_inst_std.print< x >)
-#define SETLEVEL(x) log_inst.setLevel(x);log_inst_std.setLevel(x)
+#define DO_IF_LOGLEVEL(x) if(x >= log_inst.getLevel()) 
+#define SETLEVEL(x) log_inst.setLevel(x)
+#define CSETLEVEL(x) log_inst_std.setLevel(x)
 
 #include <fstream>
 #include <iostream>
@@ -19,7 +22,7 @@
 #include <thread>
 
 #include "./logger.hpp"
-static logging::logger< logging::file_log_policy > log_inst( "execution.log" );
+static logging::logger< logging::file_log_policy > log_inst( LOG_DIR "/execution.log" );
 static logging::logger< logging::file_log_policy > log_inst_std( "/dev/fd/0");
 
 #include <dirent.h>
@@ -72,6 +75,10 @@ void usage()
 
 int main(int argc, char *argv[]) 
 {
+    string logDir = LOG_DIR;
+    mkdirp(logDir.c_str());
+    LOG(severity_type::info)("Started program");
+
     const struct option longopts[] =
     {
         {"average"          , no_argument       , 0, 'a'},
@@ -99,7 +106,7 @@ int main(int argc, char *argv[])
     
     log_inst_std.setHeader(false);
     int a = 0, c = 0, d = 0, f = 0, g = 0, j = 0, l = 0, n = 0, p = 0, r = 0, s = 0,
-        v = 0;
+        v = 0, x = 0;
     double dScalar, dTolerance = 0.5;
     char *folder;
     function_container vFuncContainer;
@@ -181,17 +188,16 @@ int main(int argc, char *argv[])
             case 'v':
                 v = atoi(optarg);
                 if(v >= severity_type::no_output && v <= severity_type::error)
-                    SETLEVEL(v);
+                    CSETLEVEL(v);
+                else
+                    cout << "Error: stdout verbose level out of range" << endl;
                 break;
-            // case 'x':
-                // x = atoi(optarg);
-                // if(v >= 0 && v <= MAX_VERBOSE_LEVEL)
-
-
-
-
-            default: 
-                // usage();
+            case 'x':
+                x = atoi(optarg);
+                if(x >= severity_type::no_output && x <= severity_type::error)
+                    SETLEVEL(x);
+                else
+                    cout << "Error: file verbose level out of range" << endl;
                 break;
         }
     } 
@@ -273,6 +279,7 @@ int main(int argc, char *argv[])
     if(histLoop.joinable())
         histLoop.join();
 
+    LOG(severity_type::info)("Program exited successfully");
     return 0;
 }
 

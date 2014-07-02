@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <cmath>
 #include <string>
+#include <sstream>
 
 #include "../main.cpp"
 #include "../file.cpp"
@@ -24,16 +25,41 @@ namespace pe_solver //[p]oison-[e]quation
 {
 
 
-void printer(CImg<double> image)
+
+#include <cstdarg>
+std::string format2(const char* fmt, ...){
+    int size = 512;
+    char* buffer = 0;
+    buffer = new char[size];
+    va_list vl;
+    va_start(vl, fmt);
+    int nsize = vsnprintf(buffer, size, fmt, vl);
+    if(size<=nsize){ //fail delete buffer and try again
+        delete[] buffer;
+        buffer = 0;
+        buffer = new char[nsize+1]; //+1 for /0
+        nsize = vsnprintf(buffer, size, fmt, vl);
+    }
+    std::string ret(buffer);
+    va_end(vl);
+    delete[] buffer;
+    return ret;
+}
+
+string printer(CImg<double> image)
 {
+    stringstream ss;
     for(int iPos = 0; iPos < image.height(); iPos++)
     {
         for(int jPos = 0; jPos < image.width(); jPos++)
         {
-            printf("%5.1f ",image(jPos,iPos));
+            ss << format2("%5.1f ", image(jPos, iPos));
+            // printf("%5.1f ",image(jPos,iPos));
         }
-        cout << endl;
+        ss << "\n";
     }
+
+    return ss.str();
 }
 
 
@@ -203,7 +229,7 @@ void two_grid(double h, CImg<double> &U, CImg<double> &F, int iWidthLength, int 
 
 vector<string> iterative_solve(iterative_function function,
                     const CImg<double> solution, CImg<double> &guess, CImg<double> rho,
-                    double dMaxErr, int iWidth, const char *filename) 
+                    double dMaxErr, int iWidth, logging::logger< logging::file_log_policy > &logInst) 
 {
     CImg<double> old_guess = guess, newGuess = guess;
     double dRelativeError = 0;
@@ -213,7 +239,6 @@ vector<string> iterative_solve(iterative_function function,
     int iIter = 0;
     do
     {
-        // newGuess = old_guess;
         double dOld = dRelativeError;
         function(rho, newGuess, iWidth, iLength, dRelativeError, 1);
         // if (dOld == dRelativeError)
@@ -224,22 +249,29 @@ vector<string> iterative_solve(iterative_function function,
         // }
 
         // cout << "New guess:" << endl; printer(newGuess);
+        (logInst.print<severity_type::debug>)("New guess\n", printer(newGuess));
+        CLOG(severity_type::debug)("New guess\n", printer(newGuess));
 
         if(iIter % 50 == 0) 
         {
-           cout << "=== [ solving: " << dRelativeError << " ] ===" << endl;
+            logInst.print<severity_type::info>("solving: ", dRelativeError);
+            CLOG(severity_type::info)("solving: ", dRelativeError);
         }
 
        double dMSE = newGuess.MSE(solution);
        vOutput.push_back(std::to_string(dMSE));
-       // cout << "Image diff(mean): " << dMSE << endl;
+
+        (logInst.print<severity_type::extensive>)("Image residual(mean): ", dMSE);
+        CLOG(severity_type::extensive)("Image residual(mean): ", dMSE);
+        (logInst.print<severity_type::extensive>)("Iteration diff(max): ", dRelativeError);
+        CLOG(severity_type::extensive)("Iteration diff(max): ", dRelativeError);
+
         old_guess = newGuess;
         iIter++;
-
-        // cout << "Iteration diff(max): " << dRelativeError << endl;
     } while(dRelativeError > dMaxErr);
 
-    cout << iIter << " iterations" << endl;
+    CLOG(severity_type::info)("Finished in ", iIter, " iterations");
+    (logInst.print<severity_type::info>)("Finished in ", iIter, " iterations");
     guess = newGuess;
 
     return vOutput;

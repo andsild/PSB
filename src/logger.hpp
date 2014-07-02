@@ -10,8 +10,7 @@
 #include <string>
 
 
-namespace logging
-{
+namespace logging {
 
 enum severity_type
 {
@@ -51,7 +50,8 @@ void file_log_policy::open_ostream(const std::string& name)
     out_stream->open( name.c_str(), std::ios_base::binary|std::ios_base::out );
     if( !out_stream->is_open() ) 
     {
-        throw(std::runtime_error("LOGGER: Unable to open an output stream"));
+        std::string sMsg = "Logger: unable to open an output stream: " + name;
+        throw(std::runtime_error(sMsg.c_str()));
     }
 }
 
@@ -93,8 +93,9 @@ class logger
         void print_impl(First parm1, Rest...parm);
     public:
     logger( const std::string& name );
-    int iLevel = severity_type::info;
+    int iLevel;
     bool bHeader = true;
+    int getLevel() { return this->iLevel; }
     void setLevel(int iLevel) { this->iLevel = iLevel; }
     void setHeader(bool bFlag) { this->bHeader = bFlag; }
 
@@ -109,7 +110,7 @@ template< typename log_policy >
     template< severity_type severity , typename...Args >
 void logger< log_policy >::print( Args...args )
 {
-    if(this->iLevel < severity_type::debug)
+    if(this->iLevel < severity)
         return;
     write_mutex.lock();
     switch( severity )
@@ -122,6 +123,9 @@ void logger< log_policy >::print( Args...args )
             break;
         case severity_type::error:
             log_stream<<"<ERROR> :";
+            break;
+        case severity_type::extensive:
+            log_stream<<"<EXTRA> :";
             break;
     };
     print_impl( args... );
@@ -141,7 +145,7 @@ template< typename log_policy >
 void logger< log_policy >::print_impl(First parm1, Rest...parm)
 {
     log_stream<<parm1;
-    print_impl(parm...);	
+    print_impl(parm...);
 }
     template< typename log_policy >
 std::string logger< log_policy >::get_time()
@@ -177,7 +181,7 @@ std::string logger< log_policy >::get_logline_header()
 logger< log_policy >::logger( const std::string& name )
 {
     log_line_number = 0;
-    this->iLevel = severity_type::debug;
+    this->iLevel = severity_type::info;
     policy = new log_policy;
     if( !policy )
     {

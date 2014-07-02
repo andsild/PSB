@@ -16,6 +16,7 @@
 #include "./main.cpp"
 
 using namespace std;
+using namespace logging;
 
 namespace file_IO
 {
@@ -103,7 +104,9 @@ void writeToFile(const vector<t> vRes, string sFilename, string sFolderDest)
         data_file.open(sFilename.c_str(), ios::out);
         if(!data_file)
         {
-            cout << "Unable to write to file: " << sFilename << endl;
+            string sMsg = "Unable to write to file: " + sFilename;
+            LOG(severity_type::error)(sMsg);
+            CLOG(severity_type::error)(sMsg);
             return;
         }
     }
@@ -138,13 +141,13 @@ void getFilesInFolder(string sDir, vector<string> &output)
         // Check for valid file(s)
         if (stat( readFile.c_str(), &filestat ))
         {
-            cout << "Skipping " << readFile << " : file invalid" << endl;
+            LOG(severity_type::warning)("Skipping ", readFile, " : file invalid");
+            CLOG(severity_type::warning)("Skipping ", readFile, " : file invalid");
         }
         if (S_ISDIR( filestat.st_mode ))
         {
             continue;
         }
-
         output.push_back(readFile);
     }
 }
