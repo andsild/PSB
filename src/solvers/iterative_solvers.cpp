@@ -1,70 +1,51 @@
-#ifndef _SOLVER
-#define _SOLVER 1
-
-//TODO: check for diagonal dominance
-//If you know that a matrix is diagonally dominant,
-//
-#include <iostream>
-#include <cmath>
-#include <algorithm>
-#include <vector>
-#include <stdio.h>
-#include <cmath>
 #include <string>
-#include <sstream>
-
-#include "../main.cpp"
-#include "../file.cpp"
-#include "../image2.cpp"
+#include <vector>
 
 #include "CImg.h"
+
+#include "../image2.cpp"
+
 using namespace cimg_library;
-using namespace std;
 
 namespace pe_solver //[p]oison-[e]quation
 {
 
-
-
-#include <cstdarg>
-std::string format2(const char* fmt, ...){
-    int size = 512;
-    char* buffer = 0;
-    buffer = new char[size];
-    va_list vl;
-    va_start(vl, fmt);
-    int nsize = vsnprintf(buffer, size, fmt, vl);
-    if(size<=nsize){ //fail delete buffer and try again
-        delete[] buffer;
-        buffer = 0;
-        buffer = new char[nsize+1]; //+1 for /0
-        nsize = vsnprintf(buffer, size, fmt, vl);
-    }
-    std::string ret(buffer);
-    va_end(vl);
-    delete[] buffer;
-    return ret;
-}
-
-string printer(CImg<double> image)
-{
-    stringstream ss;
-    for(int iPos = 0; iPos < image.height(); iPos++)
-    {
-        for(int jPos = 0; jPos < image.width(); jPos++)
-        {
-            ss << format2("%5.1f ", image(jPos, iPos));
-            // printf("%5.1f ",image(jPos,iPos));
-        }
-        ss << "\n";
-    }
-
-    return ss.str();
-}
-
-
-typedef void (*iterative_function)(const CImg<double> &arg1, CImg<double> &arg2,
-                                   double, int, double &arg3, double) ;
+// #include <cstdarg>
+// std::std::string format2(const char* fmt, ...){
+//     int size = 512;
+//     char* buffer = 0;
+//     buffer = new char[size];
+//     va_list vl;
+//     va_start(vl, fmt);
+//     int nsize = vsnprintf(buffer, size, fmt, vl);
+//     if(size<=nsize){ //fail delete buffer and try again
+//         delete[] buffer;
+//         buffer = 0;
+//         buffer = new char[nsize+1]; //+1 for /0
+//         nsize = vsnprintf(buffer, size, fmt, vl);
+//     }
+//     std::std::string ret(buffer);
+//     va_end(vl);
+//     delete[] buffer;
+//     return ret;
+// }
+//
+// std::string printer(CImg<double> image)
+// {
+//     std::stringstream ss;
+//     for(int iPos = 0; iPos < image.height(); iPos++)
+//     {
+//         for(int jPos = 0; jPos < image.width(); jPos++)
+//         {
+//             ss << format2("%5.1f ", image(jPos, iPos));
+//             // printf("%5.1f ",image(jPos,iPos));
+//         }
+//         ss << "\n";
+//     }
+//
+//     return ss.str();
+// }
+//
 
 /** jacobi iteration
  *
@@ -213,7 +194,7 @@ void two_grid(double h, CImg<double> &U, CImg<double> &F, int iWidthLength, int 
     }
 
     // correct U
-    for(vector<int>::size_type iPos = iWidthLength;
+    for(std::vector<int>::size_type iPos = iWidthLength;
             iPos < iWidthLength * 2;
             iPos++) 
     {
@@ -227,13 +208,13 @@ void two_grid(double h, CImg<double> &U, CImg<double> &F, int iWidthLength, int 
     }
 }
 
-vector<string> iterative_solve(iterative_function function,
+std::vector<std::string> iterative_solve(iterative_function function,
                     const CImg<double> solution, CImg<double> &guess, CImg<double> rho,
                     double dMaxErr, int iWidth, logging::logger< logging::file_log_policy > &logInst) 
 {
     CImg<double> old_guess = guess, newGuess = guess;
     double dRelativeError = 0;
-    vector<string> vOutput;
+    std::vector<std::string> vOutput;
     int iLength = solution.width() * solution.height();
 
     int iIter = 0;
@@ -249,8 +230,8 @@ vector<string> iterative_solve(iterative_function function,
         // }
 
         // cout << "New guess:" << endl; printer(newGuess);
-        (logInst.print<severity_type::debug>)("New guess\n", printer(newGuess));
-        CLOG(severity_type::debug)("New guess\n", printer(newGuess));
+        (logInst.print<severity_type::debug>)("New guess\n", image_psb::printImage(newGuess));
+        CLOG(severity_type::debug)("New guess\n", image_psb::printImage(newGuess));
 
         if(iIter % 50 == 0) 
         {
@@ -278,7 +259,5 @@ vector<string> iterative_solve(iterative_function function,
 }
 
 } // EndOfNamespace
-
-#endif
 
 /* EOF */

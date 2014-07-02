@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-#include "file.cpp"
+#include "file.hpp"
 
 namespace plot
 {
