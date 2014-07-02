@@ -59,16 +59,42 @@ void display_histogram(image_fmt image)
 }
 
 
-void printImage(image_fmt image)
+#include <cstdarg>
+std::string format(const char* fmt, ...){
+    int size = 512;
+    char* buffer = 0;
+    buffer = new char[size];
+    va_list vl;
+    va_start(vl, fmt);
+    int nsize = vsnprintf(buffer, size, fmt, vl);
+    if(size<=nsize){ //fail delete buffer and try again
+        delete[] buffer;
+        buffer = 0;
+        buffer = new char[nsize+1]; //+1 for /0
+        nsize = vsnprintf(buffer, size, fmt, vl);
+    }
+    std::string ret(buffer);
+    va_end(vl);
+    delete[] buffer;
+    return ret;
+}
+
+
+
+string printImage(image_fmt image)
 {
+    stringstream ss;
     for(int iPos = 0; iPos < image.height(); iPos++)
     {
         for(int jPos = 0; jPos < image.width(); jPos++)
         {
-            printf("%5.1f ",image(jPos,iPos));
+            ss << format("%5.1f  ", image(jPos, iPos));
+            // printf("%5.1f ",image(jPos,iPos));
         }
-        cout << endl;
+        ss << "\n";
     }
+
+    return ss.str();
 }
 
 
@@ -222,12 +248,12 @@ template <class T> class ImageProcess
             }
         }
 
-        void solve(iterative_function func)
+        void solve(iterative_function func,logging::logger< logging::file_log_policy > &logInstance)
        {
             this->vOutput =  iterative_solve(func,
                                        this->image, this->U, this->rho,
                                        this->dMaxErr, this->image.width(),
-                                       this->fileName);
+                                       logInstance);
 
             if(this->vOutput.size() < 1) 
             {
@@ -262,12 +288,17 @@ template <class T> class ImageProcess
 
         void writeInitdata(string filename)
         {
-            string sAscii = filename + "RHO.txt";
-            this->rho.get_round(2)./*get_crop(1,1,0,0,rho.width() - 1, rho.height() - 1, rho.depth(), rho.spectrum()).*/save_ascii(sAscii.c_str());
-            string sImage = filename + "IMAGE.txt";
-            this->image.get_round(2).save_ascii(sImage.c_str());
-            string sInitGuess = filename + "GUESS.txt";
-            this->U.get_round(2).save_ascii(sInitGuess.c_str());
+            // DO_IF_LOGLEVEL(severity_type::extensive)
+            // {
+            //     string sDir = LOG_DIR + "/init/";
+            //     mkdirp(sDir);
+            //     string sAscii = sDir + filename + "RHO.txt";
+            //     this->rho.get_round(2)./*get_crop(1,1,0,0,rho.width() - 1, rho.height() - 1, rho.depth(), rho.spectrum()).*/save_ascii(sAscii.c_str());
+            //     string sImage = filename + "IMAGE.txt";
+            //     this->image.get_round(2).save_ascii(sImage.c_str());
+            //     string sInitGuess = filename + "GUESS.txt";
+            //     this->U.get_round(2).save_ascii(sInitGuess.c_str());
+            // }
         }
 
         void writeResultToFile(string fileDir)
@@ -342,7 +373,8 @@ class ImageSolver
         {
             if(this->filenames.size() < 1) 
             { 
-                cout << "No files added!" << endl;
+                LOG(severity_type::error)("No files added!");
+                CLOG(severity_type::error)("No files added!");
                 exit(EXIT_FAILURE); 
             }
 
@@ -390,10 +422,13 @@ class ImageSolver
             cimg::exception_mode(0);
             try {
                 image.load(sFileDest.c_str());
-                cout << "Loaded image " << sFileDest << " to code format at " 
-                     << &image << endl;
+                LOG(severity_type::debug)("Loaded image ", sFileDest,
+                                          "to code format at ", &image);
+                CLOG(severity_type::debug)("Loaded image ", sFileDest,
+                                          "to code format at ", &image);
                 toGrayScale(image);
-                cout << "Converted " << sFileDest << " to grayscale" << endl;
+                LOG(severity_type::debug)("Converted ", sFileDest, " to grayscale");
+                CLOG(severity_type::debug)("Converted ", sFileDest, " to grayscale");
             }
             catch(CImgIOException cioe)
             {
@@ -412,7 +447,6 @@ class ImageSolver
         void doImageDisplay(map_gallery &mapFiles, string sImageRoot)
         {
             map_gallery::iterator it = mapFiles.begin();
-
 
             vector<string> out = it->second;
             string mainFile = it->first;
@@ -566,7 +600,8 @@ class ImageSolver
         {
             if(this->filenames.size() < 1
             || vIf.size() < 1) {
-                cout << "Solve called without files (or functions?)" << endl;
+                LOG(severity_type::error)("Solve called without files (or functions?)");
+                CLOG(severity_type::error)("Solve called without files (or functions?)");
                 return;
             }
 
@@ -602,36 +637,46 @@ class ImageSolver
                     subIt != vIf.end();
                     ++subIt)
                 {
+
                     string sImageDir = DATA_DIR + (*subIt).sPath + string(cImagePath);
+                    string sLogPath = LOG_DIR + (*subIt).sPath;
+                    string sLogFile = sLogPath + (*it);
+                    trimTrailingFilename(sLogFile);
+                    trimLeadingFileName(sLogFile);
+                    sLogFile = sLogFile + ".log";
+                    mkdirp(sLogPath.c_str());
+                    logging::logger< logging::file_log_policy > logInstance(sLogPath + sLogFile);
+                    logInstance.setLevel(log_inst.getLevel());
+
+                    (logInstance.print<severity_type::extensive>)("Initial image\n", printImage(ipImage.getImage()));
+                    CLOG(severity_type::extensive)("Initial image\n", printImage(ipImage.getImage()));
+                    ipImage.makeInitialGuess(BORDERS);
+                    (logInstance.print<severity_type::extensive>)("Initial guess\n", printImage(ipImage.getGuess()));
+                    CLOG(severity_type::extensive)("Initial guess\n", printImage(ipImage.getGuess()));
+                    (logInstance.print<severity_type::extensive>)("Initial rho\n", printImage(ipImage.getGuess()));
+                    CLOG(severity_type::extensive)("Initial rho\n", printImage(ipImage.getGuess()));
+                    (logInstance.print<severity_type::info>)("Beginning solver: ", (*subIt).sPath);
+                    CLOG(severity_type::info)("Beginning solver: ", (*subIt).sPath);
+
                     try{
-                        cout << "Initial image" << endl;
-                        // printImage(ipImage.getImage());
-                        ipImage.makeInitialGuess(BORDERS);
-                        cout << "instantiated initial guess for " << (*it) << endl;
-                        // printImage(ipImage.getGuess());
-                        cout << endl << "Initial; rho" << endl;
-                        printImage(ipImage.getRho());
-                        cout << "Beginning solver " << (*subIt).sPath << endl;
-                        ipImage.solve((*subIt).func);
+
+                        ipImage.solve((*subIt).func, logInstance);
                         cout << loadBar << endl;
+
                         if(bComputeLines) { ipImage.computeLine("lines"); }
                         ipImage.writeResultToFile(string(cResultPath) + (*subIt).sPath);
+
                         ipImage.roundValues();
                         ipImage.writeImageToFile(sImageDir.c_str());
                         ipImage.clearImages();
                     }
                     catch(ImageException &ie)
                     {
-                        cout << ie.what() << endl;
+                        LOG(severity_type::warning)(ie.what());
+                        CLOG(severity_type::warning)(ie.what());
                     }
                 }                
 
-                string stmp = (*it);
-                trimLeadingFileName(stmp);
-                trimTrailingFilename(stmp);
-                string sInitDataFile = DATA_DIR + stmp;
-                ipImage.makeInitialGuess(BORDERS);
-                ipImage.writeInitdata(sInitDataFile);
             }
             cout << loadBar << endl;// if last image has errors, this might be necessary
         }
@@ -651,7 +696,8 @@ void calculateAverage(string sFilePath)
     catch(file_IO::DirNotFound &f)
     {
         cout << f.what() << endl;
-        exit(EXIT_FAILURE);
+        LOG(severity_type::error)(f.what());
+        CLOG(severity_type::error)(f.what());
     }
 
     vector<double> average; // can give undererror
@@ -666,7 +712,8 @@ void calculateAverage(string sFilePath)
         size_t found = (*it).find(avoid);
         if(found!=string::npos) 
         {
-           cout << "average: skipping file " << *it << endl;
+           LOG(severity_type::warning)("average: skipping file", *it);
+           CLOG(severity_type::warning)("average: skipping file", *it);
             continue;
         }
         dValidFiles++;
