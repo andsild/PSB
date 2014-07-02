@@ -5,6 +5,10 @@
 #define DATA_EXTENSION ".dat"
 #define PRECISION 20
 
+#define LOG(x) (log_inst.print< x >)
+#define CLOG(x) (log_inst_std.print< x >)
+#define SETLEVEL(x) log_inst.setLevel(x);log_inst_std.setLevel(x)
+
 #include <fstream>
 #include <iostream>
 #include <iomanip>
@@ -14,11 +18,16 @@
 #include <string>
 #include <thread>
 
+#include "./logger.hpp"
+static logging::logger< logging::file_log_policy > log_inst( "execution.log" );
+static logging::logger< logging::file_log_policy > log_inst_std( "/dev/fd/0");
+
 #include <dirent.h>
 #include <getopt.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
 
 #include "CImg.h"
 #include "./file.cpp"
@@ -31,11 +40,15 @@
 #define required_argument 1 
 #define optional_argument 2
 
+
 using namespace cimg_library;
 using namespace pe_solver;
 using namespace image_psb;
 using namespace file_IO;
 using namespace plot;
+using namespace logging;
+
+
 
 void usage()
 {
@@ -74,7 +87,9 @@ int main(int argc, char *argv[])
         {"resolve"          , required_argument , 0, 'r'},
         {"tolerance"        , no_argument       , 0, 't'},
         {"sor"              , no_argument       , 0, 's'},
-        {"values-histogram" , no_argument       , 0, 'v'},
+        {"verbose"          , optional_argument , 0, 'v'},
+        {"fileverbose"          , optional_argument , 0, 'x'},
+        // {"values-histogram" , no_argument       , 0, 'v'},
         {0,0,0,0},
     };
 
@@ -82,6 +97,7 @@ int main(int argc, char *argv[])
     int iarg=0;
     extern char *optarg;
     
+    log_inst_std.setHeader(false);
     int a = 0, c = 0, d = 0, f = 0, g = 0, j = 0, l = 0, n = 0, p = 0, r = 0, s = 0,
         v = 0;
     double dScalar, dTolerance = 0.5;
@@ -106,7 +122,7 @@ int main(int argc, char *argv[])
 
     while(iarg != -1)
     {
-        iarg = getopt_long(argc, argv, "acd:fgjlhnpr:st:v", longopts, &index);
+        iarg = getopt_long(argc, argv, "acd:fgjlhnpr:st:v:x:", longopts, &index);
 
         switch (iarg)
         {
@@ -163,8 +179,16 @@ int main(int argc, char *argv[])
                 p++;
                 break;
             case 'v':
-                v++;
+                v = atoi(optarg);
+                if(v >= severity_type::no_output && v <= severity_type::error)
+                    SETLEVEL(v);
                 break;
+            // case 'x':
+                // x = atoi(optarg);
+                // if(v >= 0 && v <= MAX_VERBOSE_LEVEL)
+
+
+
 
             default: 
                 // usage();
@@ -174,18 +198,21 @@ int main(int argc, char *argv[])
 
     if(d) {
         if(vFuncContainer.size() < 1 && !n)
-            cout << "Warning: no iterators chosen" << endl;
+            CLOG(severity_type::warning)("no iterators chosen");
+            LOG(severity_type::warning)("no iterators chosen");
         imageSolver.addFolder(folder);
         if(!n)
             imageSolver.solve(vFuncContainer, l>0, dTolerance);
     }
     else {
-        cout << "Warning: no media folder given" << endl;
+        CLOG(severity_type::warning)("no media folder given");
+        LOG(severity_type::warning)("no media folder given");
     }
 
     if(r)
     {
         ImageSolver imageSolver2;
+        imageSolver2.setVerbosity(v);
         for (function_container::iterator it = vFuncContainer.begin();
             it != vFuncContainer.end();
             ++it)

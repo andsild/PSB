@@ -20,16 +20,19 @@
 
 
 #include "CImg.h"
+#include "main.cpp"
+#include "logger.hpp"
+#include "loadingbar.cpp"
 #include "./file.cpp"
 #include "solvers/iterative_solvers.cpp"
 #include "plot.cpp"
-
-#include <sys/ioctl.h>
 
 using namespace cimg_library;
 using namespace pe_solver;
 using namespace file_IO;
 using namespace plot;
+using namespace logging;
+using namespace loadbar;
 
 typedef CImg<double> image_fmt;
 
@@ -87,86 +90,6 @@ class ImageException: public exception
 };
 
 
-class LoadingBar
-{
-    private:
-        int iNumIterations;
-        double dStepSize;
-        mutable double dProgress;
-        mutable int iTimeRemaining;
-        mutable int iImageSize;
-
-    public:
-        struct winsize w;
-        LoadingBar() {}
-        LoadingBar(int iNumIterations) : iNumIterations(iNumIterations)
-    {
-        this->dProgress = 0;
-        this->dStepSize = ((double)100 / iNumIterations);
-        this->iTimeRemaining = 0;//filenames.size() * vIf.size() 
-                             //* (pow( (img.height() * img.width()), 0.3));
-    }
-
-    void initialize(int iNumIterations)
-    {
-        this->iNumIterations = iNumIterations;
-        this->dProgress = 0;
-        this->dStepSize = ((double)100 / iNumIterations);
-        this->iTimeRemaining = 0;//filenames.size() * vIf.size() 
-                             //* (pow( (img.height() * img.width()), 0.3));
-    }
-    string getTimeLeft() const
-    {
-        int iMinutesLeft = this->iTimeRemaining / 60;
-        int iSecondsLeft = this->iTimeRemaining - (iMinutesLeft * 60);
-        return string(to_string(iMinutesLeft) + "m"
-                + to_string(iSecondsLeft) + "s");
-    }
-    void updateTimeRemaining(int iImageSize) const
-    {
-        this->iImageSize = iImageSize;
-        int iIterationsLeft = int((100 - this->getProgress()) 
-                                   / this->dStepSize);
-        // rough estimate
-        this->iTimeRemaining = iIterationsLeft * pow(iImageSize, 0.3); 
-    }
-    void increaseProgress(int iIterations = 1) const
-    {
-        this->dProgress += this->dStepSize * iIterations;
-        updateTimeRemaining(this->iImageSize);
-    }
-    double getProgress() const { return this->dProgress; }
-    friend ostream& operator<< (ostream &str, const LoadingBar& obj);
-
-};
-
-ostream& operator<< (ostream &str, const LoadingBar& obj)
-{
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &obj.w);
-
-    if(obj.getProgress() > 100) 
-    { 
-        // str << "(error: loading bar exceeded 100 %)" << endl;
-        return str;
-    }
-
-    const int xPos = 0, yPos = 0;
-    // To compensate for []>::space:: symbols
-    int iColWidth = obj.w.ws_col - 20; 
-    int iSignPercentage = (int) ((obj.getProgress() * iColWidth) / 100),
-        iPercentage     = (int)obj.getProgress();
-    string sMarker(iColWidth, '=');
-
-    // printf("\033[%d;%dH[%s>%*c] %3d%%\n", xPos, yPos
-    printf("\r[%s>%*c] %3d%% ETA %s"
-                             , sMarker.substr(0,iSignPercentage).c_str()
-                             , iColWidth - iSignPercentage, ' '
-                             , iPercentage
-                             , obj.getTimeLeft().c_str());
-    obj.increaseProgress();
-    return str;
-}
-
 void toGrayScale(image_fmt &image)
 {
     if(image.spectrum() == 1)
@@ -210,7 +133,6 @@ template <class T> class ImageProcess
     private:
     typedef map<iterative_function,vector<string> > mapfuncres;
         image_fmt image;
-        int iHeight, iWidth, iDepth, iSpectrum, iDim;
         const char *fileName;
         mapfuncres mapFuncRes;
         vector<string> vOutput;
@@ -220,21 +142,6 @@ template <class T> class ImageProcess
         image_fmt sRGBtoGrayscale()
         {
             return this->image.get_norm();
-            // this->image.sRGBtoRGB();
-            // for(int iPos = 0; iPos < this->image.width(); iPos++)
-            // {
-            //     for(int jPos = 0; jPos < this->image.height(); jPos++)
-            //     {
-            //         double r = this->image(iPos, jPos, 0, 0); // First channel RED
-            //         double g = this->image(iPos, jPos, 0, 1);
-            //         double b = this->image(iPos, jPos, 0, 2);
-            //
-            //         double grayValue = (r + g + b) / 3 ;
-            //         image(jPos, iPos) = (r / 3)  ;
-            //     }
-            // }
-            //
-            // return image;
         }
 
             
@@ -242,15 +149,11 @@ template <class T> class ImageProcess
         image_fmt getGuess() { return this->U; }
         image_fmt getImage () { return this->image; }
         image_fmt getRho() { return this->rho; }
-        int getWidth() { return this->iWidth; }
 
         void multiply(double dScalar)
         {
             this->image *= dScalar;
         }
-
-
-
 
         double dMaxErr;
         ImageProcess(image_fmt image, const char *fileName, double dMaxErr)
@@ -258,11 +161,6 @@ template <class T> class ImageProcess
                   image(image)
 
         {
-            this->iHeight = image.height();
-            this->iWidth = image.width();
-            this->iSpectrum = image.spectrum();
-            this->iDepth = image.depth();
-            this->iDim = image.height() * image.width();
         }
 
         void clearImages()
@@ -328,7 +226,8 @@ template <class T> class ImageProcess
        {
             this->vOutput =  iterative_solve(func,
                                        this->image, this->U, this->rho,
-                                       this->dMaxErr, this->iWidth);
+                                       this->dMaxErr, this->image.width(),
+                                       this->fileName);
 
             if(this->vOutput.size() < 1) 
             {
@@ -364,7 +263,7 @@ template <class T> class ImageProcess
         void writeInitdata(string filename)
         {
             string sAscii = filename + "RHO.txt";
-            this->rho.get_round(2).get_crop(1,1,0,0,rho.width() - 1, rho.height() - 1, rho.depth(), rho.spectrum()).save_ascii(sAscii.c_str());
+            this->rho.get_round(2)./*get_crop(1,1,0,0,rho.width() - 1, rho.height() - 1, rho.depth(), rho.spectrum()).*/save_ascii(sAscii.c_str());
             string sImage = filename + "IMAGE.txt";
             this->image.get_round(2).save_ascii(sImage.c_str());
             string sInitGuess = filename + "GUESS.txt";
@@ -402,7 +301,8 @@ template <class T> class ImageProcess
             }
             catch(CImgIOException &cioe)
             {
-                cout << cioe.what() << endl;
+                CLOG(severity_type::error)(cioe.what());
+                LOG(severity_type::error)(cioe.what());
             }
 
         }
@@ -419,6 +319,10 @@ class ImageSolver
     public:
         LoadingBar loadBar;
         vector<string> filenames;
+
+        void setVerbosity(int iLevel)
+        {
+        }
         void addFolder(string sFolder, const char *errMsg = "")
         {
             try{
@@ -426,7 +330,7 @@ class ImageSolver
             }
             catch(const file_IO::DirNotFound& f)
             {
-                cout << f.what() << " " << errMsg << endl;
+                // CLOG(severity_type::error)(f.what(), " ", errMsg);
                 exit(EXIT_FAILURE);
             }
         }
