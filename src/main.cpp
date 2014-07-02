@@ -21,21 +21,18 @@
 #include <string>
 #include <thread>
 
+#include <getopt.h>
+
 #include "./logger.hpp"
+using namespace logging;
 static logging::logger< logging::file_log_policy > log_inst( LOG_DIR "/execution.log" );
 static logging::logger< logging::file_log_policy > log_inst_std( "/dev/fd/0");
 
-#include <dirent.h>
-#include <getopt.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-
 #include "CImg.h"
-#include "./file.cpp"
+
+#include "./file.hpp"
 #include "./image2.cpp"
-#include "solvers/iterative_solvers.cpp"
+#include "include/iterative_solvers.hpp"
 #include "plot.cpp"
 // #include "solvers/FFT.cpp"
 
@@ -49,8 +46,6 @@ using namespace pe_solver;
 using namespace image_psb;
 using namespace file_IO;
 using namespace plot;
-using namespace logging;
-
 
 
 void usage()
@@ -95,7 +90,7 @@ int main(int argc, char *argv[])
         {"tolerance"        , no_argument       , 0, 't'},
         {"sor"              , no_argument       , 0, 's'},
         {"verbose"          , optional_argument , 0, 'v'},
-        {"fileverbose"          , optional_argument , 0, 'x'},
+        {"fileverbose"      , optional_argument , 0, 'x'},
         // {"values-histogram" , no_argument       , 0, 'v'},
         {0,0,0,0},
     };
@@ -110,9 +105,9 @@ int main(int argc, char *argv[])
     double dScalar, dTolerance = 0.5;
     char *folder;
     function_container vFuncContainer;
-    SolverMeta smG(iterate_gauss, "gauss/", "images/");
-    SolverMeta smJ(iterate_jacobi, "jacobi/", "images/");
-    SolverMeta smS(iterate_sor, "sor/", "images/");
+    SolverMeta smG(iterate_gauss, string("gauss/"));
+    SolverMeta smJ(iterate_jacobi, string("jacobi/"));
+    SolverMeta smS(iterate_sor, string("sor/"));
     ImageSolver imageSolver;
 
     if(argc == 2 && ! (strcmp(argv[1], "-p") || strcmp(argv[1], "-n") 

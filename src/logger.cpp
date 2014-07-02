@@ -1,53 +1,20 @@
-#ifndef LOGGER_HPP_
-#define LOGGER_HPP_
-
-#include <stdexcept>
-#include <fstream>
-#include <sstream>
-#include <mutex>
 #include <ios>
-#include <memory>
-#include <string>
+#include <stdexcept>
 
+// #include "./file.hpp" // for mkdirp
 
-namespace logging {
-
-enum severity_type
-{
-    no_output = -1,
-    info,
-    extensive,
-    debug,
-    warning,
-    error
-};
-
-class log_policy_interface
-{
-    public:
-        virtual void		open_ostream(const std::string& name) = 0;
-        virtual void		close_ostream() = 0;
-        virtual void		write(const std::string& msg) = 0;
-
-};
 
 /*
  * Implementation which allow to write into a file
  */
 
-class file_log_policy : public log_policy_interface
+namespace logging
 {
-    std::unique_ptr< std::ofstream > out_stream;
-    public:
-    file_log_policy() : out_stream( new std::ofstream ) {}
-    void open_ostream(const std::string& name);
-    void close_ostream();
-    void write(const std::string& msg);
-    ~file_log_policy();
-};
+
 void file_log_policy::open_ostream(const std::string& name)
 {
     out_stream->open( name.c_str(), std::ios_base::binary|std::ios_base::out );
+    // file_IO::mkdirp(name.c_str());
     if( !out_stream->is_open() ) 
     {
         std::string sMsg = "Logger: unable to open an output stream: " + name;
@@ -76,35 +43,14 @@ file_log_policy::~file_log_policy()
     }
 }
 
+template< typename log_policy >
+int logger< log_policy >::getLevel(){ return this->iLevel; }
 
 template< typename log_policy >
-class logger
-{
-    unsigned log_line_number;
-    std::string get_time();
-    std::string get_logline_header();
-    std::stringstream log_stream;
-    log_policy* policy;
-    std::mutex write_mutex;
+void logger< log_policy >::setLevel(int iLevel){ this->iLevel = iLevel; }
 
-    //Core printing functionality
-    void print_impl();
-    template<typename First, typename...Rest>
-        void print_impl(First parm1, Rest...parm);
-    public:
-    logger( const std::string& name );
-    int iLevel;
-    bool bHeader = true;
-    int getLevel() { return this->iLevel; }
-    void setLevel(int iLevel) { this->iLevel = iLevel; }
-    void setHeader(bool bFlag) { this->bHeader = bFlag; }
-
-    template< severity_type severity , typename...Args >
-        void print( Args...args );
-
-    ~logger();
-};
-
+template< typename log_policy >
+void logger< log_policy >::setHeader(bool bFlag) { this->bHeader = bFlag; }
 
 template< typename log_policy >
     template< severity_type severity , typename...Args >
@@ -200,7 +146,4 @@ logger< log_policy >::~logger()
     }
 }
 
-}
-
-
-#endif
+} /* EndOfNamespace */

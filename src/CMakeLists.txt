@@ -61,6 +61,8 @@ SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../bin/)
 #Path of CImg.h file relative to this file path
 set(CIMG_H_PATH ${PROJECT_SOURCE_DIR}/../lib/CImg-1.5.8)
 include_directories( ${PROJECT_SOURCE_DIR} )
+include_directories( ${PROJECT_SOURCE_DIR}/include )
+include_directories( ${PROJECT_SOURCE_DIR}/debug_tools )
 include_directories( ${CIMG_H_PATH} )
 
 find_program(GNUPLOT_BIN gnuplot)
@@ -250,7 +252,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CIMG_CFLAGS} -g -std=c++11 -lpthread -
 
 
 SET(CIMG_FILES main
-    make_test_image
+    #make_test_image
   )
 
 foreach(program ${CIMG_FILES})
