@@ -1,22 +1,18 @@
 #ifndef LOGGER_HPP_
-#define LOGGER_HPP_
+#define LOGGER_HPP_ 1
 
 #include <fstream>
-#include <sstream>
 #include <memory>
-#include <string>
 #include <mutex>
+#include <sstream>
+#include <string>
 
 
 #define LOG_DIR "./log/"
-#define LOG(x) (log_inst.print< x >)
-#define CLOG(x) (log_inst_std.print< x >)
-#define DO_IF_LOGLEVEL(x) if(x >= log_inst.getLevel()) 
-#define SETLEVEL(x) log_inst.setLevel(x)
-#define CSETLEVEL(x) log_inst_std.setLevel(x)
 
 namespace logging
 {
+
 
 enum severity_type
 {
@@ -64,7 +60,7 @@ class logger
     //Core printing functionality
     void print_impl();
     template<typename First, typename...Rest>
-        void print_impl(First parm1, Rest...parm);
+        void print_impl(First parm1, Rest...);
     public:
     logger( const std::string& name );
     int iLevel;
@@ -73,18 +69,24 @@ class logger
     void setLevel(int);
     void setHeader(bool);
 
-    template< severity_type severity , typename...Args >
-        void print( Args...args );
+    template< severity_type severity , typename ...Args >
+        void print( Args... );
 
     ~logger();
 };
 
 
+
 } /* EndOfNamespace */
 
-static logging::logger< logging::file_log_policy > log_inst( LOG_DIR "/execution.log" );
-static logging::logger< logging::file_log_policy > log_inst_std( "/execution2.log");
-// static logging::logger< logging::file_log_policy > log_inst_std( "/dev/fd/0");
+extern logging::logger< logging::file_log_policy > log_inst;
+extern logging::logger< logging::file_log_policy > log_inst_std;
 
+#define LOG(x) (log_inst.print< x >)
+#define CLOG(x) (log_inst_std.print< x >)
+// #define USE_LOGGER extern logging::logger< logging::file_log_policy > log_inst
+#define DO_IF_LOGLEVEL(x) if(x >= log_inst.getLevel()) 
+#define SETLEVEL(x) log_inst.setLevel(x)
+#define CSETLEVEL(x) log_inst_std.setLevel(x)
 
 #endif

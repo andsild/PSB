@@ -5,6 +5,10 @@
 
 #include "CImg.h"
 
+#include "logger.hpp"
+#include "image2.hpp"
+
+using namespace logging;
 using namespace cimg_library;
 
 namespace pe_solver //[p]oison-[e]quation

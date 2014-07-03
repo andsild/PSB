@@ -9,7 +9,8 @@
 /*
  * Implementation which allow to write into a file
  */
-
+logging::logger< logging::file_log_policy > log_inst( LOG_DIR "/execution.log" );
+logging::logger< logging::file_log_policy > log_inst_std( "/dev/fd/0");
 namespace logging
 {
 
@@ -148,4 +149,12 @@ logger< log_policy >::~logger()
     }
 }
 
+
+
 } /* EndOfNamespace */
+
+
+int main()
+{
+}
+

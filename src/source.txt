@@ -2,5 +2,4 @@ file.cpp
 image2.cpp
 loadingbar.cpp
 logger.cpp
-main.cpp
 plot.cpp
