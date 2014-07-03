@@ -60,9 +60,24 @@ SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../bin/)
 
 #Path of CImg.h file relative to this file path
 set(CIMG_H_PATH ${PROJECT_SOURCE_DIR}/../lib/CImg-1.5.8)
-include_directories( ${PROJECT_SOURCE_DIR} )
-include_directories( ${PROJECT_SOURCE_DIR}/include )
-include_directories( ${PROJECT_SOURCE_DIR}/debug_tools )
+set(PROJECT_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
+include ( ${PROJECT_INCLUDE_DIR} )
+include_directories( ${PROJECT_INCLUDE_DIR} )
+include_directories ( ${PROJECT_SOURCE_DIR} )
+
+set  (FILELIST ${PROJECT_SOURCE_DIR}/source.txt )
+file(READ ${FILELIST} SRC)
+string(REGEX REPLACE  "#.*$"  ""  SRC  ${SRC})
+string(REPLACE        "\n"    ";" SRC  ${SRC})
+ 
+add_executable(${PROJECT_NAME} ${SRC} )
+
+# add debug tools?
+#    OPTION (USE_DEBUG_TOOLS
+#       "Include primitive debug tools for creating test images" OFF)
+# 
+
+# include_directories( ${PROJECT_SOURCE_DIR}/debug_tools )
 include_directories( ${CIMG_H_PATH} )
 
 find_program(GNUPLOT_BIN gnuplot)
@@ -250,8 +265,12 @@ endif()
 # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CIMG_CFLAGS} -L/usr/X11/R6/lib")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CIMG_CFLAGS} -g -std=c++11 -lpthread -I/usr/X11R6/include -L/usr/X11R6/lib -lm -lpthread -lX11 ")
 
+# foreach(source ${PROJECT_SOURCE_DIR})
+#   add_executable(${source} ${source}/*.cpp)
+#     target_link_libraries(${source})
+# endforeach(source)
 
-SET(CIMG_FILES main
+SET(CIMG_FILES main 
     #make_test_image
   )
 
@@ -259,5 +278,3 @@ foreach(program ${CIMG_FILES})
   add_executable(${program} ${program}.cpp)
   target_link_libraries(${program} ${SYSTEM_LIBS} )
 endforeach(program)
-
-

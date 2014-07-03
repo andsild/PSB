@@ -1,6 +1,9 @@
 #ifndef _FILE_H
 #define _FILE_H 1
 
+#define PRECISION 20
+#define DATA_DIR "./output/"
+#define DATA_EXTENSION ".dat"
 #define PROJECT_DIR "PSB"
 
 #include <string>

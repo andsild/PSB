@@ -8,6 +8,13 @@
 #include <mutex>
 
 
+#define LOG_DIR "./log/"
+#define LOG(x) (log_inst.print< x >)
+#define CLOG(x) (log_inst_std.print< x >)
+#define DO_IF_LOGLEVEL(x) if(x >= log_inst.getLevel()) 
+#define SETLEVEL(x) log_inst.setLevel(x)
+#define CSETLEVEL(x) log_inst_std.setLevel(x)
+
 namespace logging
 {
 
@@ -74,5 +81,9 @@ class logger
 
 
 } /* EndOfNamespace */
+
+static logging::logger< logging::file_log_policy > log_inst( LOG_DIR "/execution.log" );
+static logging::logger< logging::file_log_policy > log_inst_std( "/dev/fd/0");
+
 
 #endif

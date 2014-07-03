@@ -1,9 +1,9 @@
+#include "iterative_solvers.hpp"
+
 #include <string>
 #include <vector>
 
 #include "CImg.h"
-
-#include "../image2.cpp"
 
 using namespace cimg_library;
 

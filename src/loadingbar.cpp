@@ -2,9 +2,10 @@
 #define LOADBAR_CPP_
 
 #include <string>
-#include <sys/ioctl.h>
 
-using namespace std;
+#include <math.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
 
 namespace loadbar
 {
@@ -37,12 +38,12 @@ class LoadingBar
         this->iTimeRemaining = 0;//filenames.size() * vIf.size() 
                              //* (pow( (img.height() * img.width()), 0.3));
     }
-    string getTimeLeft() const
+    std::string getTimeLeft() const
     {
         int iMinutesLeft = this->iTimeRemaining / 60;
         int iSecondsLeft = this->iTimeRemaining - (iMinutesLeft * 60);
-        return string(to_string(iMinutesLeft) + "m"
-                + to_string(iSecondsLeft) + "s");
+        return std::string(std::to_string(iMinutesLeft) + "m"
+                + std::to_string(iSecondsLeft) + "s");
     }
     void updateTimeRemaining(int iImageSize) const
     {
@@ -58,11 +59,11 @@ class LoadingBar
         updateTimeRemaining(this->iImageSize);
     }
     double getProgress() const { return this->dProgress; }
-    friend ostream& operator<< (ostream &str, const LoadingBar& obj);
+    friend std::ostream& operator<< (std::ostream &str, const LoadingBar& obj);
 
 };
 
-ostream& operator<< (ostream &str, const LoadingBar& obj)
+std::ostream& operator<< (std::ostream &str, const LoadingBar& obj)
 {
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &obj.w);
 
@@ -77,7 +78,7 @@ ostream& operator<< (ostream &str, const LoadingBar& obj)
     int iColWidth = obj.w.ws_col - 20; 
     int iSignPercentage = (int) ((obj.getProgress() * iColWidth) / 100),
         iPercentage     = (int)obj.getProgress();
-    string sMarker(iColWidth, '=');
+    std::string sMarker(iColWidth, '=');
 
     // printf("\033[%d;%dH[%s>%*c] %3d%%\n", xPos, yPos
     printf("\r[%s>%*c] %3d%% ETA %s"

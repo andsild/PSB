@@ -1,21 +1,10 @@
 #ifndef _MAIN_CPP
 #define _MAIN_CPP   1
 
-#define DATA_DIR "./output/"
-#define DATA_EXTENSION ".dat"
-#define PRECISION 20
-
-#define LOG_DIR "./log/"
-#define LOG(x) (log_inst.print< x >)
-#define CLOG(x) (log_inst_std.print< x >)
-#define DO_IF_LOGLEVEL(x) if(x >= log_inst.getLevel()) 
-#define SETLEVEL(x) log_inst.setLevel(x)
-#define CSETLEVEL(x) log_inst_std.setLevel(x)
 
 #include <fstream>
 #include <iostream>
 #include <iomanip>
-#include <limits>
 #include <map>
 #include <sstream> 
 #include <string>
@@ -23,15 +12,12 @@
 
 #include <getopt.h>
 
-#include "./logger.hpp"
-using namespace logging;
-static logging::logger< logging::file_log_policy > log_inst( LOG_DIR "/execution.log" );
-static logging::logger< logging::file_log_policy > log_inst_std( "/dev/fd/0");
 
 #include "CImg.h"
 
-#include "./file.hpp"
-#include "./image2.cpp"
+#include "logger.hpp"
+#include "file.hpp"
+#include "image2.hpp"
 #include "include/iterative_solvers.hpp"
 #include "plot.cpp"
 // #include "solvers/FFT.cpp"
@@ -40,17 +26,16 @@ static logging::logger< logging::file_log_policy > log_inst_std( "/dev/fd/0");
 #define required_argument 1 
 #define optional_argument 2
 
-
 using namespace cimg_library;
-using namespace pe_solver;
 using namespace image_psb;
 using namespace file_IO;
 using namespace plot;
+using namespace logging;
 
 
 void usage()
 {
-    cout << "Usage: main <folder>" << endl;
+    std::cout << "Usage: main <folder>" << std::endl;
 
     printf("\t -%c, %s\t%s\n", 'a', "--average", "compute average errors for solvers");
     printf("\t -%c, %s\t%s\n", 'c', "--compare", "visual comparison of solved images vs original image");
@@ -70,7 +55,7 @@ void usage()
 
 int main(int argc, char *argv[]) 
 {
-    string logDir = LOG_DIR;
+    std::string logDir = LOG_DIR;
     mkdirp(logDir.c_str());
     LOG(severity_type::info)("Started program");
 
@@ -105,17 +90,17 @@ int main(int argc, char *argv[])
     double dScalar, dTolerance = 0.5;
     char *folder;
     function_container vFuncContainer;
-    SolverMeta smG(iterate_gauss, string("gauss/"));
-    SolverMeta smJ(iterate_jacobi, string("jacobi/"));
-    SolverMeta smS(iterate_sor, string("sor/"));
+    SolverMeta smG(pe_solver::iterate_gauss, std::string("gauss/"));
+    SolverMeta smJ(pe_solver::iterate_jacobi, std::string("jacobi/"));
+    SolverMeta smS(pe_solver::iterate_sor, std::string("sor/"));
     ImageSolver imageSolver;
 
     if(argc == 2 && ! (strcmp(argv[1], "-p") || strcmp(argv[1], "-n") 
                        || strcmp(argv[1], "-h")))
     {
-        cout << "Assuming \"-d " << string(argv[1]) << " --gauss --plot" << endl;
+        std::cout << "Assuming \"-d " << std::string(argv[1]) << " --gauss --plot" << std::endl;
         vFuncContainer.push_back(smG);
-        imageSolver.addFolder(string(argv[1]));
+        imageSolver.addFolder(std::string(argv[1]));
         imageSolver.solve(vFuncContainer);
         plot::plot();
         exit(EXIT_SUCCESS);
@@ -185,14 +170,14 @@ int main(int argc, char *argv[])
                 if(v >= severity_type::no_output && v <= severity_type::error)
                     CSETLEVEL(v);
                 else
-                    cout << "Error: stdout verbose level out of range" << endl;
+                    std::cout << "Error: stdout verbose level out of range" << std::endl;
                 break;
             case 'x':
                 x = atoi(optarg);
                 if(x >= severity_type::no_output && x <= severity_type::error)
                     SETLEVEL(x);
                 else
-                    cout << "Error: file verbose level out of range" << endl;
+                    std::cout << "Error: file verbose level out of range" << std::endl;
                 break;
         }
     } 
@@ -213,12 +198,11 @@ int main(int argc, char *argv[])
     if(r)
     {
         ImageSolver imageSolver2;
-        imageSolver2.setVerbosity(v);
         for (function_container::iterator it = vFuncContainer.begin();
             it != vFuncContainer.end();
             ++it)
         {
-            string sPath = DATA_DIR + (*it).sPath + "/image";
+            std::string sPath = "/output" + (*it).sPath + "/image/";
             imageSolver2.addFolder(sPath);
         }
 
@@ -242,10 +226,10 @@ int main(int argc, char *argv[])
     //     imageSolver.addFolder(folder);
     //     imageList_fmt histogram = imageSolver.histogram(folder, vFuncContainer);
         // CImgDisplay hist_disp(histogram, "histogram", 0,  false,true);
-        // cout << "SIZE " << histogram.size() << endl;
+        // std::cout << "SIZE " << histogram.size() << std::endl;
         //histLoop = thread(display_histogram, histogram);
-        // cout << histogram.width() << endl;
-        // cout << histogram.height() << endl;
+        // std::cout << histogram.width() << std::endl;
+        // std::cout << histogram.height() << std::endl;
         // histLoop = thread(renderImage, hist_disp);
     // }
 
@@ -257,7 +241,7 @@ int main(int argc, char *argv[])
         plot::plot();
         image_fmt imgPlot("graph.png");
         CImgDisplay plot_disp(imgPlot, "graph.png : graph for all images in folder",0, false, true);	
-        plotLoop = thread(renderImage, plot_disp);
+        plotLoop = std::thread(renderImage, plot_disp);
     }
 
 
