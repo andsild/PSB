@@ -1,51 +1,30 @@
-#ifndef _IMAGE_CPP
-#define _IMAGE_CPP   1
-
-#define cimg_debug 0 
+#include "image2.hpp"
 
 #include <cstdarg>
 #include <iostream>
 #include <iomanip>
 #include <list>
+#include <map>
 #include <sstream> 
 #include <string>
 
 #include "CImg.h"
 
-#include "./main.cpp"
-
-#include "./logger.hpp"
-#include "./loadingbar.cpp"
-#include "./file.hpp"
-#include "./include/iterative_solvers.hpp"
+#include "logger.hpp"
+#include "loadingbar.cpp"
+#include "iterative_solvers.hpp"
+#include "file.hpp"
 #include "plot.cpp"
 
 using namespace cimg_library;
-using namespace pe_solver;
 using namespace file_IO;
 using namespace plot;
 using namespace logging;
 using namespace loadbar;
-
-typedef CImg<double> image_fmt;
+using namespace pe_solver;
 
 namespace image_psb
 {
-
-class SolverMeta
-{
-    public:
-        iterative_function func;
-        std::string sPath;
-        SolverMeta(iterative_function func,
-                          std::string sPath)
-            : func(func), sPath(sPath)
-        {
-        }
-};
-
-typedef CImgList<double> imageList_fmt;
-typedef std::vector<SolverMeta> function_container;
 
 void renderImage(CImgDisplay disp)
 {
@@ -62,14 +41,16 @@ void display_histogram(image_fmt image)
 }
 
 
-std::string format(const char* fmt, ...){
+std::string format(const char* fmt, ...)
+{
     int size = 512;
     char* buffer = 0;
     buffer = new char[size];
     va_list vl;
     va_start(vl, fmt);
     int nsize = vsnprintf(buffer, size, fmt, vl);
-    if(size<=nsize){ //fail delete buffer and try again
+    if(size<=nsize)
+    {
         delete[] buffer;
         buffer = 0;
         buffer = new char[nsize+1]; //+1 for /0
@@ -110,7 +91,7 @@ class ImageException: public std::exception
         virtual ~ImageException() throw (){}
         virtual const char* what() const throw()
         {
-            std::string ret = string("") + msg_;
+            std::string ret = std::string("") + msg_;
             return ret.c_str();
         }
     protected:
@@ -139,7 +120,7 @@ void toGrayScale(image_fmt &image)
 template <class T> class ImageProcess 
 {
     private:
-    typedef map<iterative_function,std::vector<std::string> > mapfuncres;
+    typedef std::map<iterative_function,std::vector<std::string> > mapfuncres;
         image_fmt image;
         const char *fileName;
         mapfuncres mapFuncRes;
@@ -285,7 +266,7 @@ template <class T> class ImageProcess
 
         void writeResultToFile(std::string fileDir)
         {
-            std::string sFilename = string(this->fileName);
+            std::string sFilename = std::string(this->fileName);
             try{
             writeToFile(this->vOutput, sFilename, fileDir);
             }
@@ -302,9 +283,9 @@ template <class T> class ImageProcess
         }
         void writeImageToFile(const char *fileDir)
         {
-            std::string sFileName = string(this->fileName);
+            std::string sFileName = std::string(this->fileName);
             trimLeadingFileName(sFileName);
-            std::string sFilename = string(fileDir) + "/" + sFileName;
+            std::string sFilename = std::string(fileDir) + "/" + sFileName;
             cimg::exception_mode(0);
             try
             {
@@ -322,347 +303,331 @@ template <class T> class ImageProcess
 };
 
 
-class ImageSolver
+ImageSolver::ImageSolver() {}
+void ImageSolver::addFolder(std::string sFolder, const char *errMsg)
 {
-    private:
-        static constexpr int NEXT_IMAGE = 0, PREV_IMAGE = 1, NEXT_SOLVER = 2, PREV_SOLVER = 3,
-                EXIT = 10;
-        typedef map<std::string, std::vector<string> > map_gallery;
+    try{
+        getFilesInFolder(sFolder, this->filenames);
+    }
+    catch(const file_IO::DirNotFound& f)
+    {
+        // CLOG(severity_type::error)(f.what(), " ", errMsg);
+        exit(EXIT_FAILURE);
+    }
+}
 
-    public:
-        LoadingBar loadBar;
-        std::vector<std::string> filenames;
-
-        void setVerbosity(int iLevel)
-        {
-        }
-        void addFolder(std::string sFolder, const char *errMsg = "")
-        {
-            try{
-                getFilesInFolder(sFolder, this->filenames);
-            }
-            catch(const file_IO::DirNotFound& f)
-            {
-                // CLOG(severity_type::error)(f.what(), " ", errMsg);
-                exit(EXIT_FAILURE);
-            }
+void ImageSolver::renderImages(std::string sImageRoot, function_container vIf,
+                               const char *cImagePath)
+{
+        if(this->filenames.size() < 1) 
+        { 
+            LOG(severity_type::error)("No files added!");
+            CLOG(severity_type::error)("No files added!");
+            exit(EXIT_FAILURE); 
         }
 
-        ImageSolver() { }
+        // sort the list of filenames
+        std::vector<std::string>::const_iterator it = this->filenames.begin();
 
+        map_gallery mapFiles;
 
-        void renderImages(std::string sImageRoot, function_container vIf, const char *cImagePath = "/image/")
+        cimg::exception_mode(0);
+        for(std::vector<std::string>::iterator it = filenames.begin();
+            it != filenames.end();
+            it++)
         {
-            if(this->filenames.size() < 1) 
-            { 
-                LOG(severity_type::error)("No files added!");
-                CLOG(severity_type::error)("No files added!");
-                exit(EXIT_FAILURE); 
-            }
-
-            // sort the list of filenames
-            std::vector<std::string>::const_iterator it = this->filenames.begin();
-
-            map_gallery mapFiles;
-
-            cimg::exception_mode(0);
-            for(std::vector<std::string>::iterator it = filenames.begin();
-                it != filenames.end();
-                it++)
-            {
-                std::string s = (*it);
-                trimLeadingFileName(s);
-                std::vector<std::string> vOutputs;
-                mapFiles[s] = vOutputs;
-            }
-
-            this->filenames.clear();
-
-            for (function_container::iterator subIt = vIf.begin();
-                subIt != vIf.end();
-                ++subIt)
-            {
-                std::string sImageDir = DATA_DIR + (*subIt).sPath + string(cImagePath);
-                this->addFolder(sImageDir, "when trying to show rendered images (-c flag)");
-            }
-
-            for(std::vector<std::string>::iterator it = filenames.begin();
-                it != filenames.end();
-                it++)
-            {
-                std::string s = (*it);
-                trimLeadingFileName(s);
-                mapFiles[s].push_back(*it);
-            }
-
-            doImageDisplay(mapFiles, sImageRoot);
-
+            std::string s = (*it);
+            trimLeadingFileName(s);
+            std::vector<std::string> vOutputs;
+            mapFiles[s] = vOutputs;
         }
 
-        bool loadImage(std::string sFileDest, image_fmt &image)
-        {
-            cimg::exception_mode(0);
-            try {
-                image.load(sFileDest.c_str());
-                LOG(severity_type::debug)("Loaded image ", sFileDest,
-                                          "to code format at ", &image);
-                CLOG(severity_type::debug)("Loaded image ", sFileDest,
-                                          "to code format at ", &image);
-                toGrayScale(image);
-                LOG(severity_type::debug)("Converted ", sFileDest, " to grayscale");
-                CLOG(severity_type::debug)("Converted ", sFileDest, " to grayscale");
-            }
-            catch(CImgIOException cioe)
-            {
-                std::cout << cioe.what() << std::endl;
-                return false;
-            }
+        this->filenames.clear();
 
-            return true;
+        for (function_container::iterator subIt = vIf.begin();
+            subIt != vIf.end();
+            ++subIt)
+        {
+            std::string sImageDir = DATA_DIR + (*subIt).sPath + std::string(cImagePath);
+            this->addFolder(sImageDir,
+                    "when trying to show rendered images (-c flag)");
         }
 
-        void clearFolders()
+        for(std::vector<std::string>::iterator it = filenames.begin();
+            it != filenames.end();
+            it++)
         {
-            this->filenames.clear();
+            std::string s = (*it);
+            trimLeadingFileName(s);
+            mapFiles[s].push_back(*it);
         }
 
-        void doImageDisplay(map_gallery &mapFiles, std::string sImageRoot)
+        doImageDisplay(mapFiles, sImageRoot);
+
+}
+
+bool ImageSolver::loadImage(std::string sFileDest, image_fmt &image)
+{
+    cimg::exception_mode(0);
+    try {
+        image.load(sFileDest.c_str());
+        LOG(severity_type::debug)("Loaded image ", sFileDest,
+                                  "to code format at ", &image);
+        CLOG(severity_type::debug)("Loaded image ", sFileDest,
+                                  "to code format at ", &image);
+        toGrayScale(image);
+        LOG(severity_type::debug)("Converted ", sFileDest, " to grayscale");
+        CLOG(severity_type::debug)("Converted ", sFileDest, " to grayscale");
+    }
+    catch(CImgIOException cioe)
+    {
+        std::cout << cioe.what() << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+void ImageSolver::clearFolders()
+{
+    this->filenames.clear();
+}
+
+void ImageSolver::doImageDisplay(map_gallery &mapFiles, std::string sImageRoot)
+{
+    map_gallery::iterator it = mapFiles.begin();
+
+    std::vector<std::string> out = it->second;
+    std::string mainFile = it->first;
+    image_fmt main_image, solved_image;
+    int iIndex = 0;
+    int iImageIndex = 0;
+
+    std::string sImageDest = sImageRoot + it->first;
+    if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) return;
+
+    const double blackWhite[] = {255};
+    CImgDisplay main_disp(main_image, mainFile.c_str() ,0);	
+    CImgDisplay mask_disp(solved_image, out[iIndex].c_str() ,0);	
+    // main_disp.resize();
+    // mask_disp.resize();
+    image_fmt visu(500, 300, 1, 1, 0);
+    // image_fmt visu(main_disp);
+    CImgDisplay graph_disp(visu, "Color intensities" ,0);	
+
+    while (!main_disp.is_closed() && !mask_disp.is_closed() && !graph_disp.is_closed())
+    {
+        if (main_disp.button() && main_disp.mouse_y()>=0) 
         {
-            map_gallery::iterator it = mapFiles.begin();
+            const int yPos = main_disp.mouse_y();
+            image_fmt main_cropped =  main_image.get_crop(
+                    0, yPos, 0, 0, main_image.width()-1, yPos, 0, 0);
+            image_fmt side_cropped = solved_image.get_crop(
+                    0, yPos, 0, 0, solved_image.width()-1, yPos, 0, 0);
 
-            std::vector<std::string> out = it->second;
-            std::string mainFile = it->first;
-            image_fmt main_image, solved_image;
-            int iIndex = 0;
-            int iImageIndex = 0;
-
-            std::string sImageDest = sImageRoot + it->first;
-            if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) return;
-
-            const double blackWhite[] = {255};
-            CImgDisplay main_disp(main_image, mainFile.c_str() ,0);	
-            CImgDisplay mask_disp(solved_image, out[iIndex].c_str() ,0);	
-            // main_disp.resize();
-            // mask_disp.resize();
-            image_fmt visu(500, 300, 1, 1, 0);
-            // image_fmt visu(main_disp);
-            CImgDisplay graph_disp(visu, "Color intensities" ,0);	
-
-            while (!main_disp.is_closed() && !mask_disp.is_closed() && !graph_disp.is_closed())
-            {
-                if (main_disp.button() && main_disp.mouse_y()>=0) 
-                {
-                    const int yPos = main_disp.mouse_y();
-                    image_fmt main_cropped =  main_image.get_crop(
-                            0, yPos, 0, 0, main_image.width()-1, yPos, 0, 0);
-                    image_fmt side_cropped = solved_image.get_crop(
-                            0, yPos, 0, 0, solved_image.width()-1, yPos, 0, 0);
-
-                    // data, color, opacity, plot_type, verttex_type, ymin
-                    visu.fill(0).draw_graph(main_cropped, blackWhite, 1, 1, 0, 255, 0);
-                    visu.draw_graph(side_cropped, blackWhite, 1, 1, 0, 255, 0);
-                    visu.display(graph_disp);
-                }
-                switch (main_disp.key()) 
-                {
-                    case cimg::keyARROWUP:
-                        if(iImageIndex == mapFiles.size() - 1) {it = mapFiles.begin(); iImageIndex = 0;}
-                        else{ iImageIndex++ ; it++; }
-
-                        mainFile = it->first;
-                        out = it->second;
-                        
-
-                        sImageDest = sImageRoot + mainFile;
-                        if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { break; }
-                        main_disp = main_image;
-                        main_disp.set_title(mainFile.c_str());
-                        mask_disp = solved_image;
-                        mask_disp.set_title(out[iIndex].c_str());
-                        // main_disp.resize();
-                        // mask_disp.resize();
-                        break;
-                    case cimg::keyARROWDOWN:
-                        if(it == mapFiles.begin()) {it = mapFiles.end(); it--; iImageIndex = mapFiles.size() - 1;}
-                        else{ it--; iImageIndex--; }
-
-                        mainFile = it->first;
-                        out = it->second;
-                        
-
-                        sImageDest = sImageRoot + mainFile;
-                        if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { it--; break; }
-                        main_disp = main_image;
-                        main_disp.set_title(mainFile.c_str());
-                        mask_disp = solved_image;
-                        mask_disp.set_title(out[iIndex].c_str());
-                        // main_disp.resize();
-                        // mask_disp.resize();
-                        break;
-                    case cimg::keyARROWLEFT:
-                        if(iIndex == 0) { iIndex = out.size(); }
-                        iIndex--;
-                        if(!loadImage(out[iIndex], solved_image)) {break; }
-                        mask_disp = solved_image;
-                        mask_disp.set_title(out[iIndex].c_str());
-                        // mask_disp.resize();
-                        break;
-                    case cimg::keyARROWRIGHT:
-                        if(iIndex == out.size() - 1) { iIndex = -1; }
-                        iIndex++;
-                        if(!loadImage(out[iIndex], solved_image)) {break; }
-                        mask_disp = solved_image;
-                        mask_disp.set_title(out[iIndex].c_str());
-                        // mask_disp.resize();
-                        break;
-                    case cimg::keyQ:
-                        return;
-                }
-                main_disp.wait();
-
-            }
-
+            // data, color, opacity, plot_type, verttex_type, ymin
+            visu.fill(0).draw_graph(main_cropped, blackWhite, 1, 1, 0, 255, 0);
+            visu.draw_graph(side_cropped, blackWhite, 1, 1, 0, 255, 0);
+            visu.display(graph_disp);
         }
-
-        imageList_fmt histogram(std::string sDir, function_container vIf)
+        switch (main_disp.key()) 
         {
+            case cimg::keyARROWUP:
+                if(iImageIndex == mapFiles.size() - 1) {it = mapFiles.begin(); iImageIndex = 0;}
+                else{ iImageIndex++ ; it++; }
 
-            // for (function_container::iterator subIt = vIf.begin();
-            //     subIt != vIf.end();
-            //     ++subIt)
-            // {
-            image_fmt bigImg;
-            imageList_fmt images;
-            cimg::exception_mode(0);
+                mainFile = it->first;
+                out = it->second;
+                
 
-            for(std::vector<std::string>::iterator it = filenames.begin();
-                it != filenames.end();
-                it++)
-            {
-                image_fmt image;
-                if(!loadImage((*it), image)) 
-                {
-                    continue;
-                }
-                bigImg.append(image, 'x');
-            }
-            images.push_back(bigImg.histogram(256));
+                sImageDest = sImageRoot + mainFile;
+                if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { break; }
+                main_disp = main_image;
+                main_disp.set_title(mainFile.c_str());
+                mask_disp = solved_image;
+                mask_disp.set_title(out[iIndex].c_str());
+                // main_disp.resize();
+                // mask_disp.resize();
+                break;
+            case cimg::keyARROWDOWN:
+                if(it == mapFiles.begin()) {it = mapFiles.end(); it--; iImageIndex = mapFiles.size() - 1;}
+                else{ it--; iImageIndex--; }
 
+                mainFile = it->first;
+                out = it->second;
+                
 
-            for (function_container::iterator it = vIf.begin();
-                it != vIf.end();
-                ++it)
-            {
-                this->filenames.clear();
-                std::string sImageDir = DATA_DIR + (*it).sPath + string("image/");
-                this->addFolder(sImageDir);
-                image_fmt appender;
-
-                for(std::vector<std::string>::iterator subIt = filenames.begin();
-                    subIt != filenames.end();
-                    subIt++)
-                {
-                    image_fmt image;
-                    if(!loadImage((*subIt), image)) 
-                    {
-                        continue;
-                    }
-                    appender.append(image, 'x');
-                }
-                images.push_back(appender.histogram(256));
-            }
-
-            return images;
-        }
-
-        void solve(function_container vIf, bool bComputeLines = false,
-                    double dTolerance = 0.3,
-                   const char *cImagePath = "/image/", const char *cResultPath = "/./"
-                   , double dScalar = 1)
-        {
-            if(this->filenames.size() < 1
-            || vIf.size() < 1) {
-                LOG(severity_type::error)("Solve called without files (or functions?)");
-                CLOG(severity_type::error)("Solve called without files (or functions?)");
+                sImageDest = sImageRoot + mainFile;
+                if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { it--; break; }
+                main_disp = main_image;
+                main_disp.set_title(mainFile.c_str());
+                mask_disp = solved_image;
+                mask_disp.set_title(out[iIndex].c_str());
+                // main_disp.resize();
+                // mask_disp.resize();
+                break;
+            case cimg::keyARROWLEFT:
+                if(iIndex == 0) { iIndex = out.size(); }
+                iIndex--;
+                if(!loadImage(out[iIndex], solved_image)) {break; }
+                mask_disp = solved_image;
+                mask_disp.set_title(out[iIndex].c_str());
+                // mask_disp.resize();
+                break;
+            case cimg::keyARROWRIGHT:
+                if(iIndex == out.size() - 1) { iIndex = -1; }
+                iIndex++;
+                if(!loadImage(out[iIndex], solved_image)) {break; }
+                mask_disp = solved_image;
+                mask_disp.set_title(out[iIndex].c_str());
+                // mask_disp.resize();
+                break;
+            case cimg::keyQ:
                 return;
-            }
-
-            int iTotalIterations;
-            double dProgress = 0;
-            double dStepSize;
-
-            iTotalIterations = this->filenames.size() * vIf.size();
-            dStepSize = ((double)100 / iTotalIterations);
-            int iTimeRemaining = filenames.size() * vIf.size();
-            loadBar.initialize(iTotalIterations);
-            for(std::vector<std::string>::iterator it = filenames.begin();
-                it != filenames.end();
-                it++)
-            {
-                cimg::exception_mode(0);
-                image_fmt image;
-                if(!loadImage((*it), image)) 
-                {
-                    loadBar.increaseProgress(vIf.size() - 1);
-                    std::cout << loadBar << std::endl;
-                    continue;
-                }
-
-                ImageProcess<double> ipImage(image, (*it).c_str(), dTolerance);
-                // toGrayScale(ipImage.getImage());
-                ipImage.makeRho();
-
-                if(dScalar != 1.0) { ipImage.multiply(dScalar); }
-                bool BORDERS=true;
-
-                for (function_container::iterator subIt = vIf.begin();
-                    subIt != vIf.end();
-                    ++subIt)
-                {
-
-                    std::string sImageDir = DATA_DIR + (*subIt).sPath + string(cImagePath);
-                    std::string sLogPath = LOG_DIR + (*subIt).sPath;
-                    std::string sLogFile = sLogPath + (*it);
-                    trimTrailingFilename(sLogFile);
-                    trimLeadingFileName(sLogFile);
-                    sLogFile = sLogFile + ".log";
-                    mkdirp(sLogPath.c_str());
-                    logging::logger< logging::file_log_policy > logInstance(sLogPath + sLogFile);
-                    logInstance.setLevel(log_inst.getLevel());
-
-                    (logInstance.print<severity_type::extensive>)("Initial image\n", printImage(ipImage.getImage()));
-                    CLOG(severity_type::extensive)("Initial image\n", printImage(ipImage.getImage()));
-                    ipImage.makeInitialGuess(BORDERS);
-                    (logInstance.print<severity_type::extensive>)("Initial guess\n", printImage(ipImage.getGuess()));
-                    CLOG(severity_type::extensive)("Initial guess\n", printImage(ipImage.getGuess()));
-                    (logInstance.print<severity_type::extensive>)("Initial rho\n", printImage(ipImage.getGuess()));
-                    CLOG(severity_type::extensive)("Initial rho\n", printImage(ipImage.getGuess()));
-                    (logInstance.print<severity_type::info>)("Beginning solver: ", (*subIt).sPath);
-                    CLOG(severity_type::info)("Beginning solver: ", (*subIt).sPath);
-
-                    try{
-
-                        ipImage.solve((*subIt).func, logInstance);
-                        std::cout << loadBar << std::endl;
-
-                        if(bComputeLines) { ipImage.computeLine("lines"); }
-                        ipImage.writeResultToFile(std::string(cResultPath) + (*subIt).sPath);
-
-                        ipImage.roundValues();
-                        ipImage.writeImageToFile(sImageDir.c_str());
-                        ipImage.clearImages();
-                    }
-                    catch(ImageException &ie)
-                    {
-                        LOG(severity_type::warning)(ie.what());
-                        CLOG(severity_type::warning)(ie.what());
-                    }
-                }                
-
-            }
-            std::cout << loadBar << std::endl;// if last image has errors, this might be necessary
         }
-};
+        main_disp.wait();
+
+    }
+
+}
+
+imageList_fmt ImageSolver::histogram(std::string sDir, function_container vIf)
+{
+
+    // for (function_container::iterator subIt = vIf.begin();
+    //     subIt != vIf.end();
+    //     ++subIt)
+    // {
+    image_fmt bigImg;
+    imageList_fmt images;
+    cimg::exception_mode(0);
+
+    for(std::vector<std::string>::iterator it = filenames.begin();
+        it != filenames.end();
+        it++)
+    {
+        image_fmt image;
+        if(!loadImage((*it), image)) 
+        {
+            continue;
+        }
+        bigImg.append(image, 'x');
+    }
+    images.push_back(bigImg.histogram(256));
+
+
+    for (function_container::iterator it = vIf.begin();
+        it != vIf.end();
+        ++it)
+    {
+        this->filenames.clear();
+        std::string sImageDir = DATA_DIR + (*it).sPath + std::string("image/");
+        this->addFolder(sImageDir);
+        image_fmt appender;
+
+        for(std::vector<std::string>::iterator subIt = filenames.begin();
+            subIt != filenames.end();
+            subIt++)
+        {
+            image_fmt image;
+            if(!loadImage((*subIt), image)) 
+            {
+                continue;
+            }
+            appender.append(image, 'x');
+        }
+        images.push_back(appender.histogram(256));
+    }
+
+    return images;
+}
+
+void ImageSolver::solve(function_container vIf, bool bComputeLines,
+            double dTolerance, const char *cImagePath, const char *cResultPath
+           , double dScalar)
+{
+    if(this->filenames.size() < 1
+    || vIf.size() < 1) {
+        LOG(severity_type::error)("Solve called without files (or functions?)");
+        CLOG(severity_type::error)("Solve called without files (or functions?)");
+        return;
+    }
+
+    int iTotalIterations;
+    double dProgress = 0;
+    double dStepSize;
+
+    iTotalIterations = this->filenames.size() * vIf.size();
+    dStepSize = ((double)100 / iTotalIterations);
+    int iTimeRemaining = filenames.size() * vIf.size();
+    loadBar.initialize(iTotalIterations);
+    for(std::vector<std::string>::iterator it = filenames.begin();
+        it != filenames.end();
+        it++)
+    {
+        cimg::exception_mode(0);
+        image_fmt image;
+        if(!loadImage((*it), image)) 
+        {
+            loadBar.increaseProgress(vIf.size() - 1);
+            std::cout << loadBar << std::endl;
+            continue;
+        }
+
+        ImageProcess<double> ipImage(image, (*it).c_str(), dTolerance);
+        // toGrayScale(ipImage.getImage());
+        ipImage.makeRho();
+
+        if(dScalar != 1.0) { ipImage.multiply(dScalar); }
+        bool BORDERS=true;
+
+        for (function_container::iterator subIt = vIf.begin();
+            subIt != vIf.end();
+            ++subIt)
+        {
+
+            std::string sImageDir = DATA_DIR + (*subIt).sPath + std::string(cImagePath);
+            std::string sLogPath = LOG_DIR + (*subIt).sPath;
+            std::string sLogFile = sLogPath + (*it);
+            trimTrailingFilename(sLogFile);
+            trimLeadingFileName(sLogFile);
+            sLogFile = sLogFile + ".log";
+            mkdirp(sLogPath.c_str());
+            logging::logger< logging::file_log_policy > logInstance(sLogPath + sLogFile);
+            logInstance.setLevel(log_inst.getLevel());
+
+            (logInstance.print<severity_type::extensive>)("Initial image\n", printImage(ipImage.getImage()));
+            CLOG(severity_type::extensive)("Initial image\n", printImage(ipImage.getImage()));
+            ipImage.makeInitialGuess(BORDERS);
+            (logInstance.print<severity_type::extensive>)("Initial guess\n", printImage(ipImage.getGuess()));
+            CLOG(severity_type::extensive)("Initial guess\n", printImage(ipImage.getGuess()));
+            (logInstance.print<severity_type::extensive>)("Initial rho\n", printImage(ipImage.getGuess()));
+            CLOG(severity_type::extensive)("Initial rho\n", printImage(ipImage.getGuess()));
+            (logInstance.print<severity_type::info>)("Beginning solver: ", (*subIt).sPath);
+            CLOG(severity_type::info)("Beginning solver: ", (*subIt).sPath);
+
+            try{
+
+                ipImage.solve((*subIt).func, logInstance);
+                std::cout << loadBar << std::endl;
+
+                if(bComputeLines) { ipImage.computeLine("lines"); }
+                ipImage.writeResultToFile(std::string(cResultPath) + (*subIt).sPath);
+
+                ipImage.roundValues();
+                ipImage.writeImageToFile(sImageDir.c_str());
+                ipImage.clearImages();
+            }
+            catch(ImageException &ie)
+            {
+                LOG(severity_type::warning)(ie.what());
+                CLOG(severity_type::warning)(ie.what());
+            }
+        }                
+
+    }
+    std::cout << loadBar << std::endl;// if last image has errors, this might be necessary
+}
 
 
 void calculateAverage(std::string sFilePath)
@@ -735,7 +700,4 @@ void calculateAverage(std::string sFilePath)
     // writeToFile(average, sFilename, sFilePath);
 }
 
-
 } /* EndOfNameSpace */
-
-#endif

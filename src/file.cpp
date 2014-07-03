@@ -1,5 +1,9 @@
+#include "file.hpp"
+
+
 #include <algorithm>
 #include <errno.h>
+#include <iomanip>
 #include <stdio.h>
 #include <string>
 #include <sys/stat.h>
@@ -11,14 +15,14 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "./main.cpp"
+#include "./logger.hpp"
 
 using namespace logging;
 
 namespace file_IO
 {
 
-DirNotFound:: what() const throw() 
+const char* DirNotFound:: what() const throw() 
 {
     std::string ret = std::string("Could not find folder: ") + msg_;
     return ret.c_str();
