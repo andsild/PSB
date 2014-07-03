@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <string>
 
-#include "file.hpp"
-
 namespace plot
 {
 

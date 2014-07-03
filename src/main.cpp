@@ -18,7 +18,7 @@
 #include "logger.hpp"
 #include "file.hpp"
 #include "image2.hpp"
-#include "include/iterative_solvers.hpp"
+#include "iterative_solvers.hpp"
 #include "plot.cpp"
 // #include "solvers/FFT.cpp"
 

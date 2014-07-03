@@ -1,6 +1,5 @@
 #include "file.hpp"
 
-
 #include <algorithm>
 #include <errno.h>
 #include <iomanip>
@@ -15,7 +14,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "./logger.hpp"
+#include "logger.hpp"
 
 using namespace logging;
 
@@ -95,8 +94,8 @@ void writeToFile(const std::vector<t> vRes, std::string sFilename, std::string s
         if(!data_file)
         {
             std::string sMsg = "Unable to write to file: " + sFilename;
-            LOG(severity_type::error)(sMsg);
-            CLOG(severity_type::error)(sMsg);
+            // LOG(severity_type::error)(sMsg);
+            // CLOG(severity_type::error)(sMsg);
             return;
         }
     }
@@ -131,8 +130,9 @@ void getFilesInFolder(std::string sDir, std::vector<std::string> &output)
         // Check for valid file(s)
         if (stat( readFile.c_str(), &filestat ))
         {
-            LOG(severity_type::warning)("Skipping ", readFile, " : file invalid");
-            CLOG(severity_type::warning)("Skipping ", readFile, " : file invalid");
+            // LOG(severity_type::warning)("Skipping ", readFile, " : file invalid");
+            log_inst.print<severity_type::warning> ("test");
+            // CLOG(severity_type::warning)("Skipping ", readFile, " : file invalid");
         }
         if (S_ISDIR( filestat.st_mode ))
         {
