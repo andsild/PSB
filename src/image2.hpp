@@ -10,7 +10,7 @@
 #include <string>
 
 #include "CImg.h"
-#include "loadingbar.cpp"
+#include "loadingbar.hpp"
 #include "iterative_solvers.hpp"
 
 namespace image_psb

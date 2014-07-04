@@ -57,29 +57,29 @@ void zeroBorder(double d1[], int iHeight, int iWidth)
 }
 
 using namespace test;
-int main(int argc, char *argv[]) 
-{
-    double D1[] = {0,0,0, 0,8,0, 0,0,0};
-    double D2[] = {0,1,0, 1,-4,1, 0,1,0};
-    double D3[] = {1,1,1,1,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1,  1,1,1,1,1};
-    double D4[] = {1,1,1, 1,-0,1, 1,1,1};
-
-
-    int iDim = 5;
-    double D5[iDim*iDim];
-    for(int iPos = 0; iPos < iDim * iDim; iPos++)
-        D5[iPos] = iPos % iDim;
-
-    zeroBorder(D5, iDim, iDim);
-
-    createImage(D1, 3, 3, "simpleTest");
-    createImage(D2, 3, 3, "kernelmatrix");
-    createImage(D3, 5, 5, "5x5border");
-    createImage(D4, 3, 3, "simpleTestDense");
-    createImage(D5, iDim, iDim, "increasing");
-}
-
-
+// int main(int argc, char *argv[]) 
+// {
+//     double D1[] = {0,0,0, 0,8,0, 0,0,0};
+//     double D2[] = {0,1,0, 1,-4,1, 0,1,0};
+//     double D3[] = {1,1,1,1,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1,  1,1,1,1,1};
+//     double D4[] = {1,1,1, 1,-0,1, 1,1,1};
+//
+//
+//     int iDim = 5;
+//     double D5[iDim*iDim];
+//     for(int iPos = 0; iPos < iDim * iDim; iPos++)
+//         D5[iPos] = iPos % iDim;
+//
+//     zeroBorder(D5, iDim, iDim);
+//
+//     createImage(D1, 3, 3, "simpleTest");
+//     createImage(D2, 3, 3, "kernelmatrix");
+//     createImage(D3, 5, 5, "5x5border");
+//     createImage(D4, 3, 3, "simpleTestDense");
+//     createImage(D5, iDim, iDim, "increasing");
+// }
+//
+//
 // } /* EndOfNamespace */
 
 #endif

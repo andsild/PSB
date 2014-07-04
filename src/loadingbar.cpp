@@ -1,5 +1,4 @@
-#ifndef LOADBAR_CPP_
-#define LOADBAR_CPP_
+#include "loadingbar.hpp"
 
 #include <string>
 
@@ -10,58 +9,47 @@
 namespace loadbar
 {
 
-class LoadingBar
+LoadingBar::LoadingBar() {};
+LoadingBar::LoadingBar(int iNumIterations) : iNumIterations(iNumIterations)
 {
-    private:
-        int iNumIterations;
-        double dStepSize;
-        mutable double dProgress;
-        mutable int iTimeRemaining;
-        mutable int iImageSize;
+    this->dProgress = 0;
+    this->dStepSize = ((double)100 / iNumIterations);
+    this->iTimeRemaining = 0;//filenames.size() * vIf.size() 
+                         //* (pow( (img.height() * img.width()), 0.3));
+}
 
-    public:
-        struct winsize w;
-        LoadingBar() {}
-        LoadingBar(int iNumIterations) : iNumIterations(iNumIterations)
-    {
-        this->dProgress = 0;
-        this->dStepSize = ((double)100 / iNumIterations);
-        this->iTimeRemaining = 0;//filenames.size() * vIf.size() 
-                             //* (pow( (img.height() * img.width()), 0.3));
-    }
-
-    void initialize(int iNumIterations)
-    {
-        this->iNumIterations = iNumIterations;
-        this->dProgress = 0;
-        this->dStepSize = ((double)100 / iNumIterations);
-        this->iTimeRemaining = 0;//filenames.size() * vIf.size() 
-                             //* (pow( (img.height() * img.width()), 0.3));
-    }
-    std::string getTimeLeft() const
-    {
-        int iMinutesLeft = this->iTimeRemaining / 60;
-        int iSecondsLeft = this->iTimeRemaining - (iMinutesLeft * 60);
-        return std::string(std::to_string(iMinutesLeft) + "m"
-                + std::to_string(iSecondsLeft) + "s");
-    }
-    void updateTimeRemaining(int iImageSize) const
-    {
-        this->iImageSize = iImageSize;
-        int iIterationsLeft = int((100 - this->getProgress()) 
-                                   / this->dStepSize);
-        // rough estimate
-        this->iTimeRemaining = iIterationsLeft * pow(iImageSize, 0.3); 
-    }
-    void increaseProgress(int iIterations = 1) const
-    {
-        this->dProgress += this->dStepSize * iIterations;
-        updateTimeRemaining(this->iImageSize);
-    }
-    double getProgress() const { return this->dProgress; }
-    friend std::ostream& operator<< (std::ostream &str, const LoadingBar& obj);
-
-};
+void LoadingBar::initialize(int iNumIterations)
+{
+    this->iNumIterations = iNumIterations;
+    this->dProgress = 0;
+    this->dStepSize = ((double)100 / iNumIterations);
+    this->iTimeRemaining = 0;//filenames.size() * vIf.size() 
+                         //* (pow( (img.height() * img.width()), 0.3));
+}
+std::string LoadingBar::getTimeLeft() const
+{
+    int iMinutesLeft = this->iTimeRemaining / 60;
+    int iSecondsLeft = this->iTimeRemaining - (iMinutesLeft * 60);
+    return std::string(std::to_string(iMinutesLeft) + "m"
+            + std::to_string(iSecondsLeft) + "s");
+}
+void LoadingBar::updateTimeRemaining(int iImageSize) const
+{
+    this->iImageSize = iImageSize;
+    int iIterationsLeft = int((100 - this->getProgress()) 
+                               / this->dStepSize);
+    // rough estimate
+    this->iTimeRemaining = iIterationsLeft * pow(iImageSize, 0.3); 
+}
+void LoadingBar::increaseProgress(int iIterations) const
+{
+    this->dProgress += this->dStepSize * iIterations;
+    updateTimeRemaining(this->iImageSize);
+}
+double LoadingBar::getProgress() const
+{
+    return this->dProgress;
+}
 
 std::ostream& operator<< (std::ostream &str, const LoadingBar& obj)
 {
@@ -90,8 +78,4 @@ std::ostream& operator<< (std::ostream &str, const LoadingBar& obj)
     return str;
 }
 
-
-
 } /* EndOfNamespace */
-
-#endif
