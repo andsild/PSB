@@ -1,4 +1,0 @@
-#define innerstripe_width 5
-#define innerstripe_height 6
-static unsigned char innerstripe_bits[] = {
-   0xff, 0xff, 0xfb, 0xfb, 0xff, 0xff};
