@@ -1,7 +1,3 @@
-#ifndef _MAIN_CPP
-#define _MAIN_CPP   1
-
-
 #include <fstream>
 #include <iostream>
 #include <iomanip>
@@ -12,14 +8,13 @@
 
 #include <getopt.h>
 
-
 #include "CImg.h"
 
-#include "logger.hpp"
+#include "loginstance.hpp"
 #include "file.hpp"
 #include "image2.hpp"
 #include "iterative_solvers.hpp"
-#include "plot.cpp"
+#include "plot.hpp"
 // #include "solvers/FFT.cpp"
 
 #define no_argument 0
@@ -261,5 +256,3 @@ int main(int argc, char *argv[])
     LOG(severity_type::info)("Program exited successfully");
     return 0;
 }
-
-#endif /* _MAIN.cpp */

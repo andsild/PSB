@@ -10,11 +10,11 @@
 
 #include "CImg.h"
 
-#include "logger.hpp"
-#include "loadingbar.cpp"
+#include "loginstance.hpp"
+#include "loadingbar.hpp"
 #include "iterative_solvers.hpp"
 #include "file.hpp"
-#include "plot.cpp"
+#include "plot.hpp"
 
 using namespace cimg_library;
 using namespace file_IO;
@@ -211,7 +211,7 @@ template <class T> class ImageProcess
             }
         }
 
-        void solve(iterative_function func,logging::logger< logging::file_log_policy > &logInstance)
+        void solve(iterative_function func,logging::Logger< logging::FileLogPolicy > &logInstance)
        {
             this->vOutput =  iterative_solve(func,
                                        this->image, this->U, this->rho,
@@ -593,7 +593,7 @@ void ImageSolver::solve(function_container vIf, bool bComputeLines,
             trimLeadingFileName(sLogFile);
             sLogFile = sLogFile + ".log";
             mkdirp(sLogPath.c_str());
-            logging::logger< logging::file_log_policy > logInstance(sLogPath + sLogFile);
+            logging::Logger< logging::FileLogPolicy > logInstance(sLogPath + sLogFile);
             logInstance.setLevel(log_inst.getLevel());
 
             (logInstance.print<severity_type::extensive>)("Initial image\n", printImage(ipImage.getImage()));

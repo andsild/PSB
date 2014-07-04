@@ -5,8 +5,8 @@
 
 #include "CImg.h"
 
-#include "logger.hpp"
-#include "image2.hpp"
+#include "loginstance.hpp"
+// #include "image2.hpp"
 
 using namespace logging;
 using namespace cimg_library;
@@ -14,48 +14,12 @@ using namespace cimg_library;
 namespace pe_solver //[p]oison-[e]quation
 {
 
-// #include <cstdarg>
-// std::std::string format2(const char* fmt, ...){
-//     int size = 512;
-//     char* buffer = 0;
-//     buffer = new char[size];
-//     va_list vl;
-//     va_start(vl, fmt);
-//     int nsize = vsnprintf(buffer, size, fmt, vl);
-//     if(size<=nsize){ //fail delete buffer and try again
-//         delete[] buffer;
-//         buffer = 0;
-//         buffer = new char[nsize+1]; //+1 for /0
-//         nsize = vsnprintf(buffer, size, fmt, vl);
-//     }
-//     std::std::string ret(buffer);
-//     va_end(vl);
-//     delete[] buffer;
-//     return ret;
-// }
-//
-// std::string printer(CImg<double> image)
-// {
-//     std::stringstream ss;
-//     for(int iPos = 0; iPos < image.height(); iPos++)
-//     {
-//         for(int jPos = 0; jPos < image.width(); jPos++)
-//         {
-//             ss << format2("%5.1f ", image(jPos, iPos));
-//             // printf("%5.1f ",image(jPos,iPos));
-//         }
-//         ss << "\n";
-//     }
-//
-//     return ss.str();
-// }
-//
-
 /** jacobi iteration
  *
  */
-inline void iterate_jacobi(const CImg<double> &F, CImg<double> &U, double iWidthLength,
-                    int iLength, double &dDiff, double H = 1)
+void iterate_jacobi(const CImg<double> &F, CImg<double> &U,
+                          double iWidthLength, int iLength, double &dDiff,
+                          double H = 1)
 {
     dDiff = 0;
     int BORDER_SIZE = 1;
@@ -81,8 +45,9 @@ inline void iterate_jacobi(const CImg<double> &F, CImg<double> &U, double iWidth
 /** Gauss-seidel iteration
  *
  */
-inline void iterate_gauss(const CImg<double> &F, CImg<double> &U, double iWidthLength,
-                           int iLength, double &dDiff, double H = 1)
+void iterate_gauss(const CImg<double> &F, CImg<double> &U,
+                          double iWidthLength, int iLength, double &dDiff,
+                          double H = 1)
 {
     dDiff = 0;
     int BORDER_SIZE = 1;
@@ -101,7 +66,7 @@ inline void iterate_gauss(const CImg<double> &F, CImg<double> &U, double iWidthL
     }
 }
 
-inline void iterate_sor(const CImg<double> &F, CImg<double> &U,
+void iterate_sor(const CImg<double> &F, CImg<double> &U,
                  double iWidthLength, int iLength, double &dDiff, double H = 1)
 {
     static double omega = 2 / (1 + (3.14 / iWidthLength ));
@@ -214,7 +179,7 @@ void two_grid(double h, CImg<double> &U, CImg<double> &F, int iWidthLength, int 
 
 std::vector<std::string> iterative_solve(iterative_function function,
                     const CImg<double> solution, CImg<double> &guess, CImg<double> rho,
-                    double dMaxErr, int iWidth, logging::logger< logging::file_log_policy > &logInst) 
+                    double dMaxErr, int iWidth, logging::Logger< logging::FileLogPolicy > &logInst) 
 {
     CImg<double> old_guess = guess, newGuess = guess;
     double dRelativeError = 0;
@@ -234,8 +199,8 @@ std::vector<std::string> iterative_solve(iterative_function function,
         // }
 
         // cout << "New guess:" << endl; printer(newGuess);
-        (logInst.print<severity_type::debug>)("New guess\n", image_psb::printImage(newGuess));
-        CLOG(severity_type::debug)("New guess\n", image_psb::printImage(newGuess));
+        // (logInst.print<severity_type::debug>)("New guess\n", image_psb::printImage(newGuess));
+        // CLOG(severity_type::debug)("New guess\n", image_psb::printImage(newGuess));
 
         if(iIter % 50 == 0) 
         {

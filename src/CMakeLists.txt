@@ -231,7 +231,7 @@ endif()
 # Add CIMG Flags to Compilation Flags
 #TODO: remove debug
 # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CIMG_CFLAGS} -L/usr/X11/R6/lib")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CIMG_CFLAGS} -g -std=c++11 -I${PROJECT_INCLUDE_DIR} -I.")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CIMG_CFLAGS} -g -std=c++11 -I${PROJECT_INCLUDE_DIR} -I. -L/usr/X11R6/lib -lX11 -lpthread -lm")
 
 # foreach(source ${PROJECT_SOURCE_DIR})
 #   add_executable(${source} ${source}/*.cpp)

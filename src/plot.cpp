@@ -1,5 +1,4 @@
-#ifndef _PLOT
-#define _PLOT   1
+#include "plot.hpp"
 
 #include <stdlib.h>
 #include <string>
@@ -19,6 +18,4 @@ void plot()
     #endif
 }
 
-} //EndOfNamespace
-
-#endif
+} /* EndOfNamespace */

@@ -5,16 +5,16 @@
 #include <iomanip>
 #include <stdio.h>
 #include <string>
-#include <sys/stat.h>
 #include <vector>
 
 
 #include <dirent.h>
 #include <math.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "logger.hpp"
+#include "loginstance.hpp"
 
 using namespace logging;
 
@@ -76,38 +76,6 @@ void mkdirp(const char* path, mode_t mode) {
   }
 }
 
-template <typename t>
-void writeToFile(const std::vector<t> vRes, std::string sFilename, std::string sFolderDest)
-{
-    trimLeadingFileName(sFilename);
-    trimTrailingFilename(sFilename);
-    std::string sFileDir = DATA_DIR + sFolderDest + "/";
-    sFilename = sFileDir + sFilename + DATA_EXTENSION;
-
-    std::ofstream data_file;
-
-    data_file.open(sFilename.c_str(), std::ios::out);
-    if(!data_file)
-    {
-        mkdirp(sFileDir.c_str());
-        data_file.open(sFilename.c_str(), std::ios::out);
-        if(!data_file)
-        {
-            std::string sMsg = "Unable to write to file: " + sFilename;
-            // LOG(severity_type::error)(sMsg);
-            // CLOG(severity_type::error)(sMsg);
-            return;
-        }
-    }
-
-    typename std::vector<t>::const_iterator it;
-    for (it = vRes.begin(); it != vRes.end(); ++it)
-    {
-        data_file << std::setprecision(PRECISION) << std::fixed << *it << std::endl;
-    }
-
-    data_file.close();
-}
 
 void getFilesInFolder(std::string sDir, std::vector<std::string> &output)
 {
@@ -131,7 +99,7 @@ void getFilesInFolder(std::string sDir, std::vector<std::string> &output)
         if (stat( readFile.c_str(), &filestat ))
         {
             // LOG(severity_type::warning)("Skipping ", readFile, " : file invalid");
-            log_inst.print<severity_type::warning> ("test");
+            // log_inst.print<severity_type::warning>("dwa");
             // CLOG(severity_type::warning)("Skipping ", readFile, " : file invalid");
         }
         if (S_ISDIR( filestat.st_mode ))
