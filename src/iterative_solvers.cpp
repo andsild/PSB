@@ -6,7 +6,7 @@
 #include "CImg.h"
 
 #include "loginstance.hpp"
-// #include "image2.hpp"
+#include "image2.hpp"
 
 using namespace logging;
 using namespace cimg_library;
@@ -19,7 +19,7 @@ namespace pe_solver //[p]oison-[e]quation
  */
 void iterate_jacobi(const CImg<double> &F, CImg<double> &U,
                           double iWidthLength, int iLength, double &dDiff,
-                          double H = 1)
+                          double H)
 {
     dDiff = 0;
     int BORDER_SIZE = 1;
@@ -31,7 +31,7 @@ void iterate_jacobi(const CImg<double> &F, CImg<double> &U,
                    x,y,0,0,I,double) // uses Neumann borders
     // cimg_for3x3(copyU,x,y,0,0,I,double) // uses Neumann borders
     {
-        double dOldVal = U(x,y);
+        double dOldVal = Icc;
         double dNewVal = .25 * (Icn + Icp + Ipc + Inc - F(x,y) * H * H);
         U(x,y) = dNewVal;
         double dCurDiff = (abs(dOldVal - dNewVal));
@@ -40,14 +40,12 @@ void iterate_jacobi(const CImg<double> &F, CImg<double> &U,
     }
 }
 
-
-
 /** Gauss-seidel iteration
  *
  */
 void iterate_gauss(const CImg<double> &F, CImg<double> &U,
                           double iWidthLength, int iLength, double &dDiff,
-                          double H = 1)
+                          double H)
 {
     dDiff = 0;
     int BORDER_SIZE = 1;
@@ -67,7 +65,7 @@ void iterate_gauss(const CImg<double> &F, CImg<double> &U,
 }
 
 void iterate_sor(const CImg<double> &F, CImg<double> &U,
-                 double iWidthLength, int iLength, double &dDiff, double H = 1)
+                 double iWidthLength, int iLength, double &dDiff, double H)
 {
     static double omega = 2 / (1 + (3.14 / iWidthLength ));
     static double dOmegaConstant = omega / 4;
@@ -92,89 +90,87 @@ void iterate_sor(const CImg<double> &F, CImg<double> &U,
     }
 }
 
-
-
 void two_grid(double h, CImg<double> &U, CImg<double> &F, int iWidthLength, int iSmoothFactor)
 {
-    double H = 2 * h;
-    CImg<double> r(iWidthLength*2);
-    CImg<double> R(iWidthLength);
-    CImg<double> V(iWidthLength);
-    int L2 = iWidthLength / 2;
-
-    // solve exactly if there is only one interior point
-    if (iWidthLength == 1) 
-    {
-        U[0] = 0.25;// * (U[0][1] + U[2][1] + U[1][0] + U[1][2] + h * h * F[1][1]);
-        return;
-    }
-
-    // pre-smoothing
-    for (int iPos = 0; iPos < iSmoothFactor; iPos++)
-    {
-        iterate_gauss(F, U, iWidthLength, iWidthLength * 2, h);
-    }
-
-    for (int yPos = iWidthLength;
-         yPos <= iWidthLength;
-         yPos += iWidthLength)
-    {
-        for (int xPos = 0; xPos <= iWidthLength; xPos++)
-        {
-            int iCurrent = xPos + yPos;
-            r[iCurrent] = F[iCurrent] - (4 * U[iCurrent] / (h * h))
-                            + ( U[iCurrent + 1] + U[iCurrent - 1]
-                              + U[iCurrent - iWidthLength] 
-                              + U[iCurrent + iWidthLength]);
-        }
-    }
-
-    for (int yPos = iWidthLength; yPos <= L2; yPos += iWidthLength)
-    {
-        int iPos = 2 * yPos - 1;
-        for (int xPos = 0; xPos <= L2; xPos++)
-        {
-            int jPos = 2 * jPos - 1;
-            int iCurrent = (iPos+jPos);
-            R[(yPos+xPos)] = 0.25 * 
-                            ( r[iCurrent]
-                              + r[iCurrent+iWidthLength]
-                              + r[iCurrent + 1]
-                              + r[iCurrent+1+iWidthLength]
-                            );
-        }
-    }
-
-    two_grid(H, V, R, L2, iSmoothFactor);
-    CImg<double> v(iWidthLength*2);
-
-    for (int yPos = iWidthLength; yPos <= L2; yPos += iWidthLength)
-    {
-        int iPos = 2 * yPos - 1;
-        for (int xPos = 0; xPos <= L2; xPos++)
-        {
-            int jPos = 2 * jPos - 1;
-            int iCurrent = (iPos+jPos);
-            v[(xPos + yPos)] = v[iCurrent+iWidthLength] 
-                             = v[iCurrent+1]
-                             = v[iCurrent+1+iWidthLength]
-                             = V[(xPos+yPos)];
-        }
-    }
-
-    // correct U
-    for(std::vector<int>::size_type iPos = iWidthLength;
-            iPos < iWidthLength * 2;
-            iPos++) 
-    {
-            U[iPos] += v[iPos];
-    }
-
-    // post-smoothing Gauss-Seidel
-    for (int iPos = 0; iPos < iSmoothFactor; iPos++)
-    {
-        iterate_gauss(F, U, iWidthLength, iWidthLength * 2, h);
-    }
+    // double H = 2 * h;
+    // CImg<double> r(iWidthLength*2);
+    // CImg<double> R(iWidthLength);
+    // CImg<double> V(iWidthLength);
+    // int L2 = iWidthLength / 2;
+    //
+    // // solve exactly if there is only one interior point
+    // if (iWidthLength == 1) 
+    // {
+    //     U[0] = 0.25;// * (U[0][1] + U[2][1] + U[1][0] + U[1][2] + h * h * F[1][1]);
+    //     return;
+    // }
+    //
+    // // pre-smoothing
+    // for (int iPos = 0; iPos < iSmoothFactor; iPos++)
+    // {
+    //     iterate_gauss(F, U, iWidthLength, iWidthLength * 2, h);
+    // }
+    //
+    // for (int yPos = iWidthLength;
+    //      yPos <= iWidthLength;
+    //      yPos += iWidthLength)
+    // {
+    //     for (int xPos = 0; xPos <= iWidthLength; xPos++)
+    //     {
+    //         int iCurrent = xPos + yPos;
+    //         r[iCurrent] = F[iCurrent] - (4 * U[iCurrent] / (h * h))
+    //                         + ( U[iCurrent + 1] + U[iCurrent - 1]
+    //                           + U[iCurrent - iWidthLength] 
+    //                           + U[iCurrent + iWidthLength]);
+    //     }
+    // }
+    //
+    // for (int yPos = iWidthLength; yPos <= L2; yPos += iWidthLength)
+    // {
+    //     int iPos = 2 * yPos - 1;
+    //     for (int xPos = 0; xPos <= L2; xPos++)
+    //     {
+    //         int jPos = 2 * jPos - 1;
+    //         int iCurrent = (iPos+jPos);
+    //         R[(yPos+xPos)] = 0.25 * 
+    //                         ( r[iCurrent]
+    //                           + r[iCurrent+iWidthLength]
+    //                           + r[iCurrent + 1]
+    //                           + r[iCurrent+1+iWidthLength]
+    //                         );
+    //     }
+    // }
+    //
+    // two_grid(H, V, R, L2, iSmoothFactor);
+    // CImg<double> v(iWidthLength*2);
+    //
+    // for (int yPos = iWidthLength; yPos <= L2; yPos += iWidthLength)
+    // {
+    //     int iPos = 2 * yPos - 1;
+    //     for (int xPos = 0; xPos <= L2; xPos++)
+    //     {
+    //         int jPos = 2 * jPos - 1;
+    //         int iCurrent = (iPos+jPos);
+    //         v[(xPos + yPos)] = v[iCurrent+iWidthLength] 
+    //                          = v[iCurrent+1]
+    //                          = v[iCurrent+1+iWidthLength]
+    //                          = V[(xPos+yPos)];
+    //     }
+    // }
+    //
+    // // correct U
+    // for(std::vector<int>::size_type iPos = iWidthLength;
+    //         iPos < iWidthLength * 2;
+    //         iPos++) 
+    // {
+    //         U[iPos] += v[iPos];
+    // }
+    //
+    // // post-smoothing Gauss-Seidel
+    // for (int iPos = 0; iPos < iSmoothFactor; iPos++)
+    // {
+    //     iterate_gauss(F, U, iWidthLength, iWidthLength * 2, h);
+    // }
 }
 
 std::vector<std::string> iterative_solve(iterative_function function,
@@ -190,17 +186,10 @@ std::vector<std::string> iterative_solve(iterative_function function,
     do
     {
         double dOld = dRelativeError;
-        function(rho, newGuess, iWidth, iLength, dRelativeError, 1);
-        // if (dOld == dRelativeError)
-        // {
-        //     cout << "Method converged (no change in iteration) with value: "
-        //          << dOld << endl;
-        //     break;
-        // }
+        function(rho, newGuess, iWidth, iLength, dRelativeError, 1.0);
 
-        // cout << "New guess:" << endl; printer(newGuess);
-        // (logInst.print<severity_type::debug>)("New guess\n", image_psb::printImage(newGuess));
-        // CLOG(severity_type::debug)("New guess\n", image_psb::printImage(newGuess));
+        (logInst.print<severity_type::debug>)("New guess\n", image_psb::printImage(newGuess));
+        CLOG(severity_type::debug)("New guess\n", image_psb::printImage(newGuess));
 
         if(iIter % 50 == 0) 
         {
@@ -216,8 +205,26 @@ std::vector<std::string> iterative_solve(iterative_function function,
         (logInst.print<severity_type::extensive>)("Iteration diff(max): ", dRelativeError);
         CLOG(severity_type::extensive)("Iteration diff(max): ", dRelativeError);
 
+
+
         old_guess = newGuess;
         iIter++;
+
+        /* dRelative error reached a ``weird'' value */
+       if(dRelativeError == 0)
+       {
+           LOG(severity_type::warning)("Solver iteration diff reached 0 - something might have gone wrong");
+           CLOG(severity_type::warning)("Solver iteration diff reached 0 - something might have gone wrong");
+           break;
+        }
+
+        /* No change in iteration */
+        if (dOld == dRelativeError)
+        {
+            CLOG(severity_type::warning)("Method converged (no change in iteration) with value: ", dOld);
+            LOG(severity_type::warning)("Method converged (no change in iteration) with value: ", dOld);
+        }
+
     } while(dRelativeError > dMaxErr);
 
     CLOG(severity_type::info)("Finished in ", iIter, " iterations");

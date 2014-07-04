@@ -1,4 +1,0 @@
-#define stripe_width 4
-#define stripe_height 4
-static unsigned char stripe_bits[] = {
-   0xfd, 0xfd, 0xfd, 0xfd};

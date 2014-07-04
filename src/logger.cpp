@@ -6,13 +6,17 @@
 #include <sstream>
 #include <string>
 
+#include "file.hpp"
+#include "loginstance.hpp"
+
 namespace logging
 {
 
 void FileLogPolicy::open_ostream(const std::string& name)
 {
+    std::string sLog = LOG_DIR;
+    file_IO::mkdirp(sLog.c_str());
     out_stream->open( name.c_str(), std::ios_base::binary|std::ios_base::out );
-    // file_IO::mkdirp(name.c_str());
     if( !out_stream->is_open() ) 
     {
         std::string sMsg = "Logger: unable to open an output stream: " + name;
@@ -42,3 +46,6 @@ FileLogPolicy::~FileLogPolicy()
 }
 
 } /* EndOfNamespace */
+
+logging::Logger< logging::FileLogPolicy > log_inst(LOG_DIR "execution.log");
+logging::Logger< logging::FileLogPolicy > log_inst_std("/dev/fd/0");

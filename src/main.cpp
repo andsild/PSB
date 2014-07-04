@@ -28,6 +28,9 @@ using namespace plot;
 using namespace logging;
 
 
+
+
+
 void usage()
 {
     std::cout << "Usage: main <folder>" << std::endl;
@@ -162,25 +165,26 @@ int main(int argc, char *argv[])
                 break;
             case 'v':
                 v = atoi(optarg);
-                if(v >= severity_type::no_output && v <= severity_type::error)
+                if(v >= severity_type::no_output && v <= severity_type::debug)
                     CSETLEVEL(v);
                 else
                     std::cout << "Error: stdout verbose level out of range" << std::endl;
                 break;
             case 'x':
                 x = atoi(optarg);
-                if(x >= severity_type::no_output && x <= severity_type::error)
+                if(x >= severity_type::no_output && x <= severity_type::debug)
                     SETLEVEL(x);
                 else
                     std::cout << "Error: file verbose level out of range" << std::endl;
                 break;
         }
     } 
-
     if(d) {
         if(vFuncContainer.size() < 1 && !n)
+        {
             CLOG(severity_type::warning)("no iterators chosen");
             LOG(severity_type::warning)("no iterators chosen");
+        }
         imageSolver.addFolder(folder);
         if(!n)
             imageSolver.solve(vFuncContainer, l>0, dTolerance);

@@ -3,8 +3,10 @@
 
 #include "logger.hpp"
 
-static logging::Logger< logging::FileLogPolicy > log_inst("exe.log");
-static logging::Logger< logging::FileLogPolicy > log_inst_std("/dev/fd/0");
+#define LOG_DIR "./log/"
+
+extern logging::Logger< logging::FileLogPolicy > log_inst;
+extern logging::Logger< logging::FileLogPolicy > log_inst_std;
 
 #define LOG(x) log_inst.print< x >
 #define CLOG(x) (log_inst_std.print< x >)

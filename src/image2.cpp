@@ -64,7 +64,7 @@ std::string format(const char* fmt, ...)
 
 
 
-std::string printImage(image_fmt image)
+std::string printImage(const image_fmt image)
 {
     std::stringstream ss;
     for(int iPos = 0; iPos < image.height(); iPos++)
@@ -166,7 +166,7 @@ template <class T> class ImageProcess
             }
 
             int BORDER_SIZE = 1;
-            int DEFAULT_GUESS_VAL = 120;
+            int DEFAULT_GUESS_VAL = 0;
             this->U.assign(this->image, "xyz", DEFAULT_GUESS_VAL);
 
             if(bExtractBordes == true)
@@ -180,35 +180,30 @@ template <class T> class ImageProcess
 
         void makeRho()
         {
-            // int iKernDim = 3;
-            // image_fmt kernel(iKernDim, iKernDim, 1, 1,
-            //                  0,1,0,
-            //                  1,-4,1,
-            //                  0,1,0);
-            // image_fmt kernel(iKernDim, iKernDim, 1, 1,
-            //                  0,-1,0,
-            //                  -1,4,-1,
-            //                  0,-1,0);
-            // this->rho = this->image.get_correlate(kernel, 0);
+            int iKernDim = 3;
+            image_fmt kernel(iKernDim, iKernDim, 1, 1,
+                             0,1,0,
+                             1,-4,1,
+                             0,1,0);
+            this->rho = this->image.get_correlate(kernel, 0);
             // this->rho = this->image.get_convolve(kernel, 1);
-            // int BORDER_SIZE = 1;
-            // cimg_for_borderXY(this->image,x,y,BORDER_SIZE)
-            // {
-            //     // this->rho(x,y) = this->image(x,y); 
-            //     this->rho(x,y) = NAN;
-            // }
-            // printImage(rho);
-            //
-            rho.assign(this->image, "xyz", 0);
-            int BORDER_SIZE = 0;
-            CImg_3x3(I,double);
-            cimg_for_in3x3(this->image, BORDER_SIZE, BORDER_SIZE,
-                           this->image.width() - BORDER_SIZE - 1, this->image.height() - BORDER_SIZE - 1,
-                           x,y,0,0,I,double) // uses Neumann borders
+            int BORDER_SIZE = 1;
+            cimg_for_borderXY(this->image,x,y,BORDER_SIZE)
             {
-                double dNewVal = (Icn + Icp + Ipc + Inc - (4 * Icc));
-                this->rho(x,y) = dNewVal;
+                // this->rho(x,y) = this->image(x,y); 
+                this->rho(x,y) = NAN;
             }
+
+            // this->rho.assign(this->image, "xyz", 0);
+            // int BORDER_SIZE = 0;
+            // CImg_3x3(I,double);
+            // cimg_for_in3x3(this->image, BORDER_SIZE, BORDER_SIZE,
+            //                this->image.width() - BORDER_SIZE - 1, this->image.height() - BORDER_SIZE - 1,
+            //                x,y,0,0,I,double) // uses Neumann borders
+            // {
+            //     double dNewVal = (Icn + Icp + Ipc + Inc - (4 * Icc));
+            //     this->rho(x,y) = dNewVal;
+            // }
         }
 
         void solve(iterative_function func,logging::Logger< logging::FileLogPolicy > &logInstance)
@@ -593,6 +588,8 @@ void ImageSolver::solve(function_container vIf, bool bComputeLines,
             trimLeadingFileName(sLogFile);
             sLogFile = sLogFile + ".log";
             mkdirp(sLogPath.c_str());
+
+
             logging::Logger< logging::FileLogPolicy > logInstance(sLogPath + sLogFile);
             logInstance.setLevel(log_inst.getLevel());
 
@@ -601,14 +598,18 @@ void ImageSolver::solve(function_container vIf, bool bComputeLines,
             ipImage.makeInitialGuess(BORDERS);
             (logInstance.print<severity_type::extensive>)("Initial guess\n", printImage(ipImage.getGuess()));
             CLOG(severity_type::extensive)("Initial guess\n", printImage(ipImage.getGuess()));
-            (logInstance.print<severity_type::extensive>)("Initial rho\n", printImage(ipImage.getGuess()));
-            CLOG(severity_type::extensive)("Initial rho\n", printImage(ipImage.getGuess()));
+            (logInstance.print<severity_type::extensive>)("Initial rho\n", printImage(ipImage.getRho()));
+            CLOG(severity_type::extensive)("Initial rho\n", printImage(ipImage.getRho()));
             (logInstance.print<severity_type::info>)("Beginning solver: ", (*subIt).sPath);
             CLOG(severity_type::info)("Beginning solver: ", (*subIt).sPath);
+            CLOG(severity_type::info)("Beginning solver: ", (*subIt).sPath, " for image ", (*it));
+            LOG(severity_type::info)("Beginning solver: ", (*subIt).sPath, " for image ", (*it));
 
             try{
 
                 ipImage.solve((*subIt).func, logInstance);
+                CLOG(severity_type::extensive)("Finished image: \n", printImage(ipImage.getGuess()));
+                (logInstance.print<severity_type::extensive>)("Finished image: \n", printImage(ipImage.getGuess()));
                 std::cout << loadBar << std::endl;
 
                 if(bComputeLines) { ipImage.computeLine("lines"); }

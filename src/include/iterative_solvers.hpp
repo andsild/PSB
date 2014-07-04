@@ -21,15 +21,15 @@ typedef void (*iterative_function)(const cimg_library::CImg<double> &arg1,
 
 void iterate_jacobi(const cimg_library::CImg<double> &arg1,
                    cimg_library::CImg<double> &arg2,
-                   double, int, double &arg3, double);
+                   double, int, double &arg3, double arg4);
 
 void iterate_gauss(const cimg_library::CImg<double> &arg1,
                    cimg_library::CImg<double> &arg2,
-                   double, int, double &arg3, double);
+                   double, int, double &arg3, double arg4);
 
 void iterate_sor(const cimg_library::CImg<double> &arg1,
                  cimg_library::CImg<double> &arg2,
-                   double, int, double &arg3, double);
+                   double, int, double &arg3, double arg4);
 
 std::vector<std::string> iterative_solve(iterative_function function,
                     const cimg_library::CImg<double>,
