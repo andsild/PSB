@@ -52,7 +52,8 @@ class ImageSolver
         ImageSolver();
         void addFolder(std::string, const char *vararg = "");
         void renderImages(std::string, function_container,
-                         const char *cImagePath = "/image/");
+                         const char *cImagePath = "/image/",
+                         const char *cResolved = "NOT");
         bool loadImage(std::string, image_fmt &);
         void clearFolders();
         void doImageDisplay(map_gallery &arg, std::string);
