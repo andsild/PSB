@@ -27,10 +27,6 @@ using namespace file_IO;
 using namespace plot;
 using namespace logging;
 
-
-
-
-
 void usage()
 {
     std::cout << "Usage: main <folder>" << std::endl;

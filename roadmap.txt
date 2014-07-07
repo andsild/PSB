@@ -1,11 +1,15 @@
 # Specified in order of priority, i.e. top item is done first, last item last
 # ...note that priorites might change.
 
-Add verbose parameter to enable debugging
+Test more
 
-Change from unistd to cimg_option
+Learn to profile code
+
+Change from double to float?
 
 timing different functions / iterations
+
+Change from unistd to cimg_option
 
 Write test-cases to assert some correctness
 
