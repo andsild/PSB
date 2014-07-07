@@ -54,10 +54,26 @@ void iterate_gauss(const CImg<double> &F, CImg<double> &U,
                    U.width() - BORDER_SIZE - 1, U.height() - BORDER_SIZE - 1,
                    x,y,0,0,I,double) // uses Neumann borders
     {
+        if( (x + y) % 2 == 0)
+            continue;
         double dOldVal = U(x,y);
         double dNewVal = .25 * ( Icn + Icp + Ipc + Inc - F(x,y) * H * H);
         U(x,y) = dNewVal;
-        double dCurDiff = fabs(dOldVal - dNewVal);
+        double dCurDiff = (fabs(dOldVal - dNewVal));
+        if( dCurDiff > dDiff)
+            dDiff = dCurDiff;
+    }
+
+    cimg_for_in3x3(U, BORDER_SIZE, BORDER_SIZE,
+                   U.width() - BORDER_SIZE - 1, U.height() - BORDER_SIZE - 1,
+                   x,y,0,0,I,double) // uses Neumann borders
+    {
+        if( (x + y) % 2 != 0)
+            continue;
+        double dOldVal = U(x,y);
+        double dNewVal = .25 * ( Icn + Icp + Ipc + Inc - F(x,y) * H * H);
+        U(x,y) = dNewVal;
+        double dCurDiff = (fabs(dOldVal - dNewVal));
         if( dCurDiff > dDiff)
             dDiff = dCurDiff;
     }
@@ -78,6 +94,24 @@ void iterate_sor(const CImg<double> &F, CImg<double> &U,
                    U.width() - BORDER_SIZE - 1, U.height() - BORDER_SIZE - 1,
                    x,y,0,0,I,double) // uses Neumann borders
     {
+        if( (x + y) % 2 == 0)
+            continue;
+        double dOldVal = U(x,y);
+        double dNewVal = (dNotOmega * Icc)
+                          + (dOmegaConstant)
+                          * (Icn + Icp + Ipc + Inc - F(x,y) * H * H);
+        U(x,y) = dNewVal;
+        double dCurDiff = (fabs(dOldVal - dNewVal));
+        if( dCurDiff > dDiff)
+            dDiff = dCurDiff;
+    }
+
+    cimg_for_in3x3(U, BORDER_SIZE, BORDER_SIZE,
+                   U.width() - BORDER_SIZE - 1, U.height() - BORDER_SIZE - 1,
+                   x,y,0,0,I,double) // uses Neumann borders
+    {
+        if( (x + y) % 2 != 0)
+            continue;
         double dOldVal = U(x,y);
         double dNewVal = (dNotOmega * Icc)
                           + (dOmegaConstant)
@@ -201,10 +235,12 @@ std::vector<std::string> iterative_solve(iterative_function function,
        double dMSE = newGuess.MSE(solution);
        vOutput.push_back(std::to_string(dMSE));
 
-        (logInst.print<severity_type::extensive>)("Image residual(mean): ", dMSE);
-        (logInst.print<severity_type::extensive>)("Iteration diff(max): ", dRelativeError);
-        CLOG(severity_type::extensive)("Iteration diff(max): ", dRelativeError);
-        CLOG(severity_type::extensive)("Image residual(mean): ", dMSE);
+        (logInst.print<severity_type::extensive>)(iIter,
+                                                  ": residual(mean): ", dMSE,
+                                                  "\tdiff:", dRelativeError);
+        CLOG(severity_type::extensive)(iIter,
+                                        ": residual(mean): ", dMSE,
+                                        "\tdiff:", dRelativeError);
 
         old_guess = newGuess;
         iIter++;

@@ -3,7 +3,13 @@
 
 Test more
 
-Learn to profile code
+Finne ut om SOR gjoor noe fundamentalt annerledes
+
+Resolvers
+
+FFT
+
+Wavelet
 
 Change from double to float?
 

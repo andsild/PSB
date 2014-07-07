@@ -25,8 +25,21 @@ Mon 01 Jul 2014
 ################
 Changed from 1d std::vector to Cimg macro-loops, which was much faster
 
-################
-################
 
+
+
+################
+Mon 07 Jul 2014
+################
+changed from abs to fabs - big difference...........
+
+Change SOR to red-black - it now doesn't converge, and gives good results
+Unlike gauss-seidel and jacobi, which in general needs stop-critera set to 
+a factor of 100 less than SOR to give accurate results, much slower!
+
+################
+################
+################
+################
 ################
 ################
