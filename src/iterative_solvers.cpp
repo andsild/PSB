@@ -226,20 +226,24 @@ std::vector<std::string> iterative_solve(iterative_function function,
        if(CGETLEVEL >= severity_type::extensive)
            CLOG(severity_type::debug)("New guess\n", image_psb::printImage(newGuess));
 
-        if(iIter % 50 == 0) 
-        {
-            logInst.print<severity_type::info>("Iteration: # ",iIter, "\titeration diff: ", dRelativeError);
-            CLOG(severity_type::info)("Iteration: # ",iIter, "\titeration diff: ", dRelativeError);
-        }
-
        double dMSE = newGuess.MSE(solution);
        vOutput.push_back(std::to_string(dMSE));
+        if(iIter % 50 == 0) 
+        {
+            logInst.print<severity_type::info>("It# ", iIter,
+                                              "\titeration diff: ", dRelativeError,
+                                              "\timage diff: ", dMSE);
+            CLOG(severity_type::info)("It# ",iIter,
+                                      "\titeration diff: ", dRelativeError,
+                                      "\timage diff: ", dMSE);
+        }
 
-        (logInst.print<severity_type::extensive>)(iIter,
-                                                  ": residual(mean): ", dMSE,
+
+        (logInst.print<severity_type::extensive>)("## ", iIter,
+                                                  " ## residual(mean): ", dMSE,
                                                   "\tdiff:", dRelativeError);
-        CLOG(severity_type::extensive)(iIter,
-                                        ": residual(mean): ", dMSE,
+        CLOG(severity_type::extensive)("## ", iIter,
+                                        " ## residual(mean): ", dMSE,
                                         "\tdiff:", dRelativeError);
 
         old_guess = newGuess;

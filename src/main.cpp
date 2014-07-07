@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
                 {
                     if(v == severity_type::debug)
                         std::cout << "WARNING: debug mode will slow down the"
-                                     "program by * a lot *" << std::endl;
+                                     " program by * a lot *" << std::endl;
                     CSETLEVEL(v);
                 }
                 else
@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
                 {
                     if(x == severity_type::debug)
                         std::cout << "WARNING: debug mode will slow down the"
-                                     "program by * a lot *" << std::endl;
+                                     " program by * a lot *" << std::endl;
                     SETLEVEL(x);
                 }
                 else
@@ -207,8 +207,10 @@ int main(int argc, char *argv[])
             it != vFuncContainer.end();
             ++it)
         {
-            std::string sPath = "/output" + (*it).sPath + "/image/";
-            imageSolver2.addFolder(sPath);
+            std::string sPath = "output/" + (*it).sPath + "/image/";
+            // imageSolver2.addFolder(sPath);
+            imageSolver2.addFolder(folder);
+            break;
         }
 
         imageSolver2.solve(vFuncContainer, l>0, dTolerance, "re", "re", dScalar);
