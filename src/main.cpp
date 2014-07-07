@@ -162,14 +162,24 @@ int main(int argc, char *argv[])
             case 'v':
                 v = atoi(optarg);
                 if(v >= severity_type::no_output && v <= severity_type::debug)
+                {
+                    if(v == severity_type::debug)
+                        std::cout << "WARNING: debug mode will slow down the"
+                                     "program by * a lot *" << std::endl;
                     CSETLEVEL(v);
+                }
                 else
                     std::cout << "Error: stdout verbose level out of range" << std::endl;
                 break;
             case 'x':
                 x = atoi(optarg);
                 if(x >= severity_type::no_output && x <= severity_type::debug)
+                {
+                    if(x == severity_type::debug)
+                        std::cout << "WARNING: debug mode will slow down the"
+                                     "program by * a lot *" << std::endl;
                     SETLEVEL(x);
+                }
                 else
                     std::cout << "Error: file verbose level out of range" << std::endl;
                 break;
