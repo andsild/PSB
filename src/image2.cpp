@@ -141,7 +141,10 @@ template <class T> class ImageProcess
 
         void multiply(double dScalar)
         {
-            this->image *= dScalar;
+            cimg_forXY(this->rho, x,y)
+                this->rho(x,y) = this->rho(x,y) * dScalar;
+            LOG(severity_type::info)("Multiplied rho by ", dScalar);
+            CLOG(severity_type::info)("Multiplied rho by ", dScalar);
         }
 
         double dMaxErr;
@@ -187,11 +190,6 @@ template <class T> class ImageProcess
             //                  1,-4,1,
             //                  0,1,0);
             // this->rho = this->image.get_convolve(kernel, 0);
-            // cimg_for_borderXY(this->image,x,y,BORDER_SIZE)
-            // {
-            //     // this->rho(x,y) = this->image(x,y); 
-            //     this->rho(x,y) = NAN;
-            // }
 
             this->rho.assign(this->image, "xyz", 0);
             int BORDER_SIZE = 1;
@@ -202,6 +200,12 @@ template <class T> class ImageProcess
             {
                 double dNewVal = (Icn + Icp + Ipc + Inc - (4 * Icc));
                 this->rho(x,y) = dNewVal;
+            }
+
+            cimg_for_borderXY(this->image,x,y,BORDER_SIZE)
+            {
+                // this->rho(x,y) = this->image(x,y); 
+                this->rho(x,y) = NAN;
             }
         }
 
@@ -305,7 +309,8 @@ void ImageSolver::addFolder(std::string sFolder, const char *errMsg)
     }
     catch(const file_IO::DirNotFound& f)
     {
-        // CLOG(severity_type::error)(f.what(), " ", errMsg);
+        CLOG(severity_type::error)(f.what());
+        LOG(severity_type::error)(f.what());
         exit(EXIT_FAILURE);
     }
 }
@@ -571,21 +576,24 @@ void ImageSolver::solve(function_container vIf, bool bComputeLines,
         ImageProcess<double> ipImage(image, (*it).c_str(), dTolerance);
         // toGrayScale(ipImage.getImage());
         ipImage.makeRho();
-
         if(dScalar != 1.0) { ipImage.multiply(dScalar); }
+
         bool BORDERS=true;
 
         for (function_container::iterator subIt = vIf.begin();
             subIt != vIf.end();
             ++subIt)
         {
+            std::string sRedo = "";
+            if(dScalar != 1.0)
+                sRedo = "re";
 
             std::string sImageDir = DATA_DIR + (*subIt).sPath + std::string(cImagePath);
             std::string sLogPath = LOG_DIR + (*subIt).sPath;
             std::string sLogFile = sLogPath + (*it);
             trimTrailingFilename(sLogFile);
             trimLeadingFileName(sLogFile);
-            sLogFile = sLogFile + ".log";
+            sLogFile = sRedo + sLogFile + ".log";
             mkdirp(sLogPath.c_str());
 
 
@@ -595,7 +603,7 @@ void ImageSolver::solve(function_container vIf, bool bComputeLines,
             ipImage.makeInitialGuess(BORDERS);
             if(logInstance.getLevel() >= severity_type::extensive)
             {
-                (logInstance.print<severity_type::extensive>)("Initial image\n", printImage(ipImage.getImage()));
+                (logInstance.print<severity_type::extensive>)("Initial image: ", (*it).c_str(), "\n", printImage(ipImage.getImage()));
                 (logInstance.print<severity_type::extensive>)("Initial guess\n", printImage(ipImage.getGuess()));
                 (logInstance.print<severity_type::extensive>)("Initial rho\n", printImage(ipImage.getRho()));
             }
@@ -621,6 +629,8 @@ void ImageSolver::solve(function_container vIf, bool bComputeLines,
                 ipImage.writeResultToFile(std::string(cResultPath) + (*subIt).sPath);
 
                 ipImage.roundValues();
+                CLOG(severity_type::extensive)("Finished image (rounded and cut): \n", printImage(ipImage.getGuess()));
+                (logInstance.print<severity_type::extensive>)("Finished image(rounded and cut): \n", printImage(ipImage.getGuess()));
                 ipImage.writeImageToFile(sImageDir.c_str());
                 ipImage.clearImages();
             }
