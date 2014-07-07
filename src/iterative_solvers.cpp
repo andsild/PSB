@@ -29,12 +29,11 @@ void iterate_jacobi(const CImg<double> &F, CImg<double> &U,
     cimg_for_in3x3(copyU, BORDER_SIZE, BORDER_SIZE,
                    U.width() - BORDER_SIZE - 1, U.height() - BORDER_SIZE - 1,
                    x,y,0,0,I,double) // uses Neumann borders
-    // cimg_for3x3(copyU,x,y,0,0,I,double) // uses Neumann borders
     {
         double dOldVal = Icc;
-        double dNewVal = .25 * (Icn + Icp + Ipc + Inc - F(x,y) * H * H);
+        double dNewVal = .25 * (Icn + Icp + Ipc + Inc - F(x,y));
         U(x,y) = dNewVal;
-        double dCurDiff = (abs(dOldVal - dNewVal));
+        double dCurDiff = fabs(dOldVal - dNewVal);
         if( dCurDiff > dDiff)
             dDiff = dCurDiff;
     }
@@ -58,7 +57,7 @@ void iterate_gauss(const CImg<double> &F, CImg<double> &U,
         double dOldVal = U(x,y);
         double dNewVal = .25 * ( Icn + Icp + Ipc + Inc - F(x,y) * H * H);
         U(x,y) = dNewVal;
-        double dCurDiff = (abs(dOldVal - dNewVal));
+        double dCurDiff = fabs(dOldVal - dNewVal);
         if( dCurDiff > dDiff)
             dDiff = dCurDiff;
     }
@@ -67,9 +66,9 @@ void iterate_gauss(const CImg<double> &F, CImg<double> &U,
 void iterate_sor(const CImg<double> &F, CImg<double> &U,
                  double iWidthLength, int iLength, double &dDiff, double H)
 {
-    static double omega = 2 / (1 + (3.14 / iWidthLength ));
-    static double dOmegaConstant = omega / 4;
-    static double dNotOmega = (1 - omega);
+    const double omega = 2 / (1 + (3.14 / iWidthLength ));
+    const double dOmegaConstant = omega / 4;
+    const double dNotOmega = (1 - omega);
 
     dDiff = 0;
     int BORDER_SIZE = 1;
@@ -84,7 +83,7 @@ void iterate_sor(const CImg<double> &F, CImg<double> &U,
                           + (dOmegaConstant)
                           * (Icn + Icp + Ipc + Inc - F(x,y) * H * H);
         U(x,y) = dNewVal;
-        double dCurDiff = (abs(dOldVal - dNewVal));
+        double dCurDiff = (fabs(dOldVal - dNewVal));
         if( dCurDiff > dDiff)
             dDiff = dCurDiff;
     }
@@ -188,24 +187,24 @@ std::vector<std::string> iterative_solve(iterative_function function,
         double dOld = dRelativeError;
         function(rho, newGuess, iWidth, iLength, dRelativeError, 1.0);
 
-        (logInst.print<severity_type::debug>)("New guess\n", image_psb::printImage(newGuess));
-        CLOG(severity_type::debug)("New guess\n", image_psb::printImage(newGuess));
+       if(logInst.getLevel() >= severity_type::extensive)
+           (logInst.print<severity_type::debug>)("New guess\n", image_psb::printImage(newGuess));
+       if(CGETLEVEL >= severity_type::extensive)
+           CLOG(severity_type::debug)("New guess\n", image_psb::printImage(newGuess));
 
         if(iIter % 50 == 0) 
         {
-            logInst.print<severity_type::info>("solving: ", dRelativeError);
-            CLOG(severity_type::info)("solving: ", dRelativeError);
+            logInst.print<severity_type::info>("Iteration: # ",iIter, "\titeration diff: ", dRelativeError);
+            CLOG(severity_type::info)("Iteration: # ",iIter, "\titeration diff: ", dRelativeError);
         }
 
        double dMSE = newGuess.MSE(solution);
        vOutput.push_back(std::to_string(dMSE));
 
         (logInst.print<severity_type::extensive>)("Image residual(mean): ", dMSE);
-        CLOG(severity_type::extensive)("Image residual(mean): ", dMSE);
         (logInst.print<severity_type::extensive>)("Iteration diff(max): ", dRelativeError);
         CLOG(severity_type::extensive)("Iteration diff(max): ", dRelativeError);
-
-
+        CLOG(severity_type::extensive)("Image residual(mean): ", dMSE);
 
         old_guess = newGuess;
         iIter++;
@@ -219,11 +218,11 @@ std::vector<std::string> iterative_solve(iterative_function function,
         }
 
         /* No change in iteration */
-        if (dOld == dRelativeError)
-        {
-            CLOG(severity_type::warning)("Method converged (no change in iteration) with value: ", dOld);
-            LOG(severity_type::warning)("Method converged (no change in iteration) with value: ", dOld);
-        }
+        // if (dOld == dRelativeError)
+        // {
+        //     CLOG(severity_type::warning)("Method converged (no change in iteration) with value: ", dOld);
+        //     LOG(severity_type::warning)("Method converged (no change in iteration) with value: ", dOld);
+        // }
 
     } while(dRelativeError > dMaxErr);
 
