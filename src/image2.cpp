@@ -316,16 +316,16 @@ void ImageSolver::addFolder(std::string sFolder, const char *errMsg)
 }
 
 void ImageSolver::renderImages(std::string sImageRoot, function_container vIf,
-                               const char *cImagePath)
+                               const char *cImagePath,
+                               const char *cResolved)
 {
         if(this->filenames.size() < 1) 
         { 
             LOG(severity_type::error)("No files added!");
             CLOG(severity_type::error)("No files added!");
-            exit(EXIT_FAILURE); 
+            exit(EXIT_FAILURE);
         }
 
-        // sort the list of filenames
         std::vector<std::string>::const_iterator it = this->filenames.begin();
 
         map_gallery mapFiles;
@@ -360,6 +360,16 @@ void ImageSolver::renderImages(std::string sImageRoot, function_container vIf,
             trimLeadingFileName(s);
             mapFiles[s].push_back(*it);
         }
+        // if(strcmp(cResolved, "NOT") != 0)
+        // {
+        //     for (function_container::iterator subIt = vIf.begin();
+        //         subIt != vIf.end();
+        //         ++subIt)
+        //     {
+        //         std::string sImageDir = DATA_DIR + (*subIt).sPath + std::string(cImagePath);
+        //         this->addFolder(DATA_DIR + cResolved);
+        //     }
+        // }
 
         doImageDisplay(mapFiles, sImageRoot);
 
@@ -392,6 +402,60 @@ void ImageSolver::clearFolders()
     this->filenames.clear();
 }
 
+class ImageContainer
+{
+    private:
+    image_fmt mainImage;
+    std::vector<image_fmt> vSolvedImages,
+                      vResolvedImages;
+    const char *fileName;
+    public:
+    ImageContainer(image_fmt, const char *arg);
+    
+    void addSolverImage(std::string, image_fmt);
+    void addReSolvedImage(std::string, image_fmt);
+
+    void next();
+    void prev();
+};
+
+ImageContainer::ImageContainer(image_fmt image, const char *fileName)
+               : mainImage(image), fileName(fileName)
+{
+}
+
+void ImageContainer::addSolverImage(std::string sMainImage, image_fmt image)
+{
+}
+
+void ImageContainer::addReSolvedImage(std::string sMainImage, image_fmt image)
+{
+}
+
+class ImageDisplay
+{
+    private:
+    std::vector<ImageContainer> vMainImages;
+    int iIndex;
+    public:
+    ImageDisplay();
+    void addMainImage(image_fmt, std::string);
+    void nextImage();
+    void prevImage();
+    void computeLine();
+};
+
+ImageDisplay::ImageDisplay()
+{
+    int iIndex = 0;
+}
+
+void ImageDisplay::addMainImage(image_fmt image, std::string sFilename)
+{
+    ImageContainer ic(image, sFilename.c_str());
+    this->vMainImages.push_back(ic);
+}
+
 void ImageSolver::doImageDisplay(map_gallery &mapFiles, std::string sImageRoot)
 {
     map_gallery::iterator it = mapFiles.begin();
@@ -401,6 +465,10 @@ void ImageSolver::doImageDisplay(map_gallery &mapFiles, std::string sImageRoot)
     image_fmt main_image, solved_image;
     int iIndex = 0;
     int iImageIndex = 0;
+
+    // class container with an image and a list of children
+    // constructor initialies
+    // the next-> prev 
 
     std::string sImageDest = sImageRoot + it->first;
     if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) return;
@@ -454,7 +522,6 @@ void ImageSolver::doImageDisplay(map_gallery &mapFiles, std::string sImageRoot)
 
                 mainFile = it->first;
                 out = it->second;
-                
 
                 sImageDest = sImageRoot + mainFile;
                 if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { it--; break; }
