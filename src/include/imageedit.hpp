@@ -31,7 +31,7 @@ class ImageContainer
     std::string getNextSolver();
     std::string getPrevSolver();
     std::string getNextResolver();
-    // std::string getPrevReSolver();
+    std::string getPrevResolver();
     bool hasResolved() const;
 };
 
