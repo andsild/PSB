@@ -3,6 +3,7 @@
 
 #define cimg_debug 0 
 
+#include <cstdarg>
 #include <iomanip>
 #include <list>
 #include <map>
@@ -34,6 +35,24 @@ typedef std::vector<SolverMeta> function_container;
 typedef cimg_library::CImg<double> image_fmt;
 
 
+class ImageException: public std::exception
+{
+    public:
+        explicit ImageException(const std::string& message):
+            msg_(message)
+         {}
+
+        virtual ~ImageException() throw (){}
+        virtual const char* what() const throw()
+        {
+            std::string ret = std::string("") + msg_;
+            return ret.c_str();
+        }
+    protected:
+        std::string msg_;
+};
+
+
 void renderImage(cimg_library::CImgDisplay);
 void display_histogram(image_fmt);
 std::string format(const char *arg, ...);
@@ -54,7 +73,6 @@ class ImageSolver
         void renderImages(std::string, function_container,
                          const char *cImagePath = "/image/",
                          const char *cResolved = "NOT");
-        bool loadImage(std::string, image_fmt &);
         void clearFolders();
         void doImageDisplay(map_gallery &arg, std::string);
         imageList_fmt histogram(std::string, function_container);
