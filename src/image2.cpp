@@ -4,7 +4,7 @@
 #include <iomanip>
 #include <list>
 #include <map>
-#include <sstream> 
+#include <sstream>
 #include <string>
 
 #include "CImg.h"
@@ -102,7 +102,7 @@ void toGrayScale(image_fmt &image)
 }
 
 
-template <class T> class ImageProcess 
+template <class T> class ImageProcess
 {
     private:
     typedef std::map<iterative_function,std::vector<std::string> > mapfuncres;
@@ -112,13 +112,13 @@ template <class T> class ImageProcess
         std::vector<std::string> vOutput;
         image_fmt U;
         image_fmt rho;
-        
+
         image_fmt sRGBtoGrayscale()
         {
             return this->image.get_norm();
         }
 
-            
+
     public:
         image_fmt getGuess() { return this->U; }
         image_fmt getImage () { return this->image; }
@@ -147,8 +147,8 @@ template <class T> class ImageProcess
         }
         void makeInitialGuess(bool bExtractBordes = true)
         {
-            if(this->image.size() < 1) 
-            { 
+            if(this->image.size() < 1)
+            {
                 throw ImageException("Image std::vector was not initialized"
                                      " before creating border");
             }
@@ -161,7 +161,7 @@ template <class T> class ImageProcess
             {
                 cimg_for_borderXY(this->image,x,y,BORDER_SIZE)
                 {
-                    this->U(x,y) = this->image(x,y); 
+                    this->U(x,y) = this->image(x,y);
                 }
             }
         }
@@ -189,7 +189,7 @@ template <class T> class ImageProcess
 
             cimg_for_borderXY(this->image,x,y,BORDER_SIZE)
             {
-                // this->rho(x,y) = this->image(x,y); 
+                // this->rho(x,y) = this->image(x,y);
                 this->rho(x,y) = NAN;
             }
         }
@@ -201,7 +201,7 @@ template <class T> class ImageProcess
                                        this->dMaxErr, this->image.width(),
                                        logInstance);
 
-            if(this->vOutput.size() < 1) 
+            if(this->vOutput.size() < 1)
             {
                 throw ImageException("Solver had no results from function");
             }
@@ -334,7 +334,7 @@ void ImageSolver::renderImages(std::string sImageRoot, function_container vIf,
                                const char *cResolved)
 {
         if(this->filenames.empty())
-        { 
+        {
             LOG(severity_type::error)("No files added!");
             CLOG(severity_type::error)("No files added!");
             exit(EXIT_FAILURE);
@@ -351,10 +351,6 @@ void ImageSolver::renderImages(std::string sImageRoot, function_container vIf,
             it != filenames.end();
             it++)
         {
-            // std::string s = (*it);
-            // trimLeadingFileName(s);
-            // std::vector<std::string> vOutputs;
-            // mapFiles[s] = vOutputs;
             CLOG(severity_type::info)("Adding main image to super-container: ", (*it));
             id.addMainImage((*it));
         }
@@ -380,15 +376,10 @@ void ImageSolver::renderImages(std::string sImageRoot, function_container vIf,
             it != filenames.end();
             it++)
         {
-            // std::string s = (*it);
-            // trimLeadingFileName(s);
-            // mapFiles[s].push_back(*it);
-
             try
             {
                 CLOG(severity_type::info)("Beginning to look up: ", *it, " in super-container...");
                 id.addSolverImage((*it));
-                // break;
             }
             catch(ImageException ie) {
                 LOG(severity_type::warning)(ie.what());
@@ -396,222 +387,37 @@ void ImageSolver::renderImages(std::string sImageRoot, function_container vIf,
             }
 
         }
-        // if(strcmp(cResolved, "NOT") != 0)
-        // {
-        //     for (function_container::iterator subIt = vIf.begin();
-        //         subIt != vIf.end();
-        //         ++subIt)
-        //     {
-        //         std::string sImageDir = DATA_DIR + (*subIt).sPath + std::string(cImagePath);
-        //         this->addFolder(DATA_DIR + cResolved);
-        //     }
-        // }
+        if(strcmp(cResolved, "NOT") != 0)
+        {
+            this->filenames.clear();
+            for (function_container::iterator subIt = vIf.begin();
+                subIt != vIf.end();
+                ++subIt)
+            {
+                std::string sImageDir = DATA_DIR + (*subIt).sPath + cResolved;
+                this->addFolder(sImageDir);
+            }
+
+            for(std::vector<std::string>::iterator it = filenames.begin();
+                it != filenames.end();
+                it++)
+            {
+                try
+                {
+                    CLOG(severity_type::info)("Beginning to look up: ", *it, " in super-container...");
+                    id.addResolvedImage((*it));
+                }
+                catch(ImageException ie)
+                {
+                    LOG(severity_type::warning)(ie.what());
+                    CLOG(severity_type::warning)(ie.what());
+                }
+            }
+        }
 
         // doImageDisplay(mapFiles, sImageRoot);
         id.show();
         id.loop();
-        doMeImageDisplay(id);
-
-}
-
-void doMeImageDisplay(ImageDisplay id)
-{
-    // id.show();
-    // std::vector<std::string> out = it->second;
-    // std::string mainFile = it->first;
-    // image_fmt main_image, solved_image;
-
-    // class container with an image and a list of children
-    // constructor initialies
-    // the next-> prev 
-
-    // std::string sImageDest = sImageRoot + it->first;
-    // if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) return;
-
-    // const double blackWhite[] = {255};
-    // CImgDisplay main_disp(main_image, mainFile.c_str() ,0);	
-    // CImgDisplay mask_disp(solved_image, out[iIndex].c_str() ,0);	
-    // // main_disp.resize();
-    // // mask_disp.resize();
-    // image_fmt visu(500, 300, 1, 1, 0);
-    // CImgDisplay graph_disp(visu, "Color intensities" ,0);	
-    //
-    // while (!main_disp.is_closed() && !mask_disp.is_closed() && !graph_disp.is_closed())
-    // {
-    //     if (main_disp.button() && main_disp.mouse_y()>=0) 
-    //     {
-    //         const int yPos = main_disp.mouse_y();
-    //         image_fmt main_cropped =  main_image.get_crop(
-    //                 0, yPos, 0, 0, main_image.width()-1, yPos, 0, 0);
-    //         image_fmt side_cropped = solved_image.get_crop(
-    //                 0, yPos, 0, 0, solved_image.width()-1, yPos, 0, 0);
-    //
-    //         // data, color, opacity, plot_type, verttex_type, ymin
-    //         visu.fill(0).draw_graph(main_cropped, blackWhite, 1, 1, 0, 255, 0);
-    //         visu.draw_graph(side_cropped, blackWhite, 1, 1, 0, 255, 0);
-    //         visu.display(graph_disp);
-    //     }
-    //     switch (main_disp.key()) 
-    //     {
-    //         case cimg::keyARROWUP:
-    //             if(iImageIndex == mapFiles.size() - 1) {it = mapFiles.begin(); iImageIndex = 0;}
-    //             else{ iImageIndex++ ; it++; }
-    //
-    //             mainFile = it->first;
-    //             out = it->second;
-    //            
-    //
-    //             sImageDest = sImageRoot + mainFile;
-    //             if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { break; }
-    //             main_disp = main_image;
-    //             main_disp.set_title(mainFile.c_str());
-    //             mask_disp = solved_image;
-    //             mask_disp.set_title(out[iIndex].c_str());
-    //             // main_disp.resize();
-    //             // mask_disp.resize();
-    //             break;
-    //         case cimg::keyARROWDOWN:
-    //             if(it == mapFiles.begin()) {it = mapFiles.end(); it--; iImageIndex = mapFiles.size() - 1;}
-    //             else{ it--; iImageIndex--; }
-    //
-    //             mainFile = it->first;
-    //             out = it->second;
-    //
-    //             sImageDest = sImageRoot + mainFile;
-    //             if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { it--; break; }
-    //             main_disp = main_image;
-    //             main_disp.set_title(mainFile.c_str());
-    //             mask_disp = solved_image;
-    //             mask_disp.set_title(out[iIndex].c_str());
-    //             // main_disp.resize();
-    //             // mask_disp.resize();
-    //             break;
-    //         case cimg::keyARROWLEFT:
-    //             if(iIndex == 0) { iIndex = out.size(); }
-    //             iIndex--;
-    //             if(!loadImage(out[iIndex], solved_image)) {break; }
-    //             mask_disp = solved_image;
-    //             mask_disp.set_title(out[iIndex].c_str());
-    //             // mask_disp.resize();
-    //             break;
-    //         case cimg::keyARROWRIGHT:
-    //             if(iIndex == out.size() - 1) { iIndex = -1; }
-    //             iIndex++;
-    //             if(!loadImage(out[iIndex], solved_image)) {break; }
-    //             mask_disp = solved_image;
-    //             mask_disp.set_title(out[iIndex].c_str());
-    //             // mask_disp.resize();
-    //             break;
-    //         case cimg::keyQ:
-    //             return;
-    //     }
-    //     main_disp.wait();
-    //
-    // }
-}
-
-
-
-
-void ImageSolver::doImageDisplay(map_gallery &mapFiles, std::string sImageRoot)
-{
-//     map_gallery::iterator it = mapFiles.begin();
-//
-//     std::vector<std::string> out = it->second;
-//     std::string mainFile = it->first;
-//     image_fmt main_image, solved_image;
-//     int iIndex = 0;
-//     int iImageIndex = 0;
-//
-//     // class container with an image and a list of children
-//     // constructor initialies
-//     // the next-> prev 
-//
-//     std::string sImageDest = sImageRoot + it->first;
-//     if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) return;
-//
-//     const double blackWhite[] = {255};
-//     CImgDisplay main_disp(main_image, mainFile.c_str() ,0);	
-//     CImgDisplay mask_disp(solved_image, out[iIndex].c_str() ,0);	
-//     // main_disp.resize();
-//     // mask_disp.resize();
-//     image_fmt visu(500, 300, 1, 1, 0);
-//     // image_fmt visu(main_disp);
-//     CImgDisplay graph_disp(visu, "Color intensities" ,0);	
-//
-//     while (!main_disp.is_closed() && !mask_disp.is_closed() && !graph_disp.is_closed())
-//     {
-//         if (main_disp.button() && main_disp.mouse_y()>=0) 
-//         {
-//             const int yPos = main_disp.mouse_y();
-//             image_fmt main_cropped =  main_image.get_crop(
-//                     0, yPos, 0, 0, main_image.width()-1, yPos, 0, 0);
-//             image_fmt side_cropped = solved_image.get_crop(
-//                     0, yPos, 0, 0, solved_image.width()-1, yPos, 0, 0);
-//
-//             // data, color, opacity, plot_type, verttex_type, ymin
-//             visu.fill(0).draw_graph(main_cropped, blackWhite, 1, 1, 0, 255, 0);
-//             visu.draw_graph(side_cropped, blackWhite, 1, 1, 0, 255, 0);
-//             visu.display(graph_disp);
-//         }
-//         switch (main_disp.key()) 
-//         {
-//             case cimg::keyARROWUP:
-//                 if(iImageIndex == mapFiles.size() - 1) {it = mapFiles.begin(); iImageIndex = 0;}
-//                 else{ iImageIndex++ ; it++; }
-//
-//                 mainFile = it->first;
-//                 out = it->second;
-//                
-//
-//                 sImageDest = sImageRoot + mainFile;
-//                 if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { break; }
-//                 main_disp = main_image;
-//                 main_disp.set_title(mainFile.c_str());
-//                 mask_disp = solved_image;
-//                 mask_disp.set_title(out[iIndex].c_str());
-//                 // main_disp.resize();
-//                 // mask_disp.resize();
-//                 break;
-//             case cimg::keyARROWDOWN:
-//                 if(it == mapFiles.begin()) {it = mapFiles.end(); it--; iImageIndex = mapFiles.size() - 1;}
-//                 else{ it--; iImageIndex--; }
-//
-//                 mainFile = it->first;
-//                 out = it->second;
-//
-//                 sImageDest = sImageRoot + mainFile;
-//                 if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { it--; break; }
-//                 main_disp = main_image;
-//                 main_disp.set_title(mainFile.c_str());
-//                 mask_disp = solved_image;
-//                 mask_disp.set_title(out[iIndex].c_str());
-//                 // main_disp.resize();
-//                 // mask_disp.resize();
-//                 break;
-//             case cimg::keyARROWLEFT:
-//                 if(iIndex == 0) { iIndex = out.size(); }
-//                 iIndex--;
-//                 if(!loadImage(out[iIndex], solved_image)) {break; }
-//                 mask_disp = solved_image;
-//                 mask_disp.set_title(out[iIndex].c_str());
-//                 // mask_disp.resize();
-//                 break;
-//             case cimg::keyARROWRIGHT:
-//                 if(iIndex == out.size() - 1) { iIndex = -1; }
-//                 iIndex++;
-//                 if(!loadImage(out[iIndex], solved_image)) {break; }
-//                 mask_disp = solved_image;
-//                 mask_disp.set_title(out[iIndex].c_str());
-//                 // mask_disp.resize();
-//                 break;
-//             case cimg::keyQ:
-//                 return;
-//         }
-//         main_disp.wait();
-//
-//     }
-//
 }
 
 imageList_fmt ImageSolver::histogram(std::string sDir, function_container vIf)
@@ -629,7 +435,7 @@ imageList_fmt ImageSolver::histogram(std::string sDir, function_container vIf)
         it++)
     {
         image_fmt image;
-        if(!loadImage((*it).c_str(), image)) 
+        if(!loadImage((*it).c_str(), image))
         {
             continue;
         }
@@ -652,7 +458,7 @@ imageList_fmt ImageSolver::histogram(std::string sDir, function_container vIf)
             subIt++)
         {
             image_fmt image;
-            if(!loadImage((*subIt).c_str(), image)) 
+            if(!loadImage((*subIt).c_str(), image))
             {
                 continue;
             }
@@ -689,7 +495,7 @@ void ImageSolver::solve(function_container vIf, bool bComputeLines,
     {
         cimg::exception_mode(0);
         image_fmt image;
-        if(!loadImage((*it).c_str(), image)) 
+        if(!loadImage((*it).c_str(), image))
         {
             loadBar.increaseProgress(vIf.size() - 1);
             std::cout << loadBar << std::endl;
@@ -697,7 +503,6 @@ void ImageSolver::solve(function_container vIf, bool bComputeLines,
         }
 
         ImageProcess<double> ipImage(image, (*it).c_str(), dTolerance);
-        // toGrayScale(ipImage.getImage());
         ipImage.makeRho();
         if(dScalar != 1.0) { ipImage.multiply(dScalar); }
 
@@ -762,7 +567,7 @@ void ImageSolver::solve(function_container vIf, bool bComputeLines,
                 LOG(severity_type::warning)(ie.what());
                 CLOG(severity_type::warning)(ie.what());
             }
-        }                
+        }
 
     }
     std::cout << loadBar << std::endl;// if last image has errors, this might be necessary
@@ -796,7 +601,7 @@ void calculateAverage(std::string sFilePath)
     //     ++it)
     // {
     //     size_t found = (*it).find(avoid);
-    //     if(found!=std::string::npos) 
+    //     if(found!=std::string::npos)
     //     {
     //        LOG(severity_type::warning)("average: skipping file", *it);
     //        CLOG(severity_type::warning)("average: skipping file", *it);
@@ -811,7 +616,7 @@ void calculateAverage(std::string sFilePath)
     //
     //     while(infile >> dNum) // read whole file or stop
     //     {
-    //         if(iPos >= average.size()) 
+    //         if(iPos >= average.size())
     //             average.push_back(dNum);
     //         else
     //             average[iPos] += dNum;
@@ -824,7 +629,7 @@ void calculateAverage(std::string sFilePath)
     // lLengths.sort();
     // for(std::vector<int>::size_type iPos = 0;
     //         iPos < (int)(average.size());
-    //         iPos++) 
+    //         iPos++)
     // {
     //     if(lLengths.size() > 0 &&
     //         iPos >= lLengths.front()) //XXX: or iPos >= ?

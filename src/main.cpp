@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
     {
         imageSolver.clearFolders();
         imageSolver.addFolder(folder, "when trying to show rendered images (-c flag)");
-        imageSolver.renderImages(folder, vFuncContainer);
+        imageSolver.renderImages(folder, vFuncContainer, "image/", "re");
     }
 
     if(plotLoop.joinable())
