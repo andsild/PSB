@@ -232,21 +232,6 @@ template <class T> class ImageProcess
             // }
         }
 
-        void writeInitdata(std::string filename)
-        {
-            // DO_IF_LOGLEVEL(severity_type::extensive)
-            // {
-            //     std::string sDir = LOG_DIR + "/init/";
-            //     mkdirp(sDir);
-            //     std::string sAscii = sDir + filename + "RHO.txt";
-            //     this->rho.get_round(2)./*get_crop(1,1,0,0,rho.width() - 1, rho.height() - 1, rho.depth(), rho.spectrum()).*/save_ascii(sAscii.c_str());
-            //     std::string sImage = filename + "IMAGE.txt";
-            //     this->image.get_round(2).save_ascii(sImage.c_str());
-            //     std::string sInitGuess = filename + "GUESS.txt";
-            //     this->U.get_round(2).save_ascii(sInitGuess.c_str());
-            // }
-        }
-
         void writeResultToFile(std::string fileDir)
         {
             std::string sFilename = std::string(this->fileName);
@@ -556,7 +541,8 @@ void ImageSolver::solve(function_container vIf, bool bComputeLines,
                 if(bComputeLines) { ipImage.computeLine("lines"); }
                 ipImage.writeResultToFile(std::string(cResultPath) + (*subIt).sPath);
 
-                ipImage.roundValues();
+                if(dScalar == 1.0)
+                    ipImage.roundValues();
                 CLOG(severity_type::extensive)("Finished image (rounded and cut): \n", printImage(ipImage.getGuess()));
                 (logInstance.print<severity_type::extensive>)("Finished image(rounded and cut): \n", printImage(ipImage.getGuess()));
                 ipImage.writeImageToFile(sImageDir.c_str());
