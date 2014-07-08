@@ -22,16 +22,17 @@ class ImageContainer
     void addSolverImage(std::string);
     void addResolvedImage(std::string);
 
-    std::string getFileName() const;
+    bool hasResolvedImages();
 
+    std::string getFileName() const;
     std::string getMain() const;
-    std::string getSolved();
+    std::string getSolved() const;
     std::string getResolved() const;
     std::string getNextSolver();
+    std::string getPrevSolver();
     std::string getNextResolver();
-    bool hasResolved() const;
-    // std::string getPrevSolver();
     // std::string getPrevReSolver();
+    bool hasResolved() const;
 };
 
 class ImageDisplay
@@ -51,7 +52,7 @@ class ImageDisplay
     void nextImage();
     void prevImage();
     void nextSolver();
-    // void prevSolver();
+    void prevSolver();
     public:
     void loop();
     ImageDisplay();
