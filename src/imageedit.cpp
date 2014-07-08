@@ -116,6 +116,14 @@ std::string ImageContainer::getNextResolver()
     return this->vResolvedImages[iResolvedIndex];
 }
 
+std::string ImageContainer::getPrevResolver()
+{
+    this->iResolvedIndex--;
+    if(this->iResolvedIndex <= 0)
+        iResolvedIndex = this->vResolvedImages.size() - 1;
+    return this->vResolvedImages[iResolvedIndex];
+}
+
 ImageDisplay::ImageDisplay()
 {
     this->iIndex = 0;
@@ -126,7 +134,7 @@ ImageDisplay::ImageDisplay()
 
 bool ImageContainer::hasResolvedImages()
 {
-    return this->vResolvedImages.empty();
+    return this->vResolvedImages.empty() == false;
 }
 
 void ImageDisplay::show()
@@ -137,7 +145,7 @@ void ImageDisplay::show()
     {
         mainFile = inst.getMain();
         solver = inst.getSolved();
-        if(inst.hasResolvedImages() == false)
+        if(inst.hasResolvedImages())
             resolved = inst.getResolved();
     }
     catch(image_psb::ImageException ie)
@@ -157,7 +165,7 @@ void ImageDisplay::show()
     this->solved_disp = this->solved_image;
     this->solved_disp.set_title(solver.c_str());
 
-    if(inst.hasResolvedImages() == false)
+    if(inst.hasResolvedImages())
     {
         this->resolved_image.assign(resolved.c_str());
         this->resolved_disp = this->resolved_image;
@@ -190,19 +198,39 @@ void ImageDisplay::prevImage()
 void ImageDisplay::nextSolver()
 {
     ImageContainer ic = this->getCurrent();
+
     std::string sNextFile = ic.getNextSolver();
     this->solved_image.assign(sNextFile.c_str());
     this->solved_disp = this->solved_image;
     this->solved_disp.set_title(sNextFile.c_str());
+
+    if(ic.hasResolvedImages())
+    {
+        std::string sNextFiler = ic.getNextResolver();
+        this->resolved_image.assign(sNextFiler.c_str());
+        this->resolved_disp = this->resolved_image;
+        this->resolved_disp.set_title(sNextFiler.c_str());
+    }
+
 }
 
 void ImageDisplay::prevSolver()
 {
     ImageContainer ic = this->getCurrent();
+
     std::string sPrevFile = ic.getPrevSolver();
     this->solved_image.assign(sPrevFile.c_str());
     this->solved_disp = this->solved_image;
     this->solved_disp.set_title(sPrevFile.c_str());
+
+
+    if(ic.hasResolvedImages())
+    {
+        std::string sPrevFiler = ic.getPrevResolver();
+        this->resolved_image.assign(sPrevFiler.c_str());
+        this->resolved_disp = this->resolved_image;
+        this->resolved_disp.set_title(sPrevFiler.c_str());
+    }
 }
 
 void ImageDisplay::loop()
@@ -248,15 +276,8 @@ void ImageDisplay::loop()
                 this->nextSolver();
                 break;
             case cimg::keyARROWRIGHT:
-                this->nextSolver();
+                this->prevSolver();
                 break;
-        //         if(iIndex == out.size() - 1) { iIndex = -1; }
-        //         iIndex++;
-        //         if(!loadImage(out[iIndex], solved_image)) {break; }
-        //         mask_disp = solved_image;
-        //         mask_disp.set_title(out[iIndex].c_str());
-        //         // mask_disp.resize();
-        //         break;
             case cimg::keyQ:
                 return;
         }
