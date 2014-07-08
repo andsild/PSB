@@ -1,6 +1,5 @@
 #include "image2.hpp"
 
-#include <cstdarg>
 #include <iostream>
 #include <iomanip>
 #include <list>
@@ -10,6 +9,7 @@
 
 #include "CImg.h"
 
+#include "imageedit.hpp"
 #include "loginstance.hpp"
 #include "loadingbar.hpp"
 #include "iterative_solvers.hpp"
@@ -22,6 +22,7 @@ using namespace plot;
 using namespace logging;
 using namespace loadbar;
 using namespace pe_solver;
+using namespace image_display;
 
 namespace image_psb
 {
@@ -81,22 +82,6 @@ std::string printImage(const image_fmt image)
 }
 
 
-class ImageException: public std::exception
-{
-    public:
-        explicit ImageException(const std::string& message):
-            msg_(message)
-         {}
-
-        virtual ~ImageException() throw (){}
-        virtual const char* what() const throw()
-        {
-            std::string ret = std::string("") + msg_;
-            return ret.c_str();
-        }
-    protected:
-        std::string msg_;
-};
 
 
 void toGrayScale(image_fmt &image)
@@ -315,16 +300,47 @@ void ImageSolver::addFolder(std::string sFolder, const char *errMsg)
     }
 }
 
+bool loadImage(const char *fileDest, image_fmt &image)
+{
+    cimg::exception_mode(0);
+    try {
+        image.load(fileDest);
+        LOG(severity_type::debug)("Loaded image ", fileDest,
+                                  "to code format at ", &image);
+        CLOG(severity_type::debug)("Loaded image ", fileDest,
+                                  "to code format at ", &image);
+        toGrayScale(image);
+        LOG(severity_type::debug)("Converted ", fileDest, " to grayscale");
+        CLOG(severity_type::debug)("Converted ", fileDest, " to grayscale");
+    }
+    catch(CImgIOException cioe)
+    {
+        LOG(severity_type::error)(cioe.what());
+        CLOG(severity_type::error)(cioe.what());
+        return false;
+    }
+
+    return true;
+}
+
+void ImageSolver::clearFolders()
+{
+    this->filenames.clear();
+}
+
+void doMeImageDisplay(ImageDisplay);
 void ImageSolver::renderImages(std::string sImageRoot, function_container vIf,
                                const char *cImagePath,
                                const char *cResolved)
 {
-        if(this->filenames.size() < 1) 
+        if(this->filenames.empty())
         { 
             LOG(severity_type::error)("No files added!");
             CLOG(severity_type::error)("No files added!");
             exit(EXIT_FAILURE);
         }
+
+        ImageDisplay id;
 
         std::vector<std::string>::const_iterator it = this->filenames.begin();
 
@@ -335,14 +351,22 @@ void ImageSolver::renderImages(std::string sImageRoot, function_container vIf,
             it != filenames.end();
             it++)
         {
-            std::string s = (*it);
-            trimLeadingFileName(s);
-            std::vector<std::string> vOutputs;
-            mapFiles[s] = vOutputs;
+            // std::string s = (*it);
+            // trimLeadingFileName(s);
+            // std::vector<std::string> vOutputs;
+            // mapFiles[s] = vOutputs;
+            CLOG(severity_type::info)("Adding main image to super-container: ", (*it));
+            id.addMainImage((*it));
         }
 
         this->filenames.clear();
 
+        if(vIf.empty())
+        {
+            LOG(severity_type::error)("No solved images to fetch!");
+            CLOG(severity_type::error)("No solved images to fetch!");
+            exit(EXIT_FAILURE);
+        }
         for (function_container::iterator subIt = vIf.begin();
             subIt != vIf.end();
             ++subIt)
@@ -356,9 +380,21 @@ void ImageSolver::renderImages(std::string sImageRoot, function_container vIf,
             it != filenames.end();
             it++)
         {
-            std::string s = (*it);
-            trimLeadingFileName(s);
-            mapFiles[s].push_back(*it);
+            // std::string s = (*it);
+            // trimLeadingFileName(s);
+            // mapFiles[s].push_back(*it);
+
+            try
+            {
+                CLOG(severity_type::info)("Beginning to look up: ", *it, " in super-container...");
+                id.addSolverImage((*it));
+                // break;
+            }
+            catch(ImageException ie) {
+                LOG(severity_type::warning)(ie.what());
+                CLOG(severity_type::warning)(ie.what());
+            }
+
         }
         // if(strcmp(cResolved, "NOT") != 0)
         // {
@@ -371,195 +407,215 @@ void ImageSolver::renderImages(std::string sImageRoot, function_container vIf,
         //     }
         // }
 
-        doImageDisplay(mapFiles, sImageRoot);
+        // doImageDisplay(mapFiles, sImageRoot);
+        id.show();
+        id.loop();
+        doMeImageDisplay(id);
 
 }
 
-bool ImageSolver::loadImage(std::string sFileDest, image_fmt &image)
+void doMeImageDisplay(ImageDisplay id)
 {
-    cimg::exception_mode(0);
-    try {
-        image.load(sFileDest.c_str());
-        LOG(severity_type::debug)("Loaded image ", sFileDest,
-                                  "to code format at ", &image);
-        CLOG(severity_type::debug)("Loaded image ", sFileDest,
-                                  "to code format at ", &image);
-        toGrayScale(image);
-        LOG(severity_type::debug)("Converted ", sFileDest, " to grayscale");
-        CLOG(severity_type::debug)("Converted ", sFileDest, " to grayscale");
-    }
-    catch(CImgIOException cioe)
-    {
-        std::cout << cioe.what() << std::endl;
-        return false;
-    }
-
-    return true;
-}
-
-void ImageSolver::clearFolders()
-{
-    this->filenames.clear();
-}
-
-class ImageContainer
-{
-    private:
-    image_fmt mainImage;
-    std::vector<image_fmt> vSolvedImages,
-                      vResolvedImages;
-    const char *fileName;
-    public:
-    ImageContainer(image_fmt, const char *arg);
-    
-    void addSolverImage(std::string, image_fmt);
-    void addReSolvedImage(std::string, image_fmt);
-
-    void next();
-    void prev();
-};
-
-ImageContainer::ImageContainer(image_fmt image, const char *fileName)
-               : mainImage(image), fileName(fileName)
-{
-}
-
-void ImageContainer::addSolverImage(std::string sMainImage, image_fmt image)
-{
-}
-
-void ImageContainer::addReSolvedImage(std::string sMainImage, image_fmt image)
-{
-}
-
-class ImageDisplay
-{
-    private:
-    std::vector<ImageContainer> vMainImages;
-    int iIndex;
-    public:
-    ImageDisplay();
-    void addMainImage(image_fmt, std::string);
-    void nextImage();
-    void prevImage();
-    void computeLine();
-};
-
-ImageDisplay::ImageDisplay()
-{
-    int iIndex = 0;
-}
-
-void ImageDisplay::addMainImage(image_fmt image, std::string sFilename)
-{
-    ImageContainer ic(image, sFilename.c_str());
-    this->vMainImages.push_back(ic);
-}
-
-void ImageSolver::doImageDisplay(map_gallery &mapFiles, std::string sImageRoot)
-{
-    map_gallery::iterator it = mapFiles.begin();
-
-    std::vector<std::string> out = it->second;
-    std::string mainFile = it->first;
-    image_fmt main_image, solved_image;
-    int iIndex = 0;
-    int iImageIndex = 0;
+    // id.show();
+    // std::vector<std::string> out = it->second;
+    // std::string mainFile = it->first;
+    // image_fmt main_image, solved_image;
 
     // class container with an image and a list of children
     // constructor initialies
     // the next-> prev 
 
-    std::string sImageDest = sImageRoot + it->first;
-    if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) return;
+    // std::string sImageDest = sImageRoot + it->first;
+    // if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) return;
 
-    const double blackWhite[] = {255};
-    CImgDisplay main_disp(main_image, mainFile.c_str() ,0);	
-    CImgDisplay mask_disp(solved_image, out[iIndex].c_str() ,0);	
-    // main_disp.resize();
-    // mask_disp.resize();
-    image_fmt visu(500, 300, 1, 1, 0);
-    // image_fmt visu(main_disp);
-    CImgDisplay graph_disp(visu, "Color intensities" ,0);	
+    // const double blackWhite[] = {255};
+    // CImgDisplay main_disp(main_image, mainFile.c_str() ,0);	
+    // CImgDisplay mask_disp(solved_image, out[iIndex].c_str() ,0);	
+    // // main_disp.resize();
+    // // mask_disp.resize();
+    // image_fmt visu(500, 300, 1, 1, 0);
+    // CImgDisplay graph_disp(visu, "Color intensities" ,0);	
+    //
+    // while (!main_disp.is_closed() && !mask_disp.is_closed() && !graph_disp.is_closed())
+    // {
+    //     if (main_disp.button() && main_disp.mouse_y()>=0) 
+    //     {
+    //         const int yPos = main_disp.mouse_y();
+    //         image_fmt main_cropped =  main_image.get_crop(
+    //                 0, yPos, 0, 0, main_image.width()-1, yPos, 0, 0);
+    //         image_fmt side_cropped = solved_image.get_crop(
+    //                 0, yPos, 0, 0, solved_image.width()-1, yPos, 0, 0);
+    //
+    //         // data, color, opacity, plot_type, verttex_type, ymin
+    //         visu.fill(0).draw_graph(main_cropped, blackWhite, 1, 1, 0, 255, 0);
+    //         visu.draw_graph(side_cropped, blackWhite, 1, 1, 0, 255, 0);
+    //         visu.display(graph_disp);
+    //     }
+    //     switch (main_disp.key()) 
+    //     {
+    //         case cimg::keyARROWUP:
+    //             if(iImageIndex == mapFiles.size() - 1) {it = mapFiles.begin(); iImageIndex = 0;}
+    //             else{ iImageIndex++ ; it++; }
+    //
+    //             mainFile = it->first;
+    //             out = it->second;
+    //            
+    //
+    //             sImageDest = sImageRoot + mainFile;
+    //             if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { break; }
+    //             main_disp = main_image;
+    //             main_disp.set_title(mainFile.c_str());
+    //             mask_disp = solved_image;
+    //             mask_disp.set_title(out[iIndex].c_str());
+    //             // main_disp.resize();
+    //             // mask_disp.resize();
+    //             break;
+    //         case cimg::keyARROWDOWN:
+    //             if(it == mapFiles.begin()) {it = mapFiles.end(); it--; iImageIndex = mapFiles.size() - 1;}
+    //             else{ it--; iImageIndex--; }
+    //
+    //             mainFile = it->first;
+    //             out = it->second;
+    //
+    //             sImageDest = sImageRoot + mainFile;
+    //             if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { it--; break; }
+    //             main_disp = main_image;
+    //             main_disp.set_title(mainFile.c_str());
+    //             mask_disp = solved_image;
+    //             mask_disp.set_title(out[iIndex].c_str());
+    //             // main_disp.resize();
+    //             // mask_disp.resize();
+    //             break;
+    //         case cimg::keyARROWLEFT:
+    //             if(iIndex == 0) { iIndex = out.size(); }
+    //             iIndex--;
+    //             if(!loadImage(out[iIndex], solved_image)) {break; }
+    //             mask_disp = solved_image;
+    //             mask_disp.set_title(out[iIndex].c_str());
+    //             // mask_disp.resize();
+    //             break;
+    //         case cimg::keyARROWRIGHT:
+    //             if(iIndex == out.size() - 1) { iIndex = -1; }
+    //             iIndex++;
+    //             if(!loadImage(out[iIndex], solved_image)) {break; }
+    //             mask_disp = solved_image;
+    //             mask_disp.set_title(out[iIndex].c_str());
+    //             // mask_disp.resize();
+    //             break;
+    //         case cimg::keyQ:
+    //             return;
+    //     }
+    //     main_disp.wait();
+    //
+    // }
+}
 
-    while (!main_disp.is_closed() && !mask_disp.is_closed() && !graph_disp.is_closed())
-    {
-        if (main_disp.button() && main_disp.mouse_y()>=0) 
-        {
-            const int yPos = main_disp.mouse_y();
-            image_fmt main_cropped =  main_image.get_crop(
-                    0, yPos, 0, 0, main_image.width()-1, yPos, 0, 0);
-            image_fmt side_cropped = solved_image.get_crop(
-                    0, yPos, 0, 0, solved_image.width()-1, yPos, 0, 0);
 
-            // data, color, opacity, plot_type, verttex_type, ymin
-            visu.fill(0).draw_graph(main_cropped, blackWhite, 1, 1, 0, 255, 0);
-            visu.draw_graph(side_cropped, blackWhite, 1, 1, 0, 255, 0);
-            visu.display(graph_disp);
-        }
-        switch (main_disp.key()) 
-        {
-            case cimg::keyARROWUP:
-                if(iImageIndex == mapFiles.size() - 1) {it = mapFiles.begin(); iImageIndex = 0;}
-                else{ iImageIndex++ ; it++; }
 
-                mainFile = it->first;
-                out = it->second;
-                
 
-                sImageDest = sImageRoot + mainFile;
-                if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { break; }
-                main_disp = main_image;
-                main_disp.set_title(mainFile.c_str());
-                mask_disp = solved_image;
-                mask_disp.set_title(out[iIndex].c_str());
-                // main_disp.resize();
-                // mask_disp.resize();
-                break;
-            case cimg::keyARROWDOWN:
-                if(it == mapFiles.begin()) {it = mapFiles.end(); it--; iImageIndex = mapFiles.size() - 1;}
-                else{ it--; iImageIndex--; }
-
-                mainFile = it->first;
-                out = it->second;
-
-                sImageDest = sImageRoot + mainFile;
-                if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { it--; break; }
-                main_disp = main_image;
-                main_disp.set_title(mainFile.c_str());
-                mask_disp = solved_image;
-                mask_disp.set_title(out[iIndex].c_str());
-                // main_disp.resize();
-                // mask_disp.resize();
-                break;
-            case cimg::keyARROWLEFT:
-                if(iIndex == 0) { iIndex = out.size(); }
-                iIndex--;
-                if(!loadImage(out[iIndex], solved_image)) {break; }
-                mask_disp = solved_image;
-                mask_disp.set_title(out[iIndex].c_str());
-                // mask_disp.resize();
-                break;
-            case cimg::keyARROWRIGHT:
-                if(iIndex == out.size() - 1) { iIndex = -1; }
-                iIndex++;
-                if(!loadImage(out[iIndex], solved_image)) {break; }
-                mask_disp = solved_image;
-                mask_disp.set_title(out[iIndex].c_str());
-                // mask_disp.resize();
-                break;
-            case cimg::keyQ:
-                return;
-        }
-        main_disp.wait();
-
-    }
-
+void ImageSolver::doImageDisplay(map_gallery &mapFiles, std::string sImageRoot)
+{
+//     map_gallery::iterator it = mapFiles.begin();
+//
+//     std::vector<std::string> out = it->second;
+//     std::string mainFile = it->first;
+//     image_fmt main_image, solved_image;
+//     int iIndex = 0;
+//     int iImageIndex = 0;
+//
+//     // class container with an image and a list of children
+//     // constructor initialies
+//     // the next-> prev 
+//
+//     std::string sImageDest = sImageRoot + it->first;
+//     if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) return;
+//
+//     const double blackWhite[] = {255};
+//     CImgDisplay main_disp(main_image, mainFile.c_str() ,0);	
+//     CImgDisplay mask_disp(solved_image, out[iIndex].c_str() ,0);	
+//     // main_disp.resize();
+//     // mask_disp.resize();
+//     image_fmt visu(500, 300, 1, 1, 0);
+//     // image_fmt visu(main_disp);
+//     CImgDisplay graph_disp(visu, "Color intensities" ,0);	
+//
+//     while (!main_disp.is_closed() && !mask_disp.is_closed() && !graph_disp.is_closed())
+//     {
+//         if (main_disp.button() && main_disp.mouse_y()>=0) 
+//         {
+//             const int yPos = main_disp.mouse_y();
+//             image_fmt main_cropped =  main_image.get_crop(
+//                     0, yPos, 0, 0, main_image.width()-1, yPos, 0, 0);
+//             image_fmt side_cropped = solved_image.get_crop(
+//                     0, yPos, 0, 0, solved_image.width()-1, yPos, 0, 0);
+//
+//             // data, color, opacity, plot_type, verttex_type, ymin
+//             visu.fill(0).draw_graph(main_cropped, blackWhite, 1, 1, 0, 255, 0);
+//             visu.draw_graph(side_cropped, blackWhite, 1, 1, 0, 255, 0);
+//             visu.display(graph_disp);
+//         }
+//         switch (main_disp.key()) 
+//         {
+//             case cimg::keyARROWUP:
+//                 if(iImageIndex == mapFiles.size() - 1) {it = mapFiles.begin(); iImageIndex = 0;}
+//                 else{ iImageIndex++ ; it++; }
+//
+//                 mainFile = it->first;
+//                 out = it->second;
+//                
+//
+//                 sImageDest = sImageRoot + mainFile;
+//                 if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { break; }
+//                 main_disp = main_image;
+//                 main_disp.set_title(mainFile.c_str());
+//                 mask_disp = solved_image;
+//                 mask_disp.set_title(out[iIndex].c_str());
+//                 // main_disp.resize();
+//                 // mask_disp.resize();
+//                 break;
+//             case cimg::keyARROWDOWN:
+//                 if(it == mapFiles.begin()) {it = mapFiles.end(); it--; iImageIndex = mapFiles.size() - 1;}
+//                 else{ it--; iImageIndex--; }
+//
+//                 mainFile = it->first;
+//                 out = it->second;
+//
+//                 sImageDest = sImageRoot + mainFile;
+//                 if(!loadImage(sImageDest, main_image) || !loadImage(out[iIndex], solved_image)) { it--; break; }
+//                 main_disp = main_image;
+//                 main_disp.set_title(mainFile.c_str());
+//                 mask_disp = solved_image;
+//                 mask_disp.set_title(out[iIndex].c_str());
+//                 // main_disp.resize();
+//                 // mask_disp.resize();
+//                 break;
+//             case cimg::keyARROWLEFT:
+//                 if(iIndex == 0) { iIndex = out.size(); }
+//                 iIndex--;
+//                 if(!loadImage(out[iIndex], solved_image)) {break; }
+//                 mask_disp = solved_image;
+//                 mask_disp.set_title(out[iIndex].c_str());
+//                 // mask_disp.resize();
+//                 break;
+//             case cimg::keyARROWRIGHT:
+//                 if(iIndex == out.size() - 1) { iIndex = -1; }
+//                 iIndex++;
+//                 if(!loadImage(out[iIndex], solved_image)) {break; }
+//                 mask_disp = solved_image;
+//                 mask_disp.set_title(out[iIndex].c_str());
+//                 // mask_disp.resize();
+//                 break;
+//             case cimg::keyQ:
+//                 return;
+//         }
+//         main_disp.wait();
+//
+//     }
+//
 }
 
 imageList_fmt ImageSolver::histogram(std::string sDir, function_container vIf)
 {
-
     // for (function_container::iterator subIt = vIf.begin();
     //     subIt != vIf.end();
     //     ++subIt)
@@ -573,7 +629,7 @@ imageList_fmt ImageSolver::histogram(std::string sDir, function_container vIf)
         it++)
     {
         image_fmt image;
-        if(!loadImage((*it), image)) 
+        if(!loadImage((*it).c_str(), image)) 
         {
             continue;
         }
@@ -596,7 +652,7 @@ imageList_fmt ImageSolver::histogram(std::string sDir, function_container vIf)
             subIt++)
         {
             image_fmt image;
-            if(!loadImage((*subIt), image)) 
+            if(!loadImage((*subIt).c_str(), image)) 
             {
                 continue;
             }
@@ -633,7 +689,7 @@ void ImageSolver::solve(function_container vIf, bool bComputeLines,
     {
         cimg::exception_mode(0);
         image_fmt image;
-        if(!loadImage((*it), image)) 
+        if(!loadImage((*it).c_str(), image)) 
         {
             loadBar.increaseProgress(vIf.size() - 1);
             std::cout << loadBar << std::endl;
