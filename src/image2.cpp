@@ -207,31 +207,6 @@ template <class T> class ImageProcess
             }
        }
 
-        void computeLine(const char *fileDir, int iRow = -1)
-        {
-            // if(iRow < 0) { iRow = this->iHeight / 2; }
-            // int iRowStart = iRow * this->iWidth;
-            // std::vector<std::string> vOrigImage, vNewImage;
-            // for(int iPos = iRowStart; iPos < iRowStart + this->iWidth; iPos++)
-            // {
-            //     vOrigImage.push_back(std::to_std::string(this->image_vec[iPos]));
-            //     vNewImage.push_back(std::to_std::string(this->U[iPos]));
-            // }
-            // std::string sFileName = string(this->fileName);
-            // trimLeadingFileName(sFileName);
-            // std::string sOrigFile = "orig" + sFileName,
-            //        sNewImage = "new" + sFileName;
-            //
-            // try{
-            //     writeToFile(vOrigImage, sOrigFile, fileDir);
-            //     writeToFile(vNewImage,  sNewImage, fileDir);
-            // }
-            // catch(...)
-            // {
-            //     throw ImageException("could not write result file to " + std::string(fileDir));
-            // }
-        }
-
         void writeResultToFile(std::string fileDir)
         {
             std::string sFilename = std::string(this->fileName);
@@ -259,7 +234,6 @@ template <class T> class ImageProcess
             {
                 mkdirp(fileDir);
                 this->U.save(sFilename.c_str());
-                // this->U.get_normalize(0,255).save(sFilename.c_str());
             }
             catch(CImgIOException &cioe)
             {
@@ -538,7 +512,6 @@ void ImageSolver::solve(function_container vIf, bool bComputeLines,
                 (logInstance.print<severity_type::extensive>)("Finished image: \n", printImage(ipImage.getGuess()));
                 std::cout << loadBar << std::endl;
 
-                if(bComputeLines) { ipImage.computeLine("lines"); }
                 ipImage.writeResultToFile(std::string(cResultPath) + (*subIt).sPath);
 
                 if(dScalar == 1.0)
