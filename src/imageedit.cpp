@@ -65,10 +65,16 @@ std::string ImageContainer::getSolved() const
         std::string sErr= "lookup for solved image to " + this->fileName + " failed: no resolved images added, but access was attempted ";
         throw image_psb::ImageException(sErr);
     }
+    if(this->iSolvedIndex < 0) iSolvedIndex++;
+    if(this->iSolvedIndex >= this->vSolvedImages.size()) iSolvedIndex--;
     if(this->iSolvedIndex >= this->vSolvedImages.size()
     || this->iSolvedIndex < 0)
     {
-        std::string sErr= "lookup for solved image to " + this->fileName + " failed. ";
+        std::string sErr= "lookup for solved image to " + this->fileName +
+                          " failed. (index was out of bounds: "
+                          + std::to_string(this->iSolvedIndex)
+                          + " attempted on list of size "
+                          + std::to_string(this->vSolvedImages.size());
         throw image_psb::ImageException(sErr);
     }
     return this->vSolvedImages.at(iSolvedIndex);
@@ -80,54 +86,69 @@ std::string ImageContainer::getResolved() const
         std::string sErr= "lookup for solved image to " + this->fileName + " failed: no resolved images added, but access was attempted ";
         throw image_psb::ImageException(sErr);
     }
-        
+    if(this->iResolvedIndex < 0) iResolvedIndex++;
+    if(this->iResolvedIndex >= this->vResolvedImages.size()) iResolvedIndex--;
+
     if(this->iResolvedIndex >= this->vResolvedImages.size()
     || this->iResolvedIndex < 0)
     {
-        std::string sErr= "lookup for solved image to " + this->fileName + " failed. ";
+        std::string sErr= "lookup for solved image to " + this->fileName +
+                          " failed. (index was out of bounds: "
+                          + std::to_string(this->iResolvedIndex)
+                          + " attempted on list of size "
+                          + std::to_string(this->vResolvedImages.size());
         throw image_psb::ImageException(sErr);
     }
-    return this->vSolvedImages.at(iResolvedIndex);
+    return this->vResolvedImages.at(iResolvedIndex);
 }
 std::string ImageContainer::getNextSolver()
 {
-    this->iSolvedIndex++;
     if(this->iSolvedIndex >= this->vSolvedImages.size())
         this->iSolvedIndex = 0;
-    std::string sElem = this->vSolvedImages[iSolvedIndex];
+    if(this->iSolvedIndex < 0)
+        this->iSolvedIndex++;
+    std::string sElem = this->vSolvedImages.at(iSolvedIndex);
+    this->iSolvedIndex++;
     return sElem;
 }
 
 
 std::string ImageContainer::getPrevSolver()
 {
-    this->iSolvedIndex--;
-    if(this->iSolvedIndex <= 0)
+    if(this->iSolvedIndex < 0)
         this->iSolvedIndex = this->vSolvedImages.size() - 1;
-    std::string sElem = this->vSolvedImages[iSolvedIndex];
+    if(this->iSolvedIndex >= this->vSolvedImages.size())
+        this->iSolvedIndex--;
+    std::string sElem = this->vSolvedImages.at(iSolvedIndex);
+    this->iSolvedIndex--;
     return sElem;
 }
 
 std::string ImageContainer::getNextResolver() 
 {
-    this->iResolvedIndex++;
-    if(this->iResolvedIndex == this->vResolvedImages.size())
+    if(this->iResolvedIndex >= this->vResolvedImages.size())
         iResolvedIndex = 0;
-    return this->vResolvedImages[iResolvedIndex];
+    if(this->iResolvedIndex < 0)
+        iResolvedIndex++;
+    std::string sElem = this->vResolvedImages.at(iResolvedIndex);
+    this->iResolvedIndex++;
+    return sElem;
 }
 
 std::string ImageContainer::getPrevResolver()
 {
+    if(this->iResolvedIndex < 0)
+        this->iResolvedIndex = this->vResolvedImages.size() - 1;
+    if(this->iResolvedIndex >= vResolvedImages.size()) iResolvedIndex--;
+    std::string sElem = this->vResolvedImages.at(iResolvedIndex);
     this->iResolvedIndex--;
-    if(this->iResolvedIndex <= 0)
-        iResolvedIndex = this->vResolvedImages.size() - 1;
-    return this->vResolvedImages[iResolvedIndex];
+    return sElem;
 }
 
 ImageDisplay::ImageDisplay()
 {
     this->iIndex = 0;
-    visu.assign(500, 300, 1, 3, 0);
+    visu.assign(500, 256, 1, 3, 0);
     graph_disp = visu;
     graph_disp.set_title("Color intensities");
 }
@@ -155,9 +176,19 @@ void ImageDisplay::show()
         exit(EXIT_FAILURE);
     }
 
-
-    this->main_image.assign(mainFile.c_str());
-    this->solved_image.assign(solver.c_str());
+    cimg::exception_mode(0);
+    try
+    {
+        this->main_image.assign(mainFile.c_str());
+        // this->main_image.load_ascii(mainFile.c_str());
+        // this->solved_image.assign(solver.c_str());
+        this->solved_image.load_ascii(solver.c_str());
+    }
+    catch(CImgIOException ciie)
+    {
+        LOG(severity_type::error)(ciie.what());
+        CLOG(severity_type::error)(ciie.what());
+    }
 
 
     this->main_disp = this->main_image;
@@ -167,7 +198,8 @@ void ImageDisplay::show()
 
     if(inst.hasResolvedImages())
     {
-        this->resolved_image.assign(resolved.c_str());
+        // this->resolved_image.assign(resolved.c_str());
+        this->resolved_image.load_ascii(resolved.c_str());
         this->resolved_disp = this->resolved_image;
         this->resolved_disp.set_title(resolved.c_str());
     }
@@ -182,7 +214,7 @@ ImageContainer ImageDisplay::getCurrent()
 void ImageDisplay::nextImage()
 {
     this->iIndex++;
-    if(this->iIndex == this->vMainImages.size())
+    if(this->iIndex >= this->vMainImages.size())
         iIndex = 0;
     this->show();
 }
@@ -200,18 +232,17 @@ void ImageDisplay::nextSolver()
     ImageContainer ic = this->getCurrent();
 
     std::string sNextFile = ic.getNextSolver();
-    this->solved_image.assign(sNextFile.c_str());
+    this->solved_image.load_ascii(sNextFile.c_str());
     this->solved_disp = this->solved_image;
     this->solved_disp.set_title(sNextFile.c_str());
 
     if(ic.hasResolvedImages())
     {
         std::string sNextFiler = ic.getNextResolver();
-        this->resolved_image.assign(sNextFiler.c_str());
+        this->resolved_image.load_ascii(sNextFiler.c_str());
         this->resolved_disp = this->resolved_image;
         this->resolved_disp.set_title(sNextFiler.c_str());
     }
-
 }
 
 void ImageDisplay::prevSolver()
@@ -219,7 +250,7 @@ void ImageDisplay::prevSolver()
     ImageContainer ic = this->getCurrent();
 
     std::string sPrevFile = ic.getPrevSolver();
-    this->solved_image.assign(sPrevFile.c_str());
+    this->solved_image.load_ascii(sPrevFile.c_str());
     this->solved_disp = this->solved_image;
     this->solved_disp.set_title(sPrevFile.c_str());
 
@@ -227,7 +258,7 @@ void ImageDisplay::prevSolver()
     if(ic.hasResolvedImages())
     {
         std::string sPrevFiler = ic.getPrevResolver();
-        this->resolved_image.assign(sPrevFiler.c_str());
+        this->resolved_image.load_ascii(sPrevFiler.c_str());
         this->resolved_disp = this->resolved_image;
         this->resolved_disp.set_title(sPrevFiler.c_str());
     }
@@ -238,6 +269,18 @@ void ImageDisplay::loop()
     const double blackWhite[] = {255, 255, 255},
                  red[] = {255, 0, 0},
                  green[] = {0, 255, 0};
+    int yMin = 0, yMax = 0;
+    if(this->resolved_disp.is_empty() == false)
+    {
+        yMax = this->resolved_image.max();
+        this->visu.resize(500, yMax + 20, 1, 3);
+    }
+
+    // if(this->resolved_disp.is_empty() == false)
+    // {
+    //     yMin = this->resolved_image.min();
+    //     yMax = this->resolved_image.max() + 100;
+    // }
 
     while (!this->main_disp.is_closed() && 
            !this->solved_disp.is_closed() && 
@@ -247,21 +290,22 @@ void ImageDisplay::loop()
         if (main_disp.button() && main_disp.mouse_y()>=0) 
         {
             const int yPos = this->main_disp.mouse_y();
-            image_fmt main_cropped =  this->main_image.get_crop(
-                    0, yPos, 0, 0, this->main_image.width()-1, yPos, 0, 0);
-            image_fmt side_cropped = this->solved_image.get_crop(
-                    0, yPos, 0, 0, solved_image.width()-1, yPos, 0, 0);
-
-    
-            // data, color, opacity, plot_type, verttex_type, ymin
-            visu.fill(0).draw_graph(main_cropped, blackWhite, 1, 1, 0, 255, 0);
-            visu.draw_graph(side_cropped, red, 1, 1, 0, 255, 0);
+            visu.fill(0);
             if(this->resolved_disp.is_empty() == false)
             {
                 image_fmt resolved_cropped = this->resolved_image.get_crop(
-                    0, yPos, 0, 0, solved_image.width()-1, yPos, 0, 0);
-                visu.draw_graph(resolved_cropped, green, 1, 1, 0, 255, 0);
+                    0, yPos, 0, 0, resolved_image.width()-1, yPos, 0, 0);
+                // yMax = resolved_cropped.max();
+                visu.draw_graph(resolved_cropped, green, 1, 1, yMin, yMax, 0);
             }
+            image_fmt main_cropped =  this->main_image.get_crop(
+                    0, yPos, 0, 0, this->main_image.width()-1, yPos, 0, 0);
+            image_fmt side_cropped = this->solved_image.get_crop(
+                    0, yPos, 0, 0, this->solved_image.width()-1, yPos, 0, 0);
+
+            // data, color, opacity, plot_type, verttex_type, ymin
+            visu.draw_graph(main_cropped, blackWhite, 1, 1, yMin, yMax, 0);
+            visu.draw_graph(side_cropped, red, 1, 1, yMin, yMax, 0);
             visu.display(graph_disp);
         }
         switch (main_disp.key()) 

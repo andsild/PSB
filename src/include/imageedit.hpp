@@ -44,8 +44,9 @@ class ImageDisplay
                 solved_disp,
                 resolved_disp;
     image_psb::image_fmt main_image,
-              solved_image,
+              // solved_image,
               resolved_image;
+    cimg_library::CImg<unsigned char> solved_image;
     image_psb::image_fmt visu;
     cimg_library::CImgDisplay graph_disp;
     ImageContainer getCurrent();
