@@ -213,7 +213,8 @@ int main(int argc, char *argv[])
             break;
         }
 
-        imageSolver2.solve(vFuncContainer, l>0, dTolerance, "re", "re", dScalar);
+        if(!n)
+            imageSolver2.solve(vFuncContainer, l>0, dTolerance, "re", "re", dScalar);
     }
 
     if(a)

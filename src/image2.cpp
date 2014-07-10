@@ -63,26 +63,27 @@ std::string format(const char* fmt, ...)
     return ret;
 }
 
-
-
 std::string printImage(const image_fmt image)
 {
     std::stringstream ss;
-    for(int iPos = 0; iPos < image.height(); iPos++)
+    int iIndex = 0;
+    cimg_forXY(image, x,y)
     {
-        for(int jPos = 0; jPos < image.width(); jPos++)
-        {
-            ss << format("%5.1f  ", image(jPos, iPos));
-            // printf("%5.1f ",image(jPos,iPos));
-        }
-        ss << "\n";
+        ss << format("%5.1f  ", image(x,y));
+        if( (iIndex % image.width()) == 0) ss << "\n";
+        iIndex++;
+    // for(int iPos = 0; iPos < image.height(); iPos++)
+    // {
+    //     for(int jPos = 0; jPos < image.width(); jPos++)
+    //     {
+    //         ss << format("%5.1f  ", image(jPos, iPos));
+    //         // printf("%5.1f ",image(jPos,iPos));
+    //     }
+    //     ss << "\n";
     }
 
     return ss.str();
 }
-
-
-
 
 void toGrayScale(image_fmt &image)
 {
@@ -233,7 +234,7 @@ template <class T> class ImageProcess
             try
             {
                 mkdirp(fileDir);
-                this->U.save(sFilename.c_str());
+                this->U.save_ascii(sFilename.c_str());
             }
             catch(CImgIOException &cioe)
             {
@@ -515,7 +516,9 @@ void ImageSolver::solve(function_container vIf, bool bComputeLines,
                 ipImage.writeResultToFile(std::string(cResultPath) + (*subIt).sPath);
 
                 if(dScalar == 1.0)
+                {
                     ipImage.roundValues();
+                }
                 CLOG(severity_type::extensive)("Finished image (rounded and cut): \n", printImage(ipImage.getGuess()));
                 (logInstance.print<severity_type::extensive>)("Finished image(rounded and cut): \n", printImage(ipImage.getGuess()));
                 ipImage.writeImageToFile(sImageDir.c_str());
