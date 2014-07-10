@@ -102,7 +102,6 @@ void toGrayScale(image_fmt &image)
     image = grayscale;
 }
 
-
 template <class T> class ImageProcess
 {
     private:
@@ -121,17 +120,10 @@ template <class T> class ImageProcess
 
 
     public:
-        image_fmt getGuess() { return this->U; }
-        image_fmt getImage () { return this->image; }
-        image_fmt getRho() { return this->rho; }
+        image_fmt &getGuess() { return this->U; }
+        image_fmt &getImage () { return this->image; }
+        image_fmt &getRho() { return this->rho; }
 
-        void multiply(double dScalar)
-        {
-            cimg_forXY(this->rho, x,y)
-                this->rho(x,y) = this->rho(x,y) * dScalar;
-            LOG(severity_type::info)("Multiplied rho by ", dScalar);
-            CLOG(severity_type::info)("Multiplied rho by ", dScalar);
-        }
 
         double dMaxErr;
         ImageProcess(image_fmt image, const char *fileName, double dMaxErr)
@@ -170,29 +162,11 @@ template <class T> class ImageProcess
         void makeRho()
         {
             int iKernDim = 3;
-            // int BORDER_SIZE = 1;
-            // image_fmt kernel(iKernDim, iKernDim, 1, 1,
-            //                  0,1,0,
-            //                  1,-4,1,
-            //                  0,1,0);
-            // this->rho = this->image.get_convolve(kernel, 0);
-
-            this->rho.assign(this->image, "xyz", 0);
-            int BORDER_SIZE = 1;
-            CImg_3x3(I,double);
-            cimg_for_in3x3(this->image, BORDER_SIZE, BORDER_SIZE,
-                           this->image.width() - BORDER_SIZE - 1, this->image.height() - BORDER_SIZE - 1,
-                           x,y,0,0,I,double) // uses Neumann borders
-            {
-                double dNewVal = (Icn + Icp + Ipc + Inc - (4 * Icc));
-                this->rho(x,y) = dNewVal;
-            }
-
-            cimg_for_borderXY(this->image,x,y,BORDER_SIZE)
-            {
-                // this->rho(x,y) = this->image(x,y);
-                this->rho(x,y) = NAN;
-            }
+            image_fmt kernel(iKernDim, iKernDim, 1, 1,
+                             0,1,0,
+                             1,-4,1,
+                             0,1,0);
+            this->rho = this->image.get_convolve(kernel, 0);
         }
 
         void solve(iterative_function func,logging::Logger< logging::FileLogPolicy > &logInstance)
@@ -464,7 +438,10 @@ void ImageSolver::solve(function_container vIf, bool bComputeLines,
 
         ImageProcess<double> ipImage(image, (*it).c_str(), dTolerance);
         ipImage.makeRho();
-        if(dScalar != 1.0) { ipImage.multiply(dScalar); }
+        if(dScalar != 1.0)
+        {
+            ipImage.getRho() *= dScalar;
+        }
 
         bool BORDERS=true;
 
