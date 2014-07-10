@@ -15,6 +15,7 @@
 #include "image2.hpp"
 #include "iterative_solvers.hpp"
 #include "plot.hpp"
+#include "fft.hpp"
 // #include "solvers/FFT.cpp"
 
 #define no_argument 0
@@ -198,6 +199,13 @@ int main(int argc, char *argv[])
     else {
         CLOG(severity_type::warning)("no media folder given");
         LOG(severity_type::warning)("no media folder given");
+    }
+
+    if(f)
+    {
+        image_fmt img("../nice_example/increasing.png");
+        toGrayScale(img);
+        fft::FFT2D(img, img.width(), img.height(), 1);
     }
 
     if(r)

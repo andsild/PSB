@@ -180,6 +180,7 @@ void ImageDisplay::show()
     try
     {
         this->main_image.assign(mainFile.c_str());
+        toGrayScale(this->main_image);
         // this->main_image.load_ascii(mainFile.c_str());
         // this->solved_image.assign(solver.c_str());
         this->solved_image.load_ascii(solver.c_str());

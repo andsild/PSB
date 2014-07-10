@@ -1,9 +1,6 @@
 # Specified in order of priority, i.e. top item is done first, last item last
 # ...note that priorites might change.
 
-Resolvers
-    plot the resolved image
-
 FFT
 
 Wavelet

@@ -34,6 +34,8 @@ typedef std::vector<SolverMeta> function_container;
 
 typedef cimg_library::CImg<double> image_fmt;
 
+void toGrayScale(image_fmt &arg);
+
 
 class ImageException: public std::exception
 {

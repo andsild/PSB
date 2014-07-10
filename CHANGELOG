@@ -37,7 +37,15 @@ Change SOR to red-black - it now doesn't converge, and gives good results
 Unlike gauss-seidel and jacobi, which in general needs stop-critera set to 
 a factor of 100 less than SOR to give accurate results, much slower!
 
+
 ################
+Thu 10 Jul 2014
+################
+Images with "weird" values has to be saved/read using the ascii-format 
+otherwise CImg will round and cut the values.
+
+
+
 ################
 ################
 ################
