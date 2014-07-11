@@ -203,9 +203,10 @@ int main(int argc, char *argv[])
 
     if(f)
     {
-        image_fmt img("../nice_example/increasing.png");
+        // image_fmt img("../nice_example/increasing.png");
+        image_fmt img("../media_resolve/test.png");
         toGrayScale(img);
-        fft::FFT2D(img, img.width(), img.height(), 1);
+        fft::FFT2D(img);
     }
 
     if(r)

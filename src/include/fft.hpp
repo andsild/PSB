@@ -4,7 +4,7 @@
 
 namespace fft
 {
-    int FFT2D(image_psb::image_fmt, int, int, int);
+    int FFT2D(image_psb::image_fmt);
 }
 
 #endif
