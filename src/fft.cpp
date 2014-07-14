@@ -19,9 +19,6 @@ int FFT2D(image_psb::image_fmt input)
     // Remember average value for each channel (needed for normalizing the reconstruction).
     const image_psb::image_fmt average = input.get_resize(1,1,1,3,2);
     
-    // Image estimation from gradient of 'input' starts here.
-    //-----------------------------------------------------
-    
     // Step 1.  Estimate divergence of the gradient field (use backward finite difference scheme).
     const image_psb::image_fmt divergence = gradient[0].get_gradient("x",-1)[0] + gradient[1].get_gradient("y",-1)[0];
     
