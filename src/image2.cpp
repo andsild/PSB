@@ -70,7 +70,7 @@ std::string printImage(const image_fmt image)
     cimg_forXY(image, x,y)
     {
         ss << format("%5.1f  ", image(x,y));
-        if( (iIndex % image.width()) == 0) ss << "\n";
+        if( ((iIndex + 1) % image.width()) == 0 && iIndex > 0) ss << "\n";
         iIndex++;
     // for(int iPos = 0; iPos < image.height(); iPos++)
     // {

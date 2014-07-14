@@ -10,6 +10,7 @@
 
 #include "CImg.h"
 
+#include "wavelet.hpp"
 #include "loginstance.hpp"
 #include "file.hpp"
 #include "image2.hpp"
@@ -71,6 +72,8 @@ int main(int argc, char *argv[])
         {"sor"              , no_argument       , 0, 's'},
         {"verbose"          , optional_argument , 0, 'v'},
         {"fileverbose"      , optional_argument , 0, 'x'},
+        {"wavelet_pyconv"   , no_argument , 0, 'w'},
+
         // {"values-histogram" , no_argument       , 0, 'v'},
         {0,0,0,0},
     };
@@ -81,7 +84,7 @@ int main(int argc, char *argv[])
     
     log_inst_std.setHeader(false);
     int a = 0, c = 0, d = 0, f = 0, g = 0, j = 0, l = 0, n = 0, p = 0, r = 0, s = 0,
-        v = 0, x = 0;
+        v = 0, w=0, x = 0;
     double dScalar, dTolerance = 0.5;
     char *folder;
     function_container vFuncContainer;
@@ -90,21 +93,21 @@ int main(int argc, char *argv[])
     SolverMeta smS(pe_solver::iterate_sor, std::string("sor/"));
     ImageSolver imageSolver;
 
-    if(argc == 2 && ! (strcmp(argv[1], "-p") || strcmp(argv[1], "-n") 
-                       || strcmp(argv[1], "-h")))
-    {
-        std::cout << "Assuming \"-d " << std::string(argv[1]) << " --gauss --plot" << std::endl;
-        vFuncContainer.push_back(smG);
-        imageSolver.addFolder(std::string(argv[1]));
-        imageSolver.solve(vFuncContainer);
-        plot::plot();
-        exit(EXIT_SUCCESS);
-    }
+    // if(argc == 2 && ! (strcmp(argv[1], "-p") || strcmp(argv[1], "-n") 
+    //                    || strcmp(argv[1], "-h")))
+    // {
+    //     std::cout << "Assuming \"-d " << std::string(argv[1]) << " --gauss --plot" << std::endl;
+    //     vFuncContainer.push_back(smG);
+    //     imageSolver.addFolder(std::string(argv[1]));
+    //     imageSolver.solve(vFuncContainer);
+    //     plot::plot();
+    //     exit(EXIT_SUCCESS);
+    // }
 
 
     while(iarg != -1)
     {
-        iarg = getopt_long(argc, argv, "acd:fgjlhnpr:st:v:x:", longopts, &index);
+        iarg = getopt_long(argc, argv, "acd:fgjlhnpr:st:v:wx:", longopts, &index);
 
         switch (iarg)
         {
@@ -184,6 +187,9 @@ int main(int argc, char *argv[])
                 else
                     std::cout << "Error: file verbose level out of range" << std::endl;
                 break;
+            case 'w':
+                w++;
+                break;
         }
     } 
     if(d) {
@@ -207,6 +213,15 @@ int main(int argc, char *argv[])
         image_fmt img("../media_resolve/test.png");
         toGrayScale(img);
         fft::FFT2D(img);
+    }
+
+    if(w)
+    {
+        // image_fmt img("../media_resolve/test.png");
+        // image_fmt img("../nice_example/3gradientAnother.png");
+        image_fmt img("../nice_example/all_increasing.png");
+        toGrayScale(img);
+        wavelet::pyconv(img);
     }
 
     if(r)
