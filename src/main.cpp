@@ -281,7 +281,9 @@ int main(int argc, char *argv[])
     {
         imageSolver.clearFolders();
         imageSolver.addFolder(folder, "when trying to show rendered images (-c flag)");
-        imageSolver.renderImages(folder, vFuncContainer, "image/", "re");
+        const char *text = "NOT";
+        if(r) text = "re";
+        imageSolver.renderImages(folder, vFuncContainer, "image/", text);
     }
 
     if(plotLoop.joinable())

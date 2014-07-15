@@ -3,13 +3,13 @@
      w = [0.06110 0.26177 0.53034 0.65934  0.51106 0.05407 0.24453 0.57410];
 
         h1 = w(1:4); % first four elements
-        h1 = [h1 h1(end-1:-1:1)]; % reverse
+        h1 = [h1 h1(end-1:-1:1)]; % reverse and beginning
         h1 = h1' * h1; % pow(2)
 
         h2 = h1*w(5); % h1 multiplied by center kernel value
 
         g = w(6:8); % last elements
-        g = [g g(end-1:-1:1)]; % reverse
+        g = [g g(end-1:-1:1)]; % reverse and beginning
         g = g' * g;  % pow(@)
         result = pyconv( -div(:,:,i), h1, h2, g ); % convolution by L2 norm
 
@@ -75,16 +75,19 @@ namespace wavelet
 
 void pyconv(image_fmt input)
 {
-    image_fmt forward_mask(4, 1, 1, 1,
-            0.06110, 0.26177, 0.53034, 0.65934);
-    forward_mask.dot(forward_mask);
-    image_fmt backward_mask = (forward_mask * 5.0);
-    image_fmt g(2, 1, 1, 1,
-                0.05407, 0.24453, 0.57410);
+    const int SUBSAMPLING_FACTOR = 2;
+
+    image_fmt forward_mask(7, 1, 1, 1,
+            0.06110, 0.26177, 0.53034, 0.65934, 0.53034, 0.26177, 0.6110);
+    forward_mask = forward_mask.get_transpose().dot(forward_mask);
+    image_fmt backward_mask = (forward_mask * 0.51106);
+    image_fmt g(5, 1, 1, 1,
+                0.05407, 0.24453, 0.57410, 0.24453,0.05407);
+    g = g.get_transpose().dot(g);
 
     int iWidth = input.width(), iHeight = input.height();
-    int iHalfWidth = (iWidth / 2),
-        iHalfHeight = (iHeight / 2);
+    int iSampleWidth = iWidth / SUBSAMPLING_FACTOR,
+        iSampleHeight = iHeight / SUBSAMPLING_FACTOR;
     int iMaxLevel = ceil(cimg::log2(cimg::max(iWidth, iHeight)));
     CLOG(severity_type::debug)("Max level set to: ", iMaxLevel);
     LOG(severity_type::debug)("Max level set to: ", iMaxLevel);
@@ -97,11 +100,11 @@ void pyconv(image_fmt input)
     for(int iPos = 1; iPos < iMaxLevel; iPos++)
     {
         curPyr.convolve(forward_mask);
-        image_fmt tmp(iHalfWidth, iHalfHeight, 1, 1);
+        image_fmt tmp(iSampleWidth, iSampleHeight, 1, 1);
         // Or I could just convolve using a 1,0 mask?
         cimg_forXY(curPyr, x, y)
         {
-            if(x % 2 == 0 || y % 2 == 0) continue;
+            if(x % SUBSAMPLING_FACTOR == 0 || y % SUBSAMPLING_FACTOR == 0) continue;
             int iRow = y / 2,
                 iCol = x / 2;
             tmp(iCol, iRow) = curPyr(x,y);
@@ -109,7 +112,7 @@ void pyconv(image_fmt input)
         }
         CLOG(severity_type::debug)("Forward analys: step ", iPos, "\n", printImage(tmp));
         image_fmt newPyr(iWidth, iHeight, 1, 1, 0);
-        curPyr = newPyr.draw_image(iHalfWidth / 2 * iPos, iHalfWidth / 2 * iPos, 0, 0, tmp, 1);
+        curPyr = newPyr.draw_image(iSampleWidth / 2 * iPos, iSampleHeight / 2 * iPos, 0, 0, tmp, 1);
         curPyr = newPyr;
 
         CLOG(severity_type::debug)("Forward analys: step ", iPos, "\n", printImage(curPyr));
