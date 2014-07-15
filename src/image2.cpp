@@ -102,6 +102,18 @@ void toGrayScale(image_fmt &image)
     image = grayscale;
 }
 
+
+image_fmt makeRho(const image_fmt &input)
+{
+    int iKernDim = 3;
+    /* Discrete poison stencil */
+    image_fmt kernel(iKernDim, iKernDim, 1, 1,
+                    0,1,0,
+                    1,-4,1,
+                    0,1,0);
+    return input.get_convolve(kernel, 0);
+}
+
 template <class T> class ImageProcess
 {
     private:
@@ -111,7 +123,6 @@ template <class T> class ImageProcess
         mapfuncres mapFuncRes;
         std::vector<std::string> vOutput;
         image_fmt U;
-        image_fmt rho;
 
         image_fmt sRGBtoGrayscale()
         {
@@ -120,6 +131,7 @@ template <class T> class ImageProcess
 
 
     public:
+        image_fmt rho;
         image_fmt &getGuess() { return this->U; }
         image_fmt &getImage () { return this->image; }
         image_fmt &getRho() { return this->rho; }
@@ -159,15 +171,6 @@ template <class T> class ImageProcess
             }
         }
 
-        void makeRho()
-        {
-            int iKernDim = 3;
-            image_fmt kernel(iKernDim, iKernDim, 1, 1,
-                             0,1,0,
-                             1,-4,1,
-                             0,1,0);
-            this->rho = this->image.get_convolve(kernel, 0);
-        }
 
         void solve(iterative_function func,logging::Logger< logging::FileLogPolicy > &logInstance)
        {
@@ -352,6 +355,7 @@ void ImageSolver::renderImages(std::string sImageRoot, function_container vIf,
         // doImageDisplay(mapFiles, sImageRoot);
         id.show();
         id.loop();
+
 }
 
 imageList_fmt ImageSolver::histogram(std::string sDir, function_container vIf)
@@ -437,7 +441,7 @@ void ImageSolver::solve(function_container vIf, bool bComputeLines,
         }
 
         ImageProcess<double> ipImage(image, (*it).c_str(), dTolerance);
-        ipImage.makeRho();
+        ipImage.rho = makeRho(ipImage.getImage());
         if(dScalar != 1.0)
         {
             ipImage.getRho() *= dScalar;
