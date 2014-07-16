@@ -1,7 +1,8 @@
 #include "plot.hpp"
 
-#include <stdlib.h>
 #include <string>
+
+#include "CImg.h"
 
 namespace plot
 {
@@ -12,9 +13,9 @@ void plot()
     std::string sPlotDir = "../plot.sh";
     #ifdef __APPLE__
     std::string exe = "open " + sPlotDir;
-    system(exe.c_str());
+    cimg_library::cimg::system(exe.c_str());
     #elif __linux
-    system(sPlotDir.c_str());
+    cimg_library::cimg::system(sPlotDir.c_str());
     #endif
 }
 
