@@ -72,14 +72,6 @@ std::string printImage(const image_fmt image)
         ss << format("%5.1f  ", image(x,y));
         if( ((iIndex + 1) % image.width()) == 0 && iIndex > 0) ss << "\n";
         iIndex++;
-    // for(int iPos = 0; iPos < image.height(); iPos++)
-    // {
-    //     for(int jPos = 0; jPos < image.width(); jPos++)
-    //     {
-    //         ss << format("%5.1f  ", image(jPos, iPos));
-    //         // printf("%5.1f ",image(jPos,iPos));
-    //     }
-    //     ss << "\n";
     }
 
     return ss.str();
@@ -92,16 +84,9 @@ void toGrayScale(image_fmt &image)
         return;
     }
     image_fmt grayscale(image.width(), image.height(),1, 1, 0);
-
-        // image = image.get_sRGBtoRGB();
-        // image.sRGBtoRGB();
-        grayscale = image.get_norm().normalize(0,255);
-        // grayscale = image.get_sRGBtoRGB().RGBtoHSI().get_channel(2);
-        // grayscale = sRGBtoGrayscale();
-
+    grayscale = image.get_norm().normalize(0,255);
     image = grayscale;
 }
-
 
 image_fmt makeRho(const image_fmt &input)
 {
@@ -112,6 +97,15 @@ image_fmt makeRho(const image_fmt &input)
                     1,-4,1,
                     0,1,0);
     return input.get_convolve(kernel, 0);
+}
+
+image_fmt readImage(const char *fileName)
+{
+}
+
+double imageDiff(image_fmt source, image_fmt comparator)
+{
+    return source.MSE(comparator);
 }
 
 template <class T> class ImageProcess

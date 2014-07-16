@@ -1,3 +1,5 @@
+#define DEFAULT_TOLERANCE 1.0
+
 #include <fstream>
 #include <iostream>
 #include <iomanip>
@@ -5,8 +7,6 @@
 #include <sstream> 
 #include <string>
 #include <thread>
-
-#include <getopt.h>
 
 #include "CImg.h"
 
@@ -19,36 +19,12 @@
 #include "fft.hpp"
 // #include "solvers/FFT.cpp"
 
-#define no_argument 0
-#define required_argument 1 
-#define optional_argument 2
-
 using namespace cimg_library;
 using namespace image_psb;
 using namespace file_IO;
 using namespace plot;
 using namespace logging;
 
-void usage()
-{
-    std::cout << "Usage: main <folder>" << std::endl;
-
-    printf("\t -%c, %s\t%s\n", 'a', "--average", "compute average errors for solvers");
-    printf("\t -%c, %s\t%s\n", 'c', "--compare", "visual comparison of solved images vs original image");
-    printf("\t -%c, %s\t%s\n", 'd', "--directory", "directory with images");
-    printf("\t -%c, %s\t%s\n", 'g', "--gauss", "perform gauss-seidel iteration");
-    printf("\t -%c, %s\t%s\n", 'h', "--help", "view this text");
-    printf("\t -%c, %s\t%s\n", 'j', "--jacobi", "perform jacobi iteration");
-    printf("\t -%c, %s\t%s\n", 'n', "--nosolve", "do not invoke any solvers on the image");
-    printf("\t -%c, %s\t%s\n", 'p', "--plot", "generate plots for graphs");
-    printf("\t -%c, %s\t%s\n", 's', "--sor", "perform sor iteration");
-    printf("\t -%c, %s\t%s\n", 't', "--tolerance", "set the error tolerance between iterations");
-    printf("\n");
-
-    exit(EXIT_FAILURE);
-}
-
-#define DEFAULT_TOLERANCE 1.0
 
 void setVerboseLevel(int iLevel, const bool isConsole)
 {
@@ -64,7 +40,6 @@ void setVerboseLevel(int iLevel, const bool isConsole)
     else
         std::cerr << "Error: stdout verbose level out of range" << std::endl;
 }
-
 
 
 int main(int argc, char **argv) 

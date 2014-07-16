@@ -1,5 +1,0 @@
-file.cpp
-image2.cpp
-loadingbar.cpp
-logger.cpp
-plot.cpp

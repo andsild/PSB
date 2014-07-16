@@ -65,8 +65,8 @@ ahat = ahat(1+fs:end-fs, 1+fs:end-fs);
 #include "CImg.h"
 #include "loginstance.hpp"
 #include "image2.hpp"
+#include "image_types.hpp"
 
-using namespace image_psb;
 using namespace cimg_library;
 using namespace logging;
 
@@ -94,8 +94,8 @@ void pyconv(image_fmt input)
 
     image_fmt curPyr = input.get_resize(iWidth, iWidth, 1, 1, 0, 0);
 
-    CLOG(severity_type::debug)("Before iterations\n", printImage(curPyr));
-    LOG(severity_type::debug)("Before iterations:\n", printImage(curPyr));
+    CLOG(severity_type::debug)("Before iterations\n", image_psb::printImage(curPyr));
+    LOG(severity_type::debug)("Before iterations:\n", image_psb::printImage(curPyr));
 
     for(int iPos = 1; iPos < iMaxLevel; iPos++)
     {
@@ -110,16 +110,16 @@ void pyconv(image_fmt input)
             tmp(iCol, iRow) = curPyr(x,y);
             // tmp(x,y) = curPyr(x,y);
         }
-        CLOG(severity_type::debug)("Forward analys: step ", iPos, "\n", printImage(tmp));
+        CLOG(severity_type::debug)("Forward analys: step ", iPos, "\n", image_psb::printImage(tmp));
         image_fmt newPyr(iWidth, iHeight, 1, 1, 0);
         curPyr = newPyr.draw_image(iSampleWidth / 2 * iPos, iSampleHeight / 2 * iPos, 0, 0, tmp, 1);
         curPyr = newPyr;
 
-        CLOG(severity_type::debug)("Forward analys: step ", iPos, "\n", printImage(curPyr));
+        CLOG(severity_type::debug)("Forward analys: step ", iPos, "\n", image_psb::printImage(curPyr));
     }
 
-    // CLOG(severity_type::debug)("After forward analysis\n", printImage(curPyr));
-    // LOG(severity_type::debug)("After forward analysis\n", printImage(curPyr));
+    // CLOG(severity_type::debug)("After forward analysis\n", image_psb::printImage(curPyr));
+    // LOG(severity_type::debug)("After forward analysis\n", image_psb::printImage(curPyr));
     //
     // for(int iPos = 1; iPos < iMaxLevel; iPos++)
     // {
@@ -135,8 +135,8 @@ void pyconv(image_fmt input)
     //     break;
     // }
     //
-    // CLOG(severity_type::debug)("Finished image\n", printImage(curPyr));
-    // LOG(severity_type::debug)("Finished image\n", printImage(curPyr));
+    // CLOG(severity_type::debug)("Finished image\n", image_psb::printImage(curPyr));
+    // LOG(severity_type::debug)("Finished image\n", image_psb::printImage(curPyr));
 }
 
 } /* EndOfNamespace */

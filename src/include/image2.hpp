@@ -1,7 +1,5 @@
 #ifndef _IMAGE_H
-#define _IMAGE_H   1
-
-#define cimg_debug 0 
+#define _IMAGE_H
 
 #include <cstdarg>
 #include <iomanip>
@@ -9,10 +7,12 @@
 #include <map>
 #include <sstream> 
 #include <string>
+#include <vector>
 
 #include "CImg.h"
+
+#include "image_types.hpp"
 #include "loadingbar.hpp"
-#include "iterative_solvers.hpp"
 
 namespace image_psb
 {
@@ -20,19 +20,16 @@ namespace image_psb
 class SolverMeta
 {
     public:
-        pe_solver::iterative_function func;
+        iterative_function func;
         std::string sPath;
-        SolverMeta(pe_solver::iterative_function func,
+        SolverMeta(iterative_function func,
                           std::string sPath)
             : func(func), sPath(sPath)
         {
         }
 };
-
-typedef cimg_library::CImgList<double> imageList_fmt;
 typedef std::vector<SolverMeta> function_container;
 
-typedef cimg_library::CImg<double> image_fmt;
 
 void toGrayScale(image_fmt &arg);
 

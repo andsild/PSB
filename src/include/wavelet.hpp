@@ -1,12 +1,12 @@
 #ifndef WAVELET_H
 #define  WAVELET_H
 
-#include "image2.hpp"
+#include "image_types.hpp"
 
 namespace wavelet
 {
 
-void pyconv(image_psb::image_fmt);
+void pyconv(image_fmt);
 
 } /* EndOfNamespace */
 
