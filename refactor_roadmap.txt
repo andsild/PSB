@@ -1,0 +1,22 @@
+try out cimg plots instead of gnuplot
+
+change from file.hpp to cimg class based
+    remove mkdirp?
+
+image display should become a complete stand-alone
+
+fix the conversions from string and so on, srlsy..
+
+there should be one logger instance line for CLog and LOG
+
+fix so that there is debug and then <image_output>
+
+Create a master class "solver"
+    subclasses can process differently
+    takes as parameter a function and an image_fmt
+
+Change from reading folder to file
+
+generalize the display functions
+
+try to get rid of "file.hpp" and replace with cimg equivalents
