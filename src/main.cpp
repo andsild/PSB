@@ -10,6 +10,7 @@
 
 #include "CImg.h"
 
+#include "solver.hpp"
 #include "wavelet.hpp"
 #include "loginstance.hpp"
 #include "file.hpp"
@@ -74,6 +75,24 @@ int main(int argc, char **argv)
 
     setVerboseLevel(iVerbosityLevel, false);
     setVerboseLevel(iFileVerbosityLevel, true);
+
+    std::vector<solver::Solver> vSolvers;
+
+    /* Begin processing image */
+    // readImages
+    // process, compute rho only once
+    // then do a long check:
+    // if(rho)
+    // Solver rho(....)
+    // if(gauss)
+    // solver gauss
+
+    if(sor)
+    {
+        // IterativeSolver sor(iterate_sor2);
+        // vSolvers.add(sor);
+    }
+
 
     // if(d) {
     //     if(vFuncContainer.size() < 1 && !n)
