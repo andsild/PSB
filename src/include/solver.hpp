@@ -11,9 +11,6 @@
 namespace solver
 {
 
-typedef void (*iterative_function)(const image_fmt &arg1,
-        image_fmt &arg2, double, int, double &arg3, double) ;
-
 class Solver
 {
     private:
@@ -24,13 +21,15 @@ class Solver
     virtual void solve() = 0;
     virtual void writeData() = 0;
 
+    image_fmt origImage;
     image_fmt field;
     logging::Logger< logging::FileLogPolicy > logInst;
 
     public:
-    Solver(image_fmt image, std::string sFileName)
-        : field(image), sFilename(sFilename), logInst()
+    Solver(image_fmt origImage, image_fmt image, std::string sFileName)
+        : field(image), sFilename(sFilename), logInst(), origImage(origImage)
     {
+        // this->field = 
         this->logInst.setName(std::string("poop"));
     }
 };
@@ -47,9 +46,9 @@ class IterativeSolver : public virtual Solver
     void writeData();
 
     public:
-    IterativeSolver(image_fmt field, image_fmt guess, iterative_func func,
+    IterativeSolver(image_fmt origImage, image_fmt field, image_fmt guess, iterative_func func,
             double dStopCriterion, std::string sFilename = "")
-        : Solver(field, sFilename) , func(func), dStopCriterion(dStopCriterion) {}
+        : Solver(origImage, field, sFilename) , func(func), dStopCriterion(dStopCriterion) {}
 };
 
 // class DirectSolver : Solver

@@ -32,6 +32,7 @@ typedef std::vector<SolverMeta> function_container;
 
 
 void toGrayScale(image_fmt &arg);
+double imageDiff(image_fmt, image_fmt);
 
 
 class ImageException: public std::exception
