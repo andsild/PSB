@@ -24,9 +24,9 @@ enum severity_type
 class LogPolicyInterface
 {
     public:
-        virtual void		open_ostream(const std::string& name) = 0;
-        virtual void		close_ostream() = 0;
-        virtual void		write(const std::string& msg) = 0;
+        virtual void        open_ostream(const std::string& name) = 0;
+        virtual void        close_ostream() = 0;
+        virtual void        write(const std::string& msg) = 0;
 };
 
 class FileLogPolicy : public LogPolicyInterface
@@ -91,8 +91,7 @@ class Logger
                 log_stream<<parm1;
                 print_impl(parm...);
             }
-    public:
-        Logger( const std::string& name )
+        void initialize()
         {
             log_line_number = 0;
             this->iLevel = severity_type::info;
@@ -102,6 +101,20 @@ class Logger
             {
                 throw std::runtime_error("Logger: Unable to create the Logger instance"); 
             }
+        }
+    public:
+        Logger()
+        {
+            this->initialize();
+        }
+        Logger( const std::string& name )
+        {
+            this->initialize();
+            this->setName(name);
+        }
+
+        void setName(const std::string& name)
+        {
             policy->open_ostream( name );
         }
         int getLevel()

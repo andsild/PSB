@@ -11,13 +11,11 @@
 #include <sstream>
 
 #include "CImg.h"
+#include "image_types.hpp"
 #include "loginstance.hpp"
 
 namespace pe_solver //[p]oison-[e]quation
 {
-
-typedef void (*iterative_function)(const cimg_library::CImg<double> &arg1,
-        cimg_library::CImg<double> &arg2, double, int, double &arg3, double) ;
 
 void iterate_jacobi(const cimg_library::CImg<double> &arg1,
                    cimg_library::CImg<double> &arg2,

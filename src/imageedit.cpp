@@ -10,7 +10,8 @@
 
 #include "CImg.h"
 
-#include <file.hpp>
+#include "file.hpp"
+#include "image_types.hpp"
 #include "loginstance.hpp"
 #include "image2.hpp"
 
