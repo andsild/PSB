@@ -15,6 +15,7 @@ typedef void (*iterative_function)(const cimg_library::CImg<double> &arg1,
 
 typedef void (*iterative_func)(const image_fmt &arg1, image_fmt &arg2,
                                 double &arg3) ;
+typedef void (*direct_func)(const image_fmt &arg1, image_fmt &arg2);
 
 class ImageException: public std::exception
 {

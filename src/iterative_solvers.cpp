@@ -39,6 +39,26 @@ void iterate_jacobi(const CImg<double> &field, CImg<double> &U,
     }
 }
 
+void iterate_jacobi2(image_fmt &field, image_fmt &guess, double &dDiff)
+{
+    dDiff = 0;
+    int BORDER_SIZE = 1;
+    image_fmt origGuess(guess);
+    CImg_3x3(I,double);
+
+    cimg_for_in3x3(origGuess, BORDER_SIZE, BORDER_SIZE,
+                   origGuess.width() - BORDER_SIZE - 1, origGuess.height() - BORDER_SIZE - 1,
+                   x,y,0,0,I,double) // uses Neumann borders
+    {
+        double dOldVal = Icc;
+        double dNewVal = .25 * (Icn + Icp + Ipc + Inc - field(x,y));
+        guess(x,y) = dNewVal;
+        double dCurDiff = fabs(dOldVal - dNewVal);
+        if( dCurDiff > dDiff)
+            dDiff = dCurDiff;
+    }
+}
+
 /** Gauss-seidel iteration
  *
  */

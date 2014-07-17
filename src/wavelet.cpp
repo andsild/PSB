@@ -73,51 +73,51 @@ using namespace logging;
 namespace wavelet
 {
 
-void pyconv(image_fmt input)
+void pyconv(const image_fmt &field, image_fmt &retImg)
 {
-    const int SUBSAMPLING_FACTOR = 2;
-
-    image_fmt forward_mask(7, 1, 1, 1,
-            0.06110, 0.26177, 0.53034, 0.65934, 0.53034, 0.26177, 0.6110);
-    forward_mask = forward_mask.get_transpose().dot(forward_mask);
-    image_fmt backward_mask = (forward_mask * 0.51106);
-    image_fmt g(5, 1, 1, 1,
-                0.05407, 0.24453, 0.57410, 0.24453,0.05407);
-    g = g.get_transpose().dot(g);
-
-    int iWidth = input.width(), iHeight = input.height();
-    int iSampleWidth = iWidth / SUBSAMPLING_FACTOR,
-        iSampleHeight = iHeight / SUBSAMPLING_FACTOR;
-    int iMaxLevel = ceil(cimg::log2(cimg::max(iWidth, iHeight)));
-    CLOG(severity_type::debug)("Max level set to: ", iMaxLevel);
-    LOG(severity_type::debug)("Max level set to: ", iMaxLevel);
-
-    image_fmt curPyr = input.get_resize(iWidth, iWidth, 1, 1, 0, 0);
-
-    CLOG(severity_type::debug)("Before iterations\n", image_psb::printImage(curPyr));
-    LOG(severity_type::debug)("Before iterations:\n", image_psb::printImage(curPyr));
-
-    for(int iPos = 1; iPos < iMaxLevel; iPos++)
-    {
-        curPyr.convolve(forward_mask);
-        image_fmt tmp(iSampleWidth, iSampleHeight, 1, 1);
-        // Or I could just convolve using a 1,0 mask?
-        cimg_forXY(curPyr, x, y)
-        {
-            if(x % SUBSAMPLING_FACTOR == 0 || y % SUBSAMPLING_FACTOR == 0) continue;
-            int iRow = y / 2,
-                iCol = x / 2;
-            tmp(iCol, iRow) = curPyr(x,y);
-            // tmp(x,y) = curPyr(x,y);
-        }
-        CLOG(severity_type::debug)("Forward analys: step ", iPos, "\n", image_psb::printImage(tmp));
-        image_fmt newPyr(iWidth, iHeight, 1, 1, 0);
-        curPyr = newPyr.draw_image(iSampleWidth / 2 * iPos, iSampleHeight / 2 * iPos, 0, 0, tmp, 1);
-        curPyr = newPyr;
-
-        CLOG(severity_type::debug)("Forward analys: step ", iPos, "\n", image_psb::printImage(curPyr));
-    }
-
+    // const int SUBSAMPLING_FACTOR = 2;
+    //
+    // image_fmt forward_mask(7, 1, 1, 1,
+    //         0.06110, 0.26177, 0.53034, 0.65934, 0.53034, 0.26177, 0.6110);
+    // forward_mask = forward_mask.get_transpose().dot(forward_mask);
+    // image_fmt backward_mask = (forward_mask * 0.51106);
+    // image_fmt g(5, 1, 1, 1,
+    //             0.05407, 0.24453, 0.57410, 0.24453,0.05407);
+    // g = g.get_transpose().dot(g);
+    //
+    // int iWidth = input.width(), iHeight = input.height();
+    // int iSampleWidth = iWidth / SUBSAMPLING_FACTOR,
+    //     iSampleHeight = iHeight / SUBSAMPLING_FACTOR;
+    // int iMaxLevel = ceil(cimg::log2(cimg::max(iWidth, iHeight)));
+    // CLOG(severity_type::debug)("Max level set to: ", iMaxLevel);
+    // LOG(severity_type::debug)("Max level set to: ", iMaxLevel);
+    //
+    // image_fmt curPyr = input.get_resize(iWidth, iWidth, 1, 1, 0, 0);
+    //
+    // CLOG(severity_type::debug)("Before iterations\n", image_psb::printImage(curPyr));
+    // LOG(severity_type::debug)("Before iterations:\n", image_psb::printImage(curPyr));
+    //
+    // for(int iPos = 1; iPos < iMaxLevel; iPos++)
+    // {
+    //     curPyr.convolve(forward_mask);
+    //     image_fmt tmp(iSampleWidth, iSampleHeight, 1, 1);
+    //     // Or I could just convolve using a 1,0 mask?
+    //     cimg_forXY(curPyr, x, y)
+    //     {
+    //         if(x % SUBSAMPLING_FACTOR == 0 || y % SUBSAMPLING_FACTOR == 0) continue;
+    //         int iRow = y / 2,
+    //             iCol = x / 2;
+    //         tmp(iCol, iRow) = curPyr(x,y);
+    //         // tmp(x,y) = curPyr(x,y);
+    //     }
+    //     CLOG(severity_type::debug)("Forward analys: step ", iPos, "\n", image_psb::printImage(tmp));
+    //     image_fmt newPyr(iWidth, iHeight, 1, 1, 0);
+    //     curPyr = newPyr.draw_image(iSampleWidth / 2 * iPos, iSampleHeight / 2 * iPos, 0, 0, tmp, 1);
+    //     curPyr = newPyr;
+    //
+    //     CLOG(severity_type::debug)("Forward analys: step ", iPos, "\n", image_psb::printImage(curPyr));
+    // }
+    //
     // CLOG(severity_type::debug)("After forward analysis\n", image_psb::printImage(curPyr));
     // LOG(severity_type::debug)("After forward analysis\n", image_psb::printImage(curPyr));
     //
