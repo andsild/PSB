@@ -23,6 +23,7 @@ void iterate_sor(const image_fmt &arg1,
                  image_fmt &arg2,
                    double, int, double &arg3, double arg4);
 
+void iterate_jacobi2(const image_fmt &field, image_fmt &U, double &dDiff);
 void iterate_sor2(const image_fmt &field, image_fmt &U, double &dDiff);
 
 std::vector<std::string> iterative_solve(iterative_function function,

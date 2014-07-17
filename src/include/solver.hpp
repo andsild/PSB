@@ -41,24 +41,34 @@ class IterativeSolver : public virtual Solver
     iterative_func func;
     image_fmt &guess;
     double dStopCriterion;
-    void betweenIter();
     void postProsess();
     void writeData();
+    void divideImage();
+    imageList_fmt subspaces;
 
     public:
     image_fmt solve();
     IterativeSolver(const image_fmt &origImage, image_fmt &field, image_fmt &guess, iterative_func func,
-            double dStopCriterion, std::string sFilename = "")
+            double dStopCriterion, std::string sFilename)
         : Solver(origImage, field, std::string()) , func(func), dStopCriterion(dStopCriterion), guess(guess)
         {
+            
         }
 };
 
-// class DirectSolver : Solver
-// {
-//     DirectSolver(image_fmt image, std::string sFilename)
-//         : Solver(image, sFilename) {}
-// };
+class DirectSolver : public virtual Solver
+{
+    private:
+    direct_func func;
+    void postProsess();
+    void writeData();
+    public:
+    image_fmt solve();
+    DirectSolver(const image_fmt &origImage, image_fmt &field, direct_func func, std::string sFilename)
+        : Solver(origImage, field, sFilename), func(func)
+    {
+    }
+};
 
 } /* EndOfNamespace */
 

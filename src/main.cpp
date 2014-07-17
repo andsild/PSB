@@ -1,5 +1,6 @@
 #define DEFAULT_TOLERANCE 1.0
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
@@ -40,7 +41,6 @@ void setVerboseLevel(int iLevel, const bool isConsole)
     else
         std::cerr << "Error: stdout verbose level out of range" << std::endl;
 }
-
 
 int main(int argc, char **argv) 
 {
@@ -113,21 +113,50 @@ int main(int argc, char **argv)
     image_psb::toGrayScale(use_img);
     image_fmt field = image_psb::makeRho(use_img),
               guess = image_psb::makeInitialGuess(use_img, true);
+
+    std::vector<solver::Solver*> vSolvers;
     
     if(sor)
     {
-        std::cout << sFilename << std::endl;
-        std::string *test = new std::string("daw");
-        solver::IterativeSolver *sSor = new solver::IterativeSolver(use_img, field, guess,
-                                    solver::iterate_sor2, dTolerance, *test);
-        image_fmt result = sSor->solve();
+        // solver::IterativeSolver *sSor =      
+        vSolvers.push_back(new solver::IterativeSolver(use_img, field, guess,
+                                    solver::iterate_sor2, dTolerance, sFilename));
+    //     image_fmt result = sSor->solve();
+    //     roundValues(result);
+    //     if(resolve != 1.0)
+    //     {
+    //         sSor->alterField(resolve);
+    //         result = sSor->solve();
+    //         roundValues(result);
+    //     }
+    //     delete sSor;
+    }
+    if(wavelet)
+    {
+        // solver::DirectSolver *sWav = new solver::DirectSolver(use_img, field, wavelet::pyconv, sFilename);
+        // image_fmt result = sWav->solve();
+        vSolvers.push_back(new solver::DirectSolver(use_img, field, wavelet::pyconv, sFilename));
+        // roundValues(result);
+        // if(resolve != 1.0)
+        // {
+        //     sWav->alterField(resolve);
+        //     result = sWav->solve();
+        //     roundValues(result);
+        // }
+        // delete sWav;
+    }
+    //
+    for(std::vector<solver::Solver*>::iterator it = vSolvers.begin();
+        it != vSolvers.end(); it++)
+    {
+        image_fmt result = (*it)->solve();
         roundValues(result);
         if(resolve != 1.0)
         {
-            // sor.alterField(resolve);
-            // result = sor.solve();
+            (*it)->alterField(resolve);
+            result = (*it)->solve();
+            roundValues(result);
         }
-        delete sSor;
     }
 
 
