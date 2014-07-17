@@ -10,15 +10,14 @@
 
 #include "CImg.h"
 
+#include "iterative_solvers.hpp"
 #include "solver.hpp"
 #include "wavelet.hpp"
+#include "fft.hpp"
 #include "loginstance.hpp"
 #include "file.hpp"
 #include "image2.hpp"
-#include "iterative_solvers.hpp"
 #include "plot.hpp"
-#include "fft.hpp"
-// #include "solvers/FFT.cpp"
 
 using namespace cimg_library;
 using namespace image_psb;
@@ -56,13 +55,13 @@ int main(int argc, char **argv)
     if(argc < 2)
     {
         std::cerr << sUsageMsg << std::endl;
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     std::string sToleranceHelpStr = "error tolerance (default: " + std::to_string(DEFAULT_TOLERANCE);
 
-    const char *dirName = cimg_option("-d", (char*)0, "Input image directory");
-    const char *fileName = cimg_option("-f", (char*)0, "Input image file");
+    const char *dirname = cimg_option("-d", (char*)0, "Input image directory");
+    const char *filename = cimg_option("-f", (char*)0, "Input image file");
     const bool gauss = cimg_option("--gauss", false, "use gauss-seidel"),
                jacobi = cimg_option("--jacobi", false, "use jacobi solver"),
                sor = cimg_option("--sor", false, "use successive over-relaxation solver"),
@@ -72,11 +71,13 @@ int main(int argc, char **argv)
     const int iVerbosityLevel = cimg_option("-v", 1, "verbosity level: from .. to .. "),
               iFileVerbosityLevel = cimg_option("-x", 1, "written verbosity level");
     const double dTolerance = cimg_option("-t", DEFAULT_TOLERANCE, sToleranceHelpStr.c_str());
+    const double resolve = cimg_option("-n", 1.0, "resolve the image using a different field");
+
+    std::string sFilename = (filename) ? std::string(filename) : std::string(),
+                sDirname = (dirname) ? std::string(dirname) : std::string();
 
     setVerboseLevel(iVerbosityLevel, false);
     setVerboseLevel(iFileVerbosityLevel, true);
-
-    std::vector<solver::Solver> vSolvers;
 
     /* Begin processing image */
     // readImages
@@ -87,10 +88,46 @@ int main(int argc, char **argv)
     // if(gauss)
     // solver gauss
 
+    if(sFilename.empty() && sDirname.empty())
+    {
+        std::vector<std::string> args(argv, argv+argc);
+        for (size_t i = 1; i < args.size(); ++i)
+        {
+            if (args[i].at(0) != '-')
+            {
+                sFilename = args[i];
+                break;
+            }
+        }
+        if(sFilename.empty()) {
+        std::cerr << sUsageMsg << std::endl;
+        return EXIT_FAILURE; }
+    }
+
+    image_fmt use_img;
+    if(!image_psb::readImage(use_img, sFilename))
+    {
+        std::cerr << "Error:: could not load image: " << sFilename << std::endl;
+        return EXIT_FAILURE;
+    }
+    image_psb::toGrayScale(use_img);
+    image_fmt field = image_psb::makeRho(use_img),
+              guess = image_psb::makeInitialGuess(use_img, true);
+    
     if(sor)
     {
-        // IterativeSolver sor(iterate_sor2);
-        // vSolvers.add(sor);
+        std::cout << sFilename << std::endl;
+        std::string *test = new std::string("daw");
+        solver::IterativeSolver *sSor = new solver::IterativeSolver(use_img, field, guess,
+                                    solver::iterate_sor2, dTolerance, *test);
+        image_fmt result = sSor->solve();
+        roundValues(result);
+        if(resolve != 1.0)
+        {
+            // sor.alterField(resolve);
+            // result = sor.solve();
+        }
+        delete sSor;
     }
 
 
@@ -195,5 +232,5 @@ int main(int argc, char **argv)
     //     histLoop.join();
     //
     // LOG(severity_type::info)("Program exited successfully");
-    return 0;
+    return EXIT_SUCCESS;
 }

@@ -21,7 +21,7 @@ using namespace file_IO;
 using namespace plot;
 using namespace logging;
 using namespace loadbar;
-using namespace pe_solver;
+using namespace solver;
 using namespace image_display;
 
 namespace image_psb
@@ -34,6 +34,11 @@ void renderImage(CImgDisplay disp)
     {
         disp.wait();
     }
+}
+
+void roundValues(image_fmt &image)
+{
+    image.round(0).cut(0,255);
 }
 
 void display_histogram(image_fmt image)
@@ -99,14 +104,55 @@ image_fmt makeRho(const image_fmt &input)
     return input.get_convolve(kernel, 0);
 }
 
-image_fmt readImage(const char *fileName)
+bool readImage(image_fmt &image, std::string sFileName)
 {
+    cimg::exception_mode(0);
+    try
+    {
+        image.load(sFileName.c_str());
+    }
+    catch(CImgIOException &cioe)
+    {
+        std::cerr << cioe.what() << std::endl;
+        return false;
+    }
+    return true;
 }
 
-double imageDiff(image_fmt source, image_fmt comparator)
+double imageDiff(const image_fmt &source, const image_fmt &comparator)
 {
-    return source.MSE(comparator);
+    return (double)(source.MSE(comparator));
 }
+
+
+image_fmt makeInitialGuess(const image_fmt &image, bool bExtractBordes = true)
+{
+    if(image.size() < 1)
+    {
+        std::string sMsg = "Image was not initialized before creating border"
+                           " [[ width: " + std::to_string(image.width()) 
+                           + " height: " + std::to_string(image.height()) + " ]]";
+        throw ImageException(sMsg.c_str());
+    }
+
+    image_fmt U;
+
+    int BORDER_SIZE = 1;
+    int DEFAULT_GUESS_VAL = 0;
+    U.assign(image, "xyz", DEFAULT_GUESS_VAL);
+
+    if(bExtractBordes == true)
+    {
+        cimg_for_borderXY(image,x,y,BORDER_SIZE)
+        {
+            U(x,y) = image(x,y);
+        }
+    }
+
+    return U;
+}
+
+
 
 template <class T> class ImageProcess
 {
@@ -116,7 +162,6 @@ template <class T> class ImageProcess
         const char *fileName;
         mapfuncres mapFuncRes;
         std::vector<std::string> vOutput;
-        image_fmt U;
 
         image_fmt sRGBtoGrayscale()
         {
@@ -126,6 +171,7 @@ template <class T> class ImageProcess
 
     public:
         image_fmt rho;
+        image_fmt U;
         image_fmt &getGuess() { return this->U; }
         image_fmt &getImage () { return this->image; }
         image_fmt &getRho() { return this->rho; }
@@ -144,28 +190,6 @@ template <class T> class ImageProcess
             this->U.clear();
             this->vOutput.clear();
         }
-        void makeInitialGuess(bool bExtractBordes = true)
-        {
-            if(this->image.size() < 1)
-            {
-                throw ImageException("Image std::vector was not initialized"
-                                     " before creating border");
-            }
-
-            int BORDER_SIZE = 1;
-            int DEFAULT_GUESS_VAL = 0;
-            this->U.assign(this->image, "xyz", DEFAULT_GUESS_VAL);
-
-            if(bExtractBordes == true)
-            {
-                cimg_for_borderXY(this->image,x,y,BORDER_SIZE)
-                {
-                    this->U(x,y) = this->image(x,y);
-                }
-            }
-        }
-
-
         void solve(iterative_function func,logging::Logger< logging::FileLogPolicy > &logInstance)
        {
             this->vOutput =  iterative_solve(func,
@@ -191,11 +215,6 @@ template <class T> class ImageProcess
             }
         }
 
-        void roundValues()
-        {
-            this->U.round(0);
-            this->U.cut(0, 255);
-        }
         void writeImageToFile(const char *fileDir)
         {
             std::string sFileName = std::string(this->fileName);
@@ -463,7 +482,7 @@ void ImageSolver::solve(function_container vIf, bool bComputeLines,
             logging::Logger< logging::FileLogPolicy > logInstance(sLogPath + sLogFile);
             logInstance.setLevel(log_inst.getLevel());
 
-            ipImage.makeInitialGuess(BORDERS);
+            ipImage.U = makeInitialGuess(ipImage.getImage(), BORDERS);
             if(logInstance.getLevel() >= severity_type::extensive)
             {
                 (logInstance.print<severity_type::extensive>)("Initial image: ", (*it).c_str(), "\n", printImage(ipImage.getImage()));
@@ -492,7 +511,7 @@ void ImageSolver::solve(function_container vIf, bool bComputeLines,
 
                 if(dScalar == 1.0)
                 {
-                    ipImage.roundValues();
+                    roundValues(ipImage.getGuess());
                 }
                 CLOG(severity_type::extensive)("Finished image (rounded and cut): \n", printImage(ipImage.getGuess()));
                 (logInstance.print<severity_type::extensive>)("Finished image(rounded and cut): \n", printImage(ipImage.getGuess()));

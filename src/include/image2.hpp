@@ -32,25 +32,11 @@ typedef std::vector<SolverMeta> function_container;
 
 
 void toGrayScale(image_fmt &arg);
-double imageDiff(image_fmt, image_fmt);
-
-
-class ImageException: public std::exception
-{
-    public:
-        explicit ImageException(const std::string& message):
-            msg_(message)
-         {}
-
-        virtual ~ImageException() throw (){}
-        virtual const char* what() const throw()
-        {
-            std::string ret = std::string("") + msg_;
-            return ret.c_str();
-        }
-    protected:
-        std::string msg_;
-};
+double imageDiff(const image_fmt &arg1, const image_fmt &arg2);
+bool readImage(image_fmt &arg1, const std::string);
+image_fmt makeRho(const image_fmt &input);
+image_fmt makeInitialGuess(const image_fmt &input, bool);
+void roundValues(image_fmt &arg);
 
 
 void renderImage(cimg_library::CImgDisplay);

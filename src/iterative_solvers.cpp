@@ -11,7 +11,7 @@
 using namespace logging;
 using namespace cimg_library;
 
-namespace pe_solver //[p]oison-[e]quation
+namespace solver //[p]oison-[e]quation
 {
 
 /** jacobi iteration

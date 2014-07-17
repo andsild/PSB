@@ -64,7 +64,7 @@ std::string ImageContainer::getSolved() const
     if(this->vSolvedImages.empty())
     {
         std::string sErr= "lookup for solved image to " + this->fileName + " failed: no resolved images added, but access was attempted ";
-        throw image_psb::ImageException(sErr);
+        throw ImageException(sErr);
     }
     if(this->iSolvedIndex < 0) iSolvedIndex++;
     if(this->iSolvedIndex >= this->vSolvedImages.size()) iSolvedIndex--;
@@ -76,7 +76,7 @@ std::string ImageContainer::getSolved() const
                           + std::to_string(this->iSolvedIndex)
                           + " attempted on list of size "
                           + std::to_string(this->vSolvedImages.size());
-        throw image_psb::ImageException(sErr);
+        throw ImageException(sErr);
     }
     return this->vSolvedImages.at(iSolvedIndex);
 }
@@ -85,7 +85,7 @@ std::string ImageContainer::getResolved() const
     if(this->vResolvedImages.empty())
     {
         std::string sErr= "lookup for solved image to " + this->fileName + " failed: no resolved images added, but access was attempted ";
-        throw image_psb::ImageException(sErr);
+        throw ImageException(sErr);
     }
     if(this->iResolvedIndex < 0) iResolvedIndex++;
     if(this->iResolvedIndex >= this->vResolvedImages.size()) iResolvedIndex--;
@@ -98,7 +98,7 @@ std::string ImageContainer::getResolved() const
                           + std::to_string(this->iResolvedIndex)
                           + " attempted on list of size "
                           + std::to_string(this->vResolvedImages.size());
-        throw image_psb::ImageException(sErr);
+        throw ImageException(sErr);
     }
     return this->vResolvedImages.at(iResolvedIndex);
 }
@@ -170,7 +170,7 @@ void ImageDisplay::show()
         if(inst.hasResolvedImages())
             resolved = inst.getResolved();
     }
-    catch(image_psb::ImageException ie)
+    catch(ImageException ie)
     {
         LOG(severity_type::error)(ie.what());
         CLOG(severity_type::error)(ie.what());
@@ -356,7 +356,7 @@ void ImageDisplay::addResolvedImage(std::string fileName)
     }
 
     std::string sErr = std::string("no match for solver image: ") + fileName;
-    throw image_psb::ImageException(sErr);
+    throw ImageException(sErr);
 }
 
 void ImageDisplay::addSolverImage(std::string fileName) 
@@ -377,7 +377,7 @@ void ImageDisplay::addSolverImage(std::string fileName)
     }
 
     std::string sErr = std::string("no match for solver image: ") + fileName;
-    throw image_psb::ImageException(sErr);
+    throw ImageException(sErr);
 }
 
 } /* EndOfNameSpace */

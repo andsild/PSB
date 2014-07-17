@@ -1,5 +1,5 @@
-#ifndef SOLVER_H
-#define SOLVER_H
+#ifndef ITER_SOLVER_H
+#define ITER_SOLVER_H
 
 #include <vector>
 #include <string>
@@ -8,7 +8,7 @@
 #include "image_types.hpp"
 #include "loginstance.hpp"
 
-namespace pe_solver //[p]oison-[e]quation
+namespace solver //[p]oison-[e]quation
 {
 
 void iterate_jacobi(const image_fmt &arg1,

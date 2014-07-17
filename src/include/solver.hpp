@@ -6,7 +6,7 @@
 #include <string>
 
 #include "image_types.hpp"
-#include <loginstance.hpp>
+#include "loginstance.hpp"
 
 namespace solver
 {
@@ -18,19 +18,20 @@ class Solver
 
     protected:
     virtual void postProsess() = 0;
-    virtual void solve() = 0;
     virtual void writeData() = 0;
 
-    image_fmt origImage;
-    image_fmt field;
+    const image_fmt &origImage;
+    image_fmt &field;
     logging::Logger< logging::FileLogPolicy > logInst;
 
     public:
-    Solver(image_fmt origImage, image_fmt image, std::string sFileName)
-        : field(image), sFilename(sFilename), logInst(), origImage(origImage)
+    virtual image_fmt solve() = 0;
+    void alterField(double);
+    Solver(const image_fmt &origImage, image_fmt &field, std::string sFileName)
+        : field(field), origImage(origImage), logInst()
     {
-        // this->field = 
         this->logInst.setName(std::string("poop"));
+        this->sFilename = sFilename;
     }
 };
 
@@ -38,17 +39,19 @@ class IterativeSolver : public virtual Solver
 {
     private:
     iterative_func func;
-    image_fmt guess;
+    image_fmt &guess;
     double dStopCriterion;
     void betweenIter();
-    void solve();
     void postProsess();
     void writeData();
 
     public:
-    IterativeSolver(image_fmt origImage, image_fmt field, image_fmt guess, iterative_func func,
+    image_fmt solve();
+    IterativeSolver(const image_fmt &origImage, image_fmt &field, image_fmt &guess, iterative_func func,
             double dStopCriterion, std::string sFilename = "")
-        : Solver(origImage, field, sFilename) , func(func), dStopCriterion(dStopCriterion) {}
+        : Solver(origImage, field, std::string()) , func(func), dStopCriterion(dStopCriterion), guess(guess)
+        {
+        }
 };
 
 // class DirectSolver : Solver
@@ -58,5 +61,6 @@ class IterativeSolver : public virtual Solver
 // };
 
 } /* EndOfNamespace */
+
 
 #endif
