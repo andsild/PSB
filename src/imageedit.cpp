@@ -26,6 +26,21 @@ namespace image_display
 int ImageContainer::iSolvedIndex = 0;
 int ImageContainer::iResolvedIndex = 0;
 
+template <class baseIter>
+class circularIterator
+{
+    private:
+        baseIter cur;
+        baseIter begin;
+        baseIter end;
+    public:
+        circularIterator(baseIter b, baseIter e, baseIter i)
+            :cur(i), begin(b), end(e) {}
+        baseIter & operator ++(void) {++cur; if(cur == end) {cur = begin;}}
+        // baseIter & operator --(void) {--cur; if(std::distance(begin, cur) == 0) { cur = end;}}
+};
+
+
 ImageContainer::ImageContainer(std::string fileName)
                : fileName(fileName)
 {

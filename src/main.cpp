@@ -23,7 +23,7 @@
 using namespace cimg_library;
 using namespace image_psb;
 using namespace file_IO;
-using namespace plot;
+// using namespace plot;
 using namespace logging;
 
 
@@ -62,6 +62,7 @@ int main(int argc, char **argv)
 
     const char *dirname = cimg_option("-d", (char*)0, "Input image directory");
     const char *filename = cimg_option("-f", (char*)0, "Input image file");
+    const bool compare = cimg_option("-c", false, "Compare original images to solved images");
     const bool gauss = cimg_option("--gauss", false, "use gauss-seidel"),
                jacobi = cimg_option("--jacobi", false, "use jacobi solver"),
                sor = cimg_option("--sor", false, "use successive over-relaxation solver"),
@@ -117,35 +118,16 @@ int main(int argc, char **argv)
     std::vector<solver::Solver*> vSolvers;
     
     if(sor)
-    {
-        // solver::IterativeSolver *sSor =      
         vSolvers.push_back(new solver::IterativeSolver(use_img, field, guess,
-                                    solver::iterate_sor2, dTolerance, sFilename));
-    //     image_fmt result = sSor->solve();
-    //     roundValues(result);
-    //     if(resolve != 1.0)
-    //     {
-    //         sSor->alterField(resolve);
-    //         result = sSor->solve();
-    //         roundValues(result);
-    //     }
-    //     delete sSor;
-    }
+                                    solver::iterate_sor2, dTolerance,
+                                    sFilename));
     if(wavelet)
-    {
-        // solver::DirectSolver *sWav = new solver::DirectSolver(use_img, field, wavelet::pyconv, sFilename);
-        // image_fmt result = sWav->solve();
-        vSolvers.push_back(new solver::DirectSolver(use_img, field, wavelet::pyconv, sFilename));
-        // roundValues(result);
-        // if(resolve != 1.0)
-        // {
-        //     sWav->alterField(resolve);
-        //     result = sWav->solve();
-        //     roundValues(result);
-        // }
-        // delete sWav;
-    }
-    //
+        vSolvers.push_back(new solver::DirectSolver(use_img, field,
+                                                    wavelet::pyconv,
+                                                    sFilename));
+
+
+
     for(std::vector<solver::Solver*>::iterator it = vSolvers.begin();
         it != vSolvers.end(); it++)
     {
@@ -157,6 +139,39 @@ int main(int argc, char **argv)
             result = (*it)->solve();
             roundValues(result);
         }
+        
+        // CImgDisplay disp(visu, "orignal and resolved image");
+        // image_fmt plot(500, 256, 1, 3, 0);
+        // visu.insert(plot, visu.size() - 1);
+        // int rmin = 0, rmax = 255;
+        // const double blackWhite[] = {255, 255, 255},
+        //             red[] = {255, 0, 0},
+        //             green[] = {0, 255, 0};
+        // while(!disp.is_closed())
+        // {
+        //     const int xm = disp.mouse_x()*2*use_img.width()/disp.width() - use_img.width(),
+        //               ym = disp.mouse_y()*use_img.height()/disp.height(),
+        //               xPos = xm - use_img.width()/2,
+        //               yPos = ym - use_img.height()/2;
+        //     if (disp.button() && xm>=0 && ym>=0)
+        //     {
+        //         const int r = (int)cimg::max(0.0f,(float)std::sqrt((float)xPos*xPos + yPos*yPos) - 3);
+        //         if (disp.button()&1) rmax = r;
+        //         if (disp.button()&2) rmin = r;
+        //         if (rmin>=rmax) rmin = cimg::max(rmax - 1,0);
+        //                 disp.wait();
+        //     }
+        //     image_fmt main_cropped = use_img.get_crop(
+        //             0, yPos, 0, 0, use_img.width()-1, yPos, 0, 0);
+        //     image_fmt side_cropped = use_img,get_crop(
+        //             0, yPos, 0, 0, use_img.width()-1, yPos, 0, 0);
+        //     plot.fill(0).draw_graph(main_cropped, blackWhite, 1, 1, 0, 0, 0);
+        //     plot.display(disp);
+        // }
+    }
+
+    if(compare)
+    {
     }
 
 
