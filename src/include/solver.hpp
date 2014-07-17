@@ -3,6 +3,7 @@
 
 #define BORDER_SIZE 1
 
+#include <vector>
 #include <string>
 
 #include "image_types.hpp"
@@ -18,7 +19,7 @@ class Solver
 
     protected:
     virtual void postProsess() = 0;
-    virtual void writeData() = 0;
+    void writeData(const std::vector<double> &arg);
 
     const image_fmt &origImage;
     image_fmt &field;
@@ -39,16 +40,15 @@ class IterativeSolver : public virtual Solver
 {
     private:
     iterative_func func;
-    image_fmt &guess;
+    const image_fmt &guess;
     double dStopCriterion;
     void postProsess();
-    void writeData();
     void divideImage();
     imageList_fmt subspaces;
 
     public:
     image_fmt solve();
-    IterativeSolver(const image_fmt &origImage, image_fmt &field, image_fmt &guess, iterative_func func,
+    IterativeSolver(const image_fmt &origImage, image_fmt &field, const image_fmt &guess, iterative_func func,
             double dStopCriterion, std::string sFilename)
         : Solver(origImage, field, std::string()) , func(func), dStopCriterion(dStopCriterion), guess(guess)
         {
@@ -61,7 +61,6 @@ class DirectSolver : public virtual Solver
     private:
     direct_func func;
     void postProsess();
-    void writeData();
     public:
     image_fmt solve();
     DirectSolver(const image_fmt &origImage, image_fmt &field, direct_func func, std::string sFilename)
