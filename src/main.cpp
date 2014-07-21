@@ -72,7 +72,7 @@ int main(int argc, char **argv)
     const int iVerbosityLevel = cimg_option("-v", 1, "verbosity level: from .. to .. "),
               iFileVerbosityLevel = cimg_option("-x", 1, "written verbosity level");
     const double dTolerance = cimg_option("-t", DEFAULT_TOLERANCE, sToleranceHelpStr.c_str());
-    const double resolve = cimg_option("-n", 1.0, "resolve the image using a different field");
+    const double resolve = cimg_option("-r", 1.0, "resolve the image using a different field");
 
     std::string sFilename = (filename) ? std::string(filename) : std::string(),
                 sDirname = (dirname) ? std::string(dirname) : std::string();
@@ -118,26 +118,32 @@ int main(int argc, char **argv)
     std::vector<solver::Solver*> vSolvers;
     
     if(sor)
+    {
+        std::string sLabel = "sor";
         vSolvers.push_back(new solver::IterativeSolver(use_img, field, guess,
                                     solver::iterate_sor2, dTolerance,
-                                    sFilename));
+                                    sFilename, sLabel));
+    }
     if(wavelet)
+    {
+        std::string sLabel = "wavelet";
         vSolvers.push_back(new solver::DirectSolver(use_img, field,
                                                     wavelet::pyconv,
-                                                    sFilename));
+                                                    sFilename, sLabel));
+    }
 
-
-
-    for(std::vector<solver::Solver*>::iterator it = vSolvers.begin();
-        it != vSolvers.end(); it++)
+    for(auto it : vSolvers)
     {
-        image_fmt result = (*it)->solve();
+        image_fmt result = it->solve();
         roundValues(result);
+        std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), false);
+        file_IO::saveImage(result, sSavename);
         if(resolve != 1.0)
         {
-            (*it)->alterField(resolve);
-            result = (*it)->solve();
-            roundValues(result);
+            it->alterField(resolve);
+            result = it->solve();
+            std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), true);
+            file_IO::saveImage(result, sSavename);
         }
         
         // CImgDisplay disp(visu, "orignal and resolved image");
@@ -172,6 +178,17 @@ int main(int argc, char **argv)
 
     if(compare)
     {
+        image_psb::scanAndAddImage(file_IO::getFoldername(sFilename), DATA_DIR);
+        /* Save every image file to an output directory
+           Save them in such a way to that you can read them as
+           image1 { solved instances }
+        */
+        // ImageContainer ic; // outdir
+        /* adding with orig folder and other folder */
+        /* all resolved are those with "re" in front"
+
+           */
+
     }
 
 

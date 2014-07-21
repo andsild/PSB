@@ -37,7 +37,7 @@ class circularIterator
         circularIterator(baseIter b, baseIter e, baseIter i)
             :cur(i), begin(b), end(e) {}
         baseIter & operator ++(void) {++cur; if(cur == end) {cur = begin;}}
-        // baseIter & operator --(void) {--cur; if(std::distance(begin, cur) == 0) { cur = end;}}
+        baseIter & operator --(void) {--cur; if(std::distance(begin, cur) == 0) { cur = end;}}
 };
 
 
@@ -63,6 +63,7 @@ void ImageContainer::addSolverImage(std::string fileName)
 
 void ImageContainer::addResolvedImage(std::string fileName)
 {
+    std::cout << " pushed image " << fileName  << " back" << std::endl;
     this->vResolvedImages.push_back(fileName);
 }
 
@@ -72,13 +73,17 @@ bool ImageContainer::hasResolved() const
 }
 std::string ImageContainer::getMain() const
 {
+    if(this->fileName.length() < 1)
+    {
+        throw ImageException(std::string("no filename for image container!"));
+    }
     return this->fileName;
 }
 std::string ImageContainer::getSolved() const
 {
     if(this->vSolvedImages.empty())
     {
-        std::string sErr= "lookup for solved image to " + this->fileName + " failed: no resolved images added, but access was attempted ";
+        std::string sErr= "lookup for solved image to " + this->fileName + " failed: no (non-re)solved images added, but access was attempted ";
         throw ImageException(sErr);
     }
     if(this->iSolvedIndex < 0) iSolvedIndex++;
@@ -352,46 +357,29 @@ void ImageDisplay::addMainImage(std::string fileName)
     this->vMainImages.push_back(ic);
 }
 
-void ImageDisplay::addResolvedImage(std::string fileName)
+void ImageDisplay::addResolvedImage2(std::string sFilename, std::string sCommon,
+                                     bool isResolved)
 {
-    std::string suffix = fileName;
-    file_IO::trimLeadingFileName(suffix);
-    for(std::vector<ImageContainer>::iterator it = this->vMainImages.begin();
-        it != this->vMainImages.end();
-        it++)
+    for(auto &it : this->vMainImages)
     {
-        std::string commonFileName = (*it).getMain();
-        file_IO::trimLeadingFileName(commonFileName);
-        std::cout << "Trying to find " << fileName << " matching " << commonFileName << std::endl;
-        if( commonFileName.compare(suffix) == 0)
+        std::string sMainname = file_IO::getFilename(it.getMain());
+        std::cout << "Trying to find " << sMainname << " matching " <<  sCommon << std::endl;
+        if(sMainname.compare(sCommon) == 0)
         {
-            (*it).addResolvedImage(fileName);
+            if(isResolved)
+            {
+                std::cerr << "Adding to resolved" << std::endl;
+                it.addResolvedImage(sFilename);
+            }
+            else
+            {
+                std::cerr << "Adding to non-resolved" << std::endl;
+                it.addSolverImage(sFilename);
+            }
             return;
         }
     }
-
-    std::string sErr = std::string("no match for solver image: ") + fileName;
-    throw ImageException(sErr);
-}
-
-void ImageDisplay::addSolverImage(std::string fileName) 
-{
-    std::string suffix = fileName;
-    file_IO::trimLeadingFileName(suffix);
-    for(std::vector<ImageContainer>::iterator it = this->vMainImages.begin();
-        it != this->vMainImages.end();
-        it++)
-    {
-        std::string commonFileName = (*it).getMain();
-        file_IO::trimLeadingFileName(commonFileName);
-        if( commonFileName.compare(suffix) == 0)
-        {
-            (*it).addSolverImage(fileName);
-            return;
-        }
-    }
-
-    std::string sErr = std::string("no match for solver image: ") + fileName;
+    std::string sErr = std::string("no match for solver image: ") + sFilename;
     throw ImageException(sErr);
 }
 

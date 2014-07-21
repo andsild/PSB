@@ -3,6 +3,7 @@
 
 #define BORDER_SIZE 1
 
+#include <iostream>
 #include <vector>
 #include <string>
 
@@ -15,7 +16,8 @@ namespace solver
 class Solver
 {
     private:
-    std::string sFilename;
+    std::string sFilename,
+                sLabel;
 
     protected:
     virtual void postProsess() = 0;
@@ -28,11 +30,15 @@ class Solver
     public:
     virtual image_fmt solve() = 0;
     void alterField(double);
-    Solver(const image_fmt &origImage, image_fmt &field, std::string sFileName)
-        : field(field), origImage(origImage), logInst()
+    std::string getLabel();
+    std::string getFilename();
+    Solver(const image_fmt &origImage, image_fmt &field, std::string sFile, std::string sLab)
+        : field(field), origImage(origImage), logInst(),
+            sFilename(sFile), sLabel(sLab)
     {
         this->logInst.setName(std::string("poop"));
-        this->sFilename = sFilename;
+        std::cout << this->sFilename << std::endl;
+        std::cout << this->sLabel << std::endl;
     }
 };
 
@@ -48,12 +54,14 @@ class IterativeSolver : public virtual Solver
 
     public:
     image_fmt solve();
-    IterativeSolver(const image_fmt &origImage, image_fmt &field, const image_fmt &guess, iterative_func func,
-            double dStopCriterion, std::string sFilename)
-        : Solver(origImage, field, std::string()) , func(func), dStopCriterion(dStopCriterion), guess(guess)
-        {
-            
-        }
+    IterativeSolver(const image_fmt &origImage, image_fmt &field,
+            const image_fmt &guess, iterative_func func,
+            double dStopCriterion, std::string sFile, std::string sLabel)
+        : Solver(origImage, field, sFile, sLabel), func(func),
+            dStopCriterion(dStopCriterion), guess(guess)
+    {
+        divideImage();
+    }
 };
 
 class DirectSolver : public virtual Solver
@@ -63,8 +71,9 @@ class DirectSolver : public virtual Solver
     void postProsess();
     public:
     image_fmt solve();
-    DirectSolver(const image_fmt &origImage, image_fmt &field, direct_func func, std::string sFilename)
-        : Solver(origImage, field, sFilename), func(func)
+    DirectSolver(const image_fmt &origImage, image_fmt &field, direct_func func,
+            std::string sFilename, std::string sLabel)
+        : Solver(origImage, field, sFilename, sLabel), func(func)
     {
     }
 };

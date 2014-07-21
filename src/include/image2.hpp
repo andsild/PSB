@@ -38,11 +38,10 @@ image_fmt makeRho(const image_fmt &input);
 image_fmt makeInitialGuess(const image_fmt &input, bool);
 void roundValues(image_fmt &arg);
 
-
-void renderImage(cimg_library::CImgDisplay);
 void display_histogram(image_fmt);
 std::string format(const char *arg, ...);
 std::string printImage(image_fmt);
+void scanAndAddImage(std::string sRootdir, std::string sSolverdir);
 
 class ImageSolver
 {

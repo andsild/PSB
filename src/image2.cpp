@@ -278,98 +278,29 @@ void ImageSolver::clearFolders()
     this->filenames.clear();
 }
 
-void doMeImageDisplay(ImageDisplay);
-void ImageSolver::renderImages(std::string sImageRoot, function_container vIf,
-                               const char *cImagePath,
-                               const char *cResolved)
+void scanAndAddImage(std::string sRootdir, std::string sSolverdir)
 {
-        if(this->filenames.empty())
-        {
-            LOG(severity_type::error)("No files added!");
-            CLOG(severity_type::error)("No files added!");
-            exit(EXIT_FAILURE);
-        }
+    std::vector<std::string> vFilenames = file_IO::getFilesInFolder2(sRootdir),
+                        vSolvedNames = file_IO::getFilesInFolder2(sSolverdir);
+    ImageDisplay id;
 
-        ImageDisplay id;
+    std::cout << sRootdir  << " " << sSolverdir << std::endl;
 
-        std::vector<std::string>::const_iterator it = this->filenames.begin();
-
-        map_gallery mapFiles;
-
-        cimg::exception_mode(0);
-        for(std::vector<std::string>::iterator it = filenames.begin();
-            it != filenames.end();
-            it++)
-        {
-            CLOG(severity_type::info)("Adding main image to super-container: ", (*it));
-            id.addMainImage((*it));
-        }
-
-        this->filenames.clear();
-
-        if(vIf.empty())
-        {
-            LOG(severity_type::error)("No solved images to fetch!");
-            CLOG(severity_type::error)("No solved images to fetch!");
-            exit(EXIT_FAILURE);
-        }
-        for (function_container::iterator subIt = vIf.begin();
-            subIt != vIf.end();
-            ++subIt)
-        {
-            std::string sImageDir = DATA_DIR + (*subIt).sPath + std::string(cImagePath);
-            this->addFolder(sImageDir,
-                    "when trying to show rendered images (-c flag)");
-        }
-
-        for(std::vector<std::string>::iterator it = filenames.begin();
-            it != filenames.end();
-            it++)
-        {
-            try
-            {
-                CLOG(severity_type::info)("Beginning to look up: ", *it, " in super-container...");
-                id.addSolverImage((*it));
-            }
-            catch(ImageException ie) {
-                LOG(severity_type::warning)(ie.what());
-                CLOG(severity_type::warning)(ie.what());
-            }
-
-        }
-        if(strcmp(cResolved, "NOT") != 0)
-        {
-            this->filenames.clear();
-            for (function_container::iterator subIt = vIf.begin();
-                subIt != vIf.end();
-                ++subIt)
-            {
-                std::string sImageDir = DATA_DIR + (*subIt).sPath + cResolved;
-                this->addFolder(sImageDir);
-            }
-
-            for(std::vector<std::string>::iterator it = filenames.begin();
-                it != filenames.end();
-                it++)
-            {
-                try
-                {
-                    CLOG(severity_type::info)("Beginning to look up: ", *it, " in super-container...");
-                    id.addResolvedImage((*it));
-                }
-                catch(ImageException ie)
-                {
-                    LOG(severity_type::warning)(ie.what());
-                    CLOG(severity_type::warning)(ie.what());
-                }
-            }
-        }
-
-        // doImageDisplay(mapFiles, sImageRoot);
-        id.show();
-        id.loop();
-
+    for(auto const it : vFilenames)
+    {
+        id.addMainImage(it);
+    }
+    for(auto const it : vSolvedNames)
+    {
+        bool isResolved = false;
+        std::string _, sLabel, sFilename;
+        file_IO::SAVE_PATTERN.getNames(it, _, sLabel, sFilename, isResolved);
+        id.addResolvedImage2(it, sFilename, isResolved);
+    }
+    id.show();
+    id.loop();
 }
+
 
 imageList_fmt ImageSolver::histogram(std::string sDir, function_container vIf)
 {

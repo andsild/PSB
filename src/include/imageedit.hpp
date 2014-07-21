@@ -60,9 +60,7 @@ class ImageDisplay
     void loop();
     ImageDisplay();
     void addMainImage(std::string);
-    void addSolverImage(std::string);
-    void addResolvedImage(std::string);
-    void computeLine();
+    void addResolvedImage2(std::string sFilename, std::string sCommon, bool);
     void show();
 };
 
