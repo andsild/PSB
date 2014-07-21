@@ -13,6 +13,7 @@
 
 #include "image_types.hpp"
 #include "loadingbar.hpp"
+#include "solver.hpp"
 
 namespace image_psb
 {
@@ -42,6 +43,8 @@ void display_histogram(image_fmt);
 std::string format(const char *arg, ...);
 std::string printImage(image_fmt);
 void scanAndAddImage(std::string sRootdir, std::string sSolverdir);
+
+void processImage(std::string, double, double, const bool, const bool, const bool, const bool, const bool);
 
 class ImageSolver
 {

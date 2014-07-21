@@ -22,7 +22,6 @@ void iterate_jacobi(const CImg<double> &field, CImg<double> &U,
                           double H)
 {
     dDiff = 0;
-    int BORDER_SIZE = 1;
     CImg<double> copyU = U;
     CImg_3x3(I,double);
 
@@ -42,7 +41,6 @@ void iterate_jacobi(const CImg<double> &field, CImg<double> &U,
 void iterate_jacobi2(image_fmt &field, image_fmt &guess, double &dDiff)
 {
     dDiff = 0;
-    int BORDER_SIZE = 1;
     image_fmt origGuess(guess);
     CImg_3x3(I,double);
 
@@ -67,7 +65,6 @@ void iterate_gauss(const CImg<double> &field, CImg<double> &U,
                           double H)
 {
     dDiff = 0;
-    int BORDER_SIZE = 1;
     CImg_3x3(I,double);
 
     cimg_for_in3x3(U, BORDER_SIZE, BORDER_SIZE,
@@ -107,7 +104,6 @@ void iterate_sor(const CImg<double> &field, CImg<double> &U,
     const double dNotOmega = (1 - omega);
 
     dDiff = 0;
-    int BORDER_SIZE = 1;
     CImg_3x3(I,double);
 
     cimg_for_in3x3(U, BORDER_SIZE, BORDER_SIZE,
@@ -152,7 +148,6 @@ void iterate_sor2(const CImg<double> &field, CImg<double> &U,
     const double dNotOmega = (1 - omega);
 
     dDiff = 0;
-    int BORDER_SIZE = 1;
     CImg_3x3(I,double);
 
     cimg_for_in3x3(U, BORDER_SIZE, BORDER_SIZE,

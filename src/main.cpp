@@ -72,22 +72,13 @@ int main(int argc, char **argv)
     const int iVerbosityLevel = cimg_option("-v", 1, "verbosity level: from .. to .. "),
               iFileVerbosityLevel = cimg_option("-x", 1, "written verbosity level");
     const double dTolerance = cimg_option("-t", DEFAULT_TOLERANCE, sToleranceHelpStr.c_str());
-    const double resolve = cimg_option("-r", 1.0, "resolve the image using a different field");
+    const double dResolve = cimg_option("-r", 1.0, "dResolve the image using a different field");
 
     std::string sFilename = (filename) ? std::string(filename) : std::string(),
                 sDirname = (dirname) ? std::string(dirname) : std::string();
 
     setVerboseLevel(iVerbosityLevel, false);
     setVerboseLevel(iFileVerbosityLevel, true);
-
-    /* Begin processing image */
-    // readImages
-    // process, compute rho only once
-    // then do a long check:
-    // if(rho)
-    // Solver rho(....)
-    // if(gauss)
-    // solver gauss
 
     if(sFilename.empty() && sDirname.empty())
     {
@@ -96,99 +87,40 @@ int main(int argc, char **argv)
         {
             if (args[i].at(0) != '-')
             {
-                sFilename = args[i];
+                const char *fileType = cimg::file_type(0, args[i].c_str());
+                std::cout << fileType << std::endl;
+                if(!fileType)
+                    sDirname = args[i];
+                else
+                    sFilename = args[i];
                 break;
             }
         }
-        if(sFilename.empty()) {
+        if(sFilename.empty() && sDirname.empty()) {
         std::cerr << sUsageMsg << std::endl;
         return EXIT_FAILURE; }
     }
 
-    image_fmt use_img;
-    if(!image_psb::readImage(use_img, sFilename))
+    if(sDirname.empty() == false)
     {
-        std::cerr << "Error:: could not load image: " << sFilename << std::endl;
-        return EXIT_FAILURE;
-    }
-    image_psb::toGrayScale(use_img);
-    image_fmt field = image_psb::makeRho(use_img),
-              guess = image_psb::makeInitialGuess(use_img, true);
-
-    std::vector<solver::Solver*> vSolvers;
-    
-    if(sor)
-    {
-        std::string sLabel = "sor";
-        vSolvers.push_back(new solver::IterativeSolver(use_img, field, guess,
-                                    solver::iterate_sor2, dTolerance,
-                                    sFilename, sLabel));
-    }
-    if(wavelet)
-    {
-        std::string sLabel = "wavelet";
-        vSolvers.push_back(new solver::DirectSolver(use_img, field,
-                                                    wavelet::pyconv,
-                                                    sFilename, sLabel));
-    }
-
-    for(auto it : vSolvers)
-    {
-        image_fmt result = it->solve();
-        roundValues(result);
-        std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), false);
-        file_IO::saveImage(result, sSavename);
-        if(resolve != 1.0)
+        std::vector<std::string> vFiles = file_IO::getFilesInFolder2(sDirname);
+        for(auto const it : vFiles)
         {
-            it->alterField(resolve);
-            result = it->solve();
-            std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), true);
-            file_IO::saveImage(result, sSavename);
+            image_psb::processImage(it, dTolerance, dResolve,
+                                    gauss, jacobi, sor, wavelet, fft);
         }
-        
-        // CImgDisplay disp(visu, "orignal and resolved image");
-        // image_fmt plot(500, 256, 1, 3, 0);
-        // visu.insert(plot, visu.size() - 1);
-        // int rmin = 0, rmax = 255;
-        // const double blackWhite[] = {255, 255, 255},
-        //             red[] = {255, 0, 0},
-        //             green[] = {0, 255, 0};
-        // while(!disp.is_closed())
-        // {
-        //     const int xm = disp.mouse_x()*2*use_img.width()/disp.width() - use_img.width(),
-        //               ym = disp.mouse_y()*use_img.height()/disp.height(),
-        //               xPos = xm - use_img.width()/2,
-        //               yPos = ym - use_img.height()/2;
-        //     if (disp.button() && xm>=0 && ym>=0)
-        //     {
-        //         const int r = (int)cimg::max(0.0f,(float)std::sqrt((float)xPos*xPos + yPos*yPos) - 3);
-        //         if (disp.button()&1) rmax = r;
-        //         if (disp.button()&2) rmin = r;
-        //         if (rmin>=rmax) rmin = cimg::max(rmax - 1,0);
-        //                 disp.wait();
-        //     }
-        //     image_fmt main_cropped = use_img.get_crop(
-        //             0, yPos, 0, 0, use_img.width()-1, yPos, 0, 0);
-        //     image_fmt side_cropped = use_img,get_crop(
-        //             0, yPos, 0, 0, use_img.width()-1, yPos, 0, 0);
-        //     plot.fill(0).draw_graph(main_cropped, blackWhite, 1, 1, 0, 0, 0);
-        //     plot.display(disp);
-        // }
+    }
+    if(sFilename.empty() == false)
+    {
+        image_psb::processImage(sFilename, dTolerance, dResolve,
+                                gauss, jacobi, sor, wavelet, fft);
     }
 
     if(compare)
     {
-        image_psb::scanAndAddImage(file_IO::getFoldername(sFilename), DATA_DIR);
-        /* Save every image file to an output directory
-           Save them in such a way to that you can read them as
-           image1 { solved instances }
-        */
-        // ImageContainer ic; // outdir
-        /* adding with orig folder and other folder */
-        /* all resolved are those with "re" in front"
-
-           */
-
+        std::string sDir = (sFilename.empty()) ? sDirname : sFilename;
+        sDir = file_IO::getFoldername(sDir);
+        image_psb::scanAndAddImage(sDir, DATA_DIR);
     }
 
 
@@ -210,14 +142,14 @@ int main(int argc, char **argv)
     // if(f)
     // {
     //     // image_fmt img("../nice_example/increasing.png");
-    //     image_fmt img("../media_resolve/test.png");
+    //     image_fmt img("../media_dResolve/test.png");
     //     toGrayScale(img);
     //     fft::FFT2D(img);
     // }
     //
     // if(w)
     // {
-    //     // image_fmt img("../media_resolve/test.png");
+    //     // image_fmt img("../media_dResolve/test.png");
     //     // image_fmt img("../nice_example/3gradientAnother.png");
     //     image_fmt img("../nice_example/all_increasing.png");
     //     toGrayScale(img);
