@@ -13,6 +13,8 @@
 #include "loginstance.hpp"
 #include "loadingbar.hpp"
 #include "iterative_solvers.hpp"
+#include "wavelet.hpp"
+#include "solver.hpp"
 #include "file.hpp"
 #include "plot.hpp"
 
@@ -137,8 +139,7 @@ image_fmt makeInitialGuess(const image_fmt &image, bool bExtractBordes = true)
 
     image_fmt U;
 
-    int BORDER_SIZE = 1;
-    int DEFAULT_GUESS_VAL = 0;
+    const int DEFAULT_GUESS_VAL = 0;
     U.assign(image, "xyz", DEFAULT_GUESS_VAL);
 
     if(bExtractBordes == true)
@@ -280,11 +281,9 @@ void ImageSolver::clearFolders()
 
 void scanAndAddImage(std::string sRootdir, std::string sSolverdir)
 {
-    std::vector<std::string> vFilenames = file_IO::getFilesInFolder2(sRootdir),
-                        vSolvedNames = file_IO::getFilesInFolder2(sSolverdir);
+    std::vector<std::string> vFilenames = getFilesInFolder2(sRootdir),
+                        vSolvedNames = getFilesInFolder2(sSolverdir);
     ImageDisplay id;
-
-    std::cout << sRootdir  << " " << sSolverdir << std::endl;
 
     for(auto const it : vFilenames)
     {
@@ -292,13 +291,62 @@ void scanAndAddImage(std::string sRootdir, std::string sSolverdir)
     }
     for(auto const it : vSolvedNames)
     {
-        bool isResolved = false;
-        std::string _, sLabel, sFilename;
-        file_IO::SAVE_PATTERN.getNames(it, _, sLabel, sFilename, isResolved);
+        bool isResolved = false; std::string _, sLabel, sFilename;
+        SAVE_PATTERN.getNames(it, _, sLabel, sFilename, isResolved);
         id.addResolvedImage2(it, sFilename, isResolved);
     }
     id.show();
     id.loop();
+}
+
+    
+void processImage(std::string sFilename, double dTolerance, double dResolve,
+                  const bool gauss, const bool jacobi, const bool sor,
+                  const bool wav, const bool fft)
+{
+
+    image_fmt use_img;
+    std::vector<solver::Solver*> vSolvers;
+
+    if(!readImage(use_img, sFilename))
+    {
+        std::cerr << "Error:: could not load image: " << sFilename << std::endl;
+        return;
+    }
+    toGrayScale(use_img);
+    image_fmt field = makeRho(use_img),
+              guess = makeInitialGuess(use_img, true);
+
+
+    if(sor)
+    {
+        std::string sLabel = "sor";
+        vSolvers.push_back(new solver::IterativeSolver(use_img, field, guess,
+                                    solver::iterate_sor2, dTolerance,
+                                    sFilename, sLabel));
+    }
+    if(wav)
+    {
+        std::string sLabel = "wavelet";
+        vSolvers.push_back(new solver::DirectSolver(use_img, field,
+                                                    wavelet::pyconv,
+                                                    sFilename, sLabel));
+    }
+
+    for(auto it : vSolvers)
+    {
+        image_fmt result = it->solve();
+        roundValues(result);
+        std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), false);
+        file_IO::saveImage(result, sSavename);
+        if(dResolve != 1.0)
+        {
+            it->alterField(dResolve);
+            result = it->solve();
+            std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), true);
+            file_IO::saveImage(result, sSavename);
+        }
+    }
 }
 
 
