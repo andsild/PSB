@@ -20,16 +20,38 @@ image_fmt IterativeSolver::solve()
     for(iIter; this->dStopCriterion < dIterationDiff; iIter++)
     {
         this->func(this->field, ret, dIterationDiff);
-        vResults.push_back(image_psb::imageDiff(this->origImage, this->guess));
+        vResults.push_back(image_psb::imageDiff(this->origImage, ret));
     }
 
     this->writeData(vResults);
     return ret;
 }
 
+std::string Solver::getFilename() { return this->sFilename; }
+std::string Solver::getLabel() { return this->sLabel; }
+
 void IterativeSolver::postProsess()
 {
     // this->writeData();
+}
+void IterativeSolver::divideImage()
+{
+    int DIVISON_SIZE = 4;
+    // Division is square: for 4 regions we split X in 2 (hence the / 2)
+    const int WIDHT_REGION = (this->origImage.width() / (DIVISON_SIZE / 2)),
+              HEIGHT_REGION = (this->origImage.height() / (DIVISON_SIZE / 2));
+
+    for(int iSlice = 0; iSlice < DIVISON_SIZE; iSlice++)
+    {
+        int iLeftmostX = iSlice * WIDHT_REGION,
+            iUpperY = iSlice * HEIGHT_REGION;
+
+        this->subspaces.insert(this->origImage.get_crop(iLeftmostX, iUpperY, 0,
+                                                        iLeftmostX + WIDHT_REGION,
+                                                        iUpperY + HEIGHT_REGION,
+                                                        0),
+                                this->subspaces.size() - 1);
+    }
 }
 
 void Solver::writeData(const std::vector<double> &vData)
