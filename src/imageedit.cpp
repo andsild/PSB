@@ -181,6 +181,8 @@ bool ImageContainer::hasResolvedImages()
 
 void ImageDisplay::show()
 {
+    if(this->vMainImages.empty())
+        return;
     ImageContainer inst = this->vMainImages.at(this->iIndex);
     std::string mainFile, solver, resolved;
     try
@@ -194,7 +196,9 @@ void ImageDisplay::show()
     {
         LOG(severity_type::error)(ie.what());
         CLOG(severity_type::error)(ie.what());
-        exit(EXIT_FAILURE);
+        this->vMainImages.erase(this->vMainImages.begin() + this->iIndex);
+        this->show();
+        return;
     }
 
     cimg::exception_mode(0);

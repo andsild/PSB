@@ -3,6 +3,7 @@
 #include <string>
 
 #include "CImg.h"
+#include "file.hpp"
 
 namespace plot
 {

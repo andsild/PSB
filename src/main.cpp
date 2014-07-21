@@ -13,8 +13,6 @@
 
 #include "iterative_solvers.hpp"
 #include "solver.hpp"
-#include "wavelet.hpp"
-#include "fft.hpp"
 #include "loginstance.hpp"
 #include "file.hpp"
 #include "image2.hpp"
@@ -69,6 +67,7 @@ int main(int argc, char **argv)
                fft = cimg_option("--fft", false, "use FFT-solver"),
                wavelet = cimg_option("--wavelet", false, "use wavelet solver");
     const bool nosolve = cimg_option("-n", false, "do not comput anything");
+    const bool plot = cimg_option("-p", false, "visualize the results in a graph");
     const int iVerbosityLevel = cimg_option("-v", 1, "verbosity level: from .. to .. "),
               iFileVerbosityLevel = cimg_option("-x", 1, "written verbosity level");
     const double dTolerance = cimg_option("-t", DEFAULT_TOLERANCE, sToleranceHelpStr.c_str());
@@ -123,56 +122,11 @@ int main(int argc, char **argv)
         image_psb::scanAndAddImage(sDir, DATA_DIR);
     }
 
+    if(plot)
+    {
+    }
 
-    // if(d) {
-    //     if(vFuncContainer.size() < 1 && !n)
-    //     {
-    //         CLOG(severity_type::warning)("no iterators chosen");
-    //         LOG(severity_type::warning)("no iterators chosen");
-    //     }
-    //     imageSolver.addFolder(folder);
-    //     if(!n)
-    //         imageSolver.solve(vFuncContainer, l>0, dTolerance);
-    // }
-    // else {
-    //     CLOG(severity_type::warning)("no media folder given");
-    //     LOG(severity_type::warning)("no media folder given");
-    // }
-    //
-    // if(f)
-    // {
-    //     // image_fmt img("../nice_example/increasing.png");
-    //     image_fmt img("../media_dResolve/test.png");
-    //     toGrayScale(img);
-    //     fft::FFT2D(img);
-    // }
-    //
-    // if(w)
-    // {
-    //     // image_fmt img("../media_dResolve/test.png");
-    //     // image_fmt img("../nice_example/3gradientAnother.png");
-    //     image_fmt img("../nice_example/all_increasing.png");
-    //     toGrayScale(img);
-    //     wavelet::pyconv(img);
-    // }
-    //
-    // if(r)
-    // {
-    //     ImageSolver imageSolver2;
-    //     for (function_container::iterator it = vFuncContainer.begin();
-    //         it != vFuncContainer.end();
-    //         ++it)
-    //     {
-    //         std::string sPath = "output/" + (*it).sPath + "/image/";
-    //         // imageSolver2.addFolder(sPath);
-    //         imageSolver2.addFolder(folder);
-    //         break;
-    //     }
-    //
-    //     if(!n)
-    //         imageSolver2.solve(vFuncContainer, l>0, dTolerance, "re", "re", dScalar);
-    // }
-    //
+
     // if(a)
     // {
     //     for (function_container::iterator it = vFuncContainer.begin();
@@ -199,7 +153,7 @@ int main(int argc, char **argv)
     //
     //
     //
-    // std::thread plotLoop;
+    std::thread plotLoop;
     // if(p) 
     // { 
     //     plot::plot();
@@ -209,18 +163,9 @@ int main(int argc, char **argv)
     // }
     //
     //
-    // if(c && d)
-    // {
-    //     imageSolver.clearFolders();
-    //     imageSolver.addFolder(folder, "when trying to show rendered images (-c flag)");
-    //     const char *text = "NOT";
-    //     if(r) text = "re";
-    //     imageSolver.renderImages(folder, vFuncContainer, "image/", text);
-    // }
-    //
     // if(plotLoop.joinable())
     //     plotLoop.join();
-    //
+    
     // if(histLoop.joinable())
     //     histLoop.join();
     //

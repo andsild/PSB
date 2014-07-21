@@ -17,6 +17,7 @@
 #include "solver.hpp"
 #include "file.hpp"
 #include "plot.hpp"
+#include "fft.hpp"
 
 using namespace cimg_library;
 using namespace file_IO;
@@ -153,8 +154,6 @@ image_fmt makeInitialGuess(const image_fmt &image, bool bExtractBordes = true)
     return U;
 }
 
-
-
 template <class T> class ImageProcess
 {
     private:
@@ -193,10 +192,10 @@ template <class T> class ImageProcess
         }
         void solve(iterative_function func,logging::Logger< logging::FileLogPolicy > &logInstance)
        {
-            this->vOutput =  iterative_solve(func,
-                                       this->image, this->U, this->rho,
-                                       this->dMaxErr, this->image.width(),
-                                       logInstance);
+            // this->vOutput =  iterative_solve(func,
+            //                            this->image, this->U, this->rho,
+            //                            this->dMaxErr, this->image.width(),
+            //                            logInstance);
 
             if(this->vOutput.size() < 1)
             {
@@ -317,13 +316,35 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
     image_fmt field = makeRho(use_img),
               guess = makeInitialGuess(use_img, true);
 
+    const int DIVISON_SIZE = 4;
 
+    if(gauss)
+    {
+        std::string sLabel = "gauss";
+        vSolvers.push_back(new solver::IterativeSolver(use_img, field, guess,
+                                    solver::iterate_gauss, dTolerance, DIVISON_SIZE,
+                                    sFilename, sLabel));
+    }
+    if(jacobi)
+    {
+        std::string sLabel = "jacobi";
+        vSolvers.push_back(new solver::IterativeSolver(use_img, field, guess,
+                                    solver::iterate_jacobi, dTolerance, DIVISON_SIZE,
+                                    sFilename, sLabel));
+    }
     if(sor)
     {
         std::string sLabel = "sor";
         vSolvers.push_back(new solver::IterativeSolver(use_img, field, guess,
-                                    solver::iterate_sor2, dTolerance,
+                                    solver::iterate_sor, dTolerance, DIVISON_SIZE,
                                     sFilename, sLabel));
+    }
+    if(fft)
+    {
+        std::string sLabel = "fft";
+        vSolvers.push_back(new solver::DirectSolver(use_img, field,
+                                                    solver::FFT2D,
+                                                    sFilename, sLabel));
     }
     if(wav)
     {
