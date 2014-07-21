@@ -21,7 +21,6 @@ class Solver
 
     protected:
     virtual void postProsess() = 0;
-    void writeData(const std::vector<double> &arg);
 
     const image_fmt &origImage;
     image_fmt &field;
@@ -50,15 +49,16 @@ class IterativeSolver : public virtual Solver
     double dStopCriterion;
     void postProsess();
     void divideImage();
-    imageList_fmt subspaces;
+    imageList_fmt subspaces, subspaceFields;
+    const int DIVISION_SIZE;
 
     public:
     image_fmt solve();
     IterativeSolver(const image_fmt &origImage, image_fmt &field,
             const image_fmt &guess, iterative_func func,
-            double dStopCriterion, std::string sFile, std::string sLabel)
+            double dStopCriterion, const int iDivSize, std::string sFile, std::string sLabel)
         : Solver(origImage, field, sFile, sLabel), func(func),
-            dStopCriterion(dStopCriterion), guess(guess)
+            dStopCriterion(dStopCriterion), guess(guess), DIVISION_SIZE(iDivSize)
     {
         divideImage();
     }

@@ -3,9 +3,9 @@
 
 #include "image_types.hpp"
 
-namespace fft
+namespace solver
 {
-    int FFT2D(image_fmt);
+    void FFT2D(const image_fmt &arg1, image_fmt &arg2);
 }
 
 #endif

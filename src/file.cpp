@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <iostream>
 #include <stdio.h>
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -51,6 +52,15 @@ std::string SaveBehaviour::getSavename(
     return sRet;
 }
 
+std::string SaveBehaviour::getDelimiter() { return this->sDelimiter; }
+
+void writeHeader(std::string sFilename, std::string sLabel)
+{
+    const char *filename = DATA_OUTFILE;
+    std::ofstream fout(filename, std::ios_base::binary|std::ios_base::out|std::ios_base::app);
+    fout.close();
+}
+
 std::string SaveBehaviour::getResolveLabel(std::string sLabel)
 {
     return std::string(this->sResolveTag + this->sDelimiter + sLabel);
@@ -83,6 +93,20 @@ void SaveBehaviour::getNames(std::string sSearch,
              << "\tfilename: " << sFilename
              << std::endl
               << std::endl;
+}
+
+void writeData(const std::vector<double> &vData, std::string sLabel, std::string sFilename)
+{
+    const char *filename = DATA_OUTFILE;
+    std::ofstream fout(filename, std::ios_base::binary|std::ios_base::out|std::ios_base::app);
+
+    std::string sDelim = SAVE_PATTERN.getDelimiter();
+    fout << sLabel << sDelim << sFilename << std::endl;
+
+    for(auto const item : vData)
+        fout << item << " ";
+    fout << std::endl;
+    fout.close();
 }
 
 

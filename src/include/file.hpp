@@ -1,8 +1,9 @@
 #ifndef _FILE_H
-#define _FILE_H 1
+#define _FILE_H
 
 #define PRECISION 20
 #define DATA_DIR "./output/"
+#define DATA_OUTFILE "./output.txt"
 #define DATA_EXTENSION ".dat"
 #define PROJECT_DIR "PSB"
 
@@ -24,6 +25,7 @@ namespace file_IO
 {
 
 void saveImage(const image_fmt &arg, std::string);
+void writeData(const std::vector<double> &arg1, std::string, std::string);
 
 class DirNotFound : public std::exception
 {
@@ -57,6 +59,7 @@ class SaveBehaviour
                     std::string &arg3, bool &arg4);
         std::string getResolveLabel(std::string arg);
         std::string getOutdir() { return this->sOutdir; }
+        std::string getDelimiter();
 };
 
 

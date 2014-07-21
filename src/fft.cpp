@@ -8,11 +8,11 @@
 
 using namespace cimg_library;
 
-namespace fft
+namespace solver
 {
 
     /* FFT: convolutions are multiplications in fourier space.. */
-int FFT2D(image_fmt input)
+void FFT2D(const image_fmt &input, image_fmt &ret)
 {
     const imageList_fmt gradient = input.get_gradient("xy",1);
     
