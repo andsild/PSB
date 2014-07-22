@@ -49,6 +49,7 @@ class IterativeSolver : public virtual Solver
     double dStopCriterion;
     void postProsess();
     void divideImage();
+    image_fmt joinImage(imageList_fmt);
     imageList_fmt subspaces, subspaceFields;
     const int DIVISION_SIZE;
 
