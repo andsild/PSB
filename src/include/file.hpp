@@ -18,6 +18,7 @@
 #include <unistd.h>
 
 #include "image_types.hpp"
+#include "loginstance.hpp"
 
 #define DEFAULT_MODE      S_IRWXU | S_IRGRP |  S_IXGRP | S_IROTH | S_IXOTH
 
@@ -44,16 +45,21 @@ class SaveBehaviour
     private:
         const std::string sDelimiter,
                     sResolveTag,
+                    sLogDir,
+                    sLogExtension,
                     sSuffix,
                     sOutdir;
     public:
         SaveBehaviour(const std::string sDelim,
                     const std::string sResolve,
                     const std::string sSuff)
-            : sDelimiter(sDelim), sResolveTag(sResolve), sSuffix(sSuff), sOutdir(DATA_DIR)
+            : sDelimiter(sDelim), sResolveTag(sResolve), sSuffix(sSuff),
+            sOutdir(DATA_DIR), sLogDir(LOG_DIR), sLogExtension(".log")
         {
         }
         std::string getSavename(const std::string,
+                              const std::string, const bool) const;
+        std::string getLogname(const std::string,
                               const std::string, const bool) const;
         void getNames(const std::string, std::string &arg1, std::string &arg2,
                     std::string &arg3, bool &arg4);
@@ -69,8 +75,7 @@ void trimLeadingFileName(std::string &arg);
 void trimTrailingFilename(std::string &arg);
 void mkdirp(const char *arg, mode_t = DEFAULT_MODE);
 
-void getFilesInFolder(std::string, std::vector<std::string> &arg);
-std::vector<std::string> getFilesInFolder2(std::string);
+std::vector<std::string> getFilesInFolder(std::string);
 std::string getFoldername(const std::string sFilename);
 std::string getFilename(const std::string sFilename);
 

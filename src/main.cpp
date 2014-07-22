@@ -1,18 +1,11 @@
 #define DEFAULT_TOLERANCE 1.0
 
-#include <algorithm>
-#include <fstream>
 #include <iostream>
-#include <iomanip>
-#include <map>
-#include <sstream> 
 #include <string>
 #include <thread>
 
 #include "CImg.h"
 
-#include "iterative_solvers.hpp"
-#include "solver.hpp"
 #include "loginstance.hpp"
 #include "file.hpp"
 #include "image2.hpp"
@@ -44,7 +37,7 @@ int main(int argc, char **argv)
 {
     std::string logDir = LOG_DIR;
     mkdirp(logDir.c_str());
-    LOG(severity_type::info)("Started program");
+    MLOG(severity_type::info, "Started program");
 
     std::string sUsageMsg = std::string(argv[0]) + " <name of image file>"
                             "\n\nreport bugs to sildnes@mpi-cbg.de";
@@ -76,8 +69,8 @@ int main(int argc, char **argv)
     std::string sFilename = (filename) ? std::string(filename) : std::string(),
                 sDirname = (dirname) ? std::string(dirname) : std::string();
 
-    setVerboseLevel(iVerbosityLevel, false);
-    setVerboseLevel(iFileVerbosityLevel, true);
+    setVerboseLevel(iVerbosityLevel, true);
+    setVerboseLevel(iFileVerbosityLevel, false);
 
     if(sFilename.empty() && sDirname.empty())
     {
@@ -87,7 +80,6 @@ int main(int argc, char **argv)
             if (args[i].at(0) != '-')
             {
                 const char *fileType = cimg::file_type(0, args[i].c_str());
-                std::cout << fileType << std::endl;
                 if(!fileType)
                     sDirname = args[i];
                 else
@@ -102,7 +94,7 @@ int main(int argc, char **argv)
 
     if(sDirname.empty() == false)
     {
-        std::vector<std::string> vFiles = file_IO::getFilesInFolder2(sDirname);
+        std::vector<std::string> vFiles = file_IO::getFilesInFolder(sDirname);
         for(auto const it : vFiles)
         {
             image_psb::processImage(it, dTolerance, dResolve,
@@ -126,7 +118,6 @@ int main(int argc, char **argv)
     {
     }
 
-
     // if(a)
     // {
     //     for (function_container::iterator it = vFuncContainer.begin();
@@ -144,10 +135,8 @@ int main(int argc, char **argv)
     // //     imageSolver.addFolder(folder);
     // //     imageList_fmt histogram = imageSolver.histogram(folder, vFuncContainer);
     //     // CImgDisplay hist_disp(histogram, "histogram", 0,  false,true);
-    //     // std::cout << "SIZE " << histogram.size() << std::endl;
     //     //histLoop = thread(display_histogram, histogram);
     //     // std::cout << histogram.width() << std::endl;
-    //     // std::cout << histogram.height() << std::endl;
     //     // histLoop = thread(renderImage, hist_disp);
     // // }
     //
