@@ -8,6 +8,8 @@
 extern logging::Logger< logging::FileLogPolicy > log_inst;
 extern logging::Logger< logging::FileLogPolicy > log_inst_std;
 
+#define MLOG(x, ...) CLOG(x)(__VA_ARGS__);LOG(x)(__VA_ARGS__)
+
 #define LOG(x) log_inst.print< x >
 #define CLOG(x) (log_inst_std.print< x >)
 #define DO_IF_LOGLEVEL(x) if(x >= log_inst.getLevel()) 

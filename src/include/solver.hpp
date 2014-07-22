@@ -9,6 +9,7 @@
 
 #include "image_types.hpp"
 #include "loginstance.hpp"
+#include "file.hpp"
 
 namespace solver
 {
@@ -20,24 +21,24 @@ class Solver
                 sLabel;
 
     protected:
-    virtual void postProsess() = 0;
-
     const image_fmt &origImage;
     image_fmt &field;
     logging::Logger< logging::FileLogPolicy > logInst;
+    bool bMultipart, bFinal;
 
     public:
     virtual image_fmt solve() = 0;
     void alterField(double);
     std::string getLabel();
     std::string getFilename();
-    Solver(const image_fmt &origImage, image_fmt &field, std::string sFile, std::string sLab)
+    bool isMultipart();
+    bool isFinal();
+    Solver(const image_fmt &origImage, image_fmt &field, std::string sFile, std::string sLab, bool bMulPart, bool bFin = false)
         : field(field), origImage(origImage), logInst(),
-            sFilename(sFile), sLabel(sLab)
+            sFilename(sFile), sLabel(sLab), bMultipart(bMulPart), bFinal(bFin)
     {
-        this->logInst.setName(std::string("poop"));
-        std::cout << this->sFilename << std::endl;
-        std::cout << this->sLabel << std::endl;
+        this->logInst.setName(
+                file_IO::SAVE_PATTERN.getLogname(this->sFilename, this->sLabel, false));
     }
 };
 
@@ -47,21 +48,16 @@ class IterativeSolver : public virtual Solver
     iterative_func func;
     const image_fmt &guess;
     double dStopCriterion;
-    void postProsess();
-    void divideImage();
-    image_fmt joinImage(imageList_fmt);
-    imageList_fmt subspaces, subspaceFields;
-    const int DIVISION_SIZE;
 
     public:
     image_fmt solve();
     IterativeSolver(const image_fmt &origImage, image_fmt &field,
-            const image_fmt &guess, iterative_func func,
-            double dStopCriterion, const int iDivSize, std::string sFile, std::string sLabel)
-        : Solver(origImage, field, sFile, sLabel), func(func),
-            dStopCriterion(dStopCriterion), guess(guess), DIVISION_SIZE(iDivSize)
+            const image_fmt &U, iterative_func func,
+            double dStopCriterion, std::string sFile, std::string sLabel,
+            bool bMultiPart, bool bFinal = false)
+        : Solver(origImage, field, sFile, sLabel, bMultiPart, bFinal), func(func),
+            dStopCriterion(dStopCriterion), guess(U)
     {
-        divideImage();
     }
 };
 
@@ -69,12 +65,11 @@ class DirectSolver : public virtual Solver
 {
     private:
     direct_func func;
-    void postProsess();
     public:
     image_fmt solve();
     DirectSolver(const image_fmt &origImage, image_fmt &field, direct_func func,
-            std::string sFilename, std::string sLabel)
-        : Solver(origImage, field, sFilename, sLabel), func(func)
+            std::string sFilename, std::string sLabel, bool bMultiPart, bool bFinal = false)
+        : Solver(origImage, field, sFilename, sLabel, bMultiPart, bFinal), func(func)
     {
     }
 };

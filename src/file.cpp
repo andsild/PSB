@@ -1,6 +1,5 @@
 #include "file.hpp"
 
-#include <algorithm>
 #include <errno.h>
 #include <iomanip>
 #include <iostream>
@@ -9,9 +8,7 @@
 #include <string>
 #include <vector>
 
-
 #include <dirent.h>
-#include <math.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -52,6 +49,19 @@ std::string SaveBehaviour::getSavename(
     return sRet;
 }
 
+std::string SaveBehaviour::getLogname(
+                                const std::string sName,
+                                const std::string sLabel,
+                                const bool bResolve) const
+{
+    std::string sFilename = getFilename(sName);
+    std::string sResolve = (bResolve) ? this->sResolveTag : "";
+    std::string sRet = this->sLogDir + sResolve + this->sDelimiter
+                + sLabel + this->sDelimiter
+                + sFilename + this->sLogExtension;
+    return sRet;
+}
+
 std::string SaveBehaviour::getDelimiter() { return this->sDelimiter; }
 
 void writeHeader(std::string sFilename, std::string sLabel)
@@ -87,12 +97,8 @@ void SaveBehaviour::getNames(std::string sSearch,
     sFilename = sSearch.substr(0, searchPos);
     sSearch.erase(0, searchPos + sDelimiter.length());
 
-    std::cout << "From " << sCopy
-              << "\tOutdir : " <<  sOutdir 
-             << "\tlabel: " << sLabel
-             << "\tfilename: " << sFilename
-             << std::endl
-              << std::endl;
+    MLOG(severity_type::debug, "From ", sCopy , "\tOutdir : ",  sOutdir ,
+                               "\tlabel: ", sLabel , "\tfilename: ", sFilename);
 }
 
 void writeData(const std::vector<double> &vData, std::string sLabel, std::string sFilename)
@@ -119,7 +125,7 @@ void saveImage(const image_fmt &image, const std::string sSaveName)
     }
     catch(cimg_library::CImgIOException &cioe)
     {
-        std::cout << cioe.what() << std::endl;
+        MLOG(severity_type::error, cioe.what());
     }
 }
 
@@ -174,7 +180,7 @@ void mkdirp(const char* path, mode_t mode) {
   }
 }
 
-std::vector<std::string> getFilesInFolder2(std::string sDir)
+std::vector<std::string> getFilesInFolder(std::string sDir)
 {
     std::ifstream fin;
     int num;
@@ -196,9 +202,7 @@ std::vector<std::string> getFilesInFolder2(std::string sDir)
         // Check for valid file(s)
         if (stat( readFile.c_str(), &filestat ))
         {
-            // LOG(severity_type::warning)("Skipping ", readFile, " : file invalid");
-            // log_inst.print<severity_type::warning>("dwa");
-            // CLOG(severity_type::warning)("Skipping ", readFile, " : file invalid");
+            MLOG(severity_type::warning, "Skipping ", readFile, " : file invalid");
         }
         if (S_ISDIR( filestat.st_mode ))
         {
@@ -208,40 +212,6 @@ std::vector<std::string> getFilesInFolder2(std::string sDir)
     }
 
     return vRet;
-}
-
-
-void getFilesInFolder(std::string sDir, std::vector<std::string> &output)
-{
-    std::ifstream fin;
-    int num;
-    DIR *dp;
-    struct stat filestat;
-    struct dirent *dirp;
-
-    dp = opendir(sDir.c_str());
-    if (dp == NULL)
-    {
-        throw DirNotFound(sDir);
-    }
-
-    while ((dirp = readdir( dp )))
-    {
-        std::string readFile = sDir + "/" + std::string(dirp->d_name);
-
-        // Check for valid file(s)
-        if (stat( readFile.c_str(), &filestat ))
-        {
-            // LOG(severity_type::warning)("Skipping ", readFile, " : file invalid");
-            // log_inst.print<severity_type::warning>("dwa");
-            // CLOG(severity_type::warning)("Skipping ", readFile, " : file invalid");
-        }
-        if (S_ISDIR( filestat.st_mode ))
-        {
-            continue;
-        }
-        output.push_back(readFile);
-    }
 }
 
 } /* EndOfNamespace */

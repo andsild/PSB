@@ -1,7 +1,5 @@
 #include "imageedit.hpp"
 
-#include <iostream>
-
 #include <stdlib.h>
 #include <string>
 #include <vector>
@@ -57,13 +55,13 @@ std::string ImageContainer::getFileName() const
 
 void ImageContainer::addSolverImage(std::string fileName)
 {
-    std::cout << " pushed image " << fileName  << " back" << std::endl;
+    MLOG(severity_type::debug, " pushed image ", fileName, " back");
     this->vSolvedImages.push_back(fileName);
 }
 
 void ImageContainer::addResolvedImage(std::string fileName)
 {
-    std::cout << " pushed image " << fileName  << " back" << std::endl;
+    MLOG(severity_type::debug, " pushed image ", fileName, " back");
     this->vResolvedImages.push_back(fileName);
 }
 
@@ -194,8 +192,7 @@ void ImageDisplay::show()
     }
     catch(ImageException ie)
     {
-        LOG(severity_type::error)(ie.what());
-        CLOG(severity_type::error)(ie.what());
+        MLOG(severity_type::error, ie.what());
         this->vMainImages.erase(this->vMainImages.begin() + this->iIndex);
         this->show();
         return;
@@ -212,8 +209,7 @@ void ImageDisplay::show()
     }
     catch(CImgIOException ciie)
     {
-        LOG(severity_type::error)(ciie.what());
-        CLOG(severity_type::error)(ciie.what());
+        MLOG(severity_type::error, ciie.what());
     }
 
 
@@ -367,17 +363,14 @@ void ImageDisplay::addResolvedImage2(std::string sFilename, std::string sCommon,
     for(auto &it : this->vMainImages)
     {
         std::string sMainname = file_IO::getFilename(it.getMain());
-        std::cout << "Trying to find " << sMainname << " matching " <<  sCommon << std::endl;
         if(sMainname.compare(sCommon) == 0)
         {
             if(isResolved)
             {
-                std::cerr << "Adding to resolved" << std::endl;
                 it.addResolvedImage(sFilename);
             }
             else
             {
-                std::cerr << "Adding to non-resolved" << std::endl;
                 it.addSolverImage(sFilename);
             }
             return;
