@@ -29,8 +29,7 @@ image_fmt IterativeSolver::solve()
     std::vector< double > vEndRes;
     int iShortest = -1;
 
-    // std::cerr << image_psb::printImage(this->origImage) << std::endl;
-    // std::cerr << image_psb::printImage(this->subspaceFields[3]) << std::endl;
+    imageList_fmt complete_img;
 
     for(int iPos = 0; iPos < this->DIVISION_SIZE; iPos++)
     {
@@ -42,6 +41,7 @@ image_fmt IterativeSolver::solve()
             this->func(this->subspaceFields[iPos], ret, dIterationDiff);
             vResults.push_back(this->subspaces[iPos].MSE(ret));
         }
+        complete_img.push_back(ret);
         if(vResults.empty())
             continue;
         vDivisions.push_back(vResults);
@@ -65,12 +65,25 @@ image_fmt IterativeSolver::solve()
     //     std::cout << std::get<0>(it) << " " << std::get<1>(it) << " " << std::endl;
     // }
     file_IO::writeData(vEndRes, this->getLabel(), this->getFilename());
-
-    // TODO: join picture
-
-
-    // file_IO::writeData(vResults, this->getLabel, this->getFilename);
+    image_fmt ret = this->joinImage(complete_img);
     return ret;
+}
+
+image_fmt IterativeSolver::joinImage(imageList_fmt list)
+{
+    image_fmt img((unsigned int)0, (unsigned int)0,(unsigned int)1);
+    for(int xSlice = 0; xSlice < this->DIVISION_SIZE / 2; xSlice++)
+    {
+        image_fmt tmp((unsigned int)0, (unsigned int)0,(unsigned int)1);
+        for(int ySlice = 0; ySlice < this->DIVISION_SIZE / 2; ySlice++)
+        {
+            tmp.append(list.front(), 'y', 0);
+            list.pop_front();
+        }
+        img.append(tmp, 'x', 0);
+    }
+
+    return img;
 }
 
 std::string Solver::getFilename() { return this->sFilename; }
@@ -104,7 +117,6 @@ void IterativeSolver::divideImage()
                 iRightmostX = this->field.width() - 1;
             if(iLowerY > this->field.height())
                 iLowerY = this->field.height() - 1;
-
 
             this->subspaceFields.push_back(this->field.get_crop(iLeftmostX, iUpperY, 0,
                                                                 iRightmostX,
