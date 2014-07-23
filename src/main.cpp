@@ -14,7 +14,6 @@
 using namespace cimg_library;
 using namespace image_psb;
 using namespace file_IO;
-// using namespace plot;
 using namespace logging;
 
 
@@ -119,6 +118,7 @@ int main(int argc, char **argv)
 
     if(plot)
     {
+        plot::plot();
     }
 
     // if(a)

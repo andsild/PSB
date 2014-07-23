@@ -16,6 +16,8 @@
 #include "image_types.hpp"
 #include "loginstance.hpp"
 
+#include "image2.hpp" // just for printImage, debug
+
 using namespace logging;
 
 namespace file_IO
@@ -63,13 +65,8 @@ std::string SaveBehaviour::getLogname(
 }
 
 std::string SaveBehaviour::getDelimiter() { return this->sDelimiter; }
+std::string SaveBehaviour::getValueDelimiter() { return this->sValueDelimiter; }
 
-void writeHeader(std::string sFilename, std::string sLabel)
-{
-    const char *filename = DATA_OUTFILE;
-    std::ofstream fout(filename, std::ios_base::binary|std::ios_base::out|std::ios_base::app);
-    fout.close();
-}
 
 std::string SaveBehaviour::getResolveLabel(std::string sLabel)
 {
@@ -101,7 +98,65 @@ void SaveBehaviour::getNames(std::string sSearch,
                                "\tlabel: ", sLabel , "\tfilename: ", sFilename);
 }
 
-void writeData(const std::vector<double> &vData, std::string sLabel, std::string sFilename)
+void splitHeader(const std::string sHeader, std::string &sLabel, std::string &sFilename)
+{
+    size_t pos;
+    pos = sHeader.find_last_of(SAVE_PATTERN.getDelimiter());
+    sLabel = sHeader.substr(0,pos);
+    sFilename = sHeader.substr(pos + SAVE_PATTERN.getDelimiter().length(), sHeader.length());
+}
+
+
+image_fmt readData()
+{
+    const char *filename = DATA_OUTFILE;
+    std::ifstream fin(filename, std::ios_base::binary|std::ios_base::in);
+    image_fmt resGraph(500, 400, 1, 3, 0);
+    const double blackWhite[] = {255, 255, 255};
+
+    
+    
+    while(true) // until EOF
+    {
+        std::string sHeader, sData;
+        std::getline(fin, sHeader);
+        std::getline(fin, sData);
+        if(fin.eof())
+            break;
+
+        std::string sLabel, sFilename;
+        splitHeader(sHeader, sLabel, sFilename);
+       
+        std::string::size_type start = 0;
+        rawdata_fmt vData;
+    
+        while ((start = sData.find(SAVE_PATTERN.getValueDelimiter(), start)) != std::string::npos)
+        {
+            vData.push_back(atof(sData.substr(0,start).c_str()));
+            sData.erase(0,start);
+            start += SAVE_PATTERN.getValueDelimiter().length();
+        }
+    
+        double *dData = new double[vData.size()];
+    
+        for(int iPos = 0; iPos < vData.size(); iPos++)
+        {
+            dData[iPos] = vData[iPos];
+        }
+        image_fmt imgData(dData, vData.size(), 1, 1, 1, true);
+    
+        resGraph.draw_graph(imgData, blackWhite);
+        // std::cerr << image_psb::printImage(resGraph) << std::endl;
+    }
+    
+    resGraph.draw_axes(resGraph, resGraph, blackWhite);
+    
+    fin.close();
+    return resGraph;
+}
+
+
+void writeData(const rawdata_fmt &vData, std::string sLabel, std::string sFilename)
 {
     const char *filename = DATA_OUTFILE;
     std::ofstream fout(filename, std::ios_base::binary|std::ios_base::out|std::ios_base::app);
@@ -110,7 +165,7 @@ void writeData(const std::vector<double> &vData, std::string sLabel, std::string
     fout << sLabel << sDelim << sFilename << std::endl;
 
     for(auto const item : vData)
-        fout << item << " ";
+        fout << item << SAVE_PATTERN.getValueDelimiter();
     fout << std::endl;
     fout.close();
 }

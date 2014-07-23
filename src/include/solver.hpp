@@ -3,7 +3,6 @@
 
 #define BORDER_SIZE 1
 
-#include <iostream>
 #include <vector>
 #include <string>
 
@@ -30,7 +29,7 @@ class Solver
     bool bMultipart, bFinal;
 
     public:
-    virtual image_fmt solve() = 0;
+    virtual image_fmt solve(std::vector<double> &arg) = 0;
     void alterField(double);
     std::string getLabel();
     std::string getFilename();
@@ -62,7 +61,7 @@ class IterativeSolver : public virtual Solver
     double dStopCriterion;
 
     public:
-    image_fmt solve();
+    image_fmt solve(std::vector<double> &arg1);
     IterativeSolver(const image_fmt &origImage, image_fmt &field,
             const image_fmt &U, iterative_func func,
             double dStopCriterion, std::string sFile, std::string sLabel,
@@ -80,7 +79,7 @@ class DirectSolver : public virtual Solver
     private:
     direct_func func;
     public:
-    image_fmt solve();
+    image_fmt solve(std::vector<double> &arg1);
     DirectSolver(const image_fmt &origImage, image_fmt &field, direct_func func,
             std::string sFilename, std::string sLabel, bool bMultiPart, bool bFinal = false)
         : Solver(origImage, field, sFilename, sLabel, bMultiPart, bFinal), func(func)
