@@ -351,12 +351,20 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
         {
             accumulator.push_back(result);
             if(it->isFinal())
+            {
                 result = joinImage(accumulator, DIVISION_SIZE);
+                accumulator.clear();
+            }
             else
                 continue;
         }
         
         roundValues(result);
+        DO_IF_LOGLEVEL(severity_type::extensive)
+        {
+            std::string sMsg = "Final image(cut)\n" + printImage(result);
+            it->log(1, sMsg);
+        }
         std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), false);
         file_IO::saveImage(result, sSavename);
         if(dResolve != 1.0)
