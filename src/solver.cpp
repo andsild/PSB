@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "image2.hpp"
-#include "file.hpp"
 #include "loginstance.hpp"
 
 using namespace logging;
@@ -11,16 +10,13 @@ using namespace logging;
 namespace solver
 {
 
-image_fmt IterativeSolver::solve()
+image_fmt IterativeSolver::solve(std::vector<double> &vResults)
 {
     int iIter = 0;
     double dIterationDiff = 9001;
     image_fmt guess(this->guess);
 
-    std::vector<double> vResults;
-    vResults.reserve(2049);
     this->logInst.print< severity_type::info>("Stop criteria set to :", dStopCriterion);
-
 
     for(iIter = 0; this->dStopCriterion < dIterationDiff; iIter++)
     {
@@ -41,8 +37,6 @@ image_fmt IterativeSolver::solve()
         //     CLOG(severity_type::debug)("Process for ", this->getLabel(), " on image ", this->getFilename(), ":\n", sImage);
         // }
     }
-
-    file_IO::writeData(vResults, this->getLabel(), this->getFilename());
 
     DO_IF_LOGLEVEL(severity_type::debug)
     {
@@ -65,12 +59,11 @@ bool Solver::isFinal() { return this->bFinal; }
 std::string Solver::getFilename() { return this->sFilename; }
 std::string Solver::getLabel() { return this->sLabel; }
 
-image_fmt DirectSolver::solve()
+image_fmt DirectSolver::solve(std::vector<double> &vResults)
 {
     image_fmt ret(this->origImage, "xyz", 0);
     this->func(this->field, ret);
-    std::vector<double> vtmp(1, (image_psb::imageDiff(this->origImage, ret)));
-    file_IO::writeData(vtmp, this->getLabel(), this->getFilename());
+    vResults.push_back(image_psb::imageDiff(this->origImage, ret));
     return ret;
 }
 

@@ -191,7 +191,8 @@ void ImageDisplay::loadImmy(std::string &sMainfile, std::string &sSolverfile,
     {
         MLOG(severity_type::error, ie.what());
         this->vMainImages.erase(this->vMainImages.begin() + this->iIndex);
-        this->iIndex--;
+        if(iIndex != 0)
+            this->iIndex--;
         this->loadImmy(sMainfile, sSolverfile, sResolvedfile);
     }
 }

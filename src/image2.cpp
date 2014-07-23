@@ -1,5 +1,6 @@
 #include "image2.hpp"
 
+#include <math.h>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -15,6 +16,8 @@
 #include "file.hpp"
 #include "plot.hpp"
 #include "fft.hpp"
+
+#define SPLIT_VALUE -1
 
 using namespace cimg_library;
 using namespace file_IO;
@@ -285,6 +288,108 @@ void addIterativeSolver(std::vector<solver::Solver*> &vIn,
                                         sFilename, sLabel, true, true));
 }
 
+/** Given n containers with results, "unify" each container such that
+  each container has the same length.
+
+  This is done using a simple interpolation scheme:
+  given container A:
+            1 2 3 4
+        container B:
+            1 2 
+    After unify, for A:
+            lengthDifferenceRatio = max(len(A), len(B)) / min(len(B), len(A))
+            ( (1 + 2) / lengthdifferenceratio ) ( (3 + 4) / lengthdifferenceratio)
+        container A:
+            1.5 3.5
+        for B:
+            1 2
+*/
+rawdata_fmt sampleRateConversion(const rawdata_fmt &vData, const int iNewsize)
+{
+    const int iInterpolationSize = ceil((double)vData.size() / iNewsize);
+    rawdata_fmt s(iNewsize, 0);
+
+    int iIndex = 0;
+    double dAccumulator = 0;
+    for(int iPos = 0; iPos < vData.size(); iPos++)
+    {
+        dAccumulator = 0;
+        for(int iIndex = 0; iIndex < iInterpolationSize; iIndex++)
+        {
+            dAccumulator += vData[iPos];
+            iPos++;
+        }
+        iPos--;
+        s.at(iPos / iInterpolationSize) = dAccumulator / (double)iInterpolationSize;
+    }
+
+    return s;
+}
+
+
+rawdata_fmt averageResult(const std::vector<rawdata_fmt> &vInput, const int iDivSize)
+{
+    std::vector<rawdata_fmt> vInterpolatedInput;
+    int iShortest;
+    for(auto const it : vInput)
+    {
+        iShortest = (iShortest < it.size()) ? iShortest : it.size();
+    }
+    rawdata_fmt vRes(iShortest, 0);
+    
+    for(const auto & it : vInput)
+    {
+        rawdata_fmt interpolatedData = sampleRateConversion(it, iShortest);
+        vInterpolatedInput.push_back(interpolatedData);
+    }
+    
+    for(const auto it : vInterpolatedInput)
+    {
+        for(int iPos = 0; iPos < iShortest; iPos++)
+        {
+            vRes.at(iPos) += it.at(iPos);
+        }
+    }
+
+    for(auto & it : vRes)
+    {
+        it = (double)( it / (double)iDivSize);
+    }
+
+    return vRes;
+
+
+    // for(int iPos = 0; iPos < vInput.size(); iPos++)
+    // {
+    //     double dElem = vInput[iPos];
+    //     int iIndex = iPos % iMod;
+    //     if(dElem == SPLIT_VALUE || (iIndex == 1 && iIndex > iPrev))
+    //     {
+    //         iPrev = iPos + 1;
+    //         if(iIndex > iMod)
+    //             iMod = iPos + 1;
+    //         continue;
+    //     }
+    //     vRes[iPos % iMod] += vInput[iPos];
+    // }
+    // const double dDiv = (double)iDivSize;
+    //
+    // for(rawdata_fmt::iterator it = vRes.begin();
+    //         it != vRes.end(); it++)
+    // {
+    //     if( (*it) == 0)
+    //     {
+    //         vRes.erase(it, vRes.end());
+    //         break;
+    //     }
+    //     (*it) /= dDiv;
+    // }
+
+    // vRes.pop_back(); // a minus 1 that sneaks in
+    return vRes;
+}
+
+
     
 void processImage(std::string sFilename, double dTolerance, double dResolve,
                   const bool gauss, const bool jacobi, const bool sor,
@@ -293,7 +398,7 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
 
     image_fmt use_img;
     std::vector<solver::Solver*> vSolvers;
-    const int DIVISION_SIZE = 1;
+    const int DIVISION_SIZE = 4;
 
     if(!readImage(use_img, sFilename))
     {
@@ -344,39 +449,53 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
     }
 
     imageList_fmt accumulator;
+    rawdata_fmt vResults;
+
+    std::vector<rawdata_fmt > vAccumulator;
+
     for(auto it : vSolvers)
     {
-        image_fmt result = it->solve();
+        image_fmt result = it->solve(vResults);
+        // vResults.push_back(SPLIT_VALUE);
         if(it->isMultipart())
         {
             accumulator.push_back(result);
+            vAccumulator.push_back(vResults);
             if(it->isFinal())
             {
                 result = joinImage(accumulator, DIVISION_SIZE);
+                vResults = averageResult(vAccumulator, DIVISION_SIZE);
                 accumulator.clear();
+                vAccumulator.clear();
+                // vResults = averageResult(vResults, DIVISION_SIZE);
             }
             else
                 continue;
         }
-        
         roundValues(result);
         DO_IF_LOGLEVEL(severity_type::extensive)
         {
             std::string sMsg = "Final image(cut)\n" + printImage(result);
             it->log(1, sMsg);
         }
+
         std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), false);
         file_IO::saveImage(result, sSavename);
-        if(dResolve != 1.0)
-        {
-            it->alterField(dResolve);
-            result = it->solve();
-            std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), true);
-            file_IO::saveImage(result, sSavename);
-        }
+        file_IO::writeData(vResults, it->getLabel(), it->getFilename());
+        // vResults.clear();
+        vResults.erase(vResults.begin(), vResults.end());
+
+        // if(dResolve != 1.0)
+        // {
+        //     it->alterField(dResolve);
+        //     result = it->solve(vResults);
+        //     std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), true);
+        //     file_IO::saveImage(result, sSavename);
+        //     file_IO::writeData(vResults, it->getLabel(), it->getFilename());
+        //     vResults.clear();
+        // }
     }
 }
-
 
 void calculateAverage(std::string sFilePath)
 {
@@ -394,7 +513,7 @@ void calculateAverage(std::string sFilePath)
         // MLOG(severity_type::error, f.what());
     // }
     //
-    // std::vector<double> average; // can give undererror
+    // rawdata_fmt average; // can give undererror
     // int iLineCount = numeric_limits<int>::max();
     // std::string avoid = "average";
     // double dValidFiles = 0;
