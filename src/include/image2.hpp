@@ -20,6 +20,7 @@ double imageDiff(const image_fmt &arg1, const image_fmt &arg2);
 // std::string format(const char *arg, ...);
 std::string printImage(image_fmt);
 void scanAndAddImage(std::string sRootdir, std::string sSolverdir);
+rawdata_fmt averageResult(const std::vector<rawdata_fmt> &arg, const int);
 
 void processImage(std::string, double, double, const bool, const bool, const bool, const bool, const bool);
 

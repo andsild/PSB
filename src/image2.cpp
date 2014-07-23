@@ -288,22 +288,7 @@ void addIterativeSolver(std::vector<solver::Solver*> &vIn,
                                         sFilename, sLabel, true, true));
 }
 
-/** Given n containers with results, "unify" each container such that
-  each container has the same length.
-
-  This is done using a simple interpolation scheme:
-  given container A:
-            1 2 3 4
-        container B:
-            1 2 
-    After unify, for A:
-            lengthDifferenceRatio = max(len(A), len(B)) / min(len(B), len(A))
-            ( (1 + 2) / lengthdifferenceratio ) ( (3 + 4) / lengthdifferenceratio)
-        container A:
-            1.5 3.5
-        for B:
-            1 2
-*/
+//FIXME: must be EXTRAPOLATION, not interpolation!
 rawdata_fmt sampleRateConversion(const rawdata_fmt &vData, const int iNewsize)
 {
     const int iInterpolationSize = ceil((double)vData.size() / iNewsize);
@@ -499,6 +484,22 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
 
 void calculateAverage(std::string sFilePath)
 {
+    /* 
+       readLabel
+       processLine
+       push vector to label box
+       interpolate label box
+       average label box
+       write to output.txt under label "average"
+
+       if it is too heavy then 
+          when finding new result
+            imediately interpolate and add in to label box
+         average label box
+        fi
+    */
+
+
     // std::vector<std::string> files;
     //
     // std::string sReadFolder = DATA_DIR + sFilePath;

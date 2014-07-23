@@ -19,13 +19,13 @@ void plot()
     // cimg_library::cimg::system(sPlotDir.c_str());
     // #endif
 
-    // image_fmt graph = file_IO::readData();
-    // cimg_library::CImgDisplay disp(graph);
-    // disp.show();
-    // while(!disp.is_closed() && !disp.is_keyQ())
-    // {
-    //     disp.wait();
-    // }
+    image_fmt graph = file_IO::readData();
+    cimg_library::CImgDisplay disp(graph);
+    disp.show();
+    while(!disp.is_closed() && !disp.is_keyQ())
+    {
+        disp.wait();
+    }
 }
 
 } /* EndOfNamespace */
