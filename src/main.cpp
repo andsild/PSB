@@ -92,19 +92,22 @@ int main(int argc, char **argv)
         return EXIT_FAILURE; }
     }
 
-    if(sDirname.empty() == false)
+    if(nosolve == false)
     {
-        std::vector<std::string> vFiles = file_IO::getFilesInFolder(sDirname);
-        for(auto const it : vFiles)
+        if(sDirname.empty() == false)
         {
-            image_psb::processImage(it, dTolerance, dResolve,
+            std::vector<std::string> vFiles = file_IO::getFilesInFolder(sDirname);
+            for(auto const it : vFiles)
+            {
+                image_psb::processImage(it, dTolerance, dResolve,
+                                        gauss, jacobi, sor, wavelet, fft);
+            }
+        }
+        if(sFilename.empty() == false)
+        {
+            image_psb::processImage(sFilename, dTolerance, dResolve,
                                     gauss, jacobi, sor, wavelet, fft);
         }
-    }
-    if(sFilename.empty() == false)
-    {
-        image_psb::processImage(sFilename, dTolerance, dResolve,
-                                gauss, jacobi, sor, wavelet, fft);
     }
 
     if(compare)

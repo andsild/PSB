@@ -1,10 +1,9 @@
 #include "imageedit.hpp"
 
-#include <stdlib.h>
 #include <string>
 #include <vector>
 
-#include <stdio.h>
+#include <iostream>
 
 #include "CImg.h"
 
@@ -55,13 +54,13 @@ std::string ImageContainer::getFileName() const
 
 void ImageContainer::addSolverImage(std::string fileName)
 {
-    MLOG(severity_type::debug, " pushed image ", fileName, " back");
+    MLOG(severity_type::extensive, " pushed image ", fileName, " back");
     this->vSolvedImages.push_back(fileName);
 }
 
 void ImageContainer::addResolvedImage(std::string fileName)
 {
-    MLOG(severity_type::debug, " pushed image ", fileName, " back");
+    MLOG(severity_type::extensive, " pushed image ", fileName, " back");
     this->vResolvedImages.push_back(fileName);
 }
 
@@ -177,53 +176,57 @@ bool ImageContainer::hasResolvedImages()
     return this->vResolvedImages.empty() == false;
 }
 
-void ImageDisplay::show()
+void ImageDisplay::loadImmy(std::string &sMainfile, std::string &sSolverfile,
+                            std::string &sResolvedfile)
 {
-    if(this->vMainImages.empty())
-        return;
     ImageContainer inst = this->vMainImages.at(this->iIndex);
-    std::string mainFile, solver, resolved;
     try
     {
-        mainFile = inst.getMain();
-        solver = inst.getSolved();
+        sMainfile = inst.getMain();
+        sSolverfile = inst.getSolved();
         if(inst.hasResolvedImages())
-            resolved = inst.getResolved();
+            sResolvedfile = inst.getResolved();
     }
     catch(ImageException ie)
     {
         MLOG(severity_type::error, ie.what());
         this->vMainImages.erase(this->vMainImages.begin() + this->iIndex);
-        this->show();
-        return;
+        this->iIndex--;
+        this->loadImmy(sMainfile, sSolverfile, sResolvedfile);
     }
+}
+
+void ImageDisplay::show()
+{
+    if(this->vMainImages.empty())
+        return;
+    std::string sMainfile, sSolverfile, sResolvedfile;
+    loadImmy(sMainfile, sSolverfile, sResolvedfile);
 
     cimg::exception_mode(0);
     try
     {
-        this->main_image.assign(mainFile.c_str());
+        this->main_image.assign(sMainfile.c_str());
         toGrayScale(this->main_image);
-        // this->main_image.load_ascii(mainFile.c_str());
-        // this->solved_image.assign(solver.c_str());
-        this->solved_image.load_ascii(solver.c_str());
+        std::cerr << sSolverfile << std::endl;
+        this->solved_image.load_ascii(sSolverfile.c_str());
     }
     catch(CImgIOException ciie)
     {
         MLOG(severity_type::error, ciie.what());
+        return;
     }
 
-
     this->main_disp = this->main_image;
-    this->main_disp.set_title(mainFile.c_str());
+    this->main_disp.set_title(sMainfile.c_str());
     this->solved_disp = this->solved_image;
-    this->solved_disp.set_title(solver.c_str());
+    this->solved_disp.set_title(sSolverfile.c_str());
 
-    if(inst.hasResolvedImages())
+    if(this->vMainImages.at(this->iIndex).hasResolvedImages())
     {
-        // this->resolved_image.assign(resolved.c_str());
-        this->resolved_image.load_ascii(resolved.c_str());
+        this->resolved_image.load_ascii(sResolvedfile.c_str());
         this->resolved_disp = this->resolved_image;
-        this->resolved_disp.set_title(resolved.c_str());
+        this->resolved_disp.set_title(sResolvedfile.c_str());
     }
 
 }
@@ -330,6 +333,7 @@ void ImageDisplay::loop()
             visu.draw_graph(side_cropped, red, 1, 1, yMin, yMax, 0);
             visu.display(graph_disp);
         }
+        MLOG(severity_type::extensive, "solver index:  ", getCurrent().iSolvedIndex, "\tresolver index: ",  getCurrent().iResolvedIndex);
         switch (main_disp.key()) 
         {
             case cimg::keyARROWUP:

@@ -56,6 +56,7 @@ class ImageDisplay
     void prevImage();
     void nextSolver();
     void prevSolver();
+    void loadImmy(std::string &arg1, std::string &arg2, std::string &arg3);
     public:
     void loop();
     ImageDisplay();

@@ -19,15 +19,45 @@ image_fmt IterativeSolver::solve()
 
     std::vector<double> vResults;
     vResults.reserve(2049);
+    this->logInst.print< severity_type::info>("Stop criteria set to :", dStopCriterion);
+
+
     for(iIter = 0; this->dStopCriterion < dIterationDiff; iIter++)
     {
         this->func(this->field, guess, dIterationDiff);
-        MLOG(severity_type::debug, "Process: ", image_psb::printImage(guess));
-        vResults.push_back(this->origImage.MSE(guess));
+        double dDiff = this->origImage.MSE(guess);
+        vResults.push_back(dDiff);
+
+        if(iIter % 100 == 0)
+        {
+            this->logInst.print< severity_type::info >("Iteration number :", iIter, " with iteration diff ", dIterationDiff, " and image difference ", dDiff );
+            CLOG(severity_type::info)("Solver ", this->getLabel(), " for ", this->getFilename(), ":: iteration number :", iIter, " with iteration diff ", dIterationDiff, " and image difference ", dDiff );
+        }
+        
+        // DO_IF_LOGLEVEL(severity_type::debug)
+        // {
+        //     std::string sImage = image_psb::printImage(guess);
+        //     this->logInst.print< severity_type::debug >("Process:\n", sImage);
+        //     CLOG(severity_type::debug)("Process for ", this->getLabel(), " on image ", this->getFilename(), ":\n", sImage);
+        // }
     }
 
     file_IO::writeData(vResults, this->getLabel(), this->getFilename());
+
+    DO_IF_LOGLEVEL(severity_type::debug)
+    {
+        std::string sImage = image_psb::printImage(guess);
+        this->logInst.print< severity_type::debug >("Finished image:\n", sImage );
+        CLOG(severity_type::debug)("Final product with ", this->getLabel(), " on image ", this->getFilename(), ":\n", sImage);
+    }
+    this->logInst.print< severity_type::info>("Finished in ", iIter, " iterations\nFinal MSE: ", vResults.back());
+
     return guess;
+}
+
+void Solver::log(int iLevel, std::string sMsg)
+{
+    this->logInst.print<severity_type::info>(sMsg);
 }
 
 bool Solver::isMultipart() { return this->bMultipart; }

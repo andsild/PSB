@@ -8,8 +8,11 @@
 #include <string>
 
 #include "image_types.hpp"
+#include "image2.hpp"
 #include "loginstance.hpp"
 #include "file.hpp"
+
+using namespace logging;
 
 namespace solver
 {
@@ -31,6 +34,7 @@ class Solver
     void alterField(double);
     std::string getLabel();
     std::string getFilename();
+    void log(int, std::string);
     bool isMultipart();
     bool isFinal();
     Solver(const image_fmt &origImage, image_fmt &field, std::string sFile, std::string sLab, bool bMulPart, bool bFin = false)
@@ -39,6 +43,14 @@ class Solver
     {
         this->logInst.setName(
                 file_IO::SAVE_PATTERN.getLogname(this->sFilename, this->sLabel, false));
+        this->logInst.setLevel(GETLEVEL);
+
+        DO_IF_LOGLEVEL(severity_type::extensive)
+        {
+            this->logInst.print< severity_type::extensive>("Initial image:\n", image_psb::printImage(this->origImage));
+            this->logInst.print< severity_type::extensive>("Initial field:\n", image_psb::printImage(this->field));
+        }
+
     }
 };
 
@@ -58,6 +70,8 @@ class IterativeSolver : public virtual Solver
         : Solver(origImage, field, sFile, sLabel, bMultiPart, bFinal), func(func),
             dStopCriterion(dStopCriterion), guess(U)
     {
+        DO_IF_LOGLEVEL(severity_type::extensive)
+            this->logInst.print< severity_type::extensive>("Initial guess:\n", image_psb::printImage(this->guess));
     }
 };
 
