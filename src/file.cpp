@@ -1,10 +1,11 @@
 #include "file.hpp"
 
 #include <errno.h>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <map>
 #include <stdio.h>
-#include <fstream>
 #include <string>
 #include <vector>
 
@@ -101,7 +102,7 @@ void SaveBehaviour::getNames(std::string sSearch,
 void splitHeader(const std::string sHeader, std::string &sLabel, std::string &sFilename)
 {
     size_t pos;
-    pos = sHeader.find_last_of(SAVE_PATTERN.getDelimiter());
+    pos = sHeader.find(SAVE_PATTERN.getDelimiter(), 0);
     sLabel = sHeader.substr(0,pos);
     sFilename = sHeader.substr(pos + SAVE_PATTERN.getDelimiter().length(), sHeader.length());
 }
@@ -113,9 +114,8 @@ image_fmt readData()
     std::ifstream fin(filename, std::ios_base::binary|std::ios_base::in);
     image_fmt resGraph(500, 400, 1, 3, 0);
     const double blackWhite[] = {255, 255, 255};
+    std::map<std::string, std::vector< rawdata_fmt> > mapRes;
 
-    
-    
     while(true) // until EOF
     {
         std::string sHeader, sData;
@@ -145,11 +145,35 @@ image_fmt readData()
         }
         image_fmt imgData(dData, vData.size(), 1, 1, 1, true);
     
+        if(mapRes.find(sLabel) == mapRes.end())
+        {
+            std::vector<rawdata_fmt> vIn(1, vData);
+            mapRes.insert(std::pair<std::string, std::vector<rawdata_fmt> >(sLabel, vIn));
+        }
+        else
+            mapRes[sLabel].push_back(vData);
+
         resGraph.draw_graph(imgData, blackWhite);
         // std::cerr << image_psb::printImage(resGraph) << std::endl;
     }
+
+    for(auto it = mapRes.begin(); it != mapRes.end(); it++)
+    {
+        std::string sWriteHeader = it->first;
+        rawdata_fmt vRes = image_psb::averageResult(it->second, 2);
+        writeData(vRes, sWriteHeader, "average");
+
+        double *dData = new double[vRes.size()];
     
-    resGraph.draw_axes(resGraph, resGraph, blackWhite);
+        for(int iPos = 0; iPos < vRes.size(); iPos++)
+        {
+            dData[iPos] = vRes[iPos];
+        }
+        image_fmt imgData(dData, vRes.size(), 1, 1, 1, true);
+        resGraph.draw_graph(imgData, blackWhite);
+    }
+    
+    // resGraph.draw_axes(resGraph, resGraph, blackWhite);
     
     fin.close();
     return resGraph;
