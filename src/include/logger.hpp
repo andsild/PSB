@@ -25,6 +25,7 @@ class LogPolicyInterface
 {
     public:
         virtual void        open_ostream(const std::string& name) = 0;
+        virtual void        flush() = 0;
         virtual void        close_ostream() = 0;
         virtual void        write(const std::string& msg) = 0;
 };
@@ -36,6 +37,7 @@ class FileLogPolicy : public LogPolicyInterface
     FileLogPolicy() : out_stream( new std::ofstream ) {}
     void open_ostream(const std::string& name);
     void close_ostream();
+    void flush();
     void write(const std::string& msg);
     ~FileLogPolicy();
 };
@@ -154,6 +156,12 @@ class Logger
                 print_impl( args... );
                 write_mutex.unlock();
             }
+
+        void flush()
+        {
+            policy->flush();
+        }
+
 
         ~Logger()
         {

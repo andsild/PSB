@@ -3,8 +3,6 @@
 #include <string>
 #include <vector>
 
-#include <iostream>
-
 #include "CImg.h"
 
 #include "file.hpp"
@@ -209,7 +207,6 @@ void ImageDisplay::show()
     {
         this->main_image.assign(sMainfile.c_str());
         toGrayScale(this->main_image);
-        std::cerr << sSolverfile << std::endl;
         this->solved_image.load_ascii(sSolverfile.c_str());
     }
     catch(CImgIOException ciie)
@@ -334,7 +331,6 @@ void ImageDisplay::loop()
             visu.draw_graph(side_cropped, red, 1, 1, yMin, yMax, 0);
             visu.display(graph_disp);
         }
-        MLOG(severity_type::extensive, "solver index:  ", getCurrent().iSolvedIndex, "\tresolver index: ",  getCurrent().iResolvedIndex);
         switch (main_disp.key()) 
         {
             case cimg::keyARROWUP:
@@ -354,6 +350,9 @@ void ImageDisplay::loop()
         }
         main_disp.wait();
     }
+    main_disp.close();
+    solved_disp.close();
+    graph_disp.close();
 }
 
 void ImageDisplay::addMainImage(std::string fileName)

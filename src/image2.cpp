@@ -60,6 +60,8 @@ void renderImage(CImgDisplay disp)
     {
         disp.wait();
     }
+
+    disp.close();
 }
 
 void roundValues(image_fmt &image)
@@ -222,14 +224,14 @@ void divide(int iDivSize, const image_fmt &origImage, const image_fmt &rho,
     if(iDivSize == 2)
     {
         int w = origImage.width(); int h = origImage.height();
-        origImageList.push_back(origImage.get_crop(w, 0, 0, 0, h / 2, 0, 0));
-        origImageList.push_back(origImage.get_crop(w, h / 2, 0, 0, h, 0, 0));
-        rhoList.push_back(rho.get_crop(w, 0, 0, 0, h / 2, 0, 0));
-        rhoList.push_back(rho.get_crop(w, h / 2, 0, 0, h, 0, 0));
+        origImageList.push_back(origImage.get_crop(0, 0, 0, 0, w, h / 2, 0, 0));
+        origImageList.push_back(origImage.get_crop(0, h / 2, 0, 0, w, h, 0, 0));
+        rhoList.push_back(rho.get_crop(0, 0, 0, 0, w, h / 2, 0, 0));
+        rhoList.push_back(rho.get_crop(0, h / 2, 0, 0, w, h, 0, 0));
 
         image_fmt guess = makeInitialGuess(origImage);
-        guessList.push_back(guess.get_crop(w, 0, 0, 0, h / 2, 0, 0));
-        guessList.push_back(guess.get_crop(w, h / 2, 0, 0, h, 0, 0));
+        guessList.push_back(guess.get_crop(0, 0, 0, 0, w, h / 2, 0, 0));
+        guessList.push_back(guess.get_crop(0, h / 2, 0, 0, w, h, 0, 0));
         return;
     }
 
@@ -369,7 +371,7 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
 
     image_fmt use_img;
     std::vector<solver::Solver*> vSolvers;
-    const int DIVISION_SIZE = 2;
+    const int DIVISION_SIZE = 4;
 
     if(!readImage(use_img, sFilename))
     {
