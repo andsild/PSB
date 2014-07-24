@@ -1,6 +1,9 @@
 #include "image2.hpp"
 
+#include <limits.h>
 #include <math.h>
+
+#include <list>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -64,11 +67,67 @@ void roundValues(image_fmt &image)
     image.round(0).cut(0,255);
 }
 
-void display_histogram(image_fmt image)
+
+image_fmt vectorToImage(rawdata_fmt &data)
 {
-    image.display_graph("Histogram", 3);
+    image_fmt imgData(1, data.size(), 1, 1, false);
+    cimg_forY(imgData,y)
+        imgData(0, y) = data[y];
+
+    return imgData;
 }
 
+
+image_fmt padImage(const image_fmt &input, const int iPadLength)
+{
+    if(input.height() == iPadLength)  return input;
+    image_fmt padded(1, iPadLength, 1, 1, 0);
+    padded += input;
+    for(int iPos = input.height() - 1; iPos < iPadLength; iPos++)
+        padded(0, iPos) = 0;
+
+    return padded;
+}
+
+rawdata_fmt averageResult(const std::vector<rawdata_fmt> &vInput, int iDivSize)
+{
+    int iShortest = INT_MAX, iLongest = INT_MIN;
+    std::vector<rawdata_fmt>::iterator it;
+    std::list<int> lLengths;
+    for(auto const it : vInput)
+    {
+        int iSize = it.size();
+        iShortest = (iShortest < iSize) ? iShortest : iSize;
+        iLongest  = (iLongest  > iSize) ? iLongest :  iSize;
+        lLengths.push_back(iSize);
+    }
+
+    rawdata_fmt vRes(iLongest, 0);
+    
+    for(const auto it : vInput)
+    {
+        for(int iPos = 0; iPos < it.size(); iPos++)
+        {
+            vRes.at(iPos) += it.at(iPos);
+        }
+    }
+
+    lLengths.sort(); // lowest first
+    int iPos = 0;
+
+    for(auto & it : vRes)
+    {
+        it = (double)( it / (double)iDivSize);
+        iPos++;
+        if(iPos >= lLengths.front())
+        {
+            lLengths.pop_front();
+            iDivSize--;
+        }
+    }
+
+    return vRes;
+}
 
 std::string format(const char* fmt, ...)
 {
@@ -147,26 +206,40 @@ double imageDiff(const image_fmt &source, const image_fmt &comparator)
     return (double)(source.MSE(comparator));
 }
 
-void divide(const int DIVISION_SIZE, const image_fmt &origImage, const image_fmt &rho,
+void divide(int iDivSize, const image_fmt &origImage, const image_fmt &rho,
             imageList_fmt &origImageList, imageList_fmt &rhoList, imageList_fmt &guessList)
 {
     const int DEFAULT_GUESS_VAL = 0;
 
-    // U.assign(image, "xyz", DEFAULT_GUESS_VAL);
-    if(DIVISION_SIZE == 1)
+    if(iDivSize == 1)
     {
         origImageList.push_back(origImage);
         rhoList.push_back(rho);
         guessList.push_back(makeInitialGuess(origImage));
         return;
     }
-
-    const int WIDHT_REGION = (origImage.width() / (DIVISION_SIZE / 2)),
-              HEIGHT_REGION = (origImage.height() / (DIVISION_SIZE / 2));
-
-    for(int xSlice = 0; xSlice < DIVISION_SIZE / 2; xSlice++)
+    
+    if(iDivSize == 2)
     {
-        for(int ySlice = 0; ySlice < DIVISION_SIZE / 2; ySlice++)
+        int w = origImage.width(); int h = origImage.height();
+        origImageList.push_back(origImage.get_crop(w, 0, 0, 0, h / 2, 0, 0));
+        origImageList.push_back(origImage.get_crop(w, h / 2, 0, 0, h, 0, 0));
+        rhoList.push_back(rho.get_crop(w, 0, 0, 0, h / 2, 0, 0));
+        rhoList.push_back(rho.get_crop(w, h / 2, 0, 0, h, 0, 0));
+
+        image_fmt guess = makeInitialGuess(origImage);
+        guessList.push_back(guess.get_crop(w, 0, 0, 0, h / 2, 0, 0));
+        guessList.push_back(guess.get_crop(w, h / 2, 0, 0, h, 0, 0));
+        return;
+    }
+
+
+    const int WIDHT_REGION = (origImage.width() / (iDivSize / 2));
+    const int HEIGHT_REGION = (origImage.height() / (iDivSize / 2));
+
+    for(int xSlice = 0; xSlice < iDivSize / 2; xSlice++)
+    {
+        for(int ySlice = 0; ySlice < iDivSize / 2; ySlice++)
         {
             int iLeftmostX = xSlice * WIDHT_REGION,
                 iUpperY = ySlice * HEIGHT_REGION;
@@ -288,94 +361,7 @@ void addIterativeSolver(std::vector<solver::Solver*> &vIn,
                                         sFilename, sLabel, true, true));
 }
 
-//FIXME: must be EXTRAPOLATION, not interpolation!
-rawdata_fmt sampleRateConversion(const rawdata_fmt &vData, const int iNewsize)
-{
-    const int iInterpolationSize = ceil((double)vData.size() / iNewsize);
-    rawdata_fmt s(iNewsize, 0);
 
-    int iIndex = 0;
-    double dAccumulator = 0;
-    for(int iPos = 0; iPos < vData.size(); iPos++)
-    {
-        dAccumulator = 0;
-        for(int iIndex = 0; iIndex < iInterpolationSize; iIndex++)
-        {
-            dAccumulator += vData[iPos];
-            iPos++;
-        }
-        iPos--;
-        s.at(iPos / iInterpolationSize) = dAccumulator / (double)iInterpolationSize;
-    }
-
-    return s;
-}
-
-
-rawdata_fmt averageResult(const std::vector<rawdata_fmt> &vInput, const int iDivSize)
-{
-    std::vector<rawdata_fmt> vInterpolatedInput;
-    int iShortest;
-    for(auto const it : vInput)
-    {
-        iShortest = (iShortest < it.size()) ? iShortest : it.size();
-    }
-    rawdata_fmt vRes(iShortest, 0);
-    
-    for(const auto & it : vInput)
-    {
-        rawdata_fmt interpolatedData = sampleRateConversion(it, iShortest);
-        vInterpolatedInput.push_back(interpolatedData);
-    }
-    
-    for(const auto it : vInterpolatedInput)
-    {
-        for(int iPos = 0; iPos < iShortest; iPos++)
-        {
-            vRes.at(iPos) += it.at(iPos);
-        }
-    }
-
-    for(auto & it : vRes)
-    {
-        it = (double)( it / (double)iDivSize);
-    }
-
-    return vRes;
-
-
-    // for(int iPos = 0; iPos < vInput.size(); iPos++)
-    // {
-    //     double dElem = vInput[iPos];
-    //     int iIndex = iPos % iMod;
-    //     if(dElem == SPLIT_VALUE || (iIndex == 1 && iIndex > iPrev))
-    //     {
-    //         iPrev = iPos + 1;
-    //         if(iIndex > iMod)
-    //             iMod = iPos + 1;
-    //         continue;
-    //     }
-    //     vRes[iPos % iMod] += vInput[iPos];
-    // }
-    // const double dDiv = (double)iDivSize;
-    //
-    // for(rawdata_fmt::iterator it = vRes.begin();
-    //         it != vRes.end(); it++)
-    // {
-    //     if( (*it) == 0)
-    //     {
-    //         vRes.erase(it, vRes.end());
-    //         break;
-    //     }
-    //     (*it) /= dDiv;
-    // }
-
-    // vRes.pop_back(); // a minus 1 that sneaks in
-    return vRes;
-}
-
-
-    
 void processImage(std::string sFilename, double dTolerance, double dResolve,
                   const bool gauss, const bool jacobi, const bool sor,
                   const bool wav, const bool fft)
@@ -383,7 +369,7 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
 
     image_fmt use_img;
     std::vector<solver::Solver*> vSolvers;
-    const int DIVISION_SIZE = 4;
+    const int DIVISION_SIZE = 2;
 
     if(!readImage(use_img, sFilename))
     {
@@ -435,27 +421,33 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
 
     imageList_fmt accumulator;
     rawdata_fmt vResults;
+    int iPartIndex = 0;
 
-    std::vector<rawdata_fmt > vAccumulator;
+    // std::vector<rawdata_fmt > vAccumulator;
 
-    for(auto it : vSolvers)
+    for(auto it : vSolvers) // for each solver for each image (and its divisions)
     {
         image_fmt result = it->solve(vResults);
-        // vResults.push_back(SPLIT_VALUE);
         if(it->isMultipart())
         {
             accumulator.push_back(result);
-            vAccumulator.push_back(vResults);
+            // vAccumulator.push_back(vResults);
             if(it->isFinal())
             {
                 result = joinImage(accumulator, DIVISION_SIZE);
-                vResults = averageResult(vAccumulator, DIVISION_SIZE);
+                // vResults = averageResult(vAccumulator, DIVISION_SIZE);
+                // vAccumulator.clear();
                 accumulator.clear();
-                vAccumulator.clear();
-                // vResults = averageResult(vResults, DIVISION_SIZE);
+                iPartIndex = 0;
             }
             else
+            {
+                std::string sFilename = it->getFilename() + std::to_string(iPartIndex);
+                file_IO::writeData(vResults, it->getLabel(), sFilename);
+                iPartIndex++;
+                vResults.clear(); // important, otherwise it stacks results
                 continue;
+            }
         }
         roundValues(result);
         DO_IF_LOGLEVEL(severity_type::extensive)
@@ -480,91 +472,6 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
         //     vResults.clear();
         // }
     }
-}
-
-void calculateAverage(std::string sFilePath)
-{
-    /* 
-       readLabel
-       processLine
-       push vector to label box
-       interpolate label box
-       average label box
-       write to output.txt under label "average"
-
-       if it is too heavy then 
-          when finding new result
-            imediately interpolate and add in to label box
-         average label box
-        fi
-    */
-
-
-    // std::vector<std::string> files;
-    //
-    // std::string sReadFolder = DATA_DIR + sFilePath;
-    //
-    // try
-    // {
-    //     getFilesInFolder(sReadFolder.c_str(), files);
-    // }
-    // catch(file_IO::DirNotFound &f)
-    // {
-    //     std::cout << f.what() << std::endl;
-        // MLOG(severity_type::error, f.what());
-    // }
-    //
-    // rawdata_fmt average; // can give undererror
-    // int iLineCount = numeric_limits<int>::max();
-    // std::string avoid = "average";
-    // double dValidFiles = 0;
-    // list<int> lLengths;
-    // for (std::vector<std::string>::iterator it = files.begin();
-    //     it != files.end();
-    //     ++it)
-    // {
-    //     size_t found = (*it).find(avoid);
-    //     if(found!=std::string::npos)
-    //     {
-    //        LOG(severity_type::warning)("average: skipping file", *it);
-    //        CLOG(severity_type::warning)("average: skipping file", *it);
-    //         continue;
-    //     }
-    //     dValidFiles++;
-    //
-    //     ifstream infile;
-    //     int iPos = 0;
-    //     double dNum;
-    //     infile.open(*it);
-    //
-    //     while(infile >> dNum) // read whole file or stop
-    //     {
-    //         if(iPos >= average.size())
-    //             average.push_back(dNum);
-    //         else
-    //             average[iPos] += dNum;
-    //         iPos++;
-    //     }
-    //
-    //     lLengths.push_back(iPos);
-    // }
-    //
-    // lLengths.sort();
-    // for(std::vector<int>::size_type iPos = 0;
-    //         iPos < (int)(average.size());
-    //         iPos++)
-    // {
-    //     if(lLengths.size() > 0 &&
-    //         iPos >= lLengths.front()) //XXX: or iPos >= ?
-    //     {
-    //         lLengths.pop_front();
-    //         dValidFiles--;
-    //     }
-    //     average[iPos] /= dValidFiles;
-    // }
-    //
-    // std::string sFilename = string("average") + DATA_EXTENSION;
-    // writeToFile(average, sFilename, sFilePath);
 }
 
 } /* EndOfNameSpace */

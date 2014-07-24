@@ -38,6 +38,213 @@ namespace image_psb
 {
 
 
+void display_histogram(image_fmt image)
+{
+    image.display_graph("Histogram", 3);
+}
+
+
+
+rawdata_fmt averageResult(const std::vector<rawdata_fmt> &vInput, const int iDivSize)
+{
+    std::vector<rawdata_fmt> vInterpolatedInput;
+    int iShortest = INT_MAX, iLongest = INT_MIN;
+    for(auto const it : vInput)
+    {
+        iShortest = (iShortest < it.size()) ? iShortest : it.size();
+        iLongest  = (iLongest  > it.size()) ? it.size() :  it.size();
+    }
+    // rawdata_fmt vRes(iShortest, 0);
+    rawdata_fmt vRes(iLongest, 0);
+    
+    for(const auto & it : vInput)
+    {
+        rawdata_fmt interpolatedData = sampleRateConversion(it, vRes.size());
+        vInterpolatedInput.push_back(interpolatedData);
+    }
+    
+    for(const auto it : vInterpolatedInput)
+    {
+        for(int iPos = 0; iPos < iShortest; iPos++)
+        {
+            vRes.at(iPos) += it.at(iPos);
+        }
+    }
+
+    for(auto & it : vRes)
+    {
+        it = (double)( it / (double)iDivSize);
+    }
+
+    return vRes;
+
+
+    // for(int iPos = 0; iPos < vInput.size(); iPos++)
+    // {
+    //     double dElem = vInput[iPos];
+    //     int iIndex = iPos % iMod;
+    //     if(dElem == SPLIT_VALUE || (iIndex == 1 && iIndex > iPrev))
+    //     {
+    //         iPrev = iPos + 1;
+    //         if(iIndex > iMod)
+    //             iMod = iPos + 1;
+    //         continue;
+    //     }
+    //     vRes[iPos % iMod] += vInput[iPos];
+    // }
+    // const double dDiv = (double)iDivSize;
+    //
+    // for(rawdata_fmt::iterator it = vRes.begin();
+    //         it != vRes.end(); it++)
+    // {
+    //     if( (*it) == 0)
+    //     {
+    //         vRes.erase(it, vRes.end());
+    //         break;
+    //     }
+    //     (*it) /= dDiv;
+    // }
+
+    // vRes.pop_back(); // a minus 1 that sneaks in
+    return vRes;
+}
+
+
+//FIXME: must be EXTRAPOLATION, not interpolation!
+rawdata_fmt sampleRateConversion(const rawdata_fmt &vData, const int iNewsize)
+{
+    if(vData.size() == 1 || vData.size() == iNewsize)
+    {
+        rawdata_fmt s(vData); // to avoid memory issues later
+        return s;
+    }
+    if(vData.size() > iNewsize)
+    {
+        const int iInterpolationSize = ceil((double)vData.size() / iNewsize);
+        rawdata_fmt s(iNewsize, 0);
+
+        double dAccumulator = 0;
+        for(int iPos = 0; iPos < vData.size(); iPos++)
+        {
+            dAccumulator = 0;
+            for(int iIndex = 0; iIndex < iInterpolationSize; iIndex++)
+            {
+                dAccumulator += vData[iPos];
+                iPos++;
+            }
+            iPos--;
+            s.at(iPos / iInterpolationSize) = dAccumulator / (double)iInterpolationSize;
+        }
+
+        return s;
+    }
+    const int iExtrapolationSize = floor((double)iNewsize / vData.size()),
+              iBorderElements = (iNewsize % vData.size());
+    rawdata_fmt s(iNewsize, 0);
+
+    s[0] = vData[0];
+    int sPos = 1;
+    for(int iPos = 1; iPos < vData.size() - 1; iPos++, sPos++)
+    {
+        double dDiff = vData[iPos + 1] - vData[iPos];
+        double dInc = dDiff / iExtrapolationSize;
+        // int sPos = ((iPos / iExtrapolationSize) + iPos);
+        s.at(sPos) = vData[iPos];
+
+        for(int iIndex = 1; iIndex < iExtrapolationSize; iIndex++)
+        {
+            s.at(sPos) = s.at(sPos - 1) + dInc;
+            sPos++;
+        }
+    }
+
+    for(int iPos = vData.size();
+            iPos < vData.size() + iBorderElements;
+            iPos++)
+    {
+        s.at(iPos) = vData.back(); // Copy last element
+    }
+
+    return s;
+
+}
+
+
+
+
+
+
+void calculateAverage(std::string sFilePath)
+{
+    // std::vector<std::string> files;
+    //
+    // std::string sReadFolder = DATA_DIR + sFilePath;
+    //
+    // try
+    // {
+    //     getFilesInFolder(sReadFolder.c_str(), files);
+    // }
+    // catch(file_IO::DirNotFound &f)
+    // {
+    //     std::cout << f.what() << std::endl;
+        // MLOG(severity_type::error, f.what());
+    // }
+    //
+    // rawdata_fmt average; // can give undererror
+    // int iLineCount = numeric_limits<int>::max();
+    // std::string avoid = "average";
+    // double dValidFiles = 0;
+    // list<int> lLengths;
+    // for (std::vector<std::string>::iterator it = files.begin();
+    //     it != files.end();
+    //     ++it)
+    // {
+    //     size_t found = (*it).find(avoid);
+    //     if(found!=std::string::npos)
+    //     {
+    //        LOG(severity_type::warning)("average: skipping file", *it);
+    //        CLOG(severity_type::warning)("average: skipping file", *it);
+    //         continue;
+    //     }
+    //     dValidFiles++;
+    //
+    //     ifstream infile;
+    //     int iPos = 0;
+    //     double dNum;
+    //     infile.open(*it);
+    //
+    //     while(infile >> dNum) // read whole file or stop
+    //     {
+    //         if(iPos >= average.size())
+    //             average.push_back(dNum);
+    //         else
+    //             average[iPos] += dNum;
+    //         iPos++;
+    //     }
+    //
+    //     lLengths.push_back(iPos);
+    // }
+    //
+    // lLengths.sort();
+    // for(std::vector<int>::size_type iPos = 0;
+    //         iPos < (int)(average.size());
+    //         iPos++)
+    // {
+    //     if(lLengths.size() > 0 &&
+    //         iPos >= lLengths.front()) //XXX: or iPos >= ?
+    //     {
+    //         lLengths.pop_front();
+    //         dValidFiles--;
+    //     }
+    //     average[iPos] /= dValidFiles;
+    // }
+    //
+    // std::string sFilename = string("average") + DATA_EXTENSION;
+    // writeToFile(average, sFilename, sFilePath);
+}
+
+
+
 class LoadingBar
 {
     private:

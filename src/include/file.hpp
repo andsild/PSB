@@ -27,7 +27,7 @@ namespace file_IO
 
 void saveImage(const image_fmt &arg, std::string);
 void writeData(const rawdata_fmt &arg1, std::string, std::string);
-image_fmt readData();
+image_fmt readData(const bool, const bool);
 
 class DirNotFound : public std::exception
 {
