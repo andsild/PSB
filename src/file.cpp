@@ -6,6 +6,7 @@
 #include <iostream>
 #include <map>
 #include <stdio.h>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -108,14 +109,58 @@ void splitHeader(const std::string sHeader, std::string &sLabel, std::string &sF
 }
 
 
-image_fmt readData()
+image_fmt getAxis(const int iPixelSpace, const int iFontHeight, const int iHighVal, const int iLowVal)
 {
-    const char *filename = DATA_OUTFILE;
-    std::ifstream fin(filename, std::ios_base::binary|std::ios_base::in);
-    image_fmt resGraph(500, 400, 1, 3, 0);
-    const double blackWhite[] = {255, 255, 255};
-    std::map<std::string, std::vector< rawdata_fmt> > mapRes;
+    int iStepCount = (iPixelSpace / (iFontHeight + 35));
+    double *dNums = new double[iStepCount];
+    int iInc = (iHighVal - 0) / iStepCount;
 
+    dNums[0] = iLowVal;
+    for(int iPos = 1; iPos < iStepCount; iPos ++)
+    {
+        dNums[iPos] = dNums[iPos - 1] + iInc;
+    }
+    dNums[iStepCount-1]=iHighVal;
+
+    image_fmt ret(dNums, 1, iStepCount, 1, 1, false);
+    delete dNums;
+    return ret;
+}
+
+const double *getColor(std::string sLabel, bool isAverage = false)
+{
+    static const double white[] = {255,255,255};
+    if(sLabel.compare("gauss") == 0)
+    {
+        static const double red[] = {255,0,0},
+                            lightRed[] = {100, 0, 0};
+        if(isAverage)
+            return red;
+        return lightRed;
+    }
+    if(sLabel.compare("jacobi") == 0)
+    {
+        static const double yellow[] = {255,255,0},
+                            lightYellow[] = {100, 100, 0};
+        if(isAverage)
+            return yellow;
+        return lightYellow;
+    }
+    if(sLabel.compare("sor") == 0)
+    {
+        static const double green[] = {0,255,0},
+                            lightGreen[] = {0, 100,0};
+        if(isAverage)
+            return green;
+        return lightGreen;
+    }
+
+    return white;
+}
+
+void readProperties(std::ifstream &fin, int &iLongestLine,
+                    double &dSmallestVal, double &dLargestVal)
+{
     while(true) // until EOF
     {
         std::string sHeader, sData;
@@ -126,58 +171,121 @@ image_fmt readData()
 
         std::string sLabel, sFilename;
         splitHeader(sHeader, sLabel, sFilename);
-       
+    
         std::string::size_type start = 0;
         rawdata_fmt vData;
-    
-        while ((start = sData.find(SAVE_PATTERN.getValueDelimiter(), start)) != std::string::npos)
+
+        std::istringstream iss(sData);
+        double dTmp = 0;
+        int iCount = 0;
+        
+        while(iss >> dTmp)
         {
-            vData.push_back(atof(sData.substr(0,start).c_str()));
-            sData.erase(0,start);
-            start += SAVE_PATTERN.getValueDelimiter().length();
+            iCount++;
+            dLargestVal = (dLargestVal > dTmp) ? dLargestVal : dTmp;
+            dSmallestVal = (dSmallestVal < dTmp) ? dSmallestVal : dTmp;
         }
-    
-        double *dData = new double[vData.size()];
-    
-        for(int iPos = 0; iPos < vData.size(); iPos++)
-        {
-            dData[iPos] = vData[iPos];
-        }
-        image_fmt imgData(dData, vData.size(), 1, 1, 1, true);
-    
+        iLongestLine = (iLongestLine > iCount) ? iLongestLine : iCount;
+    }
+
+    fin.clear();
+    fin.seekg(0, std::ios::beg);
+}
+
+image_fmt readData(const bool doAverage, const bool doPlot)
+{
+    const char *filename = DATA_OUTFILE;
+    image_fmt resGraph(500, 400, 1, 3, 0);
+    const double blackWhite[] = {255, 255, 255},
+                 red[] = {255, 0, 0},
+                 green[] = {0, 255, 0};
+    double yMin = 0, dMaxVal = -1, dSmallestVal = 1E+33;
+    int iLongestLine = -1;
+    std::map<std::string, std::vector< rawdata_fmt> > mapRes;
+    std::ifstream fin(filename, std::ios_base::binary|std::ios_base::in);
+
+    if(fin.good() == false)
+    {
+        image_fmt i(1,1,1,1);
+        return i;
+    }
+
+    readProperties(fin, iLongestLine, dSmallestVal, dMaxVal);
+
+    while(true) // until EOF
+    {
+        std::string sHeader, sData, sLabel, sFilename;
+        rawdata_fmt vData;
+
+        std::getline(fin, sHeader);
+        std::getline(fin, sData);
+        if(fin.eof())
+            break;
+
+        splitHeader(sHeader, sLabel, sFilename);
+       
+        std::istringstream iss(sData);
+        double dtmp = 0;
+        while(iss >> dtmp)
+            vData.push_back(dtmp);
+
+        image_fmt imgData = image_psb::vectorToImage(vData);
+        image_fmt padded = image_psb::padImage(imgData, iLongestLine);
+        yMin = imgData.min();
+
+        const double *color = getColor(sLabel);
+        resGraph.draw_graph(padded, color, 1, 1, 1, dSmallestVal, dMaxVal);
+        // delete color;
+
         if(mapRes.find(sLabel) == mapRes.end())
         {
             std::vector<rawdata_fmt> vIn(1, vData);
             mapRes.insert(std::pair<std::string, std::vector<rawdata_fmt> >(sLabel, vIn));
         }
         else
-            mapRes[sLabel].push_back(vData);
-
-        resGraph.draw_graph(imgData, blackWhite);
-        // std::cerr << image_psb::printImage(resGraph) << std::endl;
-    }
-
-    for(auto it = mapRes.begin(); it != mapRes.end(); it++)
-    {
-        std::string sWriteHeader = it->first;
-        rawdata_fmt vRes = image_psb::averageResult(it->second, 2);
-        writeData(vRes, sWriteHeader, "average");
-
-        double *dData = new double[vRes.size()];
-    
-        for(int iPos = 0; iPos < vRes.size(); iPos++)
         {
-            dData[iPos] = vRes[iPos];
+            mapRes[sLabel].push_back(vData);
         }
-        image_fmt imgData(dData, vRes.size(), 1, 1, 1, true);
-        resGraph.draw_graph(imgData, blackWhite);
+
+    }
+
+    if(doAverage)
+    {
+        for(auto it = mapRes.begin(); it != mapRes.end(); it++)
+        {
+            std::string sWriteHeader = it->first;
+            rawdata_fmt vRes = image_psb::averageResult(it->second, it->second.size());
+
+            writeData(vRes, sWriteHeader, "average");
+    
+            if(doPlot)
+            {
+                // padding does something bad :(
+                image_fmt imgData = image_psb::vectorToImage(vRes);
+                yMin = imgData.min();
+                std::cerr << image_psb::printImage(imgData) << std::endl;
+                std::cerr << yMin << std::endl;
+                image_fmt padded = image_psb::padImage(imgData, iLongestLine);
+                std::cerr << image_psb::printImage(padded) << std::endl;
+
+                const double *color = getColor(it->first, true);
+                resGraph.draw_graph(padded, color, 1, 1, 1, dSmallestVal, dMaxVal);
+            }
+        }
     }
     
-    // resGraph.draw_axes(resGraph, resGraph, blackWhite);
+    const int iFontSize = 13;
+    image_fmt xAxis = getAxis(resGraph.width(), iFontSize, iLongestLine, 0),
+              yAxis = getAxis(resGraph.height(),iFontSize, dMaxVal, dSmallestVal);
+    yAxis.mirror('y');
+    resGraph.mirror('y');
+    resGraph.draw_axis(0, yAxis, blackWhite);
+    resGraph.draw_axis(xAxis, resGraph.height(), blackWhite);
     
     fin.close();
     return resGraph;
 }
+
 
 
 void writeData(const rawdata_fmt &vData, std::string sLabel, std::string sFilename)

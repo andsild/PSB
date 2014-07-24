@@ -8,7 +8,7 @@
 namespace plot
 {
 
-void plot()
+cimg_library::CImgDisplay plot(const image_fmt &graph)
 {
     // //TODO: fix path..
     // std::string sPlotDir = "../plot.sh";
@@ -19,13 +19,9 @@ void plot()
     // cimg_library::cimg::system(sPlotDir.c_str());
     // #endif
 
-    image_fmt graph = file_IO::readData();
-    cimg_library::CImgDisplay disp(graph);
-    disp.show();
-    while(!disp.is_closed() && !disp.is_keyQ())
-    {
-        disp.wait();
-    }
+    // image_fmt graph = file_IO::readData(false, true);
+    cimg_library::CImgDisplay disp(graph,"graph.png : graph for all images in folder", 0, false, true) ;
+    return disp;
 }
 
 } /* EndOfNamespace */

@@ -53,6 +53,7 @@ int main(int argc, char **argv)
     const char *dirname = cimg_option("-d", (char*)0, "Input image directory");
     const char *filename = cimg_option("-f", (char*)0, "Input image file");
     const bool compare = cimg_option("-c", false, "Compare original images to solved images");
+    const bool average =  cimg_option("-a", false, "average the results for each solver (writes to end of output file");
     const bool gauss = cimg_option("--gauss", false, "use gauss-seidel"),
                jacobi = cimg_option("--jacobi", false, "use jacobi solver"),
                sor = cimg_option("--sor", false, "use successive over-relaxation solver"),
@@ -116,51 +117,19 @@ int main(int argc, char **argv)
         image_psb::scanAndAddImage(sDir, DATA_DIR);
     }
 
+    const bool doAverage = (nosolve) ? false : true;
+    image_fmt img = readData(doAverage,plot);
+    std::thread plotLoop;
+
     if(plot)
     {
-        plot::plot();
+        cimg_library::CImgDisplay disp = plot::plot(img);
+        plotLoop = std::thread(image_psb::renderImage, disp);
     }
 
-    // if(a)
-    // {
-    //     for (function_container::iterator it = vFuncContainer.begin();
-    //         it != vFuncContainer.end();
-    //         ++it)
-    //     {
-    //         calculateAverage((*it).sPath);
-    //     }
-    // }
-    //
-    // std::thread histLoop;
-    // // if(v)
-    // // {
-    // //     imageSolver.clearFolders();
-    // //     imageSolver.addFolder(folder);
-    // //     imageList_fmt histogram = imageSolver.histogram(folder, vFuncContainer);
-    //     // CImgDisplay hist_disp(histogram, "histogram", 0,  false,true);
-    //     //histLoop = thread(display_histogram, histogram);
-    //     // std::cout << histogram.width() << std::endl;
-    //     // histLoop = thread(renderImage, hist_disp);
-    // // }
-    //
-    //
-    //
-    std::thread plotLoop;
-    // if(p) 
-    // { 
-    //     plot::plot();
-    //     image_fmt imgPlot("graph.png");
-    //     CImgDisplay plot_disp(imgPlot, "graph.png : graph for all images in folder",0, false, true);	
-    //     plotLoop = std::thread(renderImage, plot_disp);
-    // }
-    //
-    //
-    // if(plotLoop.joinable())
-    //     plotLoop.join();
-    
-    // if(histLoop.joinable())
-    //     histLoop.join();
-    //
-    // LOG(severity_type::info)("Program exited successfully");
+    if(plotLoop.joinable())
+        plotLoop.join();
+
+    MLOG(severity_type::info, "Program exited successfully");
     return EXIT_SUCCESS;
 }

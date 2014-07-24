@@ -4,7 +4,7 @@ from PIL import Image
 import sys
 
 COLOR_RANGE = 255
-width = 10
+width = 1
 height = 10
 
 xBorderValues = 0
@@ -16,15 +16,16 @@ uppbordervalue = leftbordervalue
 lowbordervalue = leftbordervalue
 
 startVal = COLOR_RANGE - width - 10
+startVal = 0
 
 im = Image.new('L', (width,height))
 pixels = im.load()
 
 def getVal(xPos, yPos):
     # return 100
-    return (xPos * yPos) + xPos
-    return (xPos % COLOR_RANGE) + startVal
-
+    # return (xPos * yPos) + xPos
+    return height - (yPos % COLOR_RANGE) + startVal
+    return width - (xPos % COLOR_RANGE) + startVal
 
 for x in range(xBorderValues, im.size[0] - xBorderValues):
     for y in range(yBorderValues, im.size[1] - yBorderValues):
