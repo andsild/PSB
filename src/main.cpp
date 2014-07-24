@@ -110,16 +110,18 @@ int main(int argc, char **argv)
         }
     }
 
+    std::thread compareLoop;
+    std::thread plotLoop;
     if(compare)
     {
         std::string sDir = (sFilename.empty()) ? sDirname : sFilename;
         sDir = file_IO::getFoldername(sDir);
-        image_psb::scanAndAddImage(sDir, DATA_DIR);
+        // image_psb::scanAndAddImage(sDir, DATA_DIR);
+        compareLoop = std::thread(image_psb::scanAndAddImage, sDir, DATA_DIR);
     }
 
     const bool doAverage = (nosolve) ? false : true;
     image_fmt img = readData(doAverage,plot);
-    std::thread plotLoop;
 
     if(plot)
     {
@@ -129,7 +131,11 @@ int main(int argc, char **argv)
 
     if(plotLoop.joinable())
         plotLoop.join();
+    if(compareLoop.joinable())
+        compareLoop.join();
 
-    MLOG(severity_type::info, "Program exited successfully");
+    MLOG(severity_type::info, "Program exited successfully\n");
+    // MLOG(severity_type::info, std::flush);
+    MFLUSH;
     return EXIT_SUCCESS;
 }
