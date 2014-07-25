@@ -6,14 +6,17 @@
 
 #include "CImg.h"
 
-typedef cimg_library::CImgList<double> imageList_fmt;
-typedef cimg_library::CImg<double> image_fmt;
+typedef float data_fmt;
+typedef cimg_library::CImgList<data_fmt> imageList_fmt;
+typedef cimg_library::CImg<data_fmt> image_fmt;
 
-typedef std::vector<double> rawdata_fmt;
 
 typedef void (*iterative_func)(const image_fmt &arg1, image_fmt &arg2,
                                 double &arg3, const int, const int) ;
 typedef void (*direct_func)(const image_fmt &arg1, image_fmt &arg2);
+
+
+typedef std::vector<data_fmt> rawdata_fmt;
 
 class ImageException: public std::exception
 {

@@ -5,6 +5,7 @@
 
 #include "CImg.h"
 
+#include "image_types.hpp"
 #include "solver.hpp"
 // #include "loginstance.hpp"
 
@@ -13,11 +14,11 @@ using namespace cimg_library;
 namespace solver //[p]oison-[e]quation
 {
 
-double dOldVal, dNewVal, dCurDiff;
+data_fmt dOldVal, dNewVal, dCurDiff;
 
 
 
-void iterate_jacobi(const CImg<double> &field, CImg<double> &U,
+void iterate_jacobi(const image_fmt &field, image_fmt &U,
                  double &dDiff, const int iWidth, const int iHeight)
 {
     dDiff = 0;
@@ -38,7 +39,7 @@ void iterate_jacobi(const CImg<double> &field, CImg<double> &U,
 }
 
 
-void iterate_gauss(const CImg<double> &field, CImg<double> &guess,
+void iterate_gauss(const image_fmt &field, image_fmt &guess,
                  double &dDiff, const int iWidth, const int iHeight)
 {
     dDiff = 0;
@@ -73,13 +74,13 @@ void iterate_gauss(const CImg<double> &field, CImg<double> &guess,
     }
 }
 
-void iterate_sor(const CImg<double> &field, CImg<double> &U,
+void iterate_sor(const image_fmt &field, image_fmt &U,
                  double &dDiff, const int iWidth, const int iHeight)
 {
     dDiff = 0;
     CImg_3x3(I,double);
 
-    double omega,dOmegaConstant, dNotOmega;
+    data_fmt omega,dOmegaConstant, dNotOmega;
 
      omega = 2 / (1 + (3.14 / iWidth ));
      dOmegaConstant = omega / 4;

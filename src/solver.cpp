@@ -11,7 +11,7 @@ namespace solver
 {
 
 
-image_fmt IterativeSolver::solve(std::vector<double> &vResults)
+image_fmt IterativeSolver::solve(rawdata_fmt &vResults)
 {
     int iIter = 0;
     double dIterationDiff = 9001;
@@ -62,7 +62,7 @@ bool Solver::isFinal() { return this->bFinal; }
 std::string Solver::getFilename() { return this->sFilename; }
 std::string Solver::getLabel() { return this->sLabel; }
 
-image_fmt DirectSolver::solve(std::vector<double> &vResults)
+image_fmt DirectSolver::solve(rawdata_fmt &vResults)
 {
     image_fmt ret(this->origImage, "xyz", 0);
     this->func(this->field, ret);
@@ -72,7 +72,7 @@ image_fmt DirectSolver::solve(std::vector<double> &vResults)
 
 /** Modify the field of a solver (multiply by scalar)
 */
-void Solver::alterField(double dScalar)
+void Solver::alterField(data_fmt dScalar)
 {
     this->field *= dScalar;
 }
