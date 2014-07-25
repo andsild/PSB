@@ -9,6 +9,7 @@
 #include "loginstance.hpp"
 #include "file.hpp"
 #include "image2.hpp"
+#include "imageedit.hpp"
 #include "plot.hpp"
 
 using namespace cimg_library;
@@ -17,6 +18,11 @@ using namespace file_IO;
 using namespace logging;
 
 
+/** Set the verbosity level of a logger; set how much information should be printed.
+  @param iLevel the verbosity level
+  @param isConsole true means you change verbosity of console log,
+                   false means you set the (file) log
+*/
 void setVerboseLevel(int iLevel, const bool isConsole)
 {
     if(iLevel >= severity_type::no_output && iLevel <= severity_type::debug)
@@ -50,6 +56,9 @@ int main(int argc, char **argv)
 
     std::string sToleranceHelpStr = "error tolerance (default: " + std::to_string(DEFAULT_TOLERANCE);
 
+    /* Read and set the flags.
+       Note that the format is OPT, DEFAULT, HELPTEXT
+       */
     const char *dirname = cimg_option("-d", (char*)0, "Input image directory");
     const char *filename = cimg_option("-f", (char*)0, "Input image file");
     const bool compare = cimg_option("-c", false, "Compare original images to solved images");
@@ -59,7 +68,8 @@ int main(int argc, char **argv)
                sor = cimg_option("--sor", false, "use successive over-relaxation solver"),
                fft = cimg_option("--fft", false, "use FFT-solver"),
                wavelet = cimg_option("--wavelet", false, "use wavelet solver");
-    const bool nosolve = cimg_option("-n", false, "do not comput anything");
+    const bool nosolve = cimg_option("-n", false, "do not compute anything");
+    /** If you want a cimg plot */
     const bool plot = cimg_option("-p", false, "visualize the results in a graph");
     const int iVerbosityLevel = cimg_option("-v", 1, "verbosity level: from .. to .. "),
               iFileVerbosityLevel = cimg_option("-x", 1, "written verbosity level");
@@ -72,13 +82,17 @@ int main(int argc, char **argv)
     setVerboseLevel(iVerbosityLevel, true);
     setVerboseLevel(iFileVerbosityLevel, false);
 
+    /* If the user has not set file or directory using flags.. */
     if(sFilename.empty() && sDirname.empty())
     {
         std::vector<std::string> args(argv, argv+argc);
+        /* ... iterate over all argv */
         for (size_t i = 1; i < args.size(); ++i)
         {
+            /* ... we found argv which is not a parameter */
             if (args[i].at(0) != '-')
             {
+                /* cimg::file_type is NULL for directories */
                 const char *fileType = cimg::file_type(0, args[i].c_str());
                 if(!fileType)
                     sDirname = args[i];
@@ -87,6 +101,7 @@ int main(int argc, char **argv)
                 break;
             }
         }
+        /* If nothing was found, display usage message */
         if(sFilename.empty() && sDirname.empty()) {
         std::cerr << sUsageMsg << std::endl;
         return EXIT_FAILURE; }
@@ -117,7 +132,7 @@ int main(int argc, char **argv)
         std::string sDir = (sFilename.empty()) ? sDirname : sFilename;
         sDir = file_IO::getFoldername(sDir);
         // image_psb::scanAndAddImage(sDir, DATA_DIR);
-        compareLoop = std::thread(image_psb::scanAndAddImage, sDir, DATA_DIR);
+        compareLoop = std::thread(image_display::scanAndAddImage, sDir, DATA_DIR);
     }
 
     const bool doAverage = (nosolve) ? false : average;

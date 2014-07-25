@@ -1,5 +1,6 @@
 #include "file.hpp"
 
+#include <algorithm>
 #include <errno.h>
 #include <fstream>
 #include <iomanip>
@@ -286,11 +287,24 @@ image_fmt readData(const bool doAverage, const bool doPlot)
     return resGraph;
 }
 
-
+void trimFilename(std::string &s)
+{
+    if(s.back() == '0' || s.back() == '1' || s.back() == '2')
+    {
+        s.pop_back();
+    }
+    auto it = std::remove_if(std::begin(s),std::end(s),[](char c){return (c == '.');});
+    s.erase(it, std::end(s));
+    it = std::remove_if(std::begin(s),std::end(s),[](char c){return (c == '/');});
+    s.erase(it, std::end(s));
+}
 
 void writeData(const rawdata_fmt &vData, std::string sLabel, std::string sFilename)
 {
     const char *filename = DATA_OUTFILE;
+    trimFilename(sFilename);
+    std::string sFile = "./out" + sLabel + "__" + sFilename + ".dat";
+    filename = sFile.c_str();
     std::ofstream fout(filename, std::ios_base::binary|std::ios_base::out|std::ios_base::app);
 
     std::string sDelim = SAVE_PATTERN.getDelimiter();
