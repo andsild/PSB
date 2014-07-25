@@ -120,7 +120,7 @@ int main(int argc, char **argv)
         compareLoop = std::thread(image_psb::scanAndAddImage, sDir, DATA_DIR);
     }
 
-    const bool doAverage = (nosolve) ? false : true;
+    const bool doAverage = (nosolve) ? false : average;
     image_fmt img = readData(doAverage,plot);
 
     if(plot)
