@@ -65,6 +65,9 @@ class ImageDisplay
     void show();
 };
 
+
+void scanAndAddImage(std::string sRootdir, std::string sSolverdir);
+
 }
 
 #endif

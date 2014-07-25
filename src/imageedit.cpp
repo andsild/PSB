@@ -384,4 +384,26 @@ void ImageDisplay::addResolvedImage2(std::string sFilename, std::string sCommon,
     throw ImageException(sErr);
 }
 
+
+void scanAndAddImage(std::string sRootdir, std::string sSolverdir)
+{
+    std::vector<std::string> vFilenames = file_IO::getFilesInFolder(sRootdir),
+                        vSolvedNames = file_IO::getFilesInFolder(sSolverdir);
+    ImageDisplay id;
+
+    for(auto const it : vFilenames)
+    {
+        id.addMainImage(it);
+    }
+    for(auto const it : vSolvedNames)
+    {
+        bool isResolved = false; std::string _, sLabel, sFilename;
+        file_IO::SAVE_PATTERN.getNames(it, _, sLabel, sFilename, isResolved);
+        id.addResolvedImage2(it, sFilename, isResolved);
+    }
+    id.show();
+    id.loop();
+}
+
+
 } /* EndOfNameSpace */

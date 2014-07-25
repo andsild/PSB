@@ -15,20 +15,22 @@ image_fmt IterativeSolver::solve(std::vector<double> &vResults)
     int iIter = 0;
     double dIterationDiff = 9001;
     image_fmt guess(this->guess);
+    const int width = this->guess.width();
+    const int height = this->guess.height();
 
     this->logInst.print< severity_type::info>("Stop criteria set to :", dStopCriterion);
 
     for(iIter = 0; this->dStopCriterion < dIterationDiff; iIter++)
     {
-        this->func(this->field, guess, dIterationDiff);
+        this->func(this->field, guess, dIterationDiff, width, height);
         double dDiff = this->origImage.MSE(guess);
         vResults.push_back(dDiff);
 
-        if(iIter % 100 == 0)
-        {
-            this->logInst.print< severity_type::info >("Iteration number :", iIter, " with iteration diff ", dIterationDiff, " and image difference ", dDiff );
-            CLOG(severity_type::info)("Solver ", this->getLabel(), " for ", this->getFilename(), ":: iteration number :", iIter, " with iteration diff ", dIterationDiff, " and image difference ", dDiff );
-        }
+        // if(iIter % 100 == 0)
+        // {
+        //     this->logInst.print< severity_type::info >("Iteration number :", iIter, " with iteration diff ", dIterationDiff, " and image difference ", dDiff );
+        //     CLOG(severity_type::info)("Solver ", this->getLabel(), " for ", this->getFilename(), ":: iteration number :", iIter, " with iteration diff ", dIterationDiff, " and image difference ", dDiff );
+        // }
         
         // DO_IF_LOGLEVEL(severity_type::debug)
         // {
@@ -67,6 +69,8 @@ image_fmt DirectSolver::solve(std::vector<double> &vResults)
     return ret;
 }
 
+/** Modify the field of a solver (multiply by scalar)
+*/
 void Solver::alterField(double dScalar)
 {
     this->field *= dScalar;

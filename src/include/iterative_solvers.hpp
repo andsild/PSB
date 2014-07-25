@@ -6,9 +6,9 @@
 namespace solver //[p]oison-[e]quation
 {
 
-void iterate_gauss (const image_fmt &field, image_fmt &U, double &dDiff);
-void iterate_jacobi(const image_fmt &field, image_fmt &U, double &dDiff);
-void iterate_sor   (const image_fmt &field, image_fmt &U, double &dDiff);
+void iterate_gauss (const image_fmt &field, image_fmt &U, double &dDiff, const int, const int);
+void iterate_jacobi(const image_fmt &field, image_fmt &U, double &dDiff, const int, const int);
+void iterate_sor   (const image_fmt &field, image_fmt &U, double &dDiff, const int, const int);
 
 } /* EndOfNamespace */
 

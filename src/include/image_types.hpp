@@ -11,12 +11,8 @@ typedef cimg_library::CImg<double> image_fmt;
 
 typedef std::vector<double> rawdata_fmt;
 
-typedef void (*iterative_function)(const cimg_library::CImg<double> &arg1,
-                                    cimg_library::CImg<double> &arg2,
-                                    double, int, double &arg3, double) ;
-
 typedef void (*iterative_func)(const image_fmt &arg1, image_fmt &arg2,
-                                double &arg3) ;
+                                double &arg3, const int, const int) ;
 typedef void (*direct_func)(const image_fmt &arg1, image_fmt &arg2);
 
 class ImageException: public std::exception
