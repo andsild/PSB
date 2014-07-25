@@ -10,6 +10,7 @@ using namespace logging;
 namespace solver
 {
 
+
 image_fmt IterativeSolver::solve(std::vector<double> &vResults)
 {
     int iIter = 0;
@@ -18,7 +19,7 @@ image_fmt IterativeSolver::solve(std::vector<double> &vResults)
     const int width = this->guess.width();
     const int height = this->guess.height();
 
-    this->logInst.print< severity_type::info>("Stop criteria set to :", dStopCriterion);
+    // this->logInst.print< severity_type::info>("Stop criteria set to :", dStopCriterion);
 
     for(iIter = 0; this->dStopCriterion < dIterationDiff; iIter++)
     {
@@ -40,20 +41,20 @@ image_fmt IterativeSolver::solve(std::vector<double> &vResults)
         // }
     }
 
-    DO_IF_LOGLEVEL(severity_type::debug)
-    {
-        std::string sImage = image_psb::printImage(guess);
-        this->logInst.print< severity_type::debug >("Finished image:\n", sImage );
-        CLOG(severity_type::debug)("Final product with ", this->getLabel(), " on image ", this->getFilename(), ":\n", sImage);
-    }
-    this->logInst.print< severity_type::info>("Finished in ", iIter, " iterations\nFinal MSE: ", vResults.back());
+    // DO_IF_LOGLEVEL(severity_type::debug)
+    // {
+    //     std::string sImage = image_psb::printImage(guess);
+    //     this->logInst.print< severity_type::debug >("Finished image:\n", sImage );
+    //     CLOG(severity_type::debug)("Final product with ", this->getLabel(), " on image ", this->getFilename(), ":\n", sImage);
+    // }
+    // this->logInst.print< severity_type::info>("Finished in ", iIter, " iterations\nFinal MSE: ", vResults.back());
 
     return guess;
 }
 
 void Solver::log(int iLevel, std::string sMsg)
 {
-    this->logInst.print<severity_type::info>(sMsg);
+    // this->logInst.print<severity_type::info>(sMsg);
 }
 
 bool Solver::isMultipart() { return this->bMultipart; }
