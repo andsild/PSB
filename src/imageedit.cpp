@@ -1,16 +1,12 @@
 #include "imageedit.hpp"
 
-#include <iostream>
-
-#include <stdlib.h>
 #include <string>
 #include <vector>
 
-#include <stdio.h>
-
 #include "CImg.h"
 
-#include <file.hpp>
+#include "file.hpp"
+#include "image_types.hpp"
 #include "loginstance.hpp"
 #include "image2.hpp"
 
@@ -24,6 +20,21 @@ namespace image_display
 
 int ImageContainer::iSolvedIndex = 0;
 int ImageContainer::iResolvedIndex = 0;
+
+template <class baseIter>
+class circularIterator
+{
+    private:
+        baseIter cur;
+        baseIter begin;
+        baseIter end;
+    public:
+        circularIterator(baseIter b, baseIter e, baseIter i)
+            :cur(i), begin(b), end(e) {}
+        baseIter & operator ++(void) {++cur; if(cur == end) {cur = begin;}}
+        baseIter & operator --(void) {--cur; if(std::distance(begin, cur) == 0) { cur = end;}}
+};
+
 
 ImageContainer::ImageContainer(std::string fileName)
                : fileName(fileName)
@@ -41,12 +52,13 @@ std::string ImageContainer::getFileName() const
 
 void ImageContainer::addSolverImage(std::string fileName)
 {
-    std::cout << " pushed image " << fileName  << " back" << std::endl;
+    MLOG(severity_type::extensive, " pushed image ", fileName, " back");
     this->vSolvedImages.push_back(fileName);
 }
 
 void ImageContainer::addResolvedImage(std::string fileName)
 {
+    MLOG(severity_type::extensive, " pushed image ", fileName, " back");
     this->vResolvedImages.push_back(fileName);
 }
 
@@ -56,14 +68,18 @@ bool ImageContainer::hasResolved() const
 }
 std::string ImageContainer::getMain() const
 {
+    if(this->fileName.length() < 1)
+    {
+        throw ImageException(std::string("no filename for image container!"));
+    }
     return this->fileName;
 }
 std::string ImageContainer::getSolved() const
 {
     if(this->vSolvedImages.empty())
     {
-        std::string sErr= "lookup for solved image to " + this->fileName + " failed: no resolved images added, but access was attempted ";
-        throw image_psb::ImageException(sErr);
+        std::string sErr= "lookup for solved image to " + this->fileName + " failed: no (non-re)solved images added, but access was attempted ";
+        throw ImageException(sErr);
     }
     if(this->iSolvedIndex < 0) iSolvedIndex++;
     if(this->iSolvedIndex >= this->vSolvedImages.size()) iSolvedIndex--;
@@ -75,7 +91,7 @@ std::string ImageContainer::getSolved() const
                           + std::to_string(this->iSolvedIndex)
                           + " attempted on list of size "
                           + std::to_string(this->vSolvedImages.size());
-        throw image_psb::ImageException(sErr);
+        throw ImageException(sErr);
     }
     return this->vSolvedImages.at(iSolvedIndex);
 }
@@ -84,7 +100,7 @@ std::string ImageContainer::getResolved() const
     if(this->vResolvedImages.empty())
     {
         std::string sErr= "lookup for solved image to " + this->fileName + " failed: no resolved images added, but access was attempted ";
-        throw image_psb::ImageException(sErr);
+        throw ImageException(sErr);
     }
     if(this->iResolvedIndex < 0) iResolvedIndex++;
     if(this->iResolvedIndex >= this->vResolvedImages.size()) iResolvedIndex--;
@@ -97,7 +113,7 @@ std::string ImageContainer::getResolved() const
                           + std::to_string(this->iResolvedIndex)
                           + " attempted on list of size "
                           + std::to_string(this->vResolvedImages.size());
-        throw image_psb::ImageException(sErr);
+        throw ImageException(sErr);
     }
     return this->vResolvedImages.at(iResolvedIndex);
 }
@@ -158,50 +174,57 @@ bool ImageContainer::hasResolvedImages()
     return this->vResolvedImages.empty() == false;
 }
 
-void ImageDisplay::show()
+void ImageDisplay::loadImmy(std::string &sMainfile, std::string &sSolverfile,
+                            std::string &sResolvedfile)
 {
     ImageContainer inst = this->vMainImages.at(this->iIndex);
-    std::string mainFile, solver, resolved;
     try
     {
-        mainFile = inst.getMain();
-        solver = inst.getSolved();
+        sMainfile = inst.getMain();
+        sSolverfile = inst.getSolved();
         if(inst.hasResolvedImages())
-            resolved = inst.getResolved();
+            sResolvedfile = inst.getResolved();
     }
-    catch(image_psb::ImageException ie)
+    catch(ImageException ie)
     {
-        LOG(severity_type::error)(ie.what());
-        CLOG(severity_type::error)(ie.what());
-        exit(EXIT_FAILURE);
+        MLOG(severity_type::error, ie.what());
+        this->vMainImages.erase(this->vMainImages.begin() + this->iIndex);
+        if(iIndex != 0)
+            this->iIndex--;
+        this->loadImmy(sMainfile, sSolverfile, sResolvedfile);
     }
+}
+
+void ImageDisplay::show()
+{
+    if(this->vMainImages.empty())
+        return;
+    std::string sMainfile, sSolverfile, sResolvedfile;
+    loadImmy(sMainfile, sSolverfile, sResolvedfile);
 
     cimg::exception_mode(0);
     try
     {
-        this->main_image.assign(mainFile.c_str());
-        // this->main_image.load_ascii(mainFile.c_str());
-        // this->solved_image.assign(solver.c_str());
-        this->solved_image.load_ascii(solver.c_str());
+        this->main_image.assign(sMainfile.c_str());
+        toGrayScale(this->main_image);
+        this->solved_image.load_ascii(sSolverfile.c_str());
     }
     catch(CImgIOException ciie)
     {
-        LOG(severity_type::error)(ciie.what());
-        CLOG(severity_type::error)(ciie.what());
+        MLOG(severity_type::error, ciie.what());
+        return;
     }
 
-
     this->main_disp = this->main_image;
-    this->main_disp.set_title(mainFile.c_str());
+    this->main_disp.set_title(sMainfile.c_str());
     this->solved_disp = this->solved_image;
-    this->solved_disp.set_title(solver.c_str());
+    this->solved_disp.set_title(sSolverfile.c_str());
 
-    if(inst.hasResolvedImages())
+    if(this->vMainImages.at(this->iIndex).hasResolvedImages())
     {
-        // this->resolved_image.assign(resolved.c_str());
-        this->resolved_image.load_ascii(resolved.c_str());
+        this->resolved_image.load_ascii(sResolvedfile.c_str());
         this->resolved_disp = this->resolved_image;
-        this->resolved_disp.set_title(resolved.c_str());
+        this->resolved_disp.set_title(sResolvedfile.c_str());
     }
 
 }
@@ -327,6 +350,9 @@ void ImageDisplay::loop()
         }
         main_disp.wait();
     }
+    main_disp.close();
+    solved_disp.close();
+    graph_disp.close();
 }
 
 void ImageDisplay::addMainImage(std::string fileName)
@@ -335,47 +361,49 @@ void ImageDisplay::addMainImage(std::string fileName)
     this->vMainImages.push_back(ic);
 }
 
-void ImageDisplay::addResolvedImage(std::string fileName)
+void ImageDisplay::addResolvedImage2(std::string sFilename, std::string sCommon,
+                                     bool isResolved)
 {
-    std::string suffix = fileName;
-    file_IO::trimLeadingFileName(suffix);
-    for(std::vector<ImageContainer>::iterator it = this->vMainImages.begin();
-        it != this->vMainImages.end();
-        it++)
+    for(auto &it : this->vMainImages)
     {
-        std::string commonFileName = (*it).getMain();
-        file_IO::trimLeadingFileName(commonFileName);
-        std::cout << "Trying to find " << fileName << " matching " << commonFileName << std::endl;
-        if( commonFileName.compare(suffix) == 0)
+        std::string sMainname = file_IO::getFilename(it.getMain());
+        if(sMainname.compare(sCommon) == 0)
         {
-            (*it).addResolvedImage(fileName);
+            if(isResolved)
+            {
+                it.addResolvedImage(sFilename);
+            }
+            else
+            {
+                it.addSolverImage(sFilename);
+            }
             return;
         }
     }
-
-    std::string sErr = std::string("no match for solver image: ") + fileName;
-    throw image_psb::ImageException(sErr);
+    std::string sErr = std::string("no match for solver image: ") + sFilename;
+    throw ImageException(sErr);
 }
 
-void ImageDisplay::addSolverImage(std::string fileName) 
+
+void scanAndAddImage(std::string sRootdir, std::string sSolverdir)
 {
-    std::string suffix = fileName;
-    file_IO::trimLeadingFileName(suffix);
-    for(std::vector<ImageContainer>::iterator it = this->vMainImages.begin();
-        it != this->vMainImages.end();
-        it++)
-    {
-        std::string commonFileName = (*it).getMain();
-        file_IO::trimLeadingFileName(commonFileName);
-        if( commonFileName.compare(suffix) == 0)
-        {
-            (*it).addSolverImage(fileName);
-            return;
-        }
-    }
+    std::vector<std::string> vFilenames = file_IO::getFilesInFolder(sRootdir),
+                        vSolvedNames = file_IO::getFilesInFolder(sSolverdir);
+    ImageDisplay id;
 
-    std::string sErr = std::string("no match for solver image: ") + fileName;
-    throw image_psb::ImageException(sErr);
+    for(auto const it : vFilenames)
+    {
+        id.addMainImage(it);
+    }
+    for(auto const it : vSolvedNames)
+    {
+        bool isResolved = false; std::string _, sLabel, sFilename;
+        file_IO::SAVE_PATTERN.getNames(it, _, sLabel, sFilename, isResolved);
+        id.addResolvedImage2(it, sFilename, isResolved);
+    }
+    id.show();
+    id.loop();
 }
+
 
 } /* EndOfNameSpace */

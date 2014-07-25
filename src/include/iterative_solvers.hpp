@@ -1,41 +1,15 @@
-#ifndef SOLVER_H
-#define SOLVER_H
+#ifndef ITER_SOLVER_H
+#define ITER_SOLVER_H
 
-#include <iostream>
-#include <cmath>
-#include <algorithm>
-#include <vector>
-#include <stdio.h>
-#include <cmath>
-#include <string>
-#include <sstream>
+#include "image_types.hpp"
 
-#include "CImg.h"
-#include "loginstance.hpp"
-
-namespace pe_solver //[p]oison-[e]quation
+namespace solver //[p]oison-[e]quation
 {
 
-typedef void (*iterative_function)(const cimg_library::CImg<double> &arg1,
-        cimg_library::CImg<double> &arg2, double, int, double &arg3, double) ;
 
-void iterate_jacobi(const cimg_library::CImg<double> &arg1,
-                   cimg_library::CImg<double> &arg2,
-                   double, int, double &arg3, double arg4);
-
-void iterate_gauss(const cimg_library::CImg<double> &arg1,
-                   cimg_library::CImg<double> &arg2,
-                   double, int, double &arg3, double arg4);
-
-void iterate_sor(const cimg_library::CImg<double> &arg1,
-                 cimg_library::CImg<double> &arg2,
-                   double, int, double &arg3, double arg4);
-
-std::vector<std::string> iterative_solve(iterative_function function,
-                    const cimg_library::CImg<double>,
-                    cimg_library::CImg<double> &arg1, cimg_library::CImg<double>,
-                    double, int,
-                    logging::Logger< logging::FileLogPolicy > &arg2);
+void iterate_gauss (const image_fmt &field, image_fmt &U, double &dDiff, const int, const int);
+void iterate_jacobi(const image_fmt &field, image_fmt &U, double &dDiff, const int, const int);
+void iterate_sor   (const image_fmt &field, image_fmt &U, double &dDiff, const int, const int);
 
 } /* EndOfNamespace */
 

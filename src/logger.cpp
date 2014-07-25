@@ -24,6 +24,12 @@ void FileLogPolicy::open_ostream(const std::string& name)
     }
 }
 
+void FileLogPolicy::flush()
+{
+    if(out_stream)
+        out_stream->flush();
+}
+
 void FileLogPolicy::close_ostream()
 {
     if( out_stream )

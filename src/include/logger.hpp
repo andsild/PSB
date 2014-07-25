@@ -24,9 +24,10 @@ enum severity_type
 class LogPolicyInterface
 {
     public:
-        virtual void		open_ostream(const std::string& name) = 0;
-        virtual void		close_ostream() = 0;
-        virtual void		write(const std::string& msg) = 0;
+        virtual void        open_ostream(const std::string& name) = 0;
+        virtual void        flush() = 0;
+        virtual void        close_ostream() = 0;
+        virtual void        write(const std::string& msg) = 0;
 };
 
 class FileLogPolicy : public LogPolicyInterface
@@ -36,6 +37,7 @@ class FileLogPolicy : public LogPolicyInterface
     FileLogPolicy() : out_stream( new std::ofstream ) {}
     void open_ostream(const std::string& name);
     void close_ostream();
+    void flush();
     void write(const std::string& msg);
     ~FileLogPolicy();
 };
@@ -91,8 +93,7 @@ class Logger
                 log_stream<<parm1;
                 print_impl(parm...);
             }
-    public:
-        Logger( const std::string& name )
+        void initialize()
         {
             log_line_number = 0;
             this->iLevel = severity_type::info;
@@ -102,6 +103,20 @@ class Logger
             {
                 throw std::runtime_error("Logger: Unable to create the Logger instance"); 
             }
+        }
+    public:
+        Logger()
+        {
+            this->initialize();
+        }
+        Logger( const std::string& name )
+        {
+            this->initialize();
+            this->setName(name);
+        }
+
+        void setName(const std::string& name)
+        {
             policy->open_ostream( name );
         }
         int getLevel()
@@ -141,6 +156,12 @@ class Logger
                 print_impl( args... );
                 write_mutex.unlock();
             }
+
+        void flush()
+        {
+            policy->flush();
+        }
+
 
         ~Logger()
         {

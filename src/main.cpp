@@ -1,271 +1,156 @@
-#include <fstream>
+#define DEFAULT_TOLERANCE 1.0
+
 #include <iostream>
-#include <iomanip>
-#include <map>
-#include <sstream> 
 #include <string>
 #include <thread>
-
-#include <getopt.h>
 
 #include "CImg.h"
 
 #include "loginstance.hpp"
 #include "file.hpp"
 #include "image2.hpp"
-#include "iterative_solvers.hpp"
+#include "imageedit.hpp"
 #include "plot.hpp"
-// #include "solvers/FFT.cpp"
-
-#define no_argument 0
-#define required_argument 1 
-#define optional_argument 2
 
 using namespace cimg_library;
 using namespace image_psb;
 using namespace file_IO;
-using namespace plot;
-using namespace logging;
+// using namespace logging;
 
-void usage()
+
+/** Set the verbosity level of a logger; set how much information should be printed.
+  @param iLevel the verbosity level
+  @param isConsole true means you change verbosity of console log,
+                   false means you set the (file) log
+*/
+void setVerboseLevel(int iLevel, const bool isConsole)
 {
-    std::cout << "Usage: main <folder>" << std::endl;
-
-    printf("\t -%c, %s\t%s\n", 'a', "--average", "compute average errors for solvers");
-    printf("\t -%c, %s\t%s\n", 'c', "--compare", "visual comparison of solved images vs original image");
-    printf("\t -%c, %s\t%s\n", 'd', "--directory", "directory with images");
-    printf("\t -%c, %s\t%s\n", 'g', "--gauss", "perform gauss-seidel iteration");
-    printf("\t -%c, %s\t%s\n", 'h', "--help", "view this text");
-    printf("\t -%c, %s\t%s\n", 'j', "--jacobi", "perform jacobi iteration");
-    printf("\t -%c, %s\t%s\n", 'n', "--nosolve", "do not invoke any solvers on the image");
-    printf("\t -%c, %s\t%s\n", 'p', "--plot", "generate plots for graphs");
-    printf("\t -%c, %s\t%s\n", 's', "--sor", "perform sor iteration");
-    printf("\t -%c, %s\t%s\n", 't', "--tolerance", "set the error tolerance between iterations");
-    printf("\n");
-
-    exit(EXIT_FAILURE);
+    // if(iLevel >= severity_type::no_output && iLevel <= severity_type::debug)
+    // {
+    //     if(iLevel == severity_type::debug)
+    //         std::cout << "WARNING: debug mode will slow down the"
+    //                         " program by * a lot *" << std::endl;
+    //     if(isConsole)
+    //         CSETLEVEL(iLevel);
+    //     else SETLEVEL(iLevel);
+    // }
+    // else
+    //     std::cerr << "Error: stdout verbose level out of range" << std::endl;
 }
 
-
-int main(int argc, char *argv[]) 
+int main(int argc, char **argv) 
 {
-    std::string logDir = LOG_DIR;
-    mkdirp(logDir.c_str());
-    LOG(severity_type::info)("Started program");
+    // std::string logDir = LOG_DIR;
+    // mkdirp(logDir.c_str());
+    // MLOG(severity_type::info, "Started program");
 
-    const struct option longopts[] =
+    std::string sUsageMsg = std::string(argv[0]) + " <name of image file>"
+                            "\n\nreport bugs to sildnes@mpi-cbg.de";
+    cimg_usage(sUsageMsg.c_str());
+
+    if(argc < 2)
     {
-        {"average"          , no_argument       , 0, 'a'},
-        {"compare"          , no_argument       , 0, 'c'},
-        {"directory"        , required_argument , 0, 'd'},
-        {"fft"              , no_argument       , 0, 'f'},
-        {"gauss"            , no_argument       , 0, 'g'},
-        {"help"             , no_argument       , 0, 'h'},
-        {"computeline"      , no_argument       , 0, 'l'},
-        {"jacobi"           , no_argument       , 0, 'j'},
-        {"nosolve"          , no_argument       , 0, 'n'},
-        {"plot"             , no_argument       , 0, 'p'},
-        {"resolve"          , required_argument , 0, 'r'},
-        {"tolerance"        , no_argument       , 0, 't'},
-        {"sor"              , no_argument       , 0, 's'},
-        {"verbose"          , optional_argument , 0, 'v'},
-        {"fileverbose"      , optional_argument , 0, 'x'},
-        // {"values-histogram" , no_argument       , 0, 'v'},
-        {0,0,0,0},
-    };
-
-    int index;
-    int iarg=0;
-    extern char *optarg;
-    
-    log_inst_std.setHeader(false);
-    int a = 0, c = 0, d = 0, f = 0, g = 0, j = 0, l = 0, n = 0, p = 0, r = 0, s = 0,
-        v = 0, x = 0;
-    double dScalar, dTolerance = 0.5;
-    char *folder;
-    function_container vFuncContainer;
-    SolverMeta smG(pe_solver::iterate_gauss, std::string("gauss/"));
-    SolverMeta smJ(pe_solver::iterate_jacobi, std::string("jacobi/"));
-    SolverMeta smS(pe_solver::iterate_sor, std::string("sor/"));
-    ImageSolver imageSolver;
-
-    if(argc == 2 && ! (strcmp(argv[1], "-p") || strcmp(argv[1], "-n") 
-                       || strcmp(argv[1], "-h")))
-    {
-        std::cout << "Assuming \"-d " << std::string(argv[1]) << " --gauss --plot" << std::endl;
-        vFuncContainer.push_back(smG);
-        imageSolver.addFolder(std::string(argv[1]));
-        imageSolver.solve(vFuncContainer);
-        plot::plot();
-        exit(EXIT_SUCCESS);
+        std::cerr << sUsageMsg << std::endl;
+        return EXIT_FAILURE;
     }
 
+    std::string sToleranceHelpStr = "error tolerance (default: " + std::to_string(DEFAULT_TOLERANCE);
 
-    while(iarg != -1)
+    /* Read and set the flags.
+       Note that the format is OPT, DEFAULT, HELPTEXT
+       */
+    const char *dirname = cimg_option("-d", (char*)0, "Input image directory");
+    const char *filename = cimg_option("-f", (char*)0, "Input image file");
+    const bool compare = cimg_option("-c", false, "Compare original images to solved images");
+    const bool average =  cimg_option("-a", false, "average the results for each solver (writes to end of output file");
+    const bool gauss = cimg_option("--gauss", false, "use gauss-seidel"),
+               jacobi = cimg_option("--jacobi", false, "use jacobi solver"),
+               sor = cimg_option("--sor", false, "use successive over-relaxation solver"),
+               fft = cimg_option("--fft", false, "use FFT-solver"),
+               wavelet = cimg_option("--wavelet", false, "use wavelet solver");
+    const bool nosolve = cimg_option("-n", false, "do not compute anything");
+    /** If you want a cimg plot */
+    const bool plot = cimg_option("-p", false, "visualize the results in a graph");
+    const int iVerbosityLevel = cimg_option("-v", 1, "verbosity level: from .. to .. "),
+              iFileVerbosityLevel = cimg_option("-x", 1, "written verbosity level");
+    const double dTolerance = cimg_option("-t", DEFAULT_TOLERANCE, sToleranceHelpStr.c_str());
+    const double dResolve = cimg_option("-r", 1.0, "dResolve the image using a different field");
+
+    std::string sFilename = (filename) ? std::string(filename) : std::string(),
+                sDirname = (dirname) ? std::string(dirname) : std::string();
+
+    // setVerboseLevel(iVerbosityLevel, true);
+    // setVerboseLevel(iFileVerbosityLevel, false);
+
+    /* If the user has not set file or directory using flags.. */
+    if(sFilename.empty() && sDirname.empty())
     {
-        iarg = getopt_long(argc, argv, "acd:fgjlhnpr:st:v:x:", longopts, &index);
-
-        switch (iarg)
+        std::vector<std::string> args(argv, argv+argc);
+        /* ... iterate over all argv */
+        for (size_t i = 1; i < args.size(); ++i)
         {
-            case 'a':
-                a++;
-                break;
-
-            case 'c':
-                c++;
-                break;
-
-            case 'd':
-                d++;
-                folder = optarg;
-                break;
-
-            case 'f':
-                f++;
-                break;
-
-            case 'g':
-                vFuncContainer.push_back(smG);
-                break;
-
-            case 'j':
-                vFuncContainer.push_back(smJ);
-                break;
-
-            case 'h':
-                usage();
-                break;
-
-            case 'l':
-                l++;
-                break;
-            case 'n':
-                n++;
-                break;
-
-            case 'r':
-                r++;
-                dScalar = atof(optarg);
-                break;
-
-            case 's':
-                vFuncContainer.push_back(smS);
-                break;
-
-            case 't':
-                dTolerance = atof(optarg);
-                break;
-
-            case 'p':
-                p++;
-                break;
-            case 'v':
-                v = atoi(optarg);
-                if(v >= severity_type::no_output && v <= severity_type::debug)
-                {
-                    if(v == severity_type::debug)
-                        std::cout << "WARNING: debug mode will slow down the"
-                                     " program by * a lot *" << std::endl;
-                    CSETLEVEL(v);
-                }
+            /* ... we found argv which is not a parameter */
+            if (args[i].at(0) != '-')
+            {
+                /* cimg::file_type is NULL for directories */
+                const char *fileType = cimg::file_type(0, args[i].c_str());
+                if(!fileType)
+                    sDirname = args[i];
                 else
-                    std::cout << "Error: stdout verbose level out of range" << std::endl;
+                    sFilename = args[i];
                 break;
-            case 'x':
-                x = atoi(optarg);
-                if(x >= severity_type::no_output && x <= severity_type::debug)
-                {
-                    if(x == severity_type::debug)
-                        std::cout << "WARNING: debug mode will slow down the"
-                                     " program by * a lot *" << std::endl;
-                    SETLEVEL(x);
-                }
-                else
-                    std::cout << "Error: file verbose level out of range" << std::endl;
-                break;
+            }
         }
-    } 
-    if(d) {
-        if(vFuncContainer.size() < 1 && !n)
-        {
-            CLOG(severity_type::warning)("no iterators chosen");
-            LOG(severity_type::warning)("no iterators chosen");
-        }
-        imageSolver.addFolder(folder);
-        if(!n)
-            imageSolver.solve(vFuncContainer, l>0, dTolerance);
-    }
-    else {
-        CLOG(severity_type::warning)("no media folder given");
-        LOG(severity_type::warning)("no media folder given");
+        /* If nothing was found, display usage message */
+        if(sFilename.empty() && sDirname.empty()) {
+        std::cerr << sUsageMsg << std::endl;
+        return EXIT_FAILURE; }
     }
 
-    if(r)
+    if(nosolve == false)
     {
-        ImageSolver imageSolver2;
-        for (function_container::iterator it = vFuncContainer.begin();
-            it != vFuncContainer.end();
-            ++it)
+        if(sDirname.empty() == false)
         {
-            std::string sPath = "output/" + (*it).sPath + "/image/";
-            // imageSolver2.addFolder(sPath);
-            imageSolver2.addFolder(folder);
-            break;
+            std::vector<std::string> vFiles = file_IO::getFilesInFolder(sDirname);
+            for(auto const it : vFiles)
+            {
+                image_psb::processImage(it, dTolerance, dResolve,
+                                        gauss, jacobi, sor, wavelet, fft);
+            }
         }
-
-        if(!n)
-            imageSolver2.solve(vFuncContainer, l>0, dTolerance, "re", "re", dScalar);
-    }
-
-    if(a)
-    {
-        for (function_container::iterator it = vFuncContainer.begin();
-            it != vFuncContainer.end();
-            ++it)
+        if(sFilename.empty() == false)
         {
-            calculateAverage((*it).sPath);
+            image_psb::processImage(sFilename, dTolerance, dResolve,
+                                    gauss, jacobi, sor, wavelet, fft);
         }
     }
 
-    std::thread histLoop;
-    // if(v)
-    // {
-    //     imageSolver.clearFolders();
-    //     imageSolver.addFolder(folder);
-    //     imageList_fmt histogram = imageSolver.histogram(folder, vFuncContainer);
-        // CImgDisplay hist_disp(histogram, "histogram", 0,  false,true);
-        // std::cout << "SIZE " << histogram.size() << std::endl;
-        //histLoop = thread(display_histogram, histogram);
-        // std::cout << histogram.width() << std::endl;
-        // std::cout << histogram.height() << std::endl;
-        // histLoop = thread(renderImage, hist_disp);
-    // }
-
-
-
+    std::thread compareLoop;
     std::thread plotLoop;
-    if(p) 
-    { 
-        plot::plot();
-        image_fmt imgPlot("graph.png");
-        CImgDisplay plot_disp(imgPlot, "graph.png : graph for all images in folder",0, false, true);	
-        plotLoop = std::thread(renderImage, plot_disp);
+    if(compare)
+    {
+        std::string sDir = (sFilename.empty()) ? sDirname : sFilename;
+        sDir = file_IO::getFoldername(sDir);
+        // image_psb::scanAndAddImage(sDir, DATA_DIR);
+        compareLoop = std::thread(image_display::scanAndAddImage, sDir, DATA_DIR);
     }
 
+    const bool doAverage = (nosolve) ? false : average;
+    image_fmt img = readData(doAverage,plot);
 
-    if(c && d)
+    if(plot)
     {
-        imageSolver.clearFolders();
-        imageSolver.addFolder(folder, "when trying to show rendered images (-c flag)");
-        imageSolver.renderImages(folder, vFuncContainer, "image/", "re");
+        cimg_library::CImgDisplay disp = plot::plot(img);
+        plotLoop = std::thread(image_psb::renderImage, disp);
     }
 
     if(plotLoop.joinable())
         plotLoop.join();
+    if(compareLoop.joinable())
+        compareLoop.join();
 
-    if(histLoop.joinable())
-        histLoop.join();
-
-    LOG(severity_type::info)("Program exited successfully");
-    return 0;
+    // MLOG(severity_type::info, "Program exited successfully\n");
+    // MLOG(severity_type::info, std::flush);
+    // MFLUSH;
+    return EXIT_SUCCESS;
 }

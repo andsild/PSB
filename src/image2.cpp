@@ -1,9 +1,10 @@
 #include "image2.hpp"
 
-#include <iostream>
-#include <iomanip>
+#include <limits.h>
+#include <math.h>
+
 #include <list>
-#include <map>
+#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -11,22 +12,27 @@
 
 #include "imageedit.hpp"
 #include "loginstance.hpp"
-#include "loadingbar.hpp"
+// #include "loadingbar.hpp"
 #include "iterative_solvers.hpp"
+#include "wavelet.hpp"
+#include "solver.hpp"
 #include "file.hpp"
 #include "plot.hpp"
+#include "fft.hpp"
 
 using namespace cimg_library;
 using namespace file_IO;
 using namespace plot;
-using namespace logging;
-using namespace loadbar;
-using namespace pe_solver;
+// using namespace logging;
+using namespace solver;
 using namespace image_display;
 
 namespace image_psb
 {
+image_fmt makeInitialGuess(const image_fmt &image);
 
+/** Simple function to render a CImg (useful for threading)
+*/
 void renderImage(CImgDisplay disp)
 {
     disp.show();
@@ -34,14 +40,101 @@ void renderImage(CImgDisplay disp)
     {
         disp.wait();
     }
+
+    disp.close();
 }
 
-void display_histogram(image_fmt image)
+/** Round the pixel values of an image to default RGB values, so that it can
+   be presented on a screen
+
+   @param image is the image to round
+*/
+void roundValues(image_fmt &image)
 {
-    image.display_graph("Histogram", 3);
+    image.round(0).cut(0,255);
 }
 
+/** Transform 1d vector data to a 1d CImg.
+  The returned image will have width 1 and @param data size y dimension
+*/
+image_fmt vectorToImage(rawdata_fmt &data)
+{
+    image_fmt imgData(1, data.size(), 1, 1, false);
+    cimg_forY(imgData,y)
+        imgData(0, y) = data[y];
 
+    return imgData;
+}
+
+/** Pad an image with zeroes at the end
+    @param input is the image to pad
+    @param iPadLength is the amount of pixels to extend the image with (zeroes)
+    @return is the new, paddded image
+*/
+image_fmt padImage(const image_fmt &input, const int iPadLength)
+{
+    if(input.height() == iPadLength)  return input;
+    image_fmt padded(1, iPadLength, 1, 1, 0);
+    padded += input;
+    for(int iPos = input.height() - 1; iPos < iPadLength; iPos++)
+        padded(0, iPos) = 0;
+
+    return padded;
+}
+
+/** Average the result from a nested set of vectors
+  If vector i is longer than vector j, then the average will 
+  calculate the average between i and j for as long as j has elements.
+  After j is empty, the average will continue, calculating average of the
+  remaining vectors. 
+  I.e. the average function is (sum from iterator vector elements) 
+                                            / 
+                             (number of vectors that still has elements)
+*/
+rawdata_fmt averageResult(const std::vector<rawdata_fmt> &vInput, int iDivSize)
+{
+    int iShortest = INT_MAX, iLongest = INT_MIN;
+    std::vector<rawdata_fmt>::iterator it;
+    std::list<int> lLengths;
+    for(auto const it : vInput)
+    {
+        int iSize = it.size();
+        iShortest = (iShortest < iSize) ? iShortest : iSize;
+        iLongest  = (iLongest  > iSize) ? iLongest :  iSize;
+        lLengths.push_back(iSize);
+    }
+
+    rawdata_fmt vRes(iLongest, 0);
+    
+    for(const auto it : vInput)
+    {
+        for(int iPos = 0; iPos < it.size(); iPos++)
+        {
+            vRes.at(iPos) += it.at(iPos);
+        }
+    }
+
+    lLengths.sort(); // lowest first
+    int iPos = 0;
+    for(auto & it : vRes)
+    {
+        it = (double)( it / (double)iDivSize);
+        iPos++;
+        if(iPos >= lLengths.front())
+        {
+            lLengths.pop_front();
+            iDivSize--;
+        }
+    }
+
+    return vRes;
+}
+
+/** Format a string using printf format
+  @param fmt is the format string
+  @param ... are the elements to parsed in @param fmt
+  @return is the formatted string
+*/
 std::string format(const char* fmt, ...)
 {
     int size = 512;
@@ -63,6 +156,10 @@ std::string format(const char* fmt, ...)
     return ret;
 }
 
+/** Convert a CImg to a printed string
+  Note that this method is very slow and has a large impact on
+  running time.
+*/
 std::string printImage(const image_fmt image)
 {
     std::stringstream ss;
@@ -70,21 +167,16 @@ std::string printImage(const image_fmt image)
     cimg_forXY(image, x,y)
     {
         ss << format("%5.1f  ", image(x,y));
-        if( (iIndex % image.width()) == 0) ss << "\n";
+        if( ((iIndex + 1) % image.width()) == 0 && iIndex > 0) ss << "\n";
         iIndex++;
-    // for(int iPos = 0; iPos < image.height(); iPos++)
-    // {
-    //     for(int jPos = 0; jPos < image.width(); jPos++)
-    //     {
-    //         ss << format("%5.1f  ", image(jPos, iPos));
-    //         // printf("%5.1f ",image(jPos,iPos));
-    //     }
-    //     ss << "\n";
     }
 
     return ss.str();
 }
 
+/** Convert an image to grayscale
+*/
+//TODO: ensure that image handles all formats (no errors for specific color channels)
 void toGrayScale(image_fmt &image)
 {
     if(image.spectrum() == 1)
@@ -92,518 +184,331 @@ void toGrayScale(image_fmt &image)
         return;
     }
     image_fmt grayscale(image.width(), image.height(),1, 1, 0);
-
-        // image = image.get_sRGBtoRGB();
-        // image.sRGBtoRGB();
-        grayscale = image.get_norm().normalize(0,255);
-        // grayscale = image.get_sRGBtoRGB().RGBtoHSI().get_channel(2);
-        // grayscale = sRGBtoGrayscale();
-
+    grayscale = image.get_norm().normalize(0,255);
     image = grayscale;
 }
 
-
-template <class T> class ImageProcess
+/** Compute the field from an image
+*/
+image_fmt makeRho(const image_fmt &input)
 {
-    private:
-    typedef std::map<iterative_function,std::vector<std::string> > mapfuncres;
-        image_fmt image;
-        const char *fileName;
-        mapfuncres mapFuncRes;
-        std::vector<std::string> vOutput;
-        image_fmt U;
-        image_fmt rho;
-
-        image_fmt sRGBtoGrayscale()
-        {
-            return this->image.get_norm();
-        }
-
-
-    public:
-        image_fmt getGuess() { return this->U; }
-        image_fmt getImage () { return this->image; }
-        image_fmt getRho() { return this->rho; }
-
-        void multiply(double dScalar)
-        {
-            cimg_forXY(this->rho, x,y)
-                this->rho(x,y) = this->rho(x,y) * dScalar;
-            LOG(severity_type::info)("Multiplied rho by ", dScalar);
-            CLOG(severity_type::info)("Multiplied rho by ", dScalar);
-        }
-
-        double dMaxErr;
-        ImageProcess(image_fmt image, const char *fileName, double dMaxErr)
-                : fileName(fileName), dMaxErr(dMaxErr),
-                  image(image)
-
-        {
-        }
-
-        void clearImages()
-        {
-            this->U.clear();
-            this->vOutput.clear();
-        }
-        void makeInitialGuess(bool bExtractBordes = true)
-        {
-            if(this->image.size() < 1)
-            {
-                throw ImageException("Image std::vector was not initialized"
-                                     " before creating border");
-            }
-
-            int BORDER_SIZE = 1;
-            int DEFAULT_GUESS_VAL = 0;
-            this->U.assign(this->image, "xyz", DEFAULT_GUESS_VAL);
-
-            if(bExtractBordes == true)
-            {
-                cimg_for_borderXY(this->image,x,y,BORDER_SIZE)
-                {
-                    this->U(x,y) = this->image(x,y);
-                }
-            }
-        }
-
-        void makeRho()
-        {
-            int iKernDim = 3;
-            // int BORDER_SIZE = 1;
-            // image_fmt kernel(iKernDim, iKernDim, 1, 1,
-            //                  0,1,0,
-            //                  1,-4,1,
-            //                  0,1,0);
-            // this->rho = this->image.get_convolve(kernel, 0);
-
-            this->rho.assign(this->image, "xyz", 0);
-            int BORDER_SIZE = 1;
-            CImg_3x3(I,double);
-            cimg_for_in3x3(this->image, BORDER_SIZE, BORDER_SIZE,
-                           this->image.width() - BORDER_SIZE - 1, this->image.height() - BORDER_SIZE - 1,
-                           x,y,0,0,I,double) // uses Neumann borders
-            {
-                double dNewVal = (Icn + Icp + Ipc + Inc - (4 * Icc));
-                this->rho(x,y) = dNewVal;
-            }
-
-            cimg_for_borderXY(this->image,x,y,BORDER_SIZE)
-            {
-                // this->rho(x,y) = this->image(x,y);
-                this->rho(x,y) = NAN;
-            }
-        }
-
-        void solve(iterative_function func,logging::Logger< logging::FileLogPolicy > &logInstance)
-       {
-            this->vOutput =  iterative_solve(func,
-                                       this->image, this->U, this->rho,
-                                       this->dMaxErr, this->image.width(),
-                                       logInstance);
-
-            if(this->vOutput.size() < 1)
-            {
-                throw ImageException("Solver had no results from function");
-            }
-       }
-
-        void writeResultToFile(std::string fileDir)
-        {
-            std::string sFilename = std::string(this->fileName);
-            try{
-            writeToFile(this->vOutput, sFilename, fileDir);
-            }
-            catch(...)
-            {
-                throw ImageException("could not write result file to " + fileDir);
-            }
-        }
-
-        void roundValues()
-        {
-            this->U.round(0);
-            this->U.cut(0, 255);
-        }
-        void writeImageToFile(const char *fileDir)
-        {
-            std::string sFileName = std::string(this->fileName);
-            trimLeadingFileName(sFileName);
-            std::string sFilename = std::string(fileDir) + "/" + sFileName;
-            cimg::exception_mode(0);
-            try
-            {
-                mkdirp(fileDir);
-                this->U.save_ascii(sFilename.c_str());
-            }
-            catch(CImgIOException &cioe)
-            {
-                CLOG(severity_type::error)(cioe.what());
-                LOG(severity_type::error)(cioe.what());
-            }
-
-        }
-};
-
-
-ImageSolver::ImageSolver() {}
-void ImageSolver::addFolder(std::string sFolder, const char *errMsg)
-{
-    try{
-        getFilesInFolder(sFolder, this->filenames);
-    }
-    catch(const file_IO::DirNotFound& f)
-    {
-        CLOG(severity_type::error)(f.what());
-        LOG(severity_type::error)(f.what());
-        exit(EXIT_FAILURE);
-    }
+    int iKernDim = 3;
+    /* Discrete poison stencil */
+    image_fmt kernel(iKernDim, iKernDim, 1, 1,
+                    0,1,0,
+                    1,-4,1,
+                    0,1,0);
+    return input.get_convolve(kernel, 0);
 }
 
-bool loadImage(const char *fileDest, image_fmt &image)
+
+/** Load an image
+  @param fileDest is the name of the image
+  @param image is the image to load
+  @return false if image could not be loaded successfully and print error message
+*/
+bool readImage(image_fmt &image, std::string sFileName)
 {
     cimg::exception_mode(0);
-    try {
-        image.load(fileDest);
-        LOG(severity_type::debug)("Loaded image ", fileDest,
-                                  "to code format at ", &image);
-        CLOG(severity_type::debug)("Loaded image ", fileDest,
-                                  "to code format at ", &image);
-        toGrayScale(image);
-        LOG(severity_type::debug)("Converted ", fileDest, " to grayscale");
-        CLOG(severity_type::debug)("Converted ", fileDest, " to grayscale");
-    }
-    catch(CImgIOException cioe)
+    try
     {
-        LOG(severity_type::error)(cioe.what());
-        CLOG(severity_type::error)(cioe.what());
+        image.load(sFileName.c_str());
+    }
+    catch(CImgIOException &cioe)
+    {
+        std::cerr << cioe.what() << std::endl;
         return false;
     }
-
     return true;
 }
 
-void ImageSolver::clearFolders()
+/** Calculate the mean square error between two images
+  @param source
+  @param comparator
+  @return the difference from source to comparator
+  */
+double imageDiff(const image_fmt &source, const image_fmt &comparator)
 {
-    this->filenames.clear();
+    return (double)(source.MSE(comparator));
 }
 
-void doMeImageDisplay(ImageDisplay);
-void ImageSolver::renderImages(std::string sImageRoot, function_container vIf,
-                               const char *cImagePath,
-                               const char *cResolved)
+/** Split an image, its field and guess separated regions
+  @param iDivSize the amount of split to perform. Has to be square
+  @param origImage the original image to split from
+  @param rho the original rho to split from
+  @param origimagelist a return list with iDivSize different splits
+  @param rhoList a return list with iDivSize different splits
+  @param guessList a return list with iDivSize different splits
+*/
+void divide(int iDivSize, const image_fmt &origImage, const image_fmt &rho,
+            imageList_fmt &origImageList, imageList_fmt &rhoList, imageList_fmt &guessList)
 {
-        if(this->filenames.empty())
-        {
-            LOG(severity_type::error)("No files added!");
-            CLOG(severity_type::error)("No files added!");
-            exit(EXIT_FAILURE);
-        }
+    const int DEFAULT_GUESS_VAL = 0;
 
-        ImageDisplay id;
-
-        std::vector<std::string>::const_iterator it = this->filenames.begin();
-
-        map_gallery mapFiles;
-
-        cimg::exception_mode(0);
-        for(std::vector<std::string>::iterator it = filenames.begin();
-            it != filenames.end();
-            it++)
-        {
-            CLOG(severity_type::info)("Adding main image to super-container: ", (*it));
-            id.addMainImage((*it));
-        }
-
-        this->filenames.clear();
-
-        if(vIf.empty())
-        {
-            LOG(severity_type::error)("No solved images to fetch!");
-            CLOG(severity_type::error)("No solved images to fetch!");
-            exit(EXIT_FAILURE);
-        }
-        for (function_container::iterator subIt = vIf.begin();
-            subIt != vIf.end();
-            ++subIt)
-        {
-            std::string sImageDir = DATA_DIR + (*subIt).sPath + std::string(cImagePath);
-            this->addFolder(sImageDir,
-                    "when trying to show rendered images (-c flag)");
-        }
-
-        for(std::vector<std::string>::iterator it = filenames.begin();
-            it != filenames.end();
-            it++)
-        {
-            try
-            {
-                CLOG(severity_type::info)("Beginning to look up: ", *it, " in super-container...");
-                id.addSolverImage((*it));
-            }
-            catch(ImageException ie) {
-                LOG(severity_type::warning)(ie.what());
-                CLOG(severity_type::warning)(ie.what());
-            }
-
-        }
-        if(strcmp(cResolved, "NOT") != 0)
-        {
-            this->filenames.clear();
-            for (function_container::iterator subIt = vIf.begin();
-                subIt != vIf.end();
-                ++subIt)
-            {
-                std::string sImageDir = DATA_DIR + (*subIt).sPath + cResolved;
-                this->addFolder(sImageDir);
-            }
-
-            for(std::vector<std::string>::iterator it = filenames.begin();
-                it != filenames.end();
-                it++)
-            {
-                try
-                {
-                    CLOG(severity_type::info)("Beginning to look up: ", *it, " in super-container...");
-                    id.addResolvedImage((*it));
-                }
-                catch(ImageException ie)
-                {
-                    LOG(severity_type::warning)(ie.what());
-                    CLOG(severity_type::warning)(ie.what());
-                }
-            }
-        }
-
-        // doImageDisplay(mapFiles, sImageRoot);
-        id.show();
-        id.loop();
-}
-
-imageList_fmt ImageSolver::histogram(std::string sDir, function_container vIf)
-{
-    // for (function_container::iterator subIt = vIf.begin();
-    //     subIt != vIf.end();
-    //     ++subIt)
-    // {
-    image_fmt bigImg;
-    imageList_fmt images;
-    cimg::exception_mode(0);
-
-    for(std::vector<std::string>::iterator it = filenames.begin();
-        it != filenames.end();
-        it++)
+    if(iDivSize == 1)
     {
-        image_fmt image;
-        if(!loadImage((*it).c_str(), image))
-        {
-            continue;
-        }
-        bigImg.append(image, 'x');
+        origImageList.push_back(origImage);
+        rhoList.push_back(rho);
+        guessList.push_back(makeInitialGuess(origImage));
+        return;
     }
-    images.push_back(bigImg.histogram(256));
-
-
-    for (function_container::iterator it = vIf.begin();
-        it != vIf.end();
-        ++it)
+    
+    if(iDivSize == 2)
     {
-        this->filenames.clear();
-        std::string sImageDir = DATA_DIR + (*it).sPath + std::string("image/");
-        this->addFolder(sImageDir);
-        image_fmt appender;
+        int w = origImage.width(); int h = origImage.height();
+        origImageList.push_back(origImage.get_crop(0, 0, 0, 0, w, h / 2, 0, 0));
+        origImageList.push_back(origImage.get_crop(0, h / 2, 0, 0, w, h, 0, 0));
+        rhoList.push_back(rho.get_crop(0, 0, 0, 0, w, h / 2, 0, 0));
+        rhoList.push_back(rho.get_crop(0, h / 2, 0, 0, w, h, 0, 0));
 
-        for(std::vector<std::string>::iterator subIt = filenames.begin();
-            subIt != filenames.end();
-            subIt++)
-        {
-            image_fmt image;
-            if(!loadImage((*subIt).c_str(), image))
-            {
-                continue;
-            }
-            appender.append(image, 'x');
-        }
-        images.push_back(appender.histogram(256));
-    }
-
-    return images;
-}
-
-void ImageSolver::solve(function_container vIf, bool bComputeLines,
-            double dTolerance, const char *cImagePath, const char *cResultPath
-           , double dScalar)
-{
-    if(this->filenames.size() < 1
-    || vIf.size() < 1) {
-        LOG(severity_type::error)("Solve called without files (or functions?)");
-        CLOG(severity_type::error)("Solve called without files (or functions?)");
+        image_fmt guess = makeInitialGuess(origImage);
+        guessList.push_back(guess.get_crop(0, 0, 0, 0, w, h / 2, 0, 0));
+        guessList.push_back(guess.get_crop(0, h / 2, 0, 0, w, h, 0, 0));
         return;
     }
 
-    int iTotalIterations;
-    double dProgress = 0;
-    double dStepSize;
 
-    iTotalIterations = this->filenames.size() * vIf.size();
-    dStepSize = ((double)100 / iTotalIterations);
-    int iTimeRemaining = filenames.size() * vIf.size();
-    loadBar.initialize(iTotalIterations);
-    for(std::vector<std::string>::iterator it = filenames.begin();
-        it != filenames.end();
-        it++)
+    const int WIDHT_REGION = (origImage.width() / (iDivSize / 2));
+    const int HEIGHT_REGION = (origImage.height() / (iDivSize / 2));
+
+    for(int xSlice = 0; xSlice < iDivSize / 2; xSlice++)
     {
-        cimg::exception_mode(0);
-        image_fmt image;
-        if(!loadImage((*it).c_str(), image))
+        for(int ySlice = 0; ySlice < iDivSize / 2; ySlice++)
         {
-            loadBar.increaseProgress(vIf.size() - 1);
-            std::cout << loadBar << std::endl;
-            continue;
+            int iLeftmostX = xSlice * WIDHT_REGION,
+                iUpperY = ySlice * HEIGHT_REGION;
+            int iRightmostX = iLeftmostX + WIDHT_REGION -1,
+                iLowerY = iUpperY + HEIGHT_REGION - 1;
+
+            if(WIDHT_REGION % 2 == 0 && xSlice == 0)
+                iRightmostX++;
+            if(HEIGHT_REGION % 2 == 0 && ySlice == 0)
+                iLowerY++;
+
+            if(iRightmostX > origImage.width())
+                iRightmostX = origImage.width() - 1;
+            if(iLowerY > origImage.height())
+                iLowerY = origImage.height() - 1;
+
+            image_fmt origImg = origImage.get_crop(iLeftmostX, iUpperY, 0,
+                                                iRightmostX,
+                                                iLowerY, 0);
+            origImageList.push_back(origImg);
+
+            rhoList.push_back(rho.get_crop(iLeftmostX, iUpperY, 0,
+                                                                iRightmostX,
+                                                                iLowerY, 0));
+
+            image_fmt retRegion(origImg, "xyz", 0);
+            cimg_for_borderXY(origImg,x,y,BORDER_SIZE)
+            {
+                retRegion(x,y) = origImg(x,y);
+            }
+            guessList.push_back(retRegion);
         }
-
-        ImageProcess<double> ipImage(image, (*it).c_str(), dTolerance);
-        ipImage.makeRho();
-        if(dScalar != 1.0) { ipImage.multiply(dScalar); }
-
-        bool BORDERS=true;
-
-        for (function_container::iterator subIt = vIf.begin();
-            subIt != vIf.end();
-            ++subIt)
-        {
-            std::string sRedo = "";
-            if(dScalar != 1.0)
-                sRedo = "re";
-
-            std::string sImageDir = DATA_DIR + (*subIt).sPath + std::string(cImagePath);
-            std::string sLogPath = LOG_DIR + (*subIt).sPath;
-            std::string sLogFile = sLogPath + (*it);
-            trimTrailingFilename(sLogFile);
-            trimLeadingFileName(sLogFile);
-            sLogFile = sRedo + sLogFile + ".log";
-            mkdirp(sLogPath.c_str());
-
-
-            logging::Logger< logging::FileLogPolicy > logInstance(sLogPath + sLogFile);
-            logInstance.setLevel(log_inst.getLevel());
-
-            ipImage.makeInitialGuess(BORDERS);
-            if(logInstance.getLevel() >= severity_type::extensive)
-            {
-                (logInstance.print<severity_type::extensive>)("Initial image: ", (*it).c_str(), "\n", printImage(ipImage.getImage()));
-                (logInstance.print<severity_type::extensive>)("Initial guess\n", printImage(ipImage.getGuess()));
-                (logInstance.print<severity_type::extensive>)("Initial rho\n", printImage(ipImage.getRho()));
-            }
-            if(CGETLEVEL >= severity_type::extensive)
-            {
-                CLOG(severity_type::extensive)("Initial image\n", printImage(ipImage.getImage()));
-                CLOG(severity_type::extensive)("Initial guess\n", printImage(ipImage.getGuess()));
-                CLOG(severity_type::extensive)("Initial rho\n", printImage(ipImage.getRho()));
-            }
-            (logInstance.print<severity_type::info>)("Beginning solver: ", (*subIt).sPath);
-            CLOG(severity_type::info)("Beginning solver: ", (*subIt).sPath);
-            CLOG(severity_type::info)("Beginning solver: ", (*subIt).sPath, " for image ", (*it));
-            LOG(severity_type::info)("Beginning solver: ", (*subIt).sPath, " for image ", (*it));
-
-            try{
-
-                ipImage.solve((*subIt).func, logInstance);
-                CLOG(severity_type::extensive)("Finished image: \n", printImage(ipImage.getGuess()));
-                (logInstance.print<severity_type::extensive>)("Finished image: \n", printImage(ipImage.getGuess()));
-                std::cout << loadBar << std::endl;
-
-                ipImage.writeResultToFile(std::string(cResultPath) + (*subIt).sPath);
-
-                if(dScalar == 1.0)
-                {
-                    ipImage.roundValues();
-                }
-                CLOG(severity_type::extensive)("Finished image (rounded and cut): \n", printImage(ipImage.getGuess()));
-                (logInstance.print<severity_type::extensive>)("Finished image(rounded and cut): \n", printImage(ipImage.getGuess()));
-                ipImage.writeImageToFile(sImageDir.c_str());
-                ipImage.clearImages();
-            }
-            catch(ImageException &ie)
-            {
-                LOG(severity_type::warning)(ie.what());
-                CLOG(severity_type::warning)(ie.what());
-            }
-        }
-
     }
-    std::cout << loadBar << std::endl;// if last image has errors, this might be necessary
+
 }
 
+/** Compute a prior for an image.
+  The border condition used it ZZ
+*/
 
-void calculateAverage(std::string sFilePath)
+image_fmt makeInitialGuess(const image_fmt &image)
 {
-    // std::vector<std::string> files;
-    //
-    // std::string sReadFolder = DATA_DIR + sFilePath;
-    //
-    // try
-    // {
-    //     getFilesInFolder(sReadFolder.c_str(), files);
-    // }
-    // catch(file_IO::DirNotFound &f)
-    // {
-    //     std::cout << f.what() << std::endl;
-    //     LOG(severity_type::error)(f.what());
-    //     CLOG(severity_type::error)(f.what());
-    // }
-    //
-    // std::vector<double> average; // can give undererror
-    // int iLineCount = numeric_limits<int>::max();
-    // std::string avoid = "average";
-    // double dValidFiles = 0;
-    // list<int> lLengths;
-    // for (std::vector<std::string>::iterator it = files.begin();
-    //     it != files.end();
-    //     ++it)
-    // {
-    //     size_t found = (*it).find(avoid);
-    //     if(found!=std::string::npos)
-    //     {
-    //        LOG(severity_type::warning)("average: skipping file", *it);
-    //        CLOG(severity_type::warning)("average: skipping file", *it);
-    //         continue;
-    //     }
-    //     dValidFiles++;
-    //
-    //     ifstream infile;
-    //     int iPos = 0;
-    //     double dNum;
-    //     infile.open(*it);
-    //
-    //     while(infile >> dNum) // read whole file or stop
-    //     {
-    //         if(iPos >= average.size())
-    //             average.push_back(dNum);
-    //         else
-    //             average[iPos] += dNum;
-    //         iPos++;
-    //     }
-    //
-    //     lLengths.push_back(iPos);
-    // }
-    //
-    // lLengths.sort();
-    // for(std::vector<int>::size_type iPos = 0;
-    //         iPos < (int)(average.size());
-    //         iPos++)
-    // {
-    //     if(lLengths.size() > 0 &&
-    //         iPos >= lLengths.front()) //XXX: or iPos >= ?
-    //     {
-    //         lLengths.pop_front();
-    //         dValidFiles--;
-    //     }
-    //     average[iPos] /= dValidFiles;
-    // }
-    //
-    // std::string sFilename = string("average") + DATA_EXTENSION;
-    // writeToFile(average, sFilename, sFilePath);
+    if(image.size() < 1)
+    {
+        std::string sMsg = "Image was not initialized before creating border"
+                           " [[ width: " + std::to_string(image.width()) 
+                           + " height: " + std::to_string(image.height()) + " ]]";
+        throw ImageException(sMsg.c_str());
+    }
+
+    image_fmt U;
+    const int DEFAULT_GUESS_VAL = 0;
+
+    U.assign(image, "xyz", DEFAULT_GUESS_VAL);
+
+    cimg_for_borderXY(image,x,y,BORDER_SIZE)
+    {
+        U(x,y) = image(x,y);
+    }
+
+    return U;
+}
+
+/** Put together an image that has been divided into regions.
+    The method will assume the image was split along the y axis first,
+    then x axis.
+
+    @param list is the list of image to join together
+    @param DIVISION_SIZE is the number of splits that was made
+    @return is the joined image
+*/
+image_fmt joinImage(imageList_fmt list, int DIVISION_SIZE)
+{
+    image_fmt img((unsigned int)0, (unsigned int)0,(unsigned int)1);
+    if(DIVISION_SIZE == 1)
+    {
+        return list.front();
+    }
+    for(int xSlice = 0; xSlice < DIVISION_SIZE / 2; xSlice++)
+    {
+        image_fmt tmp((unsigned int)0, (unsigned int)0,(unsigned int)1);
+        for(int ySlice = 0; ySlice < DIVISION_SIZE / 2; ySlice++)
+        {
+            tmp.append(list.front(), 'y', 0);
+            list.pop_front();
+        }
+        img.append(tmp, 'x', 0);
+    }
+
+    return img;
+}
+
+/** Add an iterative solver for an image.
+  Since the iterative solvers are split into different parts before they
+  are rejoined, they need this method to tag the different parts
+  so that other methods can know how to recombine them.
+*/
+void addIterativeSolver(std::vector<solver::Solver*> &vIn,
+        const int DIVISION_SIZE, const double dTolerance,
+        const std::string sFilename, const std::string sLabel,
+        const iterative_func func,
+        const imageList_fmt &origList, imageList_fmt &rhoList, const imageList_fmt &guessList)
+{
+    for(int iPos = 0; iPos < origList.size() - 1; iPos++)
+    {
+        vIn.push_back(new solver::IterativeSolver(origList[iPos],
+                                            rhoList[iPos], guessList[iPos],
+                                            func, dTolerance,
+                                            sFilename, sLabel, true));
+    }
+    /* Tag the last image with "isFinal" */
+    vIn.push_back(new solver::IterativeSolver(origList.back(),
+                                        rhoList.back(), guessList.back(),
+                                        func, dTolerance,
+                                        sFilename, sLabel, true, true));
+}
+
+/** The main entry point for solvers to an image.
+
+  For each solver(boolean), add the corresponding method and field,
+  then execute solve().
+*/
+void processImage(std::string sFilename, double dTolerance, double dResolve,
+                  const bool gauss, const bool jacobi, const bool sor,
+                  const bool wav, const bool fft)
+{
+
+    image_fmt use_img;
+    std::vector<solver::Solver*> vSolvers;
+    const int DIVISION_SIZE = 4;
+
+    if(!readImage(use_img, sFilename))
+    {
+        std::cerr << "Error:: could not load image: " << sFilename << std::endl;
+        return;
+    }
+    toGrayScale(use_img);
+    image_fmt field = makeRho(use_img),
+              guess = makeInitialGuess(use_img);
+    // MLOG(severity_type::extensive, "Initial image\n", printImage(use_img));
+    // MLOG(severity_type::extensive, "Initial guess\n", printImage(guess));
+    // MLOG(severity_type::extensive, "Initial rho\n", printImage(field));
+    imageList_fmt origList, guessList, rhoList;
+
+    divide(DIVISION_SIZE, use_img, field, origList, rhoList, guessList);
+
+    if(gauss)
+    {
+        std::string sLabel = "gauss";
+        addIterativeSolver(vSolvers, DIVISION_SIZE, dTolerance, sFilename, sLabel,
+                            solver::iterate_gauss, origList, rhoList, guessList);
+    }
+    if(jacobi)
+    {
+        std::string sLabel = "jacobi";
+        addIterativeSolver(vSolvers, DIVISION_SIZE, dTolerance, sFilename, sLabel,
+                            solver::iterate_jacobi, origList, rhoList, guessList);
+    }
+    if(sor)
+    {
+        std::string sLabel = "sor";
+        addIterativeSolver(vSolvers, DIVISION_SIZE, dTolerance, sFilename, sLabel,
+                            solver::iterate_sor, origList, rhoList, guessList);
+    }
+    if(fft)
+    {
+        std::string sLabel = "fft";
+        vSolvers.push_back(new solver::DirectSolver(use_img, field,
+                                                    solver::FFT2D,
+                                                    sFilename, sLabel, false));
+    }
+    if(wav)
+    {
+        std::string sLabel = "wavelet";
+        vSolvers.push_back(new solver::DirectSolver(use_img, field,
+                                                    wavelet::pyconv,
+                                                    sFilename, sLabel, false));
+    }
+
+    imageList_fmt accumulator; /*< container for subdivisions of solved image */
+    rawdata_fmt vResults;
+    int iPartIndex = 0;
+
+    for(auto it : vSolvers) // for each solver for each image (and its divisions)
+
+    {
+        image_fmt result = it->solve(vResults); /*< result now holds the resulting image,
+                                                  < vResults holds the imagediffs */
+        /* Multipart images: solve each region before moving past this if block */
+        if(it->isMultipart()) 
+        {
+            accumulator.push_back(result);
+            // vAccumulator.push_back(vResults);
+            /* We can now merge the regions together */
+            if(it->isFinal())
+            {
+                result = joinImage(accumulator, DIVISION_SIZE);
+                accumulator.clear();
+                iPartIndex = 0;
+            }
+            else
+            {
+                std::string sFilename = it->getFilename() + std::to_string(iPartIndex);
+                file_IO::writeData(vResults, it->getLabel(), sFilename);
+                iPartIndex++;
+                vResults.clear(); // important, otherwise it stacks results
+                continue;
+            }
+        }
+        /* Before saving the image, round the values so that the image can
+           be viewed later */
+        roundValues(result);
+        // DO_IF_LOGLEVEL(severity_type::extensive)
+        // {
+        //     std::string sMsg = "Final image(cut)\n" + printImage(result);
+        //     it->log(1, sMsg);
+        // }
+
+        std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), false);
+        file_IO::saveImage(result, sSavename);
+        file_IO::writeData(vResults, it->getLabel(), it->getFilename());
+        /* Erase before re-iterating */
+        vResults.erase(vResults.begin(), vResults.end());
+
+        //TODO: not (re-)implemented */
+        // if(dResolve != 1.0)
+        // {
+        //     it->alterField(dResolve);
+        //     result = it->solve(vResults);
+        //     std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), true);
+        //     file_IO::saveImage(result, sSavename);
+        //     file_IO::writeData(vResults, it->getLabel(), it->getFilename());
+        //     vResults.clear();
+        // }
+    }
 }
 
 } /* EndOfNameSpace */

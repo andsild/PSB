@@ -1,27 +1,33 @@
 #ifndef _FILE_H
-#define _FILE_H 1
+#define _FILE_H
 
 #define PRECISION 20
 #define DATA_DIR "./output/"
+#define DATA_OUTFILE "./output.txt"
 #define DATA_EXTENSION ".dat"
 #define PROJECT_DIR "PSB"
 
 #include <string>
 #include <vector>
-#include <iostream>
 #include <iomanip>
 #include <fstream>
 
 #include <dirent.h>
-#include <math.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include "image_types.hpp"
+#include "loginstance.hpp"
 
 #define DEFAULT_MODE      S_IRWXU | S_IRGRP |  S_IXGRP | S_IROTH | S_IXOTH
 
 namespace file_IO
 {
+
+void saveImage(const image_fmt &arg, std::string);
+void writeData(const rawdata_fmt &arg1, std::string, std::string);
+image_fmt readData(const bool, const bool);
 
 class DirNotFound : public std::exception
 {
@@ -35,11 +41,48 @@ class DirNotFound : public std::exception
         std::string msg_;
 };
 
+class SaveBehaviour
+{
+    private:
+        const std::string sDelimiter,
+                    sValueDelimiter,
+                    sResolveTag,
+                    sLogDir,
+                    sLogExtension,
+                    sSuffix,
+                    sOutdir;
+    public:
+        SaveBehaviour(const std::string sDelim,
+                     const std::string sValueDelim,
+                    const std::string sResolve,
+                    const std::string sSuff)
+            : sDelimiter(sDelim), sResolveTag(sResolve), sSuffix(sSuff),
+             sValueDelimiter(sValueDelim),
+            sOutdir(DATA_DIR), sLogDir(LOG_DIR), sLogExtension(".log")
+        {
+        }
+        std::string getSavename(const std::string,
+                              const std::string, const bool) const;
+        std::string getLogname(const std::string,
+                              const std::string, const bool) const;
+        void getNames(const std::string, std::string &arg1, std::string &arg2,
+                    std::string &arg3, bool &arg4);
+        std::string getResolveLabel(std::string arg);
+        std::string getOutdir() { return this->sOutdir; }
+        std::string getDelimiter();
+        std::string getValueDelimiter();
+};
+
+
+static SaveBehaviour SAVE_PATTERN("__", "  ", "re", "");
+
 void trimLeadingFileName(std::string &arg);
 void trimTrailingFilename(std::string &arg);
 void mkdirp(const char *arg, mode_t = DEFAULT_MODE);
 
-void getFilesInFolder(std::string, std::vector<std::string> &arg);
+std::vector<std::string> getFilesInFolder(std::string);
+std::string getFoldername(const std::string sFilename);
+std::string getFilename(const std::string sFilename);
 
 template <typename t>
 void writeToFile(const std::vector<t> vRes, std::string sFilename,
