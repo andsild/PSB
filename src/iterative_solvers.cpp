@@ -12,6 +12,11 @@ using namespace cimg_library;
 
 namespace solver //[p]oison-[e]quation
 {
+
+double dOldVal, dNewVal, dCurDiff;
+
+
+
 void iterate_jacobi(const CImg<double> &field, CImg<double> &U,
                  double &dDiff, const int iWidth, const int iHeight)
 {
@@ -23,10 +28,10 @@ void iterate_jacobi(const CImg<double> &field, CImg<double> &U,
                    iWidth - BORDER_SIZE - 1, iHeight - BORDER_SIZE - 1,
                    x,y,0,0,I,double) // uses Neumann borders
     {
-        double dOldVal = Icc;
-        double dNewVal = .25 * (Icn + Icp + Ipc + Inc - field(x,y));
+        dOldVal = Icc;
+        dNewVal = .25 * (Icn + Icp + Ipc + Inc - field(x,y));
         U(x,y) = dNewVal;
-        double dCurDiff = fabs(dOldVal - dNewVal);
+        dCurDiff = fabs(dOldVal - dNewVal);
         if( dCurDiff > dDiff)
             dDiff = dCurDiff;
     }
@@ -45,10 +50,10 @@ void iterate_gauss(const CImg<double> &field, CImg<double> &guess,
     {
         if( (x + y) % 2 == 0)
             continue;
-        double dOldVal = guess(x,y);
-        double dNewVal = .25 * ( Icn + Icp + Ipc + Inc - field(x,y));
+         dOldVal = guess(x,y);
+         dNewVal = .25 * ( Icn + Icp + Ipc + Inc - field(x,y));
         guess(x,y) = dNewVal;
-        double dCurDiff = (fabs(dOldVal - dNewVal));
+         dCurDiff = (fabs(dOldVal - dNewVal));
         if( dCurDiff > dDiff)
             dDiff = dCurDiff;
     }
@@ -59,25 +64,27 @@ void iterate_gauss(const CImg<double> &field, CImg<double> &guess,
     {
         if( (x + y) % 2 != 0)
             continue;
-        double dOldVal = guess(x,y);
-        double dNewVal = .25 * ( Icn + Icp + Ipc + Inc - field(x,y));
+         dOldVal = guess(x,y);
+         dNewVal = .25 * ( Icn + Icp + Ipc + Inc - field(x,y));
         guess(x,y) = dNewVal;
-        double dCurDiff = (fabs(dOldVal - dNewVal));
+         dCurDiff = (fabs(dOldVal - dNewVal));
         if( dCurDiff > dDiff)
             dDiff = dCurDiff;
     }
 }
 
-
 void iterate_sor(const CImg<double> &field, CImg<double> &U,
                  double &dDiff, const int iWidth, const int iHeight)
 {
-    const double omega = 2 / (1 + (3.14 / field.width() ));
-    const double dOmegaConstant = omega / 4;
-    const double dNotOmega = (1 - omega);
-
     dDiff = 0;
     CImg_3x3(I,double);
+
+    double omega,dOmegaConstant, dNotOmega;
+
+     omega = 2 / (1 + (3.14 / iWidth ));
+     dOmegaConstant = omega / 4;
+     dNotOmega = (1 - omega);
+
 
     cimg_for_in3x3(U, BORDER_SIZE, BORDER_SIZE,
                    U.width() - BORDER_SIZE - 1, U.height() - BORDER_SIZE - 1,
@@ -85,12 +92,12 @@ void iterate_sor(const CImg<double> &field, CImg<double> &U,
     {
         if( (x + y) % 2 == 0)
             continue;
-        double dOldVal = U(x,y);
-        double dNewVal = (dNotOmega * Icc)
+         dOldVal = U(x,y);
+         dNewVal = (dNotOmega * Icc)
                           + (dOmegaConstant)
                           * (Icn + Icp + Ipc + Inc - field(x,y));
         U(x,y) = dNewVal;
-        double dCurDiff = (fabs(dOldVal - dNewVal));
+         dCurDiff = (fabs(dOldVal - dNewVal));
         if( dCurDiff > dDiff)
             dDiff = dCurDiff;
     }

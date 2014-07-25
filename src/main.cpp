@@ -15,7 +15,7 @@
 using namespace cimg_library;
 using namespace image_psb;
 using namespace file_IO;
-using namespace logging;
+// using namespace logging;
 
 
 /** Set the verbosity level of a logger; set how much information should be printed.
@@ -25,24 +25,24 @@ using namespace logging;
 */
 void setVerboseLevel(int iLevel, const bool isConsole)
 {
-    if(iLevel >= severity_type::no_output && iLevel <= severity_type::debug)
-    {
-        if(iLevel == severity_type::debug)
-            std::cout << "WARNING: debug mode will slow down the"
-                            " program by * a lot *" << std::endl;
-        if(isConsole)
-            CSETLEVEL(iLevel);
-        else SETLEVEL(iLevel);
-    }
-    else
-        std::cerr << "Error: stdout verbose level out of range" << std::endl;
+    // if(iLevel >= severity_type::no_output && iLevel <= severity_type::debug)
+    // {
+    //     if(iLevel == severity_type::debug)
+    //         std::cout << "WARNING: debug mode will slow down the"
+    //                         " program by * a lot *" << std::endl;
+    //     if(isConsole)
+    //         CSETLEVEL(iLevel);
+    //     else SETLEVEL(iLevel);
+    // }
+    // else
+    //     std::cerr << "Error: stdout verbose level out of range" << std::endl;
 }
 
 int main(int argc, char **argv) 
 {
-    std::string logDir = LOG_DIR;
-    mkdirp(logDir.c_str());
-    MLOG(severity_type::info, "Started program");
+    // std::string logDir = LOG_DIR;
+    // mkdirp(logDir.c_str());
+    // MLOG(severity_type::info, "Started program");
 
     std::string sUsageMsg = std::string(argv[0]) + " <name of image file>"
                             "\n\nreport bugs to sildnes@mpi-cbg.de";
@@ -79,8 +79,8 @@ int main(int argc, char **argv)
     std::string sFilename = (filename) ? std::string(filename) : std::string(),
                 sDirname = (dirname) ? std::string(dirname) : std::string();
 
-    setVerboseLevel(iVerbosityLevel, true);
-    setVerboseLevel(iFileVerbosityLevel, false);
+    // setVerboseLevel(iVerbosityLevel, true);
+    // setVerboseLevel(iFileVerbosityLevel, false);
 
     /* If the user has not set file or directory using flags.. */
     if(sFilename.empty() && sDirname.empty())
@@ -149,8 +149,8 @@ int main(int argc, char **argv)
     if(compareLoop.joinable())
         compareLoop.join();
 
-    MLOG(severity_type::info, "Program exited successfully\n");
+    // MLOG(severity_type::info, "Program exited successfully\n");
     // MLOG(severity_type::info, std::flush);
-    MFLUSH;
+    // MFLUSH;
     return EXIT_SUCCESS;
 }

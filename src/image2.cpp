@@ -23,7 +23,7 @@
 using namespace cimg_library;
 using namespace file_IO;
 using namespace plot;
-using namespace logging;
+// using namespace logging;
 using namespace solver;
 using namespace image_display;
 
@@ -413,9 +413,9 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
     toGrayScale(use_img);
     image_fmt field = makeRho(use_img),
               guess = makeInitialGuess(use_img);
-    MLOG(severity_type::extensive, "Initial image\n", printImage(use_img));
-    MLOG(severity_type::extensive, "Initial guess\n", printImage(guess));
-    MLOG(severity_type::extensive, "Initial rho\n", printImage(field));
+    // MLOG(severity_type::extensive, "Initial image\n", printImage(use_img));
+    // MLOG(severity_type::extensive, "Initial guess\n", printImage(guess));
+    // MLOG(severity_type::extensive, "Initial rho\n", printImage(field));
     imageList_fmt origList, guessList, rhoList;
 
     divide(DIVISION_SIZE, use_img, field, origList, rhoList, guessList);
@@ -486,11 +486,11 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
         /* Before saving the image, round the values so that the image can
            be viewed later */
         roundValues(result);
-        DO_IF_LOGLEVEL(severity_type::extensive)
-        {
-            std::string sMsg = "Final image(cut)\n" + printImage(result);
-            it->log(1, sMsg);
-        }
+        // DO_IF_LOGLEVEL(severity_type::extensive)
+        // {
+        //     std::string sMsg = "Final image(cut)\n" + printImage(result);
+        //     it->log(1, sMsg);
+        // }
 
         std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), false);
         file_IO::saveImage(result, sSavename);
