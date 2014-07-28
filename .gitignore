@@ -28,7 +28,7 @@
 *build/*
 
 # 
-doc/
+resources/
 
 # Large files
 media/

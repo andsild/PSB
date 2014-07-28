@@ -1,0 +1,82 @@
+'\"
+.\" (C) Copyright 2001-2004 David A. Wheeler (dwheeler at dwheeler.com)
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\" 
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\" 
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+.\" 
+.\" David A. Wheeler's website is http://www.dwheeler.com
+.\"
+.\" Created Mon Jan 08 23:00:00 2001, David A. Wheeler (dwheeler at dwheeler.com)
+.\"
+.TH SLOCCOUNT 1 "25 Juny 2014 "PSB" "PSB"
+.SH NAME
+psb \- determine the best solver and parameters for a class of images
+.SH SYNOPSIS
+.B sloccount
+.RB [ --version ]
+[ \fB--folder\fR \fIdirectory\fR ]
+.RB [ --gauss]
+.RB [ --jacboi]
+.RB [ --sor]
+.RB [ --computeline]
+.RB [ --nosolve]
+.RB [ --compare]
+.RB [ --resolve \fIscalar\fR ]
+.RB [ --average]
+.RB [ -- ]
+.I directories
+.SH DESCRIPTION
+.PP
+TODO
+.PP
+WRITE ME
+.PP
+yeah
+
+.SH OPTIONS
+.TP 12
+.BI --gauss
+solve using gauss-seidel iterative method
+
+.TP 12
+.BI --cached
+Do not recalculate; instead, use cached results from a previous execution.
+Without the --cached or --append option,
+sloccount automatically removes the data directory
+and recreates it.
+
+.TP 12
+.BI --append
+Do not remove previous calculations from the data directory;
+instead, add the analysis to the current contents of the data directory.
+
+.TP
+.BI --folder " directory"
+folder to read images from. Currently, you can only specify one.
+
+.SH "NOTES"
+THIS PROGRAM IS IN DEVELOPMENT!!
+
+.SH "BUGS"
+Let me know @ https://github.com/andsild/PSB
+
+
+.SH "SEE ALSO"
+See the PSB github https://github.com/andsild/PSB
+Note that more detailed documentation is available both on the website
+and with the SLOCCount package.
+
+.SH AUTHOR
+Anders Sildnes, with much needed assistance from Yuanhao Gong and
+the MOSAIC group.
