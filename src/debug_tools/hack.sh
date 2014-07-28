@@ -1,8 +1,19 @@
 #!/bin/bash
+#: Title        : draw_graph
+#: Date         : Jul 2014
+#: Author       : Anders Sildnes
+#: Version      : 1.0
+#: Desctiption  : Convert output from PSB to a format for gnuplot
+#: Options   	: $1 should be a file that the info is dumped into (default to terminal)
 
-DATA_FILE="output.txt"
+if [ -z "${1}" ]
+then
+    printf  "usage: %s < inputfile >\n" "${0}"
+    exit 1;
+fi
+
+DATA_FILE="${1}"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
 
 numSolvers="$(grep --color=none -oE '.*__' ${DATA_FILE} | uniq | wc -l)"
 
@@ -23,6 +34,7 @@ POINT_SIZE="2"
 
 
 TMP_OUT="/tmp/abcdefg"
+TMP_FILTERED_OUT="/tmp/abcdefga"
 awk '{ 
     if (NR % 2 != 0) 
         { keep=$0;
@@ -52,9 +64,9 @@ END {
         }
         print str
     }
-}' ${TMP_OUT} | sed 's/^\t/X\t/g' > ${TMP_OUT}a
+}' ${TMP_OUT} | sed 's/^\t/X\t/g' > ${TMP_FILTERED_OUT}
 
-numcols="$(awk '{print NF}' ${TMP_OUT}a | sort | tail -n1)"
+numcols="$(awk '{print NF}' ${TMP_FILTERED_OUT} | sort | tail -n1)"
 solverCols=$(( $numSolvers / $numcols ))
 iterInc=$(( $numcols / ${numSolvers}))
 iterend=$(( ${numcols} ))
@@ -88,6 +100,6 @@ cmd="set terminal png; set output 'test.png';
 #     # plot for [col=1:${numcols}] '${TMP_OUT}a' using 0:col with lines"
 echo ${cmd}
 gnuplot -e "${cmd}"
-cat ${TMP_OUT}a
+cat ${TMP_FILTERED_OUT}
 
 # EOF

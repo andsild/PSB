@@ -97,8 +97,8 @@ void SaveBehaviour::getNames(std::string sSearch,
     sFilename = sSearch.substr(0, searchPos);
     sSearch.erase(0, searchPos + sDelimiter.length());
 
-    MLOG(severity_type::debug, "From ", sCopy , "\tOutdir : ",  sOutdir ,
-                               "\tlabel: ", sLabel , "\tfilename: ", sFilename);
+    // MLOG(severity_type::debug, "From ", sCopy , "\tOutdir : ",  sOutdir ,
+    //                            "\tlabel: ", sLabel , "\tfilename: ", sFilename);
 }
 
 void splitHeader(const std::string sHeader, std::string &sLabel, std::string &sFilename)
@@ -322,11 +322,12 @@ void saveImage(const image_fmt &image, const std::string sSaveName)
     mkdirp(SAVE_PATTERN.getOutdir().c_str());
     try
     {
-        image.save_ascii(sSaveName.c_str());
+        image.save(sSaveName.c_str());
+        // image.save_ascii(sSaveName.c_str());
     }
     catch(cimg_library::CImgIOException &cioe)
     {
-        MLOG(severity_type::error, cioe.what());
+        // MLOG(severity_type::error, cioe.what());
     }
 }
 
@@ -403,7 +404,7 @@ std::vector<std::string> getFilesInFolder(std::string sDir)
         // Check for valid file(s)
         if (stat( readFile.c_str(), &filestat ))
         {
-            MLOG(severity_type::warning, "Skipping ", readFile, " : file invalid");
+            // MLOG(severity_type::warning, "Skipping ", readFile, " : file invalid");
         }
         if (S_ISDIR( filestat.st_mode ))
         {

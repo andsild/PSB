@@ -16,15 +16,18 @@ image_fmt IterativeSolver::solve(rawdata_fmt &vResults)
     int iIter = 0;
     double dIterationDiff = 9001;
     image_fmt guess(this->guess);
-    const int width = this->guess.width();
-    const int height = this->guess.height();
+    const int iWidth = this->guess.width();
+    const int iHeight = this->guess.height();
+    const double iNumPixels = guess.size();
+    const double MULTIPLIER_CONSTANT = 100.0;
 
     // this->logInst.print< severity_type::info>("Stop criteria set to :", dStopCriterion);
 
     for(iIter = 0; this->dStopCriterion < dIterationDiff; iIter++)
     {
-        this->func(this->field, guess, dIterationDiff, width, height);
-        double dDiff = this->origImage.MSE(guess);
+        this->func(this->field, guess, dIterationDiff, iWidth, iHeight);
+        double dDiff = (this->origImage.MSE(guess) / iNumPixels)
+                        * MULTIPLIER_CONSTANT;
         vResults.push_back(dDiff);
 
         // if(iIter % 100 == 0)

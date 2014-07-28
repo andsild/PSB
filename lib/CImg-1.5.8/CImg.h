@@ -1128,6 +1128,7 @@ extern "C" {
 #define cimg_for_in9YZC(img,y0,z0,c0,y1,z1,c1,y,z,c) cimg_for_in9C(img,c0,c1,c) cimg_for_in9YZ(img,y0,z0,y1,z1,y,z)
 #define cimg_for_in9XYZC(img,x0,y0,z0,c0,x1,y1,z1,c1,x,y,z,c) cimg_for_in9C(img,c0,c1,c) cimg_for_in9XYZ(img,x0,y0,z0,x1,y1,z1,x,y,z)
 
+
 #define cimg_for2x2(img,x,y,z,c,I,T) \
   cimg_for2((img)._height,y) for (int x = 0, \
    _n1##x = (int)( \

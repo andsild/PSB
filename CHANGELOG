@@ -45,9 +45,17 @@ Images with "weird" values has to be saved/read using the ascii-format
 otherwise CImg will round and cut the values.
 
 
+################
+Mon 28 Jul 2014
+################
+Did some optimization.
+The bottleneck for the iterative solvers are the for loops which on my computer
+takes about 80 ms each. Here, access to the field values are the slowest.
 
-################
-################
+Accessing them by pointer reduced each iteration with about 10 ms, but
+you would still have to find some clever way to avoid the border
+
+Accessing by float instead of double gave about 5 ms speedup per iteration
 ################
 ################
 ################

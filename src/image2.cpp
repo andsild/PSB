@@ -468,20 +468,20 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
             accumulator.push_back(result);
             // vAccumulator.push_back(vResults);
             /* We can now merge the regions together */
-            if(it->isFinal())
-            {
-                result = joinImage(accumulator, DIVISION_SIZE);
+            // if(it->isFinal())
+            // {
+                // result = joinImage(accumulator, DIVISION_SIZE);
                 accumulator.clear();
                 iPartIndex = 0;
-            }
-            else
-            {
-                std::string sFilename = it->getFilename() + std::to_string(iPartIndex);
-                file_IO::writeData(vResults, it->getLabel(), sFilename);
-                iPartIndex++;
-                vResults.clear(); // important, otherwise it stacks results
-                continue;
-            }
+            // }
+            // else
+            // {
+            //     std::string sFilename = it->getFilename() + std::to_string(iPartIndex);
+            //     file_IO::writeData(vResults, it->getLabel(), sFilename);
+            //     iPartIndex++;
+            //     vResults.clear(); // important, otherwise it stacks results
+            //     continue;
+            // }
         }
         /* Before saving the image, round the values so that the image can
            be viewed later */
@@ -493,6 +493,7 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
         // }
 
         std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), false);
+        roundValues(result);
         file_IO::saveImage(result, sSavename);
         file_IO::writeData(vResults, it->getLabel(), it->getFilename());
         /* Erase before re-iterating */
