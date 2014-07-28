@@ -23,6 +23,7 @@
 # Images
 *.png
 *.jpg
+*.bmp
 
 # To build - these are specific for each arch
 *build/*
