@@ -308,7 +308,7 @@ void ImageDisplay::loop()
     // }
 
     while (!this->main_disp.is_closed() && 
-           !this->solved_disp.is_closed() && 
+           !this->solved_disp.is_closed() &&
            !this->graph_disp.is_closed())
     {
         ImageContainer cur = this->getCurrent();
