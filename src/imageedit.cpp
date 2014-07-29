@@ -52,13 +52,13 @@ std::string ImageContainer::getFileName() const
 
 void ImageContainer::addSolverImage(std::string fileName)
 {
-    MLOG(severity_type::extensive, " pushed image ", fileName, " back");
+    // MLOG(severity_type::extensive, " pushed image ", fileName, " back");
     this->vSolvedImages.push_back(fileName);
 }
 
 void ImageContainer::addResolvedImage(std::string fileName)
 {
-    MLOG(severity_type::extensive, " pushed image ", fileName, " back");
+    // MLOG(severity_type::extensive, " pushed image ", fileName, " back");
     this->vResolvedImages.push_back(fileName);
 }
 
@@ -187,7 +187,7 @@ void ImageDisplay::loadImmy(std::string &sMainfile, std::string &sSolverfile,
     }
     catch(ImageException ie)
     {
-        MLOG(severity_type::error, ie.what());
+        // MLOG(severity_type::error, ie.what());
         this->vMainImages.erase(this->vMainImages.begin() + this->iIndex);
         if(iIndex != 0)
             this->iIndex--;
@@ -212,7 +212,7 @@ void ImageDisplay::show()
     }
     catch(CImgIOException ciie)
     {
-        MLOG(severity_type::error, ciie.what());
+        // MLOG(severity_type::error, ciie.what());
         return;
     }
 
@@ -405,7 +405,7 @@ void scanAndAddImage(std::string sRootdir, std::string sSolverdir)
         id.addResolvedImage2(it, sFilename, isResolved);
         }
         catch(ImageException ie) {
-            MLOG(severity_type::error, ie.what(), "\n continuing...");
+            // MLOG(severity_type::error, ie.what(), "\n continuing...");
         }
     }
     id.show();
