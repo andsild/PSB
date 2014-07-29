@@ -25,7 +25,7 @@
 namespace file_IO
 {
 
-void saveImage(const image_fmt &arg, std::string);
+void saveImage(const image_fmt &arg, const std::string, const bool);
 void writeData(const rawdata_fmt &arg1, std::string, std::string);
 image_fmt readData(const bool, const bool);
 

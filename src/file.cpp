@@ -317,17 +317,19 @@ void writeData(const rawdata_fmt &vData, std::string sLabel, std::string sFilena
 }
 
 
-void saveImage(const image_fmt &image, const std::string sSaveName)
+void saveImage(const image_fmt &image, const std::string sSaveName, const bool bResolve)
 {
     mkdirp(SAVE_PATTERN.getOutdir().c_str());
     try
     {
-        image.save(sSaveName.c_str());
-        // image.save_ascii(sSaveName.c_str());
+        if(bResolve)
+            image.save_ascii(sSaveName.c_str());
+        else
+            image.save(sSaveName.c_str());
     }
     catch(cimg_library::CImgIOException &cioe)
     {
-        // MLOG(severity_type::error, cioe.what());
+        MLOG(severity_type::error, cioe.what());
     }
 }
 

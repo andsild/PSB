@@ -243,7 +243,6 @@ double imageDiff(const image_fmt &source, const image_fmt &comparator)
 void divide(int iDivSize, const image_fmt &origImage, const image_fmt &rho,
             imageList_fmt &origImageList, imageList_fmt &rhoList, imageList_fmt &guessList)
 {
-    const int DEFAULT_GUESS_VAL = 0;
 
     if(iDivSize == 1)
     {
@@ -418,6 +417,17 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
     // MLOG(severity_type::extensive, "Initial rho\n", printImage(field));
     imageList_fmt origList, guessList, rhoList;
 
+
+    // imageList_fmt test = use_img.get_gradient("xy", -1);
+    // const image_fmt divergence = test[0].get_gradient("x",-1)[0] + test[1].get_gradient("y",-1)[0];
+    // MLOG(severity_type::error, "\n", printImage(use_img ));
+    // MLOG(severity_type::error, "\n", printImage(field));
+    // MLOG(severity_type::error, "\n", printImage(test[0]));
+    // MLOG(severity_type::error, "\n", printImage(test[1]));
+    // MLOG(severity_type::error, "\n", printImage(divergence));
+    // return;
+
+
     divide(DIVISION_SIZE, use_img, field, origList, rhoList, guessList);
 
     if(gauss)
@@ -458,7 +468,6 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
     int iPartIndex = 0;
 
     for(auto it : vSolvers) // for each solver for each image (and its divisions)
-
     {
         image_fmt result = it->solve(vResults); /*< result now holds the resulting image,
                                                   < vResults holds the imagediffs */
@@ -466,50 +475,79 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
         if(it->isMultipart()) 
         {
             accumulator.push_back(result);
-            // vAccumulator.push_back(vResults);
             /* We can now merge the regions together */
-            // if(it->isFinal())
-            // {
-                // result = joinImage(accumulator, DIVISION_SIZE);
+            if(it->isFinal())
+            {
+                result = joinImage(accumulator, DIVISION_SIZE);
                 accumulator.clear();
                 iPartIndex = 0;
-            // }
-            // else
-            // {
-            //     std::string sFilename = it->getFilename() + std::to_string(iPartIndex);
-            //     file_IO::writeData(vResults, it->getLabel(), sFilename);
-            //     iPartIndex++;
-            //     vResults.clear(); // important, otherwise it stacks results
-            //     continue;
-            // }
+            }
+            else
+            {
+                std::string sFilename = it->getFilename() + std::to_string(iPartIndex);
+                file_IO::writeData(vResults, it->getLabel(), sFilename);
+                iPartIndex++;
+                vResults.clear(); // important, otherwise it stacks results
+                continue;
+            }
+
         }
+
         /* Before saving the image, round the values so that the image can
            be viewed later */
         roundValues(result);
+        std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), false);
+        roundValues(result);
+        file_IO::saveImage(result, sSavename, false);
+        file_IO::writeData(vResults, it->getLabel(), it->getFilename());
+        /* Erase before re-iterating */
+        vResults.erase(vResults.begin(), vResults.end());
         // DO_IF_LOGLEVEL(severity_type::extensive)
         // {
         //     std::string sMsg = "Final image(cut)\n" + printImage(result);
         //     it->log(1, sMsg);
         // }
 
-        std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), false);
-        roundValues(result);
-        file_IO::saveImage(result, sSavename);
-        file_IO::writeData(vResults, it->getLabel(), it->getFilename());
-        /* Erase before re-iterating */
-        vResults.erase(vResults.begin(), vResults.end());
 
-        //TODO: not (re-)implemented */
-        // if(dResolve != 1.0)
-        // {
-        //     it->alterField(dResolve);
-        //     result = it->solve(vResults);
-        //     std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), true);
-        //     file_IO::saveImage(result, sSavename);
-        //     file_IO::writeData(vResults, it->getLabel(), it->getFilename());
-        //     vResults.clear();
-        // }
     }
+        //TODO: not (re-)implemented */
+        if(dResolve != 1.0)
+        {
+            for(auto it : vSolvers) // for each solver for each image (and its divisions)
+            {
+                it->alterField(dResolve);
+                image_fmt result = it->solve(vResults); /*< result now holds the resulting image,
+                                                        < vResults holds the imagediffs */
+                /* Multipart images: solve each region before moving past this if block */
+                if(it->isMultipart()) 
+                {
+                    accumulator.push_back(result);
+                    /* We can now merge the regions together */
+                    if(it->isFinal())
+                    {
+                        result = joinImage(accumulator, DIVISION_SIZE);
+                        accumulator.clear();
+                        iPartIndex = 0;
+                    }
+                    else
+                    {
+                        std::string sFilename = it->getFilename() + std::to_string(iPartIndex);
+                        file_IO::writeData(vResults, it->getLabel(), sFilename);
+                        iPartIndex++;
+                        vResults.clear(); // important, otherwise it stacks results
+                        continue;
+                    }
+                }
+
+                roundValues(result);
+                std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), true);
+                // roundValues(result);
+                file_IO::saveImage(result, sSavename, true);
+                file_IO::writeData(vResults, it->getLabel(), it->getFilename());
+                /* Erase before re-iterating */
+                vResults.erase(vResults.begin(), vResults.end());
+            }
+        }
 }
 
 } /* EndOfNameSpace */

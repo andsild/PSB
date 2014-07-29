@@ -52,13 +52,13 @@ std::string ImageContainer::getFileName() const
 
 void ImageContainer::addSolverImage(std::string fileName)
 {
-    // MLOG(severity_type::extensive, " pushed image ", fileName, " back");
+    MLOG(severity_type::extensive, " pushed image ", fileName, " back");
     this->vSolvedImages.push_back(fileName);
 }
 
 void ImageContainer::addResolvedImage(std::string fileName)
 {
-    // MLOG(severity_type::extensive, " pushed image ", fileName, " back");
+    MLOG(severity_type::extensive, " pushed image ", fileName, " back");
     this->vResolvedImages.push_back(fileName);
 }
 
@@ -187,7 +187,7 @@ void ImageDisplay::loadImmy(std::string &sMainfile, std::string &sSolverfile,
     }
     catch(ImageException ie)
     {
-        // MLOG(severity_type::error, ie.what());
+        MLOG(severity_type::error, ie.what());
         this->vMainImages.erase(this->vMainImages.begin() + this->iIndex);
         if(iIndex != 0)
             this->iIndex--;
@@ -207,11 +207,12 @@ void ImageDisplay::show()
     {
         this->main_image.assign(sMainfile.c_str());
         toGrayScale(this->main_image);
-        this->solved_image.load_ascii(sSolverfile.c_str());
+        // this->solved_image.load_ascii(sSolverfile.c_str());
+        this->solved_image.load(sSolverfile.c_str());
     }
     catch(CImgIOException ciie)
     {
-        // MLOG(severity_type::error, ciie.what());
+        MLOG(severity_type::error, ciie.what());
         return;
     }
 
@@ -255,7 +256,8 @@ void ImageDisplay::nextSolver()
     ImageContainer ic = this->getCurrent();
 
     std::string sNextFile = ic.getNextSolver();
-    this->solved_image.load_ascii(sNextFile.c_str());
+    // this->solved_image.load_ascii(sNextFile.c_str());
+    this->solved_image.load(sNextFile.c_str());
     this->solved_disp = this->solved_image;
     this->solved_disp.set_title(sNextFile.c_str());
 
@@ -273,7 +275,7 @@ void ImageDisplay::prevSolver()
     ImageContainer ic = this->getCurrent();
 
     std::string sPrevFile = ic.getPrevSolver();
-    this->solved_image.load_ascii(sPrevFile.c_str());
+    this->solved_image.load(sPrevFile.c_str());
     this->solved_disp = this->solved_image;
     this->solved_disp.set_title(sPrevFile.c_str());
 
@@ -399,7 +401,12 @@ void scanAndAddImage(std::string sRootdir, std::string sSolverdir)
     {
         bool isResolved = false; std::string _, sLabel, sFilename;
         file_IO::SAVE_PATTERN.getNames(it, _, sLabel, sFilename, isResolved);
+        try{
         id.addResolvedImage2(it, sFilename, isResolved);
+        }
+        catch(ImageException ie) {
+            MLOG(severity_type::error, ie.what(), "\n continuing...");
+        }
     }
     id.show();
     id.loop();
