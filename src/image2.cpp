@@ -166,7 +166,7 @@ std::string printImage(const image_fmt image)
     int iIndex = 0;
     cimg_forXY(image, x,y)
     {
-        ss << format("%5.1f  ", image(x,y));
+        ss << format("%6.1f  ", image(x,y));
         if( ((iIndex + 1) % image.width()) == 0 && iIndex > 0) ss << "\n";
         iIndex++;
     }
@@ -510,7 +510,6 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
 
 
     }
-        //TODO: not (re-)implemented */
         if(dResolve != 1.0)
         {
             for(auto it : vSolvers) // for each solver for each image (and its divisions)

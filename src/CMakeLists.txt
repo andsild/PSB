@@ -67,7 +67,7 @@ set(CIMG_H_PATH ${PROJECT_SOURCE_DIR}/../lib/CImg-1.5.8)
 set(PROJECT_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/cmake-modules")
 
-option(WITH_FFTW3     "Use FFTW3 library" ON)
+# option(WITH_FFTW3     "Use FFTW3 library" ON)
 
 if(WITH_FFTW3)
   find_package( FFTW3 REQUIRED )
