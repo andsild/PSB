@@ -166,8 +166,8 @@ std::string printImage(const image_fmt image)
     int iIndex = 0;
     cimg_forXY(image, x,y)
     {
-        ss << format("%6.1f  ", image(x,y));
-        if( ((iIndex + 1) % image.width()) == 0 && iIndex > 0) ss << "\n";
+        if( ((iIndex) % image.width()) == 0 && iIndex > 0) ss << "\n";
+        ss << format("%6.4f  ", image(x,y));
         iIndex++;
     }
 
