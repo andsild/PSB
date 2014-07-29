@@ -48,12 +48,12 @@ void FFT2D(const image_fmt &field, image_fmt &ret)
     // }
 
     /* TODO: perform a DST-1 here */
-    mapped = field.get_FFT(false)[0];/* 0 is real, 1 is imaginary*/
+    mapped = field.get_FFT(false)[1];/* 0 is real, 1 is imaginary*/
     mapped.mul(DST);
 
     return ;
 
-    mapped.get_FFT(true)[0]; /* 0 is real, 1 is imaginary*/
+    mapped.get_FFT(true)[1]; /* 0 is real, 1 is imaginary*/
     mapped *= normalization;
 
     data_fmt mean_off = field.mean() - mapped.mean();

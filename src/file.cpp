@@ -329,7 +329,7 @@ void saveImage(const image_fmt &image, const std::string sSaveName, const bool b
     }
     catch(cimg_library::CImgIOException &cioe)
     {
-        MLOG(severity_type::error, cioe.what());
+        // MLOG(severity_type::error, cioe.what());
     }
 }
 
