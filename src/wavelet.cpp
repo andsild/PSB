@@ -104,61 +104,50 @@ void pyconv(const image_fmt &field, image_fmt &retImg)
     g = g.get_transpose() * g;
     MLOG(severity_type::debug, "Hacky G:\n", image_psb::printImage(g));
 
-    // image_fmt g(5, 1, 1, 1,
-    //             0.05407, 0.24453, 0.57410, 0.24453,0.05407);
-    // g = g.get_transpose().dot(g);
-
-    // MLOG(severity_type::debug, "Weights:\n", image_psb::printImage(weights));
-    // weights.unroll('y');
-    // MLOG(severity_type::debug, "Weights:\n", image_psb::printImage(weights));
-    // MLOG(severity_type::debug, "g mask\n", image_psb::printImage(g));
-    // MLOG(severity_type::debug, "backmask:\n", image_psb::printImage(backward_mask));
-
-    //
-    // int iPyrWidth = field.width(),
-    //     iPyrHeight = field.height();
-    // int iMaxLevel = ceil(cimg::log2(cimg::max(iPyrWidth, iPyrHeight)));
-    //
-    // image_fmt curPyr = field.get_resize(iPyrWidth, iPyrWidth, 1, 1, 0, 0);
-    //
-    // iPyrWidth = floor((double)iPyrWidth / (double)SCALE);
-    // iPyrHeight = floor((double)iPyrHeight / (double)SCALE);
-    // // iPyrWidth--;iPyrHeight--;
-    //
-    // const int iDrawXpos = (field.width()/ SCALE) - (iPyrWidth/ 2),
-    //          iDrawYpos = (field.height()/ SCALE) - (iPyrHeight/ 2);
-    //
-    // MLOG(severity_type::debug, "Max level set to: ", iMaxLevel);
-    // MLOG(severity_type::debug, "Before iterations\n",
-    //                             image_psb::printImage(curPyr));
-    //
-    // /* Forward transform */
-    // for(int iPos = 0; iPos < iMaxLevel; iPos++)
-    // {
-    //     curPyr.correlate(forward_mask);
-    //     image_fmt tmp = curPyr.get_shift(-1,-1, 0, 0, 1)
-    //                     .get_resize(iPyrWidth, iPyrHeight, 1, 1, 1);
-    //     curPyr = curPyr.get_fill(0)
-    //                    .draw_image( (field.width() / SCALE) - (iPyrWidth/ 2),
-    //                                 (field.height()/ SCALE) - (iPyrHeight / 2),
-    //                                 0, 0, tmp, 1);
-    //     MLOG(severity_type::debug, "Forward analysis: step ", iPos, "\n", image_psb::printImage(tmp));
-    //     MLOG(severity_type::debug, "Forward analys: step ", iPos, ", drawing at ", iDrawXpos, ",", iDrawYpos, "\n", image_psb::printImage(curPyr));
-    //
-    // }
-    // /* Backward transform */
-    // for(int iPos = 0; iPos < iMaxLevel; iPos++)
-    // {
-    //     image_fmt tmp = curPyr.get_crop(iDrawXpos, iDrawYpos, 0, 0,
-    //                     iDrawXpos + iPyrWidth,
-    //                     iDrawYpos + iPyrHeight, 0, 0);
-    //     MLOG(severity_type::debug, "Backward analysis: step ", iPos, "\n",
-    //                                 image_psb::printImage(tmp));
-    //     tmp.resize(field.width(), field.height(), 1, 1,
-    //                   4, 0);
-    //     curPyr = tmp.get_correlate(backward_mask) + curPyr.get_convolve(g);
-    //     MLOG(severity_type::debug, "Backward analysis: step ", iPos, "\n", image_psb::printImage(curPyr));
-    // }
+    int iPyrWidth = field.width(),
+        iPyrHeight = field.height();
+    int iMaxLevel = ceil(cimg::log2(cimg::max(iPyrWidth, iPyrHeight)));
+    
+    image_fmt curPyr = field.get_resize(iPyrWidth, iPyrWidth, 1, 1, 0, 0);
+    
+    iPyrWidth = floor((double)iPyrWidth / (double)SCALE);
+    iPyrHeight = floor((double)iPyrHeight / (double)SCALE);
+    // iPyrWidth--;iPyrHeight--;
+    
+    const int iDrawXpos = (field.width()/ SCALE) - (iPyrWidth/ 2),
+             iDrawYpos = (field.height()/ SCALE) - (iPyrHeight/ 2);
+    
+    MLOG(severity_type::debug, "Max level set to: ", iMaxLevel);
+    MLOG(severity_type::debug, "Before iterations\n",
+                                image_psb::printImage(curPyr));
+    
+    /* Forward transform */
+    for(int iPos = 0; iPos < iMaxLevel; iPos++)
+    {
+        curPyr.convolve(forward_mask);
+        image_fmt tmp = curPyr.get_shift(-1,-1, 0, 0, 1)
+                        .get_resize(iPyrWidth, iPyrHeight, 1, 1, 1);
+        curPyr = curPyr.get_fill(0)
+                       .draw_image( (field.width() / SCALE) - (iPyrWidth/ 2),
+                                    (field.height()/ SCALE) - (iPyrHeight / 2),
+                                    0, 0, tmp, 1);
+        MLOG(severity_type::debug, "Forward analysis: step ", iPos, "\n", image_psb::printImage(tmp));
+        MLOG(severity_type::debug, "Forward analys: step ", iPos, ", drawing at ", iDrawXpos, ",", iDrawYpos, "\n", image_psb::printImage(curPyr));
+    
+    }
+    /* Backward transform */
+    for(int iPos = 0; iPos < iMaxLevel; iPos++)
+    {
+        image_fmt tmp = curPyr.get_crop(iDrawXpos, iDrawYpos, 0, 0,
+                        iDrawXpos + iPyrWidth,
+                        iDrawYpos + iPyrHeight, 0, 0);
+        MLOG(severity_type::debug, "Backward analysis: step ", iPos, "\n",
+                                    image_psb::printImage(tmp));
+        tmp.resize(field.width(), field.height(), 1, 1,
+                      4, 0);
+        curPyr = tmp.get_convolve(backward_mask) + curPyr.get_convolve(g);
+        MLOG(severity_type::debug, "Backward analysis: step ", iPos, "\n", image_psb::printImage(curPyr));
+    }
 }
 
 } /* EndOfNamespace */
