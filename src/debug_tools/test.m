@@ -518,8 +518,7 @@ img =imread("/home/andesil/PSB/nice_example/square.png");
 divImg = conv2(img, [0,1,0;1,-4,1;0,1,0], "full" );
 divImg = conv2(img, [0,1,0;1,-4,1;0,1,0], "same");
 divImg = conv2(img, [0,1,0;1,-4,1;0,1,0], "valid");
-img
-divImg
+% divImg
 
 
 w = [0.06110 0.26177 0.53034 0.65934  0.51106 0.05407 0.24453 0.57410];
@@ -553,6 +552,8 @@ function pyconv( a, h1, h2, g )
         pyr{i} = down; % set current level in pyramid to down
 
     end
+    pyr{maxLevel}
+    return;
 
     % Backward transform (synthesis)
     % similar to loop aboves, upsamling..

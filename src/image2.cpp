@@ -170,11 +170,12 @@ std::string printImage(const image_fmt image)
     cimg_for(image,ptr,data_fmt)
     {
         if( ((iIndex) % image.width()) == 0 && iIndex > 0) ss << "\n";
+        if(*ptr == 0) continue;
         if(*ptr < 0)
             sign = '-';
         else
             sign = ' ';
-        ss << format("%c%-10.2f", sign, cimg::abs(*(ptr)));
+        ss << format("%c%-8.2f", sign, cimg::abs(*(ptr)));
         iIndex++;
     }
 
