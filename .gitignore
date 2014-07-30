@@ -22,7 +22,7 @@
 
 # Images
 *.png
-!nice_examples/*
+!nice_example/*
 *.jpg
 *.bmp
 
