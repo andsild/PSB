@@ -2,27 +2,18 @@
 from PIL import Image
 from os.path import isfile, splitext
 import sys
+from random import randint, seed
 
-COLOR_RANGE = 255
-width = 1
-height = 10
+seed(10)
 
-xBorderValues = 0
-yBorderValues = 0
 
-leftbordervalue = 0
-rightbordervalue = 0
-uppbordervalue = leftbordervalue
-lowbordervalue = leftbordervalue
-
-startVal = COLOR_RANGE - width - 10
-startVal = 0
+COLOR_RANGE = 255;
 
 def createImage(filename, width, height, valueGetterFunc,
                 startVal = 0, COLOR_RANGE = 255,
-                xBordersValues = 0, yBorderValues = 0,
+                xBorderValues = 0, yBorderValues = 0,
                 leftbordervalue = 0, rightbordervalue = 0,
-                upperboardvalue = leftbordervalue, lowerbordervalue = leftbordervalue,
+                upperboardvalue = 0, lowerbordervalue = 0,
                 ):
 
     im = Image.new('L', (width,height))
@@ -56,10 +47,13 @@ def createImage(filename, width, height, valueGetterFunc,
 
     im.save(filename);
 
+
+#pixels[x, y] = valueGetterFunc(x,y, width, height, startVal, COLOR_RANGE)
 def allSame(*args): return 100;
 def gradientX(xPos,yPos, width,height, *args): return height - (yPos % COLOR_RANGE) + startVal;
 def gradientY(xPos,yPos, width,height, *args): return width - (xPos % COLOR_RANGE) + startVal
 def nonMonotone(xPos, yPos, *args): return pow(xPos + yPos,2)
+def random(_x,_y,_w,_h,_s,COLOR_RANGE): return randint(0, COLOR_RANGE);
 
 def findFilename(prefix):
     if(hasattr(prefix, '__call__')):
@@ -75,8 +69,9 @@ def findFilename(prefix):
 if not len(sys.argv) > 1:
     # createImage(findFilename(allSame), 10, 10, allSame)
     # createImage(findFilename(gradientX), 10, 10, gradientX)
-    createImage(findFilename(nonMonotone), 10, 10, nonMonotone)
+    # createImage(findFilename(nonMonotone), 10, 10, nonMonotone)
     # createImage(findFilename(gradientY), 10, 10, gradientY)
+    createImage(findFilename(random), 8, 8, random)
 else:
     for arg in sys.argv[1:]:
         createImage(findFilename(arg), 10, 10, allSame)

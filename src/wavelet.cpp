@@ -11,7 +11,7 @@
         g = w(6:8); % last elements
         g = [g g(end-1:-1:1)]; % reverse and beginning
         g = g' * g;  % pow(@)
-        result = pyconv( -div(:,:,i), h1, h2, g ); % convolution by L2 norm
+        result = pyconv( -div(:,:,i), h1, h2, g ); 
 
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function ahat = pyconv( a, h1, h2, g )
@@ -81,6 +81,10 @@ namespace wavelet
 
 void pyconv(const image_fmt &field, image_fmt &retImg)
 {
+
+    MLOG(severity_type::debug, "Input field:\n", image_psb::printImage(field));
+    return;
+
     const int SCALE = 2;
     const int WEIGHTS_LEN = 8;
    

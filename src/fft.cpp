@@ -26,9 +26,10 @@ void FFT2D(const image_fmt &field, image_fmt &ret)
     // const image_fmt divergence = gradient[0].get_gradient("x",-1)[0] + gradient[1].get_gradient("y",-1)[0];
 
     image_fmt DST(field, "xyz", 0);
-    const data_fmt tmpR = cimg::PI/(2*field.height()),
-             tmpC = cimg::PI/(2*field.width()),
-             normalization = 1.0 / (4 * field.width() * field.height());
+    const data_fmt tmpR = cimg::PI/(2*field.height() - 2), // TODO: assert correctness
+                    tmpC = cimg::PI/(2*field.width() - 2),
+                    normalization = 1.0 / (4 * field.width() * field.height());
+
     data_fmt tmpD, tmp;
     cimg_forY(DST, y)
     {
@@ -40,6 +41,7 @@ void FFT2D(const image_fmt &field, image_fmt &ret)
             DST(x,y) = 1.0 / (4 * (tmp + tmpD *  tmpD));
         }
     }
+
     image_fmt mapped(field, "xyz", 0);
     // data_fmt *mapPtr = mapped._data;
     // cimg_for(mapped, ptr, data_fmt)
@@ -51,10 +53,12 @@ void FFT2D(const image_fmt &field, image_fmt &ret)
     mapped = field.get_FFT(false)[0];/* 0 is real, 1 is imaginary*/
     mapped.mul(DST);
 
-    return ;
-
-    mapped.get_FFT(true)[0]; /* 0 is real, 1 is imaginary*/
     mapped *= normalization;
+    MLOG(severity_type::debug, "Field:\n", image_psb::printImage(mapped));
+
+    mapped = mapped.get_FFT(true)[0]; /* 0 is real, 1 is imaginary*/
+    MLOG(severity_type::debug, "Field:\n", image_psb::printImage(mapped));
+    MLOG(severity_type::debug, "Field:\n", image_psb::printImage(mapped));
 
     data_fmt mean_off = field.mean() - mapped.mean();
     // mapped+=mean_off;

@@ -512,6 +512,10 @@
                 endfunction
  img =imread("/home/andesil/PSB/nice_example/all_increasing.png");
  % img =imread("/home/andesil/PSB/nice_example/stable.png");
+ % img =imread("/home/andesil/PSB/nice_example/nonMonotone.png");
+ img =imread("/home/andesil/PSB/nice_example/random.png");
+
+img
 
     
 w = [0.06110 0.26177 0.53034 0.65934  0.51106 0.05407 0.24453 0.57410];
@@ -570,7 +574,7 @@ function pyconv( a, h1, h2, g )
     ahat = ahat(1+fs:end-fs, 1+fs:end-fs);
 
     ahat = round(ahat);
-    disp(ahat)
+    ahat
 
 endfunction
 
