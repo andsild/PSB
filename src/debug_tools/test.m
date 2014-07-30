@@ -510,21 +510,19 @@
                     endfor
                 endif
                 endfunction
- img =imread("/home/andesil/PSB/nice_example/all_increasing.png");
- % img =imread("/home/andesil/PSB/nice_example/stable.png");
- % img =imread("/home/andesil/PSB/nice_example/nonMonotone.png");
- img =imread("/home/andesil/PSB/nice_example/random.png");
-
+img =imread("/home/andesil/PSB/nice_example/random.png");
+img =imread("/home/andesil/PSB/nice_example/square.png");
+% img =imread("/home/andesil/PSB/nice_example/square1border.png");
+% img =imread("/home/andesil/PSB/nice_example/circle.png");
+% img =imread("/home/andesil/PSB/nice_example/circleNoborder.png");
+divImg = conv2(img, [0,1,0;1,-4,1;0,1,0], "full" );
+divImg = conv2(img, [0,1,0;1,-4,1;0,1,0], "same");
+divImg = conv2(img, [0,1,0;1,-4,1;0,1,0], "valid");
 img
+divImg
 
-    
+
 w = [0.06110 0.26177 0.53034 0.65934  0.51106 0.05407 0.24453 0.57410];
-
-divImg = conv2(img, [0,1,0;1,-4,1;0,1,0], "valid")
-% divImg = conv2(img, [0,1,0;1,-4,1;0,1,0], "same")
-% divImg = conv2(img, [0,1,0;1,-4,1;0,1,0], "full" )
-% divImg = padarray(divImg,1, 0, "both")
-
 
 h1 = w(1:4); % first four elements
 h1 = [h1 h1(end-1:-1:1)]; % reverse and beginning
@@ -547,7 +545,7 @@ function pyconv( a, h1, h2, g )
     pyr{1} = padarray(a, [fs fs]); %  pad with "fs" zeroes in each direction
     for i=2:maxLevel % for each element
 
-        down = imfilter(pyr{i-1},h1, "same"); % filter previous pyramid with h1, put in down
+        down = imfilter(pyr{i-1},h1, 0); % filter previous pyramid with h1, put in down
         down = down(1:2:end,1:2:end); % extract element 1 + 2n, repeat them down
                                     % in 2d
 
@@ -574,6 +572,8 @@ function pyconv( a, h1, h2, g )
     ahat = ahat(1+fs:end-fs, 1+fs:end-fs);
 
     ahat = round(ahat);
+    ahat(ahat>255) = 255;
+    ahat(ahat<0) = 0;
     ahat
 
 endfunction

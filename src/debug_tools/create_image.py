@@ -9,6 +9,18 @@ seed(10)
 
 COLOR_RANGE = 255;
 
+
+def _createImage(width, height, valueGetterFunc,
+                startVal = 0, COLOR_RANGE = 255,
+                xBorderValues = 0, yBorderValues = 0,
+                leftbordervalue = 0, rightbordervalue = 0,
+                upperboardervalue = 0, lowerbordervalue = 0,
+                ):
+    filename = findFilename(valueGetterFunc)
+    createImage(filename,width,height,valueGetterFunc,startVal,COLOR_RANGE,
+                xBorderValues,yBorderValues,leftbordervalue,rightbordervalue,
+                upperboardervalue ,lowerbordervalue );
+
 def createImage(filename, width, height, valueGetterFunc,
                 startVal = 0, COLOR_RANGE = 255,
                 xBorderValues = 0, yBorderValues = 0,
@@ -54,6 +66,29 @@ def gradientX(xPos,yPos, width,height, *args): return height - (yPos % COLOR_RAN
 def gradientY(xPos,yPos, width,height, *args): return width - (xPos % COLOR_RANGE) + startVal
 def nonMonotone(xPos, yPos, *args): return pow(xPos + yPos,2)
 def random(_x,_y,_w,_h,_s,COLOR_RANGE): return randint(0, COLOR_RANGE);
+def square(x,y,w,h,*args):
+    border=2
+    h-=1;w-=1; # indexing
+    if y == (w - border) and (x <= w - border and x >= 0 + border) \
+    or y == (0 + border) and (x <= w - border and x >= 0 + border) \
+    or x == (h - border) and (y <= h - border and y >= 0 + border) \
+    or x == (0 + border) and (y <= h - border and y >= 0 + border):
+        return 100
+    return 0
+def circle(x,y,w,h,*args):
+    h-=1;w-=1; # indexing
+    radius = 3;
+    centerPix_x = w / 2
+    centerPix_y = h / 2
+    disXCenter = abs(centerPix_x - x)
+    disYCenter = abs(centerPix_y - y)
+    # pythagoras
+    lhs = (disXCenter)**2 + (disYCenter)**2
+    rhs = radius**2
+    # images are square, so this is an approximated circle
+    if lhs >= (rhs - 1) and lhs <= (rhs + 1):
+        return 100
+    return 0
 
 def findFilename(prefix):
     if(hasattr(prefix, '__call__')):
@@ -67,11 +102,13 @@ def findFilename(prefix):
     return filename + extension;
 
 if not len(sys.argv) > 1:
-    # createImage(findFilename(allSame), 10, 10, allSame)
-    # createImage(findFilename(gradientX), 10, 10, gradientX)
-    # createImage(findFilename(nonMonotone), 10, 10, nonMonotone)
-    # createImage(findFilename(gradientY), 10, 10, gradientY)
-    createImage(findFilename(random), 8, 8, random)
+    # _createImage(10, 10, allSame)
+    # _createImage(10, 10, gradientX)
+    # _createImage(10, 10, nonMonotone)
+    # _createImage(10, 10, gradientY)
+    # _createImage(8, 8, random)
+    _createImage(8, 8, square);
+    # _createImage(11, 11, circle);
 else:
     for arg in sys.argv[1:]:
         createImage(findFilename(arg), 10, 10, allSame)

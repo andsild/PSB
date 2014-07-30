@@ -164,10 +164,17 @@ std::string printImage(const image_fmt image)
 {
     std::stringstream ss;
     int iIndex = 0;
-    cimg_forXY(image, x,y)
+    char sign = ' ';
+    // cimg_forXY(image, x,y)
+    // {
+    cimg_for(image,ptr,data_fmt)
     {
         if( ((iIndex) % image.width()) == 0 && iIndex > 0) ss << "\n";
-        ss << format("%6.4f  ", image(x,y));
+        if(*ptr < 0)
+            sign = '-';
+        else
+            sign = ' ';
+        ss << format("%c%-10.2f", sign, cimg::abs(*(ptr)));
         iIndex++;
     }
 
