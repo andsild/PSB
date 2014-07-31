@@ -21,13 +21,13 @@ double imageDiff(const image_fmt &arg1, const image_fmt &arg2);
 // void roundValues(image_fmt &arg);
 
 // std::string format(const char *arg, ...);
-std::string printImage(image_fmt);
+std::string printImage(const image_fmt);
+std::string printImageAligned(const image_fmt);
+std::string printCore(const image_fmt, const int);
 void scanAndAddImage(std::string sRootdir, std::string sSolverdir);
 rawdata_fmt averageResult(const std::vector<rawdata_fmt> &arg, int);
 
 void processImage(std::string, double, double, const bool, const bool, const bool, const bool, const bool);
-
-// void calculateAverage(std::string sFilePath);
     
 } /* EndOfNamespace */
 

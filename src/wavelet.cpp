@@ -14,8 +14,24 @@ using namespace logging;
 namespace wavelet
 {
 
+inline image_fmt upSample(const image_fmt &input)
+{
+    image_fmt ret(input.width() * 2, input.height() * 2, 1, 1, 0);
+    data_fmt *copyPtr = input._data;
+    int iHeightStop = (ret.height() % 2 == 1) ? ret.height() + 2 : ret.height(),
+        iWidhtStop  = (ret.width() % 2 == 1) ? ret.width() + 2 : ret.width();
+    for(int yPos = 0; yPos < iHeightStop; yPos += 2)
+    {
+        for(int xPos = 0; xPos < iWidhtStop; xPos+= 2)
+        {
+            ret(xPos, yPos) = *(copyPtr++);
+        }
+    }
 
-image_fmt padCore(int iNewWidth, int iNewHeight, const image_fmt &input)
+    return ret;
+}
+
+inline image_fmt padCore(int iNewWidth, int iNewHeight, const image_fmt &input)
 {
     int iStartX = iNewWidth  / 2 - input.width()  / 2,
         iStartY = iNewHeight / 2 - input.height() / 2;
@@ -32,7 +48,6 @@ image_fmt padCore(int iNewWidth, int iNewHeight, const image_fmt &input)
 
 void pyconv(const image_fmt &field, image_fmt &retImg)
 {
-
     const int SCALE = 2;
     const int WEIGHTS_LEN = 8;
    
@@ -68,45 +83,79 @@ void pyconv(const image_fmt &field, image_fmt &retImg)
     // MLOG(severity_type::debug, "Backward mask:\n", image_psb::printImage(backward_mask));
     // MLOG(severity_type::debug, "Hacky G:\n", image_psb::printImage(g));
     // MLOG(severity_type::debug, "Max level set to: ", iMaxLevel);
+    // MLOG(severity_type::debug, "[[ SCALE set to: ", SCALE, " ]]\n");
     image_fmt useField = field.get_crop(1,1,0,0,field.width() - 2, field.height() -2, 0, 0);
-    image_fmt curPyr = padCore(useField.width() + forward_mask.width() * 2,
+    cimg_for(useField, ptr, data_fmt) *ptr *= -1;
+    image_fmt initPyr = padCore(useField.width() + forward_mask.width() * 2,
                     useField.height() + forward_mask.width() * 2,
                     useField);
-                    
-    MLOG(severity_type::debug, "Curpyr before iter:\n", image_psb::printImage(curPyr));
+    // MLOG(severity_type::debug, "[[ current pyramid before iter:\n", curPyr.print(), " ]]\n");
+    // MLOG(severity_type::debug, "Curpyr before iter:\n", image_psb::printImage(curPyr));
+    // MLOG(severity_type::debug, "Padding new core to xdim,ydim: ", useField.width() + forward_mask.width() * 2, ", ", useField.height() + forward_mask.height() * 2, "\n");
+    imageList_fmt pyramid(initPyr);
     
     /* Forward transform */
     for(int iPos = 0; iPos < iMaxLevel - 1; iPos++)
     {
+        image_fmt curPyr = pyramid.back();
         curPyr.convolve(forward_mask);
         image_fmt imgCore = curPyr.get_resize(curPyr.width() / SCALE,
                                               curPyr.height() / SCALE, 1, 1, 1);
-        curPyr = padCore(curPyr.width() + forward_mask.width() * 2,
-                        curPyr.height() + forward_mask.height() * 2,
+        curPyr = padCore(imgCore.width() + forward_mask.width() * 2,
+                         imgCore.height() + forward_mask.height() * 2,
                         imgCore);
-
+        pyramid.push_back(curPyr);
         MLOG(severity_type::debug, "Forward analysis: step ", iPos, "\n", image_psb::printImage(imgCore));
-        MLOG(severity_type::debug, "Forward analys: step ", iPos, "\n", image_psb::printImage(curPyr));
-    
+        // MLOG(severity_type::debug, "Forward analysis: step ", iPos, "\n", image_psb::printImage(curPyr));
     }
 
-    MLOG(severity_type::debug, "Forward analys: finished", "\n", image_psb::printImage(curPyr));
-    return;
+    // MLOG(severity_type::debug, "Forward analysis: finished\n");
+    pyramid.back().convolve(g);
+
     /* Backward transform */
-    for(int iPos = 0; iPos < iMaxLevel; iPos++)
+    cimglist_for(pyramid,_)
     {
-        image_fmt imgCore = curPyr.get_crop(iDrawXpos, iDrawYpos, 0, 0,
-                        iDrawXpos + iPyrWidth,
-                        iDrawYpos + iPyrHeight, 0, 0);
-        MLOG(severity_type::debug, "Backward analysis: step ", iPos, "\n",
-                                    image_psb::printImage(imgCore));
-        imgCore.resize(field.width(), field.height(), 1, 1,
-                      4, 0);
-        curPyr = imgCore.get_convolve(backward_mask) + curPyr.get_convolve(g);
-        MLOG(severity_type::debug, "Backward analysis: step ", iPos, "\n", image_psb::printImage(curPyr));
+        image_fmt imgCore = pyramid.back().get_crop(
+                backward_mask.width(), backward_mask.height(), 0, 0,
+                pyramid.back().width() - backward_mask.width() - 1,
+                pyramid.back().height() - backward_mask.height() - 1, 0, 0);
+        // MLOG(severity_type::debug, "Backward analysis: step:\n",
+        //                             image_psb::printImageAligned(imgCore));
+        // curPyr.print();
+        // imgCore.print();
+        imgCore = upSample(imgCore);
+    
+        pyramid.pop_back();
+        MLOG(severity_type::debug, "Backward analysis: step\n", image_psb::printImageAligned(pyramid.back().get_convolve(g)));
+        pyramid.back() = imgCore.get_convolve(backward_mask) + pyramid.back().get_convolve(g);
+        // curPyr = imgCore.get_convolve(backward_mask) + pyramid.back().get_convolve(g);
+        // MLOG(severity_type::debug, "Backward analysis: step ", iPos, "\n", image_psb::printImageAligned(curPyr));
+        // MLOG(severity_type::debug, "Backward analysis: step ", iPos, "\n", image_psb::printImageAligned(curPyr.get_convolve(g)));
     }
+    // MLOG(severity_type::debug, "Returned image:\n", image_psb::printImageAligned(pyramid.front()));
+    
+    retImg = pyramid.front().get_crop(
+                backward_mask.width(), backward_mask.height(), 0, 0,
+                pyramid.front().width() - backward_mask.width() - 1,
+                pyramid.front().height() - backward_mask.height() - 1, 0, 0);
+    
+    MLOG(severity_type::debug, "Returned image:\n", image_psb::printImageAligned(retImg));
+    retImg = padCore(retImg.width() + 2, retImg.height() + 2, retImg);
 }
 
 
 
 } /* EndOfNamespace */
+
+        // MLOG(severity_type::debug, "Backward analysis: step ", iPos, "\n",
+        //                             image_psb::printImageAligned(imgCore));
+        // image_fmt test(3,3,1,1,
+        //             1,2,3,//11,
+        //             4,5,6,//12,
+        //             7,8,9);//13);
+        // MLOG(severity_type::debug, "Backward analysis: step ", iPos, "\n",
+        //                             image_psb::printImageAligned(test));
+        // test = upSample(test);
+        // MLOG(severity_type::debug, "Backward analysis: step ", iPos, "\n",
+       //                             image_psb::printImageAligned(test));
+ 

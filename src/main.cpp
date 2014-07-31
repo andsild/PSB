@@ -148,8 +148,7 @@ int main(int argc, char **argv)
     if(compareLoop.joinable())
         compareLoop.join();
 
-    // MLOG(severity_type::info, "Program exited successfully\n");
+    MLOG(severity_type::info, "Program exited successfully\n");
     // MLOG(severity_type::info, std::flush);
-    // MFLUSH;
     return EXIT_SUCCESS;
 }

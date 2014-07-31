@@ -165,17 +165,60 @@ std::string printImage(const image_fmt image)
     std::stringstream ss;
     int iIndex = 0;
     char sign = ' ';
-    // cimg_forXY(image, x,y)
-    // {
     cimg_for(image,ptr,data_fmt)
     {
         if( ((iIndex) % image.width()) == 0 && iIndex > 0) ss << "\n";
-        if(*ptr == 0) continue;
         if(*ptr < 0)
             sign = '-';
         else
             sign = ' ';
         ss << format("%c%-8.2f", sign, cimg::abs(*(ptr)));
+        iIndex++;
+    }
+
+    return ss.str();
+}
+
+std::string printImageAligned(const image_fmt image)
+{
+    std::stringstream ss;
+    int iIndex = 0, iOffset = 0;
+    const int iColumns = 8;
+    char sign = ' ';
+    for(int iPos = 0; iPos < ceil(image.width() / (double)iColumns); iPos++)
+    {
+        cimg_forY(image, y)
+        {
+            for(int x = iOffset; (x < (iOffset + iColumns) && x < image.width()); x++)
+            {
+                if(image(x,y) < 0)
+                    sign = '-';
+                else
+                    sign = ' ';
+                ss << format("%c%-9.5f", sign, cimg::abs(image(x,y)));
+            }
+            ss << "\n";
+        }
+        iOffset += iColumns;
+        ss << "\n####################\n";
+    }
+
+    return ss.str();
+}
+
+std::string printCore(const image_fmt image, const int iBorderSize)
+{
+    std::stringstream ss;
+    int iIndex = 0;
+    char sign = ' ';
+    cimg_for_insideXY(image, x,y, iBorderSize)
+    {
+        if( ((iIndex) % image.width()) == 0 && iIndex > 0) ss << "\n";
+        if(image(x,y) < 0)
+            sign = '-';
+        else
+            sign = ' ';
+        ss << format("%c%-8.4f", sign, cimg::abs(image(x,y)));
         iIndex++;
     }
 
@@ -237,7 +280,7 @@ bool readImage(image_fmt &image, std::string sFileName)
   */
 double imageDiff(const image_fmt &source, const image_fmt &comparator)
 {
-    return (double)(source.MSE(comparator));
+        return (double)(source.MSE(comparator));
 }
 
 /** Split an image, its field and guess separated regions
@@ -510,11 +553,11 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
         file_IO::writeData(vResults, it->getLabel(), it->getFilename());
         /* Erase before re-iterating */
         vResults.erase(vResults.begin(), vResults.end());
-        // DO_IF_LOGLEVEL(severity_type::extensive)
-        // {
-        //     std::string sMsg = "Final image(cut)\n" + printImage(result);
-        //     it->log(1, sMsg);
-        // }
+        DO_IF_LOGLEVEL(logging::severity_type::extensive)
+        {
+            std::string sMsg = "Final image(cut)\n" + printImage(result);
+            it->log(1, sMsg);
+        }
 
 
     }

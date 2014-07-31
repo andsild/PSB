@@ -550,14 +550,13 @@ function pyconv( a, h1, h2, g )
 
         down = padarray(down, [fs fs]); % pad the array ( again )
         pyr{i} = down; % set current level in pyramid to down
-
     end
-    pyr{maxLevel}
-    return;
+    
 
     % Backward transform (synthesis)
     % similar to loop aboves, upsamling..
     fpyr{maxLevel} = imfilter(pyr{maxLevel},g, 0);
+    maxLevel
     for i=maxLevel-1:-1:1
 
         rd = fpyr{i+1}; % fetch from prev pyramid

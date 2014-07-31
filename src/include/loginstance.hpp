@@ -9,7 +9,7 @@ extern logging::Logger< logging::FileLogPolicy > log_inst;
 extern logging::Logger< logging::FileLogPolicy > log_inst_std;
 
 #define MLOG(x, ...) CLOG(x)(__VA_ARGS__);LOG(x)(__VA_ARGS__)
-#define DO_IF_LOGLEVEL(x) if(x >= log_inst.getLevel() || x >= log_inst_std.getLevel())
+#define DO_IF_LOGLEVEL(x) if(x <= log_inst.getLevel() || x <= log_inst_std.getLevel())
 
 #define MFLUSH log_inst.flush(); log_inst_std.flush()
 
