@@ -11,52 +11,19 @@ COLOR_RANGE = 255;
 
 
 def _createImage(width, height, valueGetterFunc,
-                startVal = 0, COLOR_RANGE = 255,
-                xBorderValues = 0, yBorderValues = 0,
-                leftbordervalue = 0, rightbordervalue = 0,
-                upperboardervalue = 0, lowerbordervalue = 0,
-                ):
+                startVal = 0, COLOR_RANGE = 255):
     filename = findFilename(valueGetterFunc)
-    createImage(filename,width,height,valueGetterFunc,startVal,COLOR_RANGE,
-                xBorderValues,yBorderValues,leftbordervalue,rightbordervalue,
-                upperboardervalue ,lowerbordervalue );
+    createImage(filename,width,height,valueGetterFunc,startVal,COLOR_RANGE);
 
 def createImage(filename, width, height, valueGetterFunc,
-                startVal = 0, COLOR_RANGE = 255,
-                xBorderValues = 0, yBorderValues = 0,
-                leftbordervalue = 0, rightbordervalue = 0,
-                upperboardvalue = 0, lowerbordervalue = 0,
-                ):
+                startVal = 0, COLOR_RANGE = 255):
 
     im = Image.new('L', (width,height))
     pixels = im.load()
 
-    for x in range(xBorderValues, im.size[0] - xBorderValues):
-        for y in range(yBorderValues, im.size[1] - yBorderValues):
-            # pixels[x, y] = getVal(y,x)
+    for x in range(0, im.size[0]):
+        for y in range(0, im.size[1]):
             pixels[x, y] = valueGetterFunc(x,y, width, height, startVal, COLOR_RANGE)
-
-    # borders
-    # left
-    for x in range(0, xBorderValues):
-        for y in range(0, im.size[1]):
-            pixels[x,y] = leftbordervalue
-
-    # right
-    for x in range(im.size[0] - xBorderValues, im.size[0]):
-        for y in range(0, im.size[1]):
-            pixels[x,y] = rightbordervalue
-
-    # upper
-    for x in range(0, im.size[0]):
-        for y in range(0, yBorderValues):
-            pixels[x,y] = uppbordervalue
-
-    # lower
-    for x in range(0, im.size[0]):
-        for y in range(im.size[1] - yBorderValues, im.size[1]):
-            pixels[x,y] = lowbordervalue
-
     im.save(filename);
 
 
@@ -66,6 +33,12 @@ def gradientX(xPos,yPos, width,height, *args): return height - (yPos % COLOR_RAN
 def gradientY(xPos,yPos, width,height, *args): return width - (xPos % COLOR_RANGE) + startVal
 def nonMonotone(xPos, yPos, *args): return pow(xPos + yPos,2)
 def random(_x,_y,_w,_h,_s,COLOR_RANGE): return randint(0, COLOR_RANGE);
+def randomBordered(x,y,w,h,_s,COLOR_RANGE):
+    border=3
+    if x < border or x > w - border \
+    or y < border or y > w - border:
+        return 0
+    return randint(0, COLOR_RANGE);
 def square(x,y,w,h,*args):
     border=2
     h-=1;w-=1; # indexing
@@ -107,8 +80,10 @@ if not len(sys.argv) > 1:
     # _createImage(10, 10, nonMonotone)
     # _createImage(10, 10, gradientY)
     # _createImage(8, 8, random)
-    _createImage(8, 8, square);
+    # _createImage(8, 8, square);
     # _createImage(11, 11, circle);
+    # _createImage(10, 10, randomBordered);
+    pass
 else:
     for arg in sys.argv[1:]:
         createImage(findFilename(arg), 10, 10, allSame)

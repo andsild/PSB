@@ -511,15 +511,17 @@
                 endif
                 endfunction
 img =imread("/home/andesil/PSB/nice_example/random.png");
-img =imread("/home/andesil/PSB/nice_example/square.png");
+img =imread("/home/andesil/PSB/nice_example/increasing.png");
+% img =imread("/home/andesil/PSB/nice_example/square.png");
 % img =imread("/home/andesil/PSB/nice_example/square1border.png");
 % img =imread("/home/andesil/PSB/nice_example/circle.png");
 % img =imread("/home/andesil/PSB/nice_example/circleNoborder.png");
+img = imread("/home/andesil/PSB/large_media/100000G.jpg");
 divImg = conv2(img, [0,1,0;1,-4,1;0,1,0], "full" );
-divImg = conv2(img, [0,1,0;1,-4,1;0,1,0], "same");
-divImg = conv2(img, [0,1,0;1,-4,1;0,1,0], "valid");
+% divImg = conv2(img, [0,1,0;1,-4,1;0,1,0], "same");
+% divImg = conv2(img, [0,1,0;1,-4,1;0,1,0], "valid");
+% img
 % divImg
-
 
 w = [0.06110 0.26177 0.53034 0.65934  0.51106 0.05407 0.24453 0.57410];
 
@@ -537,45 +539,45 @@ g = g' * g;  % pow(@)
 function pyconv( a, h1, h2, g )
     [h,w] = size(a); % h = rowSize, w = colSize, aka width/height
     maxLevel = ceil(log2(max(h,w))); %
+    maxLevel = maxLevel  - 5
     fs = size(h1,1); % size of first dim of h1
 
     % Forward transform (analysis)
-    % pyr = pyrmaid
     pyr{1} = padarray(a, [fs fs]); %  pad with "fs" zeroes in each direction
     for i=2:maxLevel % for each element
-
+    
         down = imfilter(pyr{i-1},h1, 0); % filter previous pyramid with h1, put in down
         down = down(1:2:end,1:2:end); % extract element 1 + 2n, repeat them down
                                     % in 2d
-
+    
         down = padarray(down, [fs fs]); % pad the array ( again )
         pyr{i} = down; % set current level in pyramid to down
     end
     
-
+    
     % Backward transform (synthesis)
     % similar to loop aboves, upsamling..
     fpyr{maxLevel} = imfilter(pyr{maxLevel},g, 0);
-    maxLevel
     for i=maxLevel-1:-1:1
-
+    
         rd = fpyr{i+1}; % fetch from prev pyramid
         rd = rd(1+fs:end-fs, 1+fs:end-fs); % fetch the kernel
-
+    
         up = zeros(size(pyr{i})); % zero array
         up(1:2:end,1:2:end) = rd; % pad every 1 + 2n elements with 0, interpolation step
-
+    
         fpyr{i} = imfilter(up,h2,0) + imfilter(pyr{i}, g, 0); % apply mask, boundary=0
     end
-
+    
     ahat = fpyr{1};
     ahat = ahat(1+fs:end-fs, 1+fs:end-fs);
 
-    ahat = round(ahat);
-    ahat(ahat>255) = 255;
-    ahat(ahat<0) = 0;
-    ahat
+    % ahat = round(ahat);
+    % ahat(ahat>255) = 255;
+    % ahat(ahat<0) = 0;
+    imwrite(ahat, "convy.out.png");
 
 endfunction
 
 pyconv( -divImg, h1, h2, g )
+ctime(time())

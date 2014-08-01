@@ -91,8 +91,11 @@ int main(int argc, char **argv)
             /* ... we found argv which is not a parameter */
             if (args[i].at(0) != '-')
             {
-                /* cimg::file_type is NULL for directories */
-                const char *fileType = cimg::file_type(0, args[i].c_str());
+                cimg::exception_mode(0);
+                const char *fileType;
+                try{
+                fileType = cimg::file_type(0, args[i].c_str());
+                }catch(CImgIOException){}
                 if(!fileType)
                     sDirname = args[i];
                 else
@@ -110,7 +113,10 @@ int main(int argc, char **argv)
     {
         if(sDirname.empty() == false)
         {
-            std::vector<std::string> vFiles = file_IO::getFilesInFolder(sDirname);
+            std::vector<std::string> vFiles;
+            try{
+                vFiles = file_IO::getFilesInFolder(sDirname);
+            }catch(file_IO::DirNotFound dnf) { std::cerr << "Failed to open " << sDirname << std::endl << " exiting..." << std::endl; exit(EXIT_FAILURE);}
             for(auto const it : vFiles)
             {
                 image_psb::processImage(it, dTolerance, dResolve,
@@ -148,7 +154,6 @@ int main(int argc, char **argv)
     if(compareLoop.joinable())
         compareLoop.join();
 
-    MLOG(severity_type::info, "Program exited successfully\n");
-    // MLOG(severity_type::info, std::flush);
+    MLOG(severity_type::info, "Program exited successfully");
     return EXIT_SUCCESS;
 }

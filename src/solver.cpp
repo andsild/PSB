@@ -57,7 +57,7 @@ image_fmt IterativeSolver::solve(rawdata_fmt &vResults)
 
 void Solver::log(int iLevel, std::string sMsg)
 {
-    this->logInst.print<severity_type::info>(sMsg);
+    this->logInst.print<severity_type::extensive>(sMsg);
 }
 
 bool Solver::isMultipart() { return this->bMultipart; }

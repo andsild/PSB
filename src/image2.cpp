@@ -183,7 +183,7 @@ std::string printImageAligned(const image_fmt image)
 {
     std::stringstream ss;
     int iIndex = 0, iOffset = 0;
-    const int iColumns = 8;
+    const int iColumns = 7;
     char sign = ' ';
     for(int iPos = 0; iPos < ceil(image.width() / (double)iColumns); iPos++)
     {
@@ -241,7 +241,7 @@ void toGrayScale(image_fmt &image)
 
 /** Compute the field from an image
 */
-image_fmt makeRho(const image_fmt &input)
+image_fmt makeField(const image_fmt &input)
 {
     int iKernDim = 3;
     /* Discrete poison stencil */
@@ -441,6 +441,15 @@ void addIterativeSolver(std::vector<solver::Solver*> &vIn,
                                         sFilename, sLabel, true, true));
 }
 
+image_fmt padCore(int iNewWidth, int iNewHeight, const image_fmt &input)
+{
+    int iStartX = iNewWidth  / 2 - input.width()  / 2,
+        iStartY = iNewHeight / 2 - input.height() / 2;
+    image_fmt ret(iNewWidth, iNewHeight, 1, 1, 0);
+    ret.draw_image(iStartX, iStartY, input);
+    return ret;
+}
+
 /** The main entry point for solvers to an image.
 
   For each solver(boolean), add the corresponding method and field,
@@ -461,22 +470,14 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
         return;
     }
     toGrayScale(use_img);
-    image_fmt field = makeRho(use_img),
+    use_img = padCore(use_img.width() + 2, use_img.height() + 2, use_img);
+    image_fmt field = makeField(use_img),
               guess = makeInitialGuess(use_img);
-    // MLOG(severity_type::extensive, "Initial image\n", printImage(use_img));
-    // MLOG(severity_type::extensive, "Initial guess\n", printImage(guess));
-    // MLOG(severity_type::extensive, "Initial rho\n", printImage(field));
     imageList_fmt origList, guessList, rhoList;
 
 
-    // imageList_fmt test = use_img.get_gradient("xy", -1);
-    // const image_fmt divergence = test[0].get_gradient("x",-1)[0] + test[1].get_gradient("y",-1)[0];
-    // MLOG(severity_type::error, "\n", printImage(use_img ));
-    // MLOG(severity_type::error, "\n", printImage(field));
-    // MLOG(severity_type::error, "\n", printImage(test[0]));
-    // MLOG(severity_type::error, "\n", printImage(test[1]));
-    // MLOG(severity_type::error, "\n", printImage(divergence));
-    // return;
+    // MLOG(severity_type::extensive, "Image:\n", printImageAligned(use_img));
+    // MLOG(severity_type::extensive, "Field\n:", printImageAligned(field));
 
 
     divide(DIVISION_SIZE, use_img, field, origList, rhoList, guessList);
@@ -553,11 +554,11 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
         file_IO::writeData(vResults, it->getLabel(), it->getFilename());
         /* Erase before re-iterating */
         vResults.erase(vResults.begin(), vResults.end());
-        DO_IF_LOGLEVEL(logging::severity_type::extensive)
-        {
-            std::string sMsg = "Final image(cut)\n" + printImage(result);
+        // DO_IF_LOGLEVEL(logging::severity_type::extensive)
+        // {
+            std::string sMsg = "Final image(cut)\n" + printImageAligned(result);
             it->log(1, sMsg);
-        }
+        // }
 
 
     }
