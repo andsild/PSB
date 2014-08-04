@@ -82,7 +82,8 @@ void pyconv(const image_fmt &field, image_fmt &retImg)
     
     // image_fmt useField = field.get_crop(0,0,0,0,field.width(), field.height() - 2, 0, 0);
     image_fmt useField = field;
-    useField *= -1;
+    // useField *= -1;
+    // useField = downSample(field.width() + 1, field.height() + 1, useField);
     image_fmt initPyr = downSample(useField.width() + forward_mask.width() * 2,
                                 useField.height() + forward_mask.width() * 2,
                                 useField);
@@ -151,7 +152,7 @@ void pyconv(const image_fmt &field, image_fmt &retImg)
                 backward_mask.width(), backward_mask.height(), 0, 0,
                 back_pyramid.back().width() - backward_mask.width() - 1,
                 back_pyramid.back().height() - backward_mask.height() - 1, 0, 0);
-    // retImg = downSample(retImg.width() + 0, retImg.height() + 0, retImg);
+    // retImg = downSample(retImg.width() -1, retImg.height() -1, retImg);
     MLOG(severity_type::debug, "Returned image:\n", image_psb::printImageAligned(retImg.get_round(0).cut(0,255)));
 }
 

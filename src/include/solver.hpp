@@ -84,6 +84,7 @@ class DirectSolver : public virtual Solver
             std::string sFilename, std::string sLabel, bool bMultiPart, bool bFinal = false)
         : Solver(origImage, field, sFilename, sLabel, bMultiPart, bFinal), func(func)
     {
+        this->alterField(-1);
     }
 };
 

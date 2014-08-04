@@ -549,7 +549,6 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
            be viewed later */
         roundValues(result);
         std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), false);
-        roundValues(result);
         file_IO::saveImage(result, sSavename, false);
         file_IO::writeData(vResults, it->getLabel(), it->getFilename());
         /* Erase before re-iterating */

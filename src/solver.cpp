@@ -69,7 +69,10 @@ image_fmt DirectSolver::solve(rawdata_fmt &vResults)
 {
     image_fmt ret(this->origImage, "xyz", 0);
     this->func(this->field, ret);
-    vResults.push_back(image_psb::imageDiff(this->origImage, ret));
+    ret.crop(1,1,0,0, ret.width() - 2, ret.height() - 2 , 0, 0);
+    vResults.push_back(image_psb::imageDiff(this->origImage.get_crop(1,1,0,0,
+                                        this->origImage.width() - 2, this->origImage.height() - 2, 0, 0),
+                                                                ret));
     return ret;
 }
 
