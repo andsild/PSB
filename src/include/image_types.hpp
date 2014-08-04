@@ -6,7 +6,7 @@
 
 #include "CImg.h"
 
-typedef double data_fmt;
+typedef float data_fmt;
 typedef cimg_library::CImgList<data_fmt> imageList_fmt;
 typedef cimg_library::CImg<data_fmt> image_fmt;
 
