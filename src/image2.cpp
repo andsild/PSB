@@ -179,11 +179,11 @@ std::string printImage(const image_fmt image)
     return ss.str();
 }
 
-std::string printImageAligned(const image_fmt image)
+std::string printImageAligned(const image_fmt image, int iCols)
 {
     std::stringstream ss;
     int iIndex = 0, iOffset = 0;
-    const int iColumns = 7;
+    const int iColumns = iCols;
     char sign = ' ';
     for(int iPos = 0; iPos < ceil(image.width() / (double)iColumns); iPos++)
     {

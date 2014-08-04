@@ -14,84 +14,74 @@ using namespace logging;
 namespace solver
 {
 
+
+inline image_fmt padZeroes(int iNewWidth, int iNewHeight, const image_fmt &input)
+{
+    int iStartX = iNewWidth  / 2 - input.width()  / 2,
+        iStartY = iNewHeight / 2 - input.height() / 2;
+    image_fmt ret(iNewWidth, iNewHeight, 1, 1, 0);
+    ret.draw_image(iStartX, iStartY, input);
+    return ret;
+}
+
+
     /* FFT: convolutions are multiplications in fourier space.. */
 void FFT2D(const image_fmt &field, image_fmt &ret)
 {
-    // const imageList_fmt gradient = field.get_gradient("xy",1);
-    
-    // Remember average value for each channel (needed for normalizing the reconstruction).
-    const image_fmt average = field.get_resize(1,1,1,1,2);
-    
-    // Step 1.  Estimate divergence of the gradient field (use backward finite difference scheme).
-    // const image_fmt divergence = gradient[0].get_gradient("x",-1)[0] + gradient[1].get_gradient("y",-1)[0];
-
-    image_fmt DST(field, "xyz", 0);
-    const data_fmt tmpR = cimg::PI/(2*field.height() - 2), // TODO: assert correctness
-                    tmpC = cimg::PI/(2*field.width() - 2),
-                    normalization = 1.0 / (4 * field.width() * field.height());
-
-    data_fmt tmpD, tmp;
-    cimg_forY(DST, y)
-    {
-        tmpD = std::sin(y * tmpR);
-        tmp = tmpD * tmpD;
-        cimg_forX(DST, x)
-        {
-            tmpD = std::sin(x * tmpC);
-            DST(x,y) = 1.0 / (4 * (tmp + tmpD *  tmpD));
-        }
-    }
-
-    image_fmt mapped(field, "xyz", 0);
-    // data_fmt *mapPtr = mapped._data;
-    // cimg_for(mapped, ptr, data_fmt)
+    // int M = field.height();
+    // int N = field.width();
+    // int Total = (M-2)*(N-2);
+    // const data_fmt tmpR = cimg::PI/(2*M-2),
+    //                tmpC = cimg::PI/(2*N-2),
+    //                normalization = 1.0 / (4 * M * N);
+    // data_fmt tmpD, tmp;
+    //
+    // //take inside
+    // image_fmt InnerField(M-2,N-2, 1, 1,0);
+    // image_fmt InnerResult = field.get_crop(1, 1, 0, 0, field.width() - 1, field.height() - 1, 0, 0);
+    //
+    // //DST coefficient
+    // image_fmt DST(M-2, N-2, 1, 1, 0);
+    // for(int y = 1; y < DST.height() + 1; y++)
     // {
-    //     *(ptr++) = -1 * *(mapPtr++) * 1.0;
+    //     tmpD = std::sin((y) * tmpR);
+    //     tmp = tmpD * tmpD;
+    //     for(int x = 1; x < DST.width() + 1; x++)
+    //     {
+    //         tmpD = std::sin((x) * tmpC);
+    //         DST(x-1,y-1) = 1.0 / (4 * (tmp + tmpD *  tmpD));
+    //     }
     // }
-
-    /* TODO: perform a DST-1 here */
-    mapped = field.get_FFT(false)[0];/* 0 is real, 1 is imaginary*/
-    mapped.mul(DST);
-
-    mapped *= normalization;
-    MLOG(severity_type::debug, "Field:\n", image_psb::printImage(mapped));
-
-    mapped = mapped.get_FFT(true)[0]; /* 0 is real, 1 is imaginary*/
-    MLOG(severity_type::debug, "Field:\n", image_psb::printImage(mapped));
-    MLOG(severity_type::debug, "Field:\n", image_psb::printImage(mapped));
-
-    data_fmt mean_off = field.mean() - mapped.mean();
-    // mapped+=mean_off;
-    ret = mapped;
-
-    // ret = field.get_FFT()[0];
-    // ret += field.mean();
-    // ret.mul(DST);
-    // // ret = field.get_mul(DST);
-    // ret += normalization;
-    
-
-    // // Step 2. Invert Laplacian operator using FFT.
-    // image_fmt factor(field, "xyz", 0);
-    // cimg_forXY(factor,x,y) factor(x,y) = -(4
-    //             - 2 * std::cos(2*x*cimg::PI/factor.width())
-    //             - 2 * std::cos(2*y*cimg::PI/factor.height()));
-    // factor(0,0) = 1;
     //
-    // imageList_fmt  FFT = field.get_FFT();
-    // FFT[0].div(factor);
-    // // FFT[1].div(factor);
-    // ret = FFT.get_FFT(true)[0];
-    // ret += average.get_resize(field.width(), field.height());
-    // ret.cut(0,255);
-    // res0.display("Reconstruction");
+    // //FFT transform
+    // fftwf_plan dct_fw, dct_bw;
+    // image_fmt fft_result(DST, "xyz", 0);
     //
-
-    // std::cerr << res0.MSE(field) << " "
-    //           << field.MSE(res0) << " "
-    //           << field.MSE(field) << " "
-    //         << std::endl;
-
+    // //forward
+    // dct_fw = fftwf_plan_r2r_2d(M-2, N-2,InnerField.data(), fft_result.data(),FFTW_RODFT00, FFTW_RODFT00,FFTW_ESTIMATE | FFTW_DESTROY_INPUT);
+    // fftwf_execute(dct_fw);
+    // MLOG(severity_type::debug, "fft_result\n", image_psb::printImageAligned(fft_result));
+    //
+    // fft_result.mul(DST);
+    //
+    // //backward
+    // dct_bw = fftwf_plan_r2r_2d(M-2, N-2,fft_result.data(), InnerResult.data(),FFTW_RODFT00, FFTW_RODFT00,FFTW_ESTIMATE | FFTW_DESTROY_INPUT);
+    // fftwf_execute(dct_bw);
+    //
+    // InnerResult *= normalization;
+    // MLOG(severity_type::debug, "pre-up\n", image_psb::printImageAligned(InnerResult));
+    //
+    // //Pad the InnerResult to Result
+    // image_fmt Result = padZeroes(M, N, InnerResult);
+    // MLOG(severity_type::debug, "Result\n", image_psb::printImageAligned(Result));
+    // // Result = Pad(InnerResult);
+    //
+    // ret = Result;
+    //
+    // fftwf_destroy_plan(dct_fw);
+    // fftwf_destroy_plan(dct_bw);
+    // fftwf_cleanup();
 }
 
 } /* EndOfNamespace */
+ /* EndOfNamespace */

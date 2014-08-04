@@ -22,7 +22,7 @@ double imageDiff(const image_fmt &arg1, const image_fmt &arg2);
 
 // std::string format(const char *arg, ...);
 std::string printImage(const image_fmt);
-std::string printImageAligned(const image_fmt);
+std::string printImageAligned(const image_fmt, int iCols = 8);
 std::string printCore(const image_fmt, const int);
 void scanAndAddImage(std::string sRootdir, std::string sSolverdir);
 rawdata_fmt averageResult(const std::vector<rawdata_fmt> &arg, int);
