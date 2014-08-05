@@ -542,7 +542,6 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
                 vResults.clear(); // important, otherwise it stacks results
                 continue;
             }
-
         }
 
         /* Before saving the image, round the values so that the image can

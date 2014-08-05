@@ -389,8 +389,17 @@ void ImageDisplay::addResolvedImage2(std::string sFilename, std::string sCommon,
 
 void scanAndAddImage(std::string sRootdir, std::string sSolverdir)
 {
-    std::vector<std::string> vFilenames = file_IO::getFilesInFolder(sRootdir),
-                        vSolvedNames = file_IO::getFilesInFolder(sSolverdir);
+    std::vector<std::string> vFilenames,vSolvedNames;
+    try
+    {
+        vFilenames = file_IO::getFilesInFolder(sRootdir),
+        vSolvedNames = file_IO::getFilesInFolder(sSolverdir);
+    }
+    catch(file_IO::DirNotFound) {
+        MLOG(severity_type::error, "No directory ", sRootdir,
+                " found. Did you remember to run a solver first?");
+        return;
+    }
     ImageDisplay id;
 
     for(auto const it : vFilenames)

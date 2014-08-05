@@ -141,7 +141,9 @@ int main(int argc, char **argv)
     }
 
     const bool doAverage = (nosolve) ? false : average;
-    image_fmt img = readData(doAverage,plot);
+    image_fmt img;
+    if(doAverage || plot)
+        img = readData(doAverage,plot);
 
     if(plot)
     {

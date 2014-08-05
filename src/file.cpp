@@ -207,8 +207,14 @@ image_fmt readData(const bool doAverage, const bool doPlot)
 
     if(fin.good() == false)
     {
-        image_fmt i(1,1,1,1);
-        return i;
+        std::string sAction = "";
+        if(doAverage) sAction = "calculate average";
+        if(doAverage && doPlot) sAction += " and ";
+        if(doPlot) sAction += "plot";
+        MLOG(severity_type::error, "No output files found when trying to ", 
+                                   sAction, ". Did you remember to run the "
+                                   "solver first?");
+        exit(EXIT_FAILURE);
     }
 
     readProperties(fin, iLongestLine, dSmallestVal, dMaxVal);
