@@ -35,7 +35,7 @@ void FFT_DCT(const image_fmt &field, image_fmt &ret)
                 -(4-2*std::cos(2*x*cimg::PI/factor.width())
                    -2*std::cos(2*y*cimg::PI/factor.height()));
     factor(0,0) = 1;
-    FFT[0].div(factor);
+   FFT[0].div(factor);
     FFT[1].div(factor);
     ret = FFT.get_FFT(true)[0];
     ret += average.get_resize(ret.width(), ret.height());

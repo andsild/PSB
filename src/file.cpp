@@ -198,7 +198,7 @@ image_fmt readData(const bool doAverage, const bool doPlot)
     const char *filename = DATA_OUTFILE;
     image_fmt resGraph(500, 400, 1, 3, 0);
     const double blackWhite[] = {255, 255, 255},
-                 red[] = {255, 0, 0},
+                red[] = {255, 0, 0},
                  green[] = {0, 255, 0};
     double yMin = 0, dMaxVal = -1, dSmallestVal = 1E+33;
     int iLongestLine = -1;

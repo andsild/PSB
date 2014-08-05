@@ -26,7 +26,7 @@ template <class baseIter>
 class circularIterator
 {
     private:
-        baseIter cur;
+       baseIter cur;
         baseIter begin;
         baseIter end;
     public:
@@ -424,3 +424,4 @@ void scanAndAddImage(std::string sRootdir, std::string sSolverdir)
 
 
 } /* EndOfNameSpace */
+ /* EndOfNameSpace */

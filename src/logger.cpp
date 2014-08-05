@@ -26,7 +26,7 @@ void FileLogPolicy::open_ostream(const std::string& name)
 
 void FileLogPolicy::flush()
 {
-    if(out_stream)
+   if(out_stream)
         out_stream->flush();
 }
 
@@ -59,3 +59,4 @@ FileLogPolicy::~FileLogPolicy()
 logging::Logger< logging::FileLogPolicy > log_inst(LOG_DIR "execution.log");
 logging::Logger< logging::FileLogPolicy > log_inst_std("/dev/fd/0");
 #endif
+
