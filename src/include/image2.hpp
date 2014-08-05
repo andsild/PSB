@@ -27,7 +27,8 @@ std::string printCore(const image_fmt, const int);
 void scanAndAddImage(std::string sRootdir, std::string sSolverdir);
 rawdata_fmt averageResult(const std::vector<rawdata_fmt> &arg, int);
 
-void processImage(std::string, double, double, const bool, const bool, const bool, const bool, const bool);
+void processImage(std::string, double, double, 
+        const bool, const bool, const bool, const bool, const bool, const bool);
     
 } /* EndOfNamespace */
 

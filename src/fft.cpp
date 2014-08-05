@@ -15,7 +15,6 @@ using namespace image_psb;
 namespace solver
 {
 
-
 inline image_fmt padZeroes(int iNewWidth, int iNewHeight, const image_fmt &input)
 {
     int iStartX = iNewWidth  / 2 - input.width()  / 2,
@@ -38,11 +37,8 @@ void FFT_DCT(const image_fmt &field, image_fmt &ret)
     factor(0,0) = 1;
     FFT[0].div(factor);
     FFT[1].div(factor);
-    image_fmt res0 = FFT.get_FFT(true)[0];
-    // res0+=average.get_resize(res0.width(),res0.height());
-    res0+= average.get_resize(res0.width(), res0.height());
-    MLOG(severity_type::debug, printImageAligned(average));
-    MLOG(severity_type::debug, printImageAligned(res0));
+    ret = FFT.get_FFT(true)[0];
+    ret += average.get_resize(ret.width(), ret.height());
 }
 
 const inline image_fmt getDST(const int iWidth, const int iHeight)
@@ -99,8 +95,6 @@ void FFT_DST(const image_fmt &field, image_fmt &ret)
     fftwf_destroy_plan(dct_fw);
     fftwf_destroy_plan(dct_bw);
     fftwf_cleanup();
-
-    MLOG(severity_type::debug, "Result\n", image_psb::printImageAligned(ret));
 }
 
 } /* EndOfNamespace */

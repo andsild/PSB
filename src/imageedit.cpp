@@ -1,5 +1,6 @@
 #include "imageedit.hpp"
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -52,13 +53,13 @@ std::string ImageContainer::getFileName() const
 
 void ImageContainer::addSolverImage(std::string fileName)
 {
-    MLOG(severity_type::extensive, " pushed image ", fileName, " back");
+    // MLOG(severity_type::extensive, " pushed image ", fileName, " back");
     this->vSolvedImages.push_back(fileName);
 }
 
 void ImageContainer::addResolvedImage(std::string fileName)
 {
-    MLOG(severity_type::extensive, " pushed image ", fileName, " back");
+    // MLOG(severity_type::extensive, " pushed image ", fileName, " back");
     this->vResolvedImages.push_back(fileName);
 }
 
@@ -187,7 +188,7 @@ void ImageDisplay::loadImmy(std::string &sMainfile, std::string &sSolverfile,
     }
     catch(ImageException ie)
     {
-        MLOG(severity_type::error, ie.what());
+        std::cerr << ie.what() << std::endl;
         this->vMainImages.erase(this->vMainImages.begin() + this->iIndex);
         if(iIndex != 0)
             this->iIndex--;
@@ -212,7 +213,7 @@ void ImageDisplay::show()
     }
     catch(CImgIOException ciie)
     {
-        MLOG(severity_type::error, ciie.what());
+        std::cerr << ciie.what() << std::endl;
         return;
     }
 
@@ -396,9 +397,9 @@ void scanAndAddImage(std::string sRootdir, std::string sSolverdir)
         vSolvedNames = file_IO::getFilesInFolder(sSolverdir);
     }
     catch(file_IO::DirNotFound) {
-        MLOG(severity_type::error, "No directory ", sRootdir,
-                " found. Did you remember to run a solver first?");
-        return;
+        std::cerr << "No directory " << sRootdir
+                  << " found. Did you remember to run a solver first?"
+                  << std::endl;
     }
     ImageDisplay id;
 
@@ -414,7 +415,7 @@ void scanAndAddImage(std::string sRootdir, std::string sSolverdir)
         id.addResolvedImage2(it, sFilename, isResolved);
         }
         catch(ImageException ie) {
-            MLOG(severity_type::error, ie.what(), "\n continuing...");
+            std::cerr << ie.what() << "\n continuing..." << std::endl;
         }
     }
     id.show();

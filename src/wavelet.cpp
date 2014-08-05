@@ -78,7 +78,7 @@ void pyconv(const image_fmt &field, image_fmt &retImg)
     const int SCALE = 2;
     const int iMaxLevel = ceil(cimg::log2(cimg::max(field.width(), field.height())))
                         - 1;
-    MLOG(severity_type::debug, "[[ Max level set to : ", iMaxLevel, " ]]\n");
+    // MLOG(severity_type::debug, "[[ Max level set to : ", iMaxLevel, " ]]\n");
     
     // image_fmt useField = field.get_crop(0,0,0,0,field.width(), field.height() - 2, 0, 0);
     image_fmt useField = field;
@@ -153,7 +153,7 @@ void pyconv(const image_fmt &field, image_fmt &retImg)
                 back_pyramid.back().width() - backward_mask.width() - 1,
                 back_pyramid.back().height() - backward_mask.height() - 1, 0, 0);
     // retImg = downSample(retImg.width() -1, retImg.height() -1, retImg);
-    MLOG(severity_type::debug, "Returned image:\n", image_psb::printImageAligned(retImg.get_round(0).cut(0,255)));
+    // MLOG(severity_type::debug, "Returned image:\n", image_psb::printImageAligned(retImg.get_round(0).cut(0,255)));
 }
 
 } /* EndOfNamespace */

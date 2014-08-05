@@ -457,7 +457,7 @@ image_fmt padCore(int iNewWidth, int iNewHeight, const image_fmt &input)
 */
 void processImage(std::string sFilename, double dTolerance, double dResolve,
                   const bool gauss, const bool jacobi, const bool sor,
-                  const bool wav, const bool fft)
+                  const bool wav, const bool dst, const bool dct)
 {
 
     image_fmt use_img;
@@ -500,11 +500,18 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
         addIterativeSolver(vSolvers, DIVISION_SIZE, dTolerance, sFilename, sLabel,
                             solver::iterate_sor, origList, rhoList, guessList);
     }
-    if(fft)
+    if(dst)
     {
-        std::string sLabel = "fft";
+        std::string sLabel = "dst";
         vSolvers.push_back(new solver::DirectSolver(use_img, field,
-                                                    solver::FFT2D,
+                                                    solver::FFT_DST,
+                                                    sFilename, sLabel, false));
+    }
+    if(dct)
+    {
+        std::string sLabel = "dst";
+        vSolvers.push_back(new solver::DirectSolver(use_img, field,
+                                                    solver::FFT_DCT,
                                                     sFilename, sLabel, false));
     }
     if(wav)

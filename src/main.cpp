@@ -25,25 +25,25 @@ using namespace logging;
 */
 void setVerboseLevel(int iLevel, const bool isConsole)
 {
-    if(iLevel >= severity_type::no_output && iLevel <= severity_type::debug)
-    {
-        if(iLevel == severity_type::debug)
-            std::cout << "WARNING: debug mode will slow down the"
-                            " program by * a lot *" << std::endl;
-        if(isConsole)
-            CSETLEVEL(iLevel);
-        else SETLEVEL(iLevel);
-    }
-    else
-        std::cerr << "Error: stdout verbose level out of range" << std::endl;
+    // if(iLevel >= severity_type::no_output && iLevel <= severity_type::debug)
+    // {
+    //     if(iLevel == severity_type::debug)
+    //         std::cout << "WARNING: debug mode will slow down the"
+    //                         " program by * a lot *" << std::endl;
+    //     if(isConsole)
+    //         CSETLEVEL(iLevel);
+    //     else SETLEVEL(iLevel);
+    // }
+    // else
+    //     std::cerr << "Error: stdout verbose level out of range" << std::endl;
 }
 
 int main(int argc, char **argv) 
 {
     std::string logDir = LOG_DIR;
-    MLOG(severity_type::info, "Started program");
+    // MLOG(severity_type::info, "Started program");
 
-    std::string sUsageMsg = std::string(argv[0]) + " <name of image file>"
+    std::string sUsageMsg = std::string(argv[0]) + " <name of image file or directory> <solvers>"
                             "\n\nreport bugs to sildnes@mpi-cbg.de";
     cimg_usage(sUsageMsg.c_str());
 
@@ -53,27 +53,28 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    std::string sToleranceHelpStr = "error tolerance (default: " + std::to_string(DEFAULT_TOLERANCE);
+    std::string sToleranceHelpStr = "error tolerance (default: " + std::to_string(DEFAULT_TOLERANCE) + ")";
 
     /* Read and set the flags.
        Note that the format is OPT, DEFAULT, HELPTEXT
        */
+    const bool gauss = cimg_option("--gauss", false, "use gauss-seidel"),
+               jacobi = cimg_option("--jacobi", false, "use jacobi solver"),
+               sor = cimg_option("--sor", false, "use successive over-relaxation solver"),
+               fft_dst = cimg_option("--dst", false, "use discrete sine solver"),
+               fft_dct = cimg_option("--dct", false, "use discrete cosine solver"),
+               wavelet = cimg_option("--wavelet", false, "use wavelet solver");
     const char *dirname = cimg_option("-d", (char*)0, "Input image directory");
     const char *filename = cimg_option("-f", (char*)0, "Input image file");
     const bool compare = cimg_option("-c", false, "Compare original images to solved images");
     const bool average =  cimg_option("-a", false, "average the results for each solver (writes to end of output file");
-    const bool gauss = cimg_option("--gauss", false, "use gauss-seidel"),
-               jacobi = cimg_option("--jacobi", false, "use jacobi solver"),
-               sor = cimg_option("--sor", false, "use successive over-relaxation solver"),
-               fft = cimg_option("--fft", false, "use FFT-solver"),
-               wavelet = cimg_option("--wavelet", false, "use wavelet solver");
     const bool nosolve = cimg_option("-n", false, "do not compute anything");
     /** If you want a cimg plot */
     const bool plot = cimg_option("-p", false, "visualize the results in a graph");
     const int iVerbosityLevel = cimg_option("-v", 1, "verbosity level: from .. to .. "),
               iFileVerbosityLevel = cimg_option("-x", 1, "written verbosity level");
     const double dTolerance = cimg_option("-t", DEFAULT_TOLERANCE, sToleranceHelpStr.c_str());
-    const double dResolve = cimg_option("-r", 1.0, "dResolve the image using a different field");
+    const double dResolve = cimg_option("-r", 1.0, "resolve the image using a modified field, multiplied by a scalar (used for testing)");
 
     std::string sFilename = (filename) ? std::string(filename) : std::string(),
                 sDirname = (dirname) ? std::string(dirname) : std::string();
@@ -120,13 +121,15 @@ int main(int argc, char **argv)
             for(auto const it : vFiles)
             {
                 image_psb::processImage(it, dTolerance, dResolve,
-                                        gauss, jacobi, sor, wavelet, fft);
+                                        gauss, jacobi, sor,
+                                        wavelet, fft_dst, fft_dct);
             }
         }
         if(sFilename.empty() == false)
         {
             image_psb::processImage(sFilename, dTolerance, dResolve,
-                                    gauss, jacobi, sor, wavelet, fft);
+                                    gauss, jacobi, sor,
+                                    wavelet, fft_dst, fft_dct);
         }
     }
 
@@ -156,6 +159,6 @@ int main(int argc, char **argv)
     if(compareLoop.joinable())
         compareLoop.join();
 
-    MLOG(severity_type::info, "Program exited successfully");
+    // MLOG(severity_type::info, "Program exited successfully");
     return EXIT_SUCCESS;
 }

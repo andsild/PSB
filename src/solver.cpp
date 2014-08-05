@@ -10,6 +10,13 @@ using namespace logging;
 namespace solver
 {
 
+const double MULTIPLIER_CONSTANT = 100.0;
+
+inline double getDiff(const double origVal, const double dPixels)
+{
+    return ((origVal / dPixels) * MULTIPLIER_CONSTANT);
+}
+
 
 image_fmt IterativeSolver::solve(rawdata_fmt &vResults)
 {
@@ -19,15 +26,14 @@ image_fmt IterativeSolver::solve(rawdata_fmt &vResults)
     const int iWidth = this->guess.width();
     const int iHeight = this->guess.height();
     const double iNumPixels = guess.size();
-    const double MULTIPLIER_CONSTANT = 100.0;
 
     // this->logInst.print< severity_type::info>("Stop criteria set to :", dStopCriterion);
 
     for(iIter = 0; this->dStopCriterion < dIterationDiff; iIter++)
     {
         this->func(this->field, guess, dIterationDiff, iWidth, iHeight);
-        double dDiff = (this->origImage.MSE(guess) / iNumPixels)
-                        * MULTIPLIER_CONSTANT;
+        double dDiff = getDiff(this->origImage.MSE(guess), iNumPixels);
+                       
         vResults.push_back(dDiff);
 
         // if(iIter % 100 == 0)
@@ -68,11 +74,14 @@ std::string Solver::getLabel() { return this->sLabel; }
 image_fmt DirectSolver::solve(rawdata_fmt &vResults)
 {
     image_fmt ret(this->origImage, "xyz", 0);
+    MLOG(severity_type::debug, "Returned image:\n", image_psb::printImageAligned(ret));
     this->func(this->field, ret);
     ret.crop(1,1,0,0, ret.width() - 2, ret.height() - 2 , 0, 0);
-    vResults.push_back(image_psb::imageDiff(this->origImage.get_crop(1,1,0,0,
-                                        this->origImage.width() - 2, this->origImage.height() - 2, 0, 0),
-                                                                ret));
+    const int iPixels = (this->origImage.width() - 2) * (this->origImage.height() - 2);
+    vResults.push_back(getDiff(image_psb::imageDiff(this->origImage.get_crop(1,1,0,0,
+                                                    this->origImage.width() - 2,
+                                                    this->origImage.height() - 2,
+                                                    0, 0), ret), iPixels));
     return ret;
 }
 

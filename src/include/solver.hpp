@@ -40,15 +40,15 @@ class Solver
         : field(field), origImage(origImage), logInst(),
             sFilename(sFile), sLabel(sLab), bMultipart(bMulPart), bFinal(bFin)
     {
-        this->logInst.setName(
-                file_IO::SAVE_PATTERN.getLogname(this->sFilename, this->sLabel, false));
-        this->logInst.setLevel(GETLEVEL);
+        // this->logInst.setName(
+        //         file_IO::SAVE_PATTERN.getLogname(this->sFilename, this->sLabel, false));
+        // this->logInst.setLevel(GETLEVEL);
 
-        DO_IF_LOGLEVEL(severity_type::extensive)
-        {
-            this->logInst.print< severity_type::extensive>("Initial image:\n", image_psb::printImage(this->origImage));
-            this->logInst.print< severity_type::extensive>("Initial field:\n", image_psb::printImage(this->field));
-        }
+        // DO_IF_LOGLEVEL(severity_type::extensive)
+        // {
+        //     this->logInst.print< severity_type::extensive>("Initial image:\n", image_psb::printImage(this->origImage));
+        //     this->logInst.print< severity_type::extensive>("Initial field:\n", image_psb::printImage(this->field));
+        // }
 
     }
 };

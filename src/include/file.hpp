@@ -7,6 +7,7 @@
 #define DATA_EXTENSION ".dat"
 #define PROJECT_DIR "PSB"
 
+#include <iostream>
 #include <string>
 #include <vector>
 #include <iomanip>
@@ -103,8 +104,7 @@ void writeToFile(const std::vector<t> vRes, std::string sFilename,
         if(!data_file)
         {
             std::string sMsg = "Unable to write to file: " + sFilename;
-            // LOG(severity_type::error)(sMsg);
-            // CLOG(severity_type::error)(sMsg);
+            std::cerr << sMsg << std::endl;
             return;
         }
     }

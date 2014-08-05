@@ -211,9 +211,9 @@ image_fmt readData(const bool doAverage, const bool doPlot)
         if(doAverage) sAction = "calculate average";
         if(doAverage && doPlot) sAction += " and ";
         if(doPlot) sAction += "plot";
-        MLOG(severity_type::error, "No output files found when trying to ", 
-                                   sAction, ". Did you remember to run the "
-                                   "solver first?");
+        std::cerr << "No output files found when trying to " << sAction
+                  << ". Did you remember to run the " "solver first?"
+                  << std::endl;
         exit(EXIT_FAILURE);
     }
 
@@ -335,7 +335,7 @@ void saveImage(const image_fmt &image, const std::string sSaveName, const bool b
     }
     catch(cimg_library::CImgIOException &cioe)
     {
-        MLOG(severity_type::error, cioe.what());
+        std::cerr << cioe.what() << std::endl;
     }
 }
 
