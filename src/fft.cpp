@@ -3,6 +3,8 @@
 #include <math.h>
 #include <iostream>
 
+#include <fftw3.h>
+
 #include "CImg.h"
 #include "image_types.hpp"
 #include "loginstance.hpp"
@@ -28,7 +30,6 @@ void FFT_DCT(const image_fmt &field, image_fmt &ret)
 {
     image_fmt useField = field;
     useField *= -1;
-    image_fmt average(1,1,1,1, field.mean());
     imageList_fmt FFT = useField.get_FFT();
     image_fmt factor(FFT[0].width(),FFT[0].height());
     cimg_forXY(factor,x,y) factor(x,y) = 
@@ -38,7 +39,6 @@ void FFT_DCT(const image_fmt &field, image_fmt &ret)
    FFT[0].div(factor);
     FFT[1].div(factor);
     ret = FFT.get_FFT(true)[0];
-    ret += average.get_resize(ret.width(), ret.height());
 }
 
 const inline image_fmt getDST(const int iWidth, const int iHeight)
@@ -64,7 +64,6 @@ const inline image_fmt getDST(const int iWidth, const int iHeight)
 
 void FFT_DST(const image_fmt &field, image_fmt &ret)
 {
-    // N, M
     const int iWidth = field.width(), iHeight = field.height();
     const image_fmt DST = getDST(iWidth-2, iHeight-2);
     const data_fmt normalization = 1.0 / (4.0 * (iHeight-1) * (iWidth-1));

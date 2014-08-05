@@ -6,7 +6,6 @@ from random import randint, seed
 
 seed(10)
 
-
 COLOR_RANGE = 255;
 
 

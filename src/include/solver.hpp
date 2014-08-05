@@ -78,11 +78,15 @@ class DirectSolver : public virtual Solver
 {
     private:
     direct_func func;
+    const bool isDirichet;
     public:
     image_fmt solve(rawdata_fmt &arg1);
     DirectSolver(const image_fmt &origImage, image_fmt &field, direct_func func,
-            std::string sFilename, std::string sLabel, bool bMultiPart, bool bFinal = false)
-        : Solver(origImage, field, sFilename, sLabel, bMultiPart, bFinal), func(func)
+            std::string sFilename, std::string sLabel,
+            bool dirichet,
+            bool bMultiPart = false, bool bFin = false)
+        : Solver(origImage, field, sFilename, sLabel, bMultiPart, bFinal),
+        func(func), isDirichet(dirichet)
     {
         this->alterField(-1);
     }

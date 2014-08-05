@@ -192,6 +192,10 @@ void ImageDisplay::loadImmy(std::string &sMainfile, std::string &sSolverfile,
         this->vMainImages.erase(this->vMainImages.begin() + this->iIndex);
         if(iIndex != 0)
             this->iIndex--;
+        if(this->vMainImages.size() <= 0) {
+            std::cerr << "Lookup for solved images exhausted, exiting" << std::endl;
+            exit(EXIT_FAILURE);
+        }
         this->loadImmy(sMainfile, sSolverfile, sResolvedfile);
     }
 }
@@ -400,6 +404,7 @@ void scanAndAddImage(std::string sRootdir, std::string sSolverdir)
         std::cerr << "No directory " << sRootdir
                   << " found. Did you remember to run a solver first?"
                   << std::endl;
+        return;
     }
     ImageDisplay id;
 

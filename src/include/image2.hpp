@@ -28,7 +28,9 @@ void scanAndAddImage(std::string sRootdir, std::string sSolverdir);
 rawdata_fmt averageResult(const std::vector<rawdata_fmt> &arg, int);
 
 void processImage(std::string, double, double, 
-        const bool, const bool, const bool, const bool, const bool, const bool);
+        const bool, const bool, const bool, /* Iterative */
+        const bool, const bool, /* FFT */
+        const bool, const bool, const bool); /* wavelet */
     
 } /* EndOfNamespace */
 

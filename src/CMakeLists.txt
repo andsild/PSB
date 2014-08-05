@@ -67,7 +67,7 @@ set(CIMG_H_PATH ${PROJECT_SOURCE_DIR}/../lib/CImg-1.5.8)
 set(PROJECT_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/cmake-modules")
 
-# option(WITH_FFTW3     "Use FFTW3 library" ON)
+option(WITH_FFTW3     "Use FFTW3 library" ON)
 
 if(WITH_FFTW3)
   find_package( FFTW3 REQUIRED )
@@ -157,7 +157,7 @@ endif()
 # Add CIMG Flags to Compilation Flags
 #TODO: remove debug
 # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CIMG_CFLAGS} -L/usr/X11/R6/lib")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CIMG_CFLAGS} -Ofast -std=c++11 -I${PROJECT_INCLUDE_DIR} -I. -L/usr/X11R6/lib -lfftw3 -lfftw3f -lX11 -lpthread -lm -lfftw3_threads ")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CIMG_CFLAGS} -DLOGGING -g -std=c++11 -I${PROJECT_INCLUDE_DIR} -I. -L/usr/X11R6/lib -lfftw3 -lfftw3f -lX11 -lpthread -lm -lfftw3_threads ")
 
 
 IF(DEFINED CMAKE_BUILD_TYPE)

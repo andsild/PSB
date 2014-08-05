@@ -59,4 +59,3 @@ FileLogPolicy::~FileLogPolicy()
 logging::Logger< logging::FileLogPolicy > log_inst(LOG_DIR "execution.log");
 logging::Logger< logging::FileLogPolicy > log_inst_std("/dev/fd/0");
 #endif
-

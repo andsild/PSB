@@ -457,7 +457,9 @@ image_fmt padCore(int iNewWidth, int iNewHeight, const image_fmt &input)
 */
 void processImage(std::string sFilename, double dTolerance, double dResolve,
                   const bool gauss, const bool jacobi, const bool sor,
-                  const bool wav, const bool dst, const bool dct)
+                  const bool dst, const bool dct,
+                  const bool wavelet_5x5, const bool wavelet_7x7,
+                  const bool multiwavelet)
 {
 
     image_fmt use_img;
@@ -505,20 +507,35 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
         std::string sLabel = "dst";
         vSolvers.push_back(new solver::DirectSolver(use_img, field,
                                                     solver::FFT_DST,
-                                                    sFilename, sLabel, false));
+                                                    sFilename, sLabel, true));
     }
     if(dct)
     {
-        std::string sLabel = "dst";
+        std::string sLabel = "dct";
         vSolvers.push_back(new solver::DirectSolver(use_img, field,
                                                     solver::FFT_DCT,
                                                     sFilename, sLabel, false));
     }
-    if(wav)
+
+    if(wavelet_5x5)
     {
         std::string sLabel = "wavelet";
         vSolvers.push_back(new solver::DirectSolver(use_img, field,
-                                                    wavelet::pyconv,
+                                                    wavelet::wavelet_5x5,
+                                                    sFilename, sLabel, false));
+    }
+    if(wavelet_7x7)
+    {
+        std::string sLabel = "wavelet";
+        vSolvers.push_back(new solver::DirectSolver(use_img, field,
+                                                    wavelet::wavelet_7x7,
+                                                    sFilename, sLabel, false));
+    }
+    if(multiwavelet)
+    {
+        std::string sLabel = "multiwavelet";
+        vSolvers.push_back(new solver::DirectSolver(use_img, field,
+                                                    wavelet::hermite_wavelet,
                                                     sFilename, sLabel, false));
     }
 

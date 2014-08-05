@@ -25,23 +25,24 @@ using namespace logging;
 */
 void setVerboseLevel(int iLevel, const bool isConsole)
 {
-    // if(iLevel >= severity_type::no_output && iLevel <= severity_type::debug)
-    // {
-    //     if(iLevel == severity_type::debug)
-    //         std::cout << "WARNING: debug mode will slow down the"
-    //                         " program by * a lot *" << std::endl;
-    //     if(isConsole)
-    //         CSETLEVEL(iLevel);
-    //     else SETLEVEL(iLevel);
-    // }
-    // else
-    //     std::cerr << "Error: stdout verbose level out of range" << std::endl;
+#ifdef LOGGING
+    if(iLevel >= severity_type::no_output && iLevel <= severity_type::debug)
+    {
+        if(iLevel == severity_type::debug)
+            std::cout << "WARNING: debug mode will slow down the"
+                            " program by * a lot *" << std::endl;
+        if(isConsole)
+            CSETLEVEL(iLevel);
+        else SETLEVEL(iLevel);
+    }
+    else
+        std::cerr << "Error: stdout verbose level out of range" << std::endl;
+#endif
 }
 
 int main(int argc, char **argv) 
 {
-    std::string logDir = LOG_DIR;
-    // MLOG(severity_type::info, "Started program");
+    MLOG(severity_type::info, "Started program");
 
     std::string sUsageMsg = std::string(argv[0]) + " <name of image file or directory> <solvers>"
                             "\n\nreport bugs to sildnes@mpi-cbg.de";
@@ -63,7 +64,9 @@ int main(int argc, char **argv)
                sor = cimg_option("--sor", false, "use successive over-relaxation solver"),
                fft_dst = cimg_option("--dst", false, "use discrete sine solver"),
                fft_dct = cimg_option("--dct", false, "use discrete cosine solver"),
-               wavelet = cimg_option("--wavelet", false, "use wavelet solver");
+               wavelet_5x5 = cimg_option("--wavelet5", false, "use wavelet solver with a 5x5 kernel"),
+               wavelet_7x7 = cimg_option("--wavelet7", false, "use wavelet solver with a 7x7 kernel"),
+               multi_wavelet = cimg_option("--multi-wavelet", false, "use multi-wavelet solver");
     const char *dirname = cimg_option("-d", (char*)0, "Input image directory");
     const char *filename = cimg_option("-f", (char*)0, "Input image file");
     const bool compare = cimg_option("-c", false, "Compare original images to solved images");
@@ -122,14 +125,16 @@ int main(int argc, char **argv)
             {
                 image_psb::processImage(it, dTolerance, dResolve,
                                         gauss, jacobi, sor,
-                                        wavelet, fft_dst, fft_dct);
+                                        fft_dst, fft_dct,
+                                        wavelet_5x5, wavelet_7x7, multi_wavelet);
             }
         }
         if(sFilename.empty() == false)
         {
             image_psb::processImage(sFilename, dTolerance, dResolve,
                                     gauss, jacobi, sor,
-                                    wavelet, fft_dst, fft_dct);
+                                    fft_dst, fft_dct,
+                                    wavelet_5x5, wavelet_7x7, multi_wavelet);
         }
     }
 
@@ -159,6 +164,6 @@ int main(int argc, char **argv)
     if(compareLoop.joinable())
         compareLoop.join();
 
-    // MLOG(severity_type::info, "Program exited successfully");
+    MLOG(severity_type::info, "Program exited successfully");
     return EXIT_SUCCESS;
 }
