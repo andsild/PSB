@@ -50,9 +50,115 @@ inline image_fmt downSample(int iNewWidth, int iNewHeight, const image_fmt &inpu
     return ret;
 }
 
+const inline image_fmt cubic_spline1(const int iWidth)
+{
+    const double dScale = (2 / (double)iWidth);
+    image_fmt ret(iWidth, 1, 1, 1);
+    data_fmt *ptr = ret.data();
+    double x;
+    for(x = -1; x < 0; x+=dScale)
+    {
+        *(ptr++) = pow((1.0 + x), 2) * (1 - (2.0 * x));
+    }
+    //TODO:
+    // *(ptr++) = 0;
+    //x = x + dScale;
+    for(x ; x < 1; x+=dScale)
+    {
+        *(ptr++) = pow((1.0 - x), 2) * (1 + (2.0 * x));
+    }
+
+    return ret;
+}
+
+const inline image_fmt cubic_spline2(const int iWidth)
+{
+    const double dScale = (2 / (double)iWidth);
+    image_fmt ret(iWidth, 1, 1, 1);
+    data_fmt *ptr = ret.data();
+    double x;
+    for(x = -1; x < 0; x+=dScale)
+    {
+        *(ptr++) = pow((1.0 + x), 2) * x;}
+    }
+    for(x ; x < 1; x+=dScale)
+    {
+        *(ptr++) = pow((1.0 - x), 2) * x;
+    }
+
+    return ret;
+}
+
+
+const imageList_fmt getHighPass()
+{
+    image_fmt negative(4,1,1,1,
+                    -2, -21, 1, 9),
+              zero(4,1,1,1,
+                    4,0,0,12),
+              positive(4,1,1,1,
+                    -2, 21, -1,9);
+    imageList_fmt ret(negative, zero, positive);
+    return ret;
+}
+
+const imageList_fmt getLowPass()
+{
+    image_fmt negative(4,1,1,1,
+                    0.5, 0.75, -0.125, -0.125),
+              zero(4,1,1,1,
+                    1,0,0,0.5),
+              positive(4,1,1,1,
+                    0.5, 0.75, 0.125, -0.125);
+    imageList_fmt ret(negative, zero, positive);
+    return ret;
+}
+const imageList_fmt H = getLowPass(),
+                    G = getHighPass();
+
+const inline void getControlMatrix(int iLevel,
+        imageList_fmt &control_matrix)
+{
+    image_fmt lowTier = control_matrix.front();
+    image_fmt midTier,newTier;
+    for(int iPos = 0; iPos < iLevel; iPos++)
+    {
+        midTier = control_matrix.back();
+        control_matrix.push_back((lowTier + midTier).get_convolve( H[0 + 1]));
+        lowTier = midTier;
+    }
+}
 
 void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
 {
+    // const data_fmt divisor = (cimg::abs(field.min()) > field.max()) ? field.min() : field.max();
+    //TODO: confirm
+    const data_fmt divisor = sqrt(field.dot(field));
+    image_fmt useField = field.get_crop(1,1,0,0,
+            field.width() - 2, field.height() - 2, 0, 0);
+    MLOG(severity_type::debug, "field\n", printImageAligned(useField));
+    image_fmt phi1(useField, "xyz", 0), phi2(useField, "xyz", 0);
+    image_fmt spline1 = cubic_spline1(useField.width()),
+              spline2 = cubic_spline2(useField.width());
+    // retImg = spline2;
+    // data_fmt *fieldPtr = useField.data();
+    // cimg_for(phi1, ptr, data_fmt)
+    // {
+    //     *ptr = cubic_spline1(*(fieldPtr++));
+    // }
+    // fieldPtr = useField.data();
+    // cimg_for(phi2, ptr, data_fmt)
+    // {
+    //     *ptr = cubic_spline2(*(fieldPtr++));
+    // }
+    //
+    // const image_fmt p1 = useField * phi1.get_transpose(),
+    //                 p2 = useField * phi2.get_transpose();
+    // imageList_fmt control_matrix(p1,p2);
+    //
+    // getControlMatrix(5, control_matrix);
+
+    MLOG(severity_type::debug, "returned image\n", printImage(retImg));
 }
 
 
@@ -71,7 +177,7 @@ const image_fmt backward_mask_5x5 = forward_mask_5x5;
 image_fmt tmp2_5x5 = weights_5x5.get_crop(3,0,0,0, WEIGHTS_LEN_5x5, 0, 0, 0)
                      .resize(WEIGHTS_LEN_5x5 - 3 + 1, 1, 1, 1, 0, 0);
 image_fmt gg_5x5 = tmp2_5x5.draw_image(2,0,0,0,tmp2_5x5.get_resize(1,1,1,1,0).mirror('x'));
-image_fmt g_5x5 = gg_5x5.get_transpose() * gg_5x5;
+const image_fmt g_5x5 = gg_5x5.get_transpose() * gg_5x5;
 
 
 void wavelet_5x5(const image_fmt &field, image_fmt &retImg)

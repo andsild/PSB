@@ -377,13 +377,9 @@ void ImageDisplay::addResolvedImage2(std::string sFilename, std::string sCommon,
         if(sMainname.compare(sCommon) == 0)
         {
             if(isResolved)
-            {
                 it.addResolvedImage(sFilename);
-            }
             else
-            {
                 it.addSolverImage(sFilename);
-            }
             return;
         }
     }

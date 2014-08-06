@@ -77,16 +77,16 @@ image_fmt DirectSolver::solve(rawdata_fmt &vResults)
     this->func(this->field, ret);
     if(this->isDirichet == false)
     {
-        ret -= ret.mean();
-        ret += this->origImage.mean();
+        // ret -= ret.mean();
+        // ret += this->origImage.mean();
     }
-    MLOG(severity_type::extensive, "Returned image:\n", image_psb::printImageAligned(ret));
+    // MLOG(severity_type::extensive, "Returned image:\n", image_psb::printImageAligned(ret));
     ret.crop(1,1,0,0, ret.width() - 2, ret.height() - 2 , 0, 0);
     const int iPixels = (this->origImage.width() - 2) * (this->origImage.height() - 2);
-    vResults.push_back(getDiff(image_psb::imageDiff(
-            this->origImage.get_crop(1,1,0,0, this->origImage.width() - 2,
-                                              this->origImage.height() - 2, 0,0)
-            ,ret), iPixels));
+    // vResults.push_back(getDiff(image_psb::imageDiff(
+    //         this->origImage.get_crop(1,1,0,0, this->origImage.width() - 2,
+    //                                           this->origImage.height() - 2, 0,0)
+    //         ,ret), iPixels));
     return ret;
 }
 
