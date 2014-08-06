@@ -79,7 +79,7 @@ const inline image_fmt cubic_spline2(const int iWidth)
     double x;
     for(x = -1; x < 0; x+=dScale)
     {
-        *(ptr++) = pow((1.0 + x), 2) * x;}
+        *(ptr++) = pow((1.0 + x), 2) * x;
     }
     for(x ; x < 1; x+=dScale)
     {
@@ -116,17 +116,97 @@ const imageList_fmt getLowPass()
 const imageList_fmt H = getLowPass(),
                     G = getHighPass();
 
-const inline void getControlMatrix(int iLevel,
-        imageList_fmt &control_matrix)
+image_fmt getControlMatrix(int iLevel, const data_fmt p1, const data_fmt p2)
 {
-    image_fmt lowTier = control_matrix.front();
-    image_fmt midTier,newTier;
-    for(int iPos = 0; iPos < iLevel; iPos++)
+    data_fmt lowP = p1,
+             midP = p2,
+             newP = 0;
+    const int iLevelCap = pow(2, iLevel + 1);
+    image_fmt wavelet1(2,1,1,1), wavelet2(2,1,1,1);
+    image_fmt control_matrix(iLevelCap, 1, 1, 1);
+        control_matrix(1) = p1; control_matrix(2) = p2;
+
+    data_fmt *updateIndex = control_matrix.data() + 2;
+    for(int iPos = 2; iPos < iLevelCap; iPos++)
     {
-        midTier = control_matrix.back();
-        control_matrix.push_back((lowTier + midTier).get_convolve( H[0 + 1]));
-        lowTier = midTier;
+        wavelet1.fill(lowP, midP);
+        cimglist_for(H, index) newP += H[index].dot(wavelet1);
+        // control_matrix(iPos, 1) = newP;
+        // cdawontrol_matrix(iPos,  newP1) = 10;
+        *(updateIndex++) = newP;
+        lowP = midP;
+        midP = newP;
+        newP = 0;
     }
+
+    return control_matrix;
+}
+
+const image_fmt scalingFunction(const int iIndex,
+                               const image_fmt &psi1, const image_fmt &ima)
+{
+    image_fmt ret(psi1.width(), 1, 1, 1);
+    int iPos;
+    double dScalar;
+
+    switch(iIndex)
+    {
+        case 1:
+            iPos = 0;
+            dScalar = (5.0 / 24.0);
+            cimg_for(ret, ptr, data_fmt)
+            {
+                // sqrt(5/24*wav_1(2x-1))
+                *ptr = sqrt(dScalar * psi1( ((2.0 * iPos++) - 1)));
+            }
+            break;
+        case 2:
+            iPos = 0;
+            dScalar = (15.0 / 4.0);
+            cimg_for(ret, ptr, data_fmt)
+            {
+                // sqrt(15/4*wav_1(2x))
+                *ptr = sqrt(dScalar * psi1( ((2.0 * iPos++) )));
+            }
+            break;
+        case 3:
+            iPos = 0;
+            dScalar = 15.0 / 8.0;
+            cimg_for(ret, ptr, data_fmt)
+            {
+                // sqrt(15/8*wav_1(2x - 1))
+                *ptr = sqrt(dScalar * psi1( (2.0 * iPos++) - 1));
+            }
+            break;
+        case 4:
+            iPos = 0;
+            dScalar = 15.0 / 4.0;
+            cimg_for(ret, ptr, data_fmt)
+            {
+                // sqrt(15/4*wav_1(2x - 2))
+                *ptr = sqrt(dScalar * psi1( (2.0 * iPos++) - 2) );
+            }
+            break;
+    }
+    return ret;
+}
+
+image_fmt waveletSpace(const int iLevel, const int iIndex,
+                       const image_fmt &psi1, const image_fmt &psi2)
+{
+    image_fmt retWavelet(psi1, "xyz", 0);
+    retWavelet(1) = (pow(2, ((-1 * iLevel) / 2.0)) 
+                        /
+                    sqrt(76.8)
+            ) * psi2(pow(2, iLevel) * x;
+
+    //TODO: do work here
+
+    retWavelet(retWavelet.width() - 1) = 
+            (pow(2, ((-1 * iLevel) / 2.0)) 
+                        /
+                    sqrt(76.8)
+            ) * psi2(pow(2, iLevel) * x - pow(2, iLevel));
 }
 
 void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
@@ -134,13 +214,20 @@ void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
     // const data_fmt divisor = (cimg::abs(field.min()) > field.max()) ? field.min() : field.max();
     //TODO: confirm
     const data_fmt divisor = sqrt(field.dot(field));
-    image_fmt useField = field.get_crop(1,1,0,0,
+    image_fmt useField = field.get_crop(2,1,0,0,
             field.width() - 2, field.height() - 2, 0, 0);
     MLOG(severity_type::debug, "field\n", printImageAligned(useField));
-    image_fmt phi1(useField, "xyz", 0), phi2(useField, "xyz", 0);
     image_fmt spline1 = cubic_spline1(useField.width()),
               spline2 = cubic_spline2(useField.width());
-    // retImg = spline2;
+    const data_fmt p1 = useField.dot(spline1),
+                   p2 = useField.dot(spline2);
+    image_fmt control_matrix = getControlMatrix(1, p1, p2);
+
+    // data_fmt psi1 = scalingFunction(1,
+
+    // IF LEVEL == 1
+    //     retImg = {scale1,s2,s3,s4}.solve(control_matrix);
+    retImg = control_matrix;
     // data_fmt *fieldPtr = useField.data();
     // cimg_for(phi1, ptr, data_fmt)
     // {
