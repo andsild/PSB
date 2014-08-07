@@ -18,49 +18,33 @@ using namespace image_psb;
 namespace wavelet
 {
 
-
-inline image_fmt upSample(const image_fmt &input, const int iNewWidth, const int iNewHeight)
+const imageList_fmt getHighPass()
 {
-    image_fmt ret(iNewWidth, iNewHeight, 1, 1, 0);
-    data_fmt *copyPtr = input._data;
-    // int iHeightStop = (ret.height() % 2 == 1) ? ret.height() + 2: ret.height(),
-    //     iWidhtStop  = (ret.width() % 2 == 1) ? ret.width()   + 2: ret.width();
-    int iHeightStop = (ret.height() % 2 == 1) ? ret.height() + 0: ret.height(),
-        iWidhtStop  = (ret.width() % 2 == 1) ? ret.width()   + 0: ret.width();
-    for(int yPos = 0; yPos < iHeightStop; yPos += 2)
-    {
-        for(int xPos = 0; xPos < iWidhtStop; xPos+= 2)
-        {
-            ret(xPos, yPos) = *(copyPtr++);
-        }
-    }
-
+    image_fmt negative(4,1,1,1,
+                    -2, -21, 1, 9),
+              zero(4,1,1,1,
+                    4,0,0,12),
+              positive(4,1,1,1,
+                    -2, 21, -1,9);
+    imageList_fmt ret(negative, zero, positive);
     return ret;
 }
 
-inline image_fmt downSample(int iNewWidth, int iNewHeight, const image_fmt &input)
+const imageList_fmt getLowPass()
 {
-    int iStartX = iNewWidth  / 2 - input.width()  / 2,
-        iStartY = iNewHeight / 2 - input.height() / 2;
-    image_fmt ret(iNewWidth, iNewHeight, 1, 1, 0);
-    ret.draw_image(iStartX, iStartY, input);
+    image_fmt negative(4,1,1,1,
+                    0.5, 0.75, -0.125, -0.125),
+              zero(4,1,1,1,
+                    1,0,0,0.5),
+              positive(4,1,1,1,
+                    0.5, 0.75, 0.125, -0.125);
+    imageList_fmt ret(negative, zero, positive);
     return ret;
 }
-
-const inline data_fmt getSpline_1_Value(const double x)
-{
-    if(x < -1 || x > 1) return 0;
-    if(x < 0) return ( pow(1.0 + x,2) * (1.0 - 2.0*x));
-    if(x >= 0) return ( pow(1.0 - x,2) * (1.0 + 2.0*x));
-}
+const imageList_fmt H = getLowPass(),
+                    G = getHighPass();
 
 
-const inline double getSpline_2_Value(const double x)
-{
-    if(x < -1.0 || x > 1.0) return 0;
-    if(x < 0.0) return ( pow(1.0 + x, 2) * x);
-    if(x >= 0.0) return ( pow(x - 1, 2) * x);
-}
 
 const inline image_fmt cubic_spline1(const int iWidth)
 {
@@ -101,32 +85,48 @@ const inline image_fmt cubic_spline2(const int iWidth)
     return ret;
 }
 
-
-const imageList_fmt getHighPass()
+inline image_fmt upSample(const image_fmt &input, const int iNewWidth, const int iNewHeight)
 {
-    image_fmt negative(4,1,1,1,
-                    -2, -21, 1, 9),
-              zero(4,1,1,1,
-                    4,0,0,12),
-              positive(4,1,1,1,
-                    -2, 21, -1,9);
-    imageList_fmt ret(negative, zero, positive);
+    image_fmt ret(iNewWidth, iNewHeight, 1, 1, 0);
+    data_fmt *copyPtr = input._data;
+    // int iHeightStop = (ret.height() % 2 == 1) ? ret.height() + 2: ret.height(),
+    //     iWidhtStop  = (ret.width() % 2 == 1) ? ret.width()   + 2: ret.width();
+    int iHeightStop = (ret.height() % 2 == 1) ? ret.height() + 0: ret.height(),
+        iWidhtStop  = (ret.width() % 2 == 1) ? ret.width()   + 0: ret.width();
+    for(int yPos = 0; yPos < iHeightStop; yPos += 2)
+    {
+        for(int xPos = 0; xPos < iWidhtStop; xPos+= 2)
+        {
+            ret(xPos, yPos) = *(copyPtr++);
+        }
+    }
+
     return ret;
 }
 
-const imageList_fmt getLowPass()
+inline image_fmt downSample(int iNewWidth, int iNewHeight, const image_fmt &input)
 {
-    image_fmt negative(4,1,1,1,
-                    0.5, 0.75, -0.125, -0.125),
-              zero(4,1,1,1,
-                    1,0,0,0.5),
-              positive(4,1,1,1,
-                    0.5, 0.75, 0.125, -0.125);
-    imageList_fmt ret(negative, zero, positive);
+    int iStartX = iNewWidth  / 2 - input.width()  / 2,
+        iStartY = iNewHeight / 2 - input.height() / 2;
+    image_fmt ret(iNewWidth, iNewHeight, 1, 1, 0);
+    ret.draw_image(iStartX, iStartY, input);
     return ret;
 }
-const imageList_fmt H = getLowPass(),
-                    G = getHighPass();
+
+const inline data_fmt getSpline_1_Value(const double x)
+{
+    if(x < -1 || x > 1) return 0;
+    if(x < 0) return  (1.0 + x)*(1.0-x) * (1.0 - 2.0*x);
+    if(x >= 0) return (1.0 - x)*(1.0-x) * (1.0 + 2.0*x);
+}
+
+
+const inline data_fmt getSpline_2_Value(const double x)
+{
+    if(x < -1.0 || x > 1.0) return 0;
+    if(x < 0.0) return ( pow(1.0 + x, 2) * x);
+    if(x >= 0.0) return ( pow(x - 1, 2) * x);
+}
 
 image_fmt getControlMatrix(int iLevel, const data_fmt p1, const data_fmt p2)
 {
@@ -177,7 +177,6 @@ const image_fmt scalingFunction(const int iIndex, const int iWidth)
             scalar = (15.0 / 4.0);
             cimg_for(ret, ptr, data_fmt)
             {
-                MLOG(severity_type::debug, 2.0 * pos);
                 // MLOG(severity_type::debug, "\nPos: ", pos,
                 // "\t\tval to sqrt: ", scalar * getSpline_2_Value(2.0 * pos),
                 // "\t val: "    , sqrt(scalar * getSpline_2_Value(2.0 * pos)));
@@ -268,6 +267,27 @@ data_fmt getP(image_fmt field, image_fmt wavelet)
     return sum;
 }
 
+void test_splines()
+{
+    image_fmt test(100, 1, 1, 1);
+    double dPos = -1;
+    cimg_for(test, ptr, data_fmt)
+    {
+        *ptr = getSpline_1_Value(dPos);
+        dPos += 0.02;
+    }
+    MLOG(severity_type::debug, "spline1\n", printImage(test));
+
+
+    dPos = -1; test.fill(0);
+    cimg_for(test, ptr, data_fmt)
+    {
+        *ptr = getSpline_2_Value(dPos);
+        dPos += 0.02;
+    }
+    MLOG(severity_type::debug, "spline2\n", printImage(test));
+}
+
 void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
 {
     // const data_fmt divisor = (cimg::abs(field.min()) > field.max()) ? field.min() : field.max();
@@ -275,8 +295,8 @@ void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
     const data_fmt divisor = sqrt(field.dot(field));
     image_fmt useField = field.get_crop(1,1,0,0,
             field.width() - 2, field.height() - 2, 0, 0);
-    // useField.crop(0,0,0,0,
-    //               3,0,0,0);
+    useField.crop(0,0,0,0,
+                  3,0,0,0);useField(3) = 0;
     MLOG(severity_type::debug, "field\n", printImage(useField));
     const int iWidth = useField.width();
     // image_fmt spline1 = cubic_spline1(iWidth + 100),
@@ -293,10 +313,8 @@ void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
               p2 = getP(useField, psi2),
               p3 = getP(useField, psi3),
               p4 = getP(useField, psi4);
+    // test_splines();
 
-
-    MLOG(severity_type::debug, "psi2\n", printImage(psi2));
-    return;
 
     MLOG(severity_type::debug, "psi1\n", printImage(psi1));
     MLOG(severity_type::debug, "psi2\n", printImage(psi2));

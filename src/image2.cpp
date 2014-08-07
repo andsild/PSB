@@ -172,7 +172,7 @@ std::string printImage(const image_fmt image)
             sign = '-';
         else
             sign = ' ';
-        ss << format("%c%-8.2f", sign, cimg::abs(*(ptr)));
+        ss << format("%c%-9.5f", sign, cimg::abs(*(ptr)));
         iIndex++;
     }
 
