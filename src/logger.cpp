@@ -57,5 +57,5 @@ FileLogPolicy::~FileLogPolicy()
                   unless we are going to use them
                */
 logging::Logger< logging::FileLogPolicy > log_inst(LOG_DIR "execution.log");
-logging::Logger< logging::FileLogPolicy > log_inst_std("/dev/fd/0");
+logging::Logger< logging::FileLogPolicy > log_inst_std("/dev/fd/1");
 #endif
