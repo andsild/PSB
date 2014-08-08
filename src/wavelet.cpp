@@ -180,7 +180,7 @@ image_fmt getControlMatrix(int iLevel, const data_fmt p1, const data_fmt p2)
 const image_fmt scalingFunction(const int iIndex, const int iWidth)
 {
     image_fmt ret(iWidth, 1, 1, 1);
-    int iWidthShift = +2;
+    int iWidthShift = +0;
     double pos, scalar;
     const double unitLength = (1.0 / (iWidth + iWidthShift));
     MLOG(severity_type::debug, "Unit step size: ", unitLength, " from width ", iWidth);
