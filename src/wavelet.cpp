@@ -113,7 +113,7 @@ inline image_fmt downSample(int iNewWidth, int iNewHeight, const image_fmt &inpu
     return ret;
 }
 
-const inline data_fmt getSpline_1_Value(const double x)
+const inline data_fmt getSplineValue_1(const double x)
 {
     if(x < -1 || x > 1) return 0;
     if(x <  0) return  (1.0 + x)*(1.0+x) * (1.0 - 2.0*x);
@@ -121,11 +121,33 @@ const inline data_fmt getSpline_1_Value(const double x)
 }
 
 
-const inline data_fmt getSpline_2_Value(const double x)
+const inline data_fmt getSplineValue_2(const double x)
 {
     if(x < -1.0 || x > 1.0) return 0;
     if(x < 0.0) return  ( pow(1.0 + x, 2) * x);
     if(x >= 0.0) return ( pow(x - 1.0, 2) * x);
+}
+
+inline data_fmt getMotherWavelet_1(const double x)
+{
+    return (
+            - 2.0 * getSplineValue_1(2.0*x + 1)
+            + 4.0 * getSplineValue_1(2.0*x)
+            - 2.0 * getSplineValue_1(2.0*x-1)
+            - 21.0 * getSplineValue_2(2.0*x+1)
+            + 21 * getSplineValue_2(2.0*x-1)
+           );
+}
+
+inline data_fmt getMotherWavelet_2(const double x)
+{
+    return (
+              getSplineValue_1(2.0*x + 1)
+            - getSplineValue_1(2.0*x - 1)
+            + 9.0 * getSplineValue_2(2.0*x+1)
+            + 12.0 * getSplineValue_2(2.0*x)
+            + 9.0 * getSplineValue_2(2.0*x-1)
+           );
 }
 
 image_fmt getControlMatrix(int iLevel, const data_fmt p1, const data_fmt p2)
@@ -165,7 +187,6 @@ const image_fmt scalingFunction(const int iIndex, const int iWidth)
     pos = 0;
     pos = unitLength;
 
-
     int iPos = 1;
 
     switch(iIndex)
@@ -175,7 +196,7 @@ const image_fmt scalingFunction(const int iIndex, const int iWidth)
             cimg_for(ret, ptr, data_fmt)
             {
                 // pos = (double) iPos++ / unitLength;
-                *ptr = scalar * getSpline_1_Value( (2.0 * pos) - 1);
+                *ptr = scalar * getSplineValue_1( (2.0 * pos) - 1);
                 pos += unitLength;
             }
             break;
@@ -185,9 +206,9 @@ const image_fmt scalingFunction(const int iIndex, const int iWidth)
             {
                 // pos = (double) iPos++ / unitLength;
                 // MLOG(severity_type::debug, "\nPos: ", pos,
-                // "\t\tval to sqrt: ", scalar * getSpline_2_Value(2.0 * pos),
-                // "\t val: "    , sqrt(scalar * getSpline_2_Value(2.0 * pos)));
-                *ptr = scalar * getSpline_2_Value(2.0 * pos);
+                // "\t\tval to sqrt: ", scalar * getSplineValue_2(2.0 * pos),
+                // "\t val: "    , sqrt(scalar * getSplineValue_2(2.0 * pos)));
+                *ptr = scalar * getSplineValue_2(2.0 * pos);
                 pos += unitLength;
             }
             break;
@@ -198,9 +219,9 @@ const image_fmt scalingFunction(const int iIndex, const int iWidth)
                 // pos = (double) iPos++ / unitLength;
                 //FIXME: wavelets positive
                 // MLOG(severity_type::debug, "\nPos: ", pos,
-                    // "\t\tval to sqrt: ", scalar * getSpline_2_Value(2.0 * pos- 1),
-                    // "\t val: ", -1 * sqrt(cimg::abs(scalar * getSpline_2_Value(2.0 * pos - 1))));
-                *ptr = scalar * getSpline_2_Value(2.0 * pos - 1);
+                    // "\t\tval to sqrt: ", scalar * getSplineValue_2(2.0 * pos- 1),
+                    // "\t val: ", -1 * sqrt(cimg::abs(scalar * getSplineValue_2(2.0 * pos - 1))));
+                *ptr = scalar * getSplineValue_2(2.0 * pos - 1);
                 pos += unitLength;
             }
             break;
@@ -210,9 +231,9 @@ const image_fmt scalingFunction(const int iIndex, const int iWidth)
             {
                 // pos = (double)iPos++ / unitLength;
                 // MLOG(severity_type::debug, "\nPos: ", pos,
-                // "\t\tval to sqrt: ", scalar * getSpline_2_Value(2.0 * pos - 2),
-                // "\t val: "    , sqrt(scalar * getSpline_2_Value(2.0 * pos - 2)));
-                *ptr = scalar * getSpline_2_Value(2.0 * pos - 2);
+                // "\t\tval to sqrt: ", scalar * getSplineValue_2(2.0 * pos - 2),
+                // "\t val: "    , sqrt(scalar * getSplineValue_2(2.0 * pos - 2)));
+                *ptr = scalar * getSplineValue_2(2.0 * pos - 2);
                 pos += unitLength;
             }
             if(pos - unitLength > 1)
@@ -236,7 +257,7 @@ image_fmt waveletSpace(const int iLevel, const int k, const int iWidth)
         const double LHS = pow(2.0, ( (-1 * iLevel) / 2.0)) / sqrt(76.8);
         cimg_for(retWavelet, ptr, data_fmt)
         {
-            *ptr = LHS * getSpline_2_Value(indexShift * x);
+            *ptr = LHS * getMotherWavelet_2(indexShift * x);
             x += unitLength;
         }
     }
@@ -245,7 +266,7 @@ image_fmt waveletSpace(const int iLevel, const int k, const int iWidth)
         const double LHS = pow(2.0, ( (-1 * iLevel) / 2.0)) / sqrt(76.8);
         cimg_for(retWavelet, ptr, data_fmt)
         {
-            *ptr = LHS * getSpline_2_Value(indexShift * x - indexShift);
+            *ptr = LHS * getMotherWavelet_2(indexShift * x - indexShift);
             x += unitLength;
         }
     }
@@ -255,7 +276,7 @@ image_fmt waveletSpace(const int iLevel, const int k, const int iWidth)
         const double LHS = pow(2.0, ((-1 * iLevel) / 2.0)) / sqrt(729.6);
         cimg_for(retWavelet, ptr, data_fmt)
         {
-            *ptr = LHS * getSpline_1_Value(indexShift * x - (k / 2));
+            *ptr = LHS * getMotherWavelet_1(indexShift * x - (k / 2));
             x += unitLength;
         }
     }
@@ -265,7 +286,7 @@ image_fmt waveletSpace(const int iLevel, const int k, const int iWidth)
 
         cimg_for(retWavelet, ptr, data_fmt)
         {
-            *ptr = LHS * getSpline_2_Value(indexShift * x - ((k - 1) / 2));
+            *ptr = LHS * getMotherWavelet_2(indexShift * x - ((k - 1) / 2));
             x += unitLength;
         }
     }
@@ -280,7 +301,7 @@ void test_splines(const int iSteps)
     double dStepSize = 2 / (double)iSteps;
     cimg_for(test, ptr, data_fmt)
     {
-        *ptr = getSpline_1_Value(dPos);
+        *ptr = getSplineValue_1(dPos);
         dPos += dStepSize;
     }
     MLOG(severity_type::debug, "spline1\n", printImage(test));
@@ -289,10 +310,33 @@ void test_splines(const int iSteps)
     dPos = -1; test.fill(0);
     cimg_for(test, ptr, data_fmt)
     {
-        *ptr = getSpline_2_Value(dPos);
+        *ptr = getSplineValue_2(dPos);
         dPos += dStepSize;
     }
     MLOG(severity_type::debug, "spline2\n", printImage(test));
+}
+
+void test_motherWavelet(const int iWidth)
+{
+    image_fmt test(iWidth, 1, 1, 1);
+    double dPos = -1;
+    double dStepSize = 2 / (double)iWidth;
+    cimg_for(test, ptr, data_fmt)
+    {
+        *ptr = getMotherWavelet_1(dPos);
+        dPos += dStepSize;
+    }
+
+
+    dPos = -1;
+    image_fmt test2(iWidth, 1, 1, 1);
+    cimg_for(test2, ptr, data_fmt)
+    {
+        *ptr = getMotherWavelet_2(dPos);
+        dPos += dStepSize;
+    }
+    MLOG(severity_type::debug, "Testing mother wavelet 1,2\n", printImage(test)
+                                ,"\n",printImage(test2));
 }
 
 void test_scales(int iWidth)
@@ -356,6 +400,7 @@ void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
     // test_splines(iWidth);
     // test_scales(100);
     // test_wavelets(100);
+    // test_motherWavelet(100);
     MLOG(severity_type::debug, "\np1: ", p1, "\t\tp2: ", p2, "\t\tp3: ", p3, "\t\tp4: ", p4);
     std::vector<data_fmt> Phi;
     Phi.push_back(p1);    Phi.push_back(p2);  Phi.push_back(p3);Phi.push_back(p4);
