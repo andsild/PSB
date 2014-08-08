@@ -90,12 +90,12 @@ inline image_fmt upSample(const image_fmt &input, const int iNewWidth, const int
     image_fmt ret(iNewWidth, iNewHeight, 1, 1, 0);
     data_fmt *copyPtr = input._data;
     // int iHeightStop = (ret.height() % 2 == 1) ? ret.height() + 2: ret.height(),
-    //     iWidhtStop  = (ret.width() % 2 == 1) ? ret.width()   + 2: ret.width();
+    //     iWidthShift  = (ret.width() % 2 == 1) ? ret.width()   + 2: ret.width();
     int iHeightStop = (ret.height() % 2 == 1) ? ret.height() + 0: ret.height(),
-        iWidhtStop  = (ret.width() % 2 == 1) ? ret.width()   + 0: ret.width();
+        iWidthShift  = (ret.width() % 2 == 1) ? ret.width()   + 0: ret.width();
     for(int yPos = 0; yPos < iHeightStop; yPos += 2)
     {
-        for(int xPos = 0; xPos < iWidhtStop; xPos+= 2)
+        for(int xPos = 0; xPos < iWidthShift; xPos+= 2)
         {
             ret(xPos, yPos) = *(copyPtr++);
         }
@@ -116,16 +116,16 @@ inline image_fmt downSample(int iNewWidth, int iNewHeight, const image_fmt &inpu
 const inline data_fmt getSpline_1_Value(const double x)
 {
     if(x < -1 || x > 1) return 0;
-    if(x < 0) return  (1.0 + x)*(1.0-x) * (1.0 - 2.0*x);
-    if(x >= 0) return (1.0 - x)*(1.0-x) * (1.0 + 2.0*x);
+    if(x <  0) return  (1.0 + x)*(1.0+x) * (1.0 - 2.0*x);
+    if(x >= 0) return  (1.0 - x)*(1.0-x) * (1.0 + 2.0*x);
 }
 
 
 const inline data_fmt getSpline_2_Value(const double x)
 {
     if(x < -1.0 || x > 1.0) return 0;
-    if(x < 0.0) return ( pow(1.0 + x, 2) * x);
-    if(x >= 0.0) return ( pow(x - 1, 2) * x);
+    if(x < 0.0) return  ( pow(1.0 + x, 2) * x);
+    if(x >= 0.0) return ( pow(x - 1.0, 2) * x);
 }
 
 image_fmt getControlMatrix(int iLevel, const data_fmt p1, const data_fmt p2)
@@ -154,127 +154,134 @@ image_fmt getControlMatrix(int iLevel, const data_fmt p1, const data_fmt p2)
     return control_matrix;
 }
 
+// shift = -1, pos = 0 has some interesting properties
 const image_fmt scalingFunction(const int iIndex, const int iWidth)
 {
     image_fmt ret(iWidth, 1, 1, 1);
-    double scalar,
-           pos,
-           unitLength = (1.0 / (iWidth + -1));
-    pos = unitLength;
+    int iWidthShift = +2;
+    double pos, scalar;
+    const double unitLength = (1.0 / (iWidth + iWidthShift));
+    MLOG(severity_type::debug, "Unit step size: ", unitLength, " from width ", iWidth);
     pos = 0;
+    pos = unitLength;
+
+
+    int iPos = 1;
 
     switch(iIndex)
     {
         case 1:
-            scalar = (5.0 / 24.0);
+            scalar = sqrt(5.0 / 24.0);
             cimg_for(ret, ptr, data_fmt)
             {
-                *ptr = sqrt(scalar * getSpline_1_Value( (2.0 * pos) - 1));
+                // pos = (double) iPos++ / unitLength;
+                *ptr = scalar * getSpline_1_Value( (2.0 * pos) - 1);
                 pos += unitLength;
             }
             break;
         case 2:
-            scalar = (15.0 / 4.0);
+            scalar = sqrt(15.0 / 4.0);
             cimg_for(ret, ptr, data_fmt)
             {
+                // pos = (double) iPos++ / unitLength;
                 // MLOG(severity_type::debug, "\nPos: ", pos,
                 // "\t\tval to sqrt: ", scalar * getSpline_2_Value(2.0 * pos),
                 // "\t val: "    , sqrt(scalar * getSpline_2_Value(2.0 * pos)));
-                *ptr = sqrt(scalar * getSpline_2_Value(2.0 * pos));
+                *ptr = scalar * getSpline_2_Value(2.0 * pos);
                 pos += unitLength;
             }
             break;
         case 3:
-            scalar = (15.0 / 8.0);
+            scalar = sqrt(15.0 / 8.0);
             cimg_for(ret, ptr, data_fmt)
             {
+                // pos = (double) iPos++ / unitLength;
                 //FIXME: wavelets positive
                 // MLOG(severity_type::debug, "\nPos: ", pos,
                     // "\t\tval to sqrt: ", scalar * getSpline_2_Value(2.0 * pos- 1),
                     // "\t val: ", -1 * sqrt(cimg::abs(scalar * getSpline_2_Value(2.0 * pos - 1))));
-                data_fmt inVal = scalar * getSpline_2_Value(2.0 * pos - 1);
-                if(inVal < 0) inVal = cimg::abs(inVal);
-                *ptr = sqrt(inVal);
-                if(pos < 0.5) *ptr = *ptr * -1;
+                *ptr = scalar * getSpline_2_Value(2.0 * pos - 1);
                 pos += unitLength;
             }
             break;
         case 4:
-            scalar = (-1.0 * 15.0 / 4.0);
+            scalar = sqrt(15.0 / 4.0);
             cimg_for(ret, ptr, data_fmt)
             {
+                // pos = (double)iPos++ / unitLength;
                 // MLOG(severity_type::debug, "\nPos: ", pos,
                 // "\t\tval to sqrt: ", scalar * getSpline_2_Value(2.0 * pos - 2),
                 // "\t val: "    , sqrt(scalar * getSpline_2_Value(2.0 * pos - 2)));
-                *ptr = -1.0 * sqrt(scalar * getSpline_2_Value(2.0 * pos - 2));
+                *ptr = scalar * getSpline_2_Value(2.0 * pos - 2);
                 pos += unitLength;
             }
+            if(pos - unitLength > 1)
+               MLOG(severity_type::warning, "pos out of scale in scaling function");
             break;
     }
     return ret;
 }
 
-image_fmt waveletSpace(const int iLevel, const int iWidth)
+image_fmt waveletSpace(const int iLevel, const int k, const int iWidth)
 {
-    const int iLevelCap = pow(2,iLevel);
-    image_fmt retWavelet(iWidth, iLevelCap, 1, 1);
-    for(int yPos = 0; yPos < 4; yPos++)
+    image_fmt retWavelet(iWidth, 1, 1, 1);
+    int iWidthShift = +2;
+    const double unitLength = (1.0 / (iWidth + iWidthShift)),
+                indexShift = pow(2.0, iLevel);
+    double x = unitLength;
+    // x = 0;
+
+    if(k == 1) /* Base case, first level */
     {
-        // iterate over each image
+        const double LHS = pow(2.0, ( (-1 * iLevel) / 2.0)) / sqrt(76.8);
+        cimg_for(retWavelet, ptr, data_fmt)
+        {
+            *ptr = LHS * getSpline_2_Value(indexShift * x);
+            x += unitLength;
+        }
     }
-    int x = 1;//FIXME
-    retWavelet(1) = (pow(2.0, ((-1 * iLevel) / 2.0)) 
-                        /
-                    sqrt(76.8)
-            ) * getSpline_2_Value(pow(2.0, iLevel) * x);
-
-    //TODO: do work here
-    for(int kPos = 2; kPos < iLevelCap; kPos++)
+    else if(k == pow(2, iLevel+1)) /* Base case, last level */
     {
-        retWavelet(kPos) = (pow(2.0, ((-1 * iLevel) / 2.0)) 
-                                    /
-                                    sqrt(729.6)
-                            ) * getSpline_1_Value(pow(2, iLevel) * x - (kPos / 2));
-
-
-        retWavelet(kPos) = (pow(2, ((-1 * iLevel) / 2.0)) 
-                                    /
-                                    sqrt(153.6)
-                            ) * getSpline_2_Value(pow(2, iLevel) * x - ((kPos - 1) / 2));
-        
+        const double LHS = pow(2.0, ( (-1 * iLevel) / 2.0)) / sqrt(76.8);
+        cimg_for(retWavelet, ptr, data_fmt)
+        {
+            *ptr = LHS * getSpline_2_Value(indexShift * x - indexShift);
+            x += unitLength;
+        }
     }
-    if(iWidth % 2 != 0)
+
+    else if(k % 2 == 0) /* Even numbers */
     {
+        const double LHS = pow(2.0, ((-1 * iLevel) / 2.0)) / sqrt(729.6);
+        cimg_for(retWavelet, ptr, data_fmt)
+        {
+            *ptr = LHS * getSpline_1_Value(indexShift * x - (k / 2));
+            x += unitLength;
+        }
     }
-        
+    else /* Odd numbers of k */
+    {
+        const double LHS = pow(2, ((-1 * iLevel) / 2.0)) / sqrt(153.6);
 
-    retWavelet(retWavelet.width() - 1) = 
-            (pow(2.0, ((-1 * iLevel) / 2.0)) 
-                        /
-                    sqrt(76.8)
-            ) *getSpline_1_Value(pow(2.0, iLevel) * x - pow(2.0, iLevel));
+        cimg_for(retWavelet, ptr, data_fmt)
+        {
+            *ptr = LHS * getSpline_2_Value(indexShift * x - ((k - 1) / 2));
+            x += unitLength;
+        }
+    }
+
+    return retWavelet;
 }
 
-data_fmt getP(image_fmt field, image_fmt wavelet)
+void test_splines(const int iSteps)
 {
-    data_fmt *ptr1 = field.data();
-    data_fmt sum = 0;
-    cimg_for(wavelet, ptr2, data_fmt)
-    {
-        sum += *(ptr1++) * *ptr2;
-    }
-
-    return sum;
-}
-
-void test_splines()
-{
-    image_fmt test(100, 1, 1, 1);
+    image_fmt test(iSteps, 1, 1, 1);
     double dPos = -1;
+    double dStepSize = 2 / (double)iSteps;
     cimg_for(test, ptr, data_fmt)
     {
         *ptr = getSpline_1_Value(dPos);
-        dPos += 0.02;
+        dPos += dStepSize;
     }
     MLOG(severity_type::debug, "spline1\n", printImage(test));
 
@@ -283,9 +290,31 @@ void test_splines()
     cimg_for(test, ptr, data_fmt)
     {
         *ptr = getSpline_2_Value(dPos);
-        dPos += 0.02;
+        dPos += dStepSize;
     }
     MLOG(severity_type::debug, "spline2\n", printImage(test));
+}
+
+void test_scales(int iWidth)
+{
+    const image_fmt psi1 = scalingFunction(1, iWidth),
+                    psi2 = scalingFunction(2, iWidth),
+                    psi3 = scalingFunction(3, iWidth),
+                    psi4 = scalingFunction(4, iWidth);
+    MLOG(severity_type::debug, "testing psi's in respective order 1 to 4\n",
+        printImage(psi1),"\n", printImage(psi2),"\n", printImage(psi3),"\n",
+        printImage(psi4));
+}
+
+void test_wavelets(const int iWidth)
+{
+    const image_fmt wav1 = waveletSpace(1,1, iWidth),
+                    wav2 = waveletSpace(1,2, iWidth),
+                    wav3 = waveletSpace(1,3, iWidth),
+                    wav4 = waveletSpace(1,4, iWidth);
+    MLOG(severity_type::debug, "testing wav's in respective order 1 to 4\n",
+        printImage(wav1),"\n", printImage(wav2),"\n", printImage(wav3),"\n",
+        printImage(wav4));
 }
 
 void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
@@ -297,6 +326,12 @@ void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
             field.width() - 2, field.height() - 2, 0, 0);
     useField.crop(0,0,0,0,
                   3,0,0,0);useField(3) = 0;
+    useField.assign(8,1,1,1,
+            -10, -100, -100, -100,
+            100, 100, 100, 10);
+
+
+
     MLOG(severity_type::debug, "field\n", printImage(useField));
     const int iWidth = useField.width();
     // image_fmt spline1 = cubic_spline1(iWidth + 100),
@@ -305,40 +340,58 @@ void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
     //                p2 = useField.dot(spline2);
     // image_fmt control_matrix = getControlMatrix(1, p1, p2);
 
-    image_fmt psi1 = scalingFunction(1, iWidth),
-              psi2 = scalingFunction(2, iWidth),
-              psi3 = scalingFunction(3, iWidth),
-              psi4 = scalingFunction(4, iWidth);
-    data_fmt  p1 = getP(useField, psi1),
-              p2 = getP(useField, psi2),
-              p3 = getP(useField, psi3),
-              p4 = getP(useField, psi4);
-    // test_splines();
-
+    const image_fmt psi1 = scalingFunction(1, iWidth),
+                    psi2 = scalingFunction(2, iWidth),
+                    psi3 = scalingFunction(3, iWidth),
+                    psi4 = scalingFunction(4, iWidth);
+    const data_fmt  p1 = useField.dot(psi1),
+                    p2 = useField.dot(psi2),
+                    p3 = useField.dot(psi3),
+                    p4 = useField.dot(psi4);
 
     MLOG(severity_type::debug, "psi1\n", printImage(psi1));
     MLOG(severity_type::debug, "psi2\n", printImage(psi2));
     MLOG(severity_type::debug, "psi3\n", printImage(psi3));
     MLOG(severity_type::debug, "psi4\n", printImage(psi4));
+    // test_splines(iWidth);
+    // test_scales(100);
+    // test_wavelets(100);
     MLOG(severity_type::debug, "\np1: ", p1, "\t\tp2: ", p2, "\t\tp3: ", p3, "\t\tp4: ", p4);
-    std::vector<data_fmt> pees;
-    pees.push_back(p1);    pees.push_back(p2);  pees.push_back(p3);pees.push_back(p4);
+    std::vector<data_fmt> Phi;
+    Phi.push_back(p1);    Phi.push_back(p2);  Phi.push_back(p3);Phi.push_back(p4);
 
     imageList_fmt testBase(psi1,psi2,psi3,psi4);
     retImg.crop(2, 1, 0, 0, 
                 useField.width() + 1, retImg.height() - 2, 0, 0);
     retImg.fill(0);
-    int iCount = 0;
+    int iImageIndex = 0;
+    data_fmt sum = 0;
     cimg_for(retImg, ptr, data_fmt)
     {
+        sum = 0;
         for(int iPos = 0; iPos < 4; iPos++)
         {
-            *ptr += testBase[iPos][iCount++] * pees[iPos];
+            sum += testBase[iPos][iImageIndex] * Phi[iPos];
         }
+        *ptr = sum;
+        iImageIndex++;
     }
+
+    retImg.fill(0); iImageIndex = 0;
+    cimg_for(retImg, ptr, data_fmt)
+    {
+        sum = 0;
+        for(int iPos = 0; iPos < 4; iPos++)
+        {
+            sum += useField.dot(testBase[iPos]) * testBase[iPos][iImageIndex];
+        }
+        *ptr = sum;
+        iImageIndex++;
+    }
+
     // cimglist_for(testBase, i)
     // {
-    //     retImg += ( testBase[i] * pees.at(i) ) ;
+    //     retImg += ( testBase[i] * Phi.at(i) ) ;
     // }
 
     MLOG(severity_type::debug, "returned image\n", printImage(retImg));
