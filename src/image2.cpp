@@ -329,62 +329,72 @@ void divide(int iDivSize, image_fmt* const origImage, image_fmt* const rho,
         guessList.push_back(guess);
         return;
     }
-    //
-    // if(iDivSize == 2)
-    // {
-    //     int w = origImage.width(); int h = origImage.height();
-    //     origImageList.push_back(&origImage.get_crop(0, 0, 0, 0, w, h / 2, 0, 0));
-    //     origImageList.push_back(origImage.get_crop(0, h / 2, 0, 0, w, h, 0, 0));
-    //     rhoList.push_back(rho.get_crop(0, 0, 0, 0, w, h / 2, 0, 0));
-    //     rhoList.push_back(rho.get_crop(0, h / 2, 0, 0, w, h, 0, 0));
-    //
-    //     image_fmt guess = makeInitialGuess(origImage);
-    //     guessList.push_back(guess.get_crop(0, 0, 0, 0, w, h / 2, 0, 0));
-    //     guessList.push_back(guess.get_crop(0, h / 2, 0, 0, w, h, 0, 0));
-    //     return;
-    // }
-    //
-    //
-    // const int WIDHT_REGION = (origImage.width() / (iDivSize / 2));
-    // const int HEIGHT_REGION = (origImage.height() / (iDivSize / 2));
-    //
-    // for(int xSlice = 0; xSlice < iDivSize / 2; xSlice++)
-    // {
-    //     for(int ySlice = 0; ySlice < iDivSize / 2; ySlice++)
-    //     {
-    //         int iLeftmostX = xSlice * WIDHT_REGION,
-    //             iUpperY = ySlice * HEIGHT_REGION;
-    //         int iRightmostX = iLeftmostX + WIDHT_REGION -1,
-    //             iLowerY = iUpperY + HEIGHT_REGION - 1;
-    //
-    //         if(WIDHT_REGION % 2 == 0 && xSlice == 0)
-    //             iRightmostX++;
-    //         if(HEIGHT_REGION % 2 == 0 && ySlice == 0)
-    //             iLowerY++;
-    //
-    //         if(iRightmostX > origImage.width())
-    //             iRightmostX = origImage.width() - 1;
-    //         if(iLowerY > origImage.height())
-    //             iLowerY = origImage.height() - 1;
-    //
-    //         image_fmt origImg = origImage.get_crop(iLeftmostX, iUpperY, 0,
-    //                                             iRightmostX,
-    //                                             iLowerY, 0);
-    //         origImageList.push_back(origImg);
-    //
-    //         rhoList.push_back(rho.get_crop(iLeftmostX, iUpperY, 0,
-    //                                                             iRightmostX,
-    //                                                             iLowerY, 0));
-    //
-    //         image_fmt retRegion(origImg, "xyz", 0);
-    //         cimg_for_borderXY(origImg,x,y,BORDER_SIZE)
-    //         {
-    //             retRegion(x,y) = origImg(x,y);
-    //         }
-    //         guessList.push_back(retRegion);
-    //     }
-    // }
+    
+    if(iDivSize == 2)
+    {
+        int w = origImage->width(); int h = origImage->height();
+        image_fmt origImageC1 = origImage->get_crop(0, 0, 0, 0, w, h / 2, 0, 0),
+                  origImageC2 = origImage->get_crop(0, h / 2, 0, 0, w, h, 0, 0);
+        origImageList.push_back(&origImageC1);
+        origImageList.push_back(&origImageC2);
 
+        image_fmt rhoC1 = rho->get_crop(0, 0, 0, 0, w, h / 2, 0, 0),
+                  rhoC2 = rho->get_crop(0, h / 2, 0, 0, w, h, 0, 0);
+        rhoList.push_back(&rhoC1);
+        rhoList.push_back(&rhoC2);
+    
+        image_fmt* guess = new image_fmt;
+        makeInitialGuess(*origImage, *guess);
+        image_fmt guessC1 = guess->get_crop(0, 0, 0, 0, w, h / 2, 0, 0),
+                  guessC2 = guess->get_crop(0, h / 2, 0, 0, w, h, 0, 0);
+        guessList.push_back(&guessC1);
+        guessList.push_back(&guessC2);
+        return;
+    }
+
+    const int iWidth = origImage->width(), iHeight = origImage->height();
+    const int WIDHT_REGION = (iWidth / (iDivSize / 2));
+    const int HEIGHT_REGION = (iHeight / (iDivSize / 2));
+    
+    for(int xSlice = 0; xSlice < iDivSize / 2; xSlice++)
+    {
+        for(int ySlice = 0; ySlice < iDivSize / 2; ySlice++)
+        {
+            int iLeftmostX = xSlice * WIDHT_REGION,
+                iUpperY = ySlice * HEIGHT_REGION;
+            int iRightmostX = iLeftmostX + WIDHT_REGION -1,
+                iLowerY = iUpperY + HEIGHT_REGION - 1;
+    
+            if(WIDHT_REGION % 2 == 0 && xSlice == 0)
+                iRightmostX++;
+            if(HEIGHT_REGION % 2 == 0 && ySlice == 0)
+                iLowerY++;
+    
+            if(iRightmostX > iWidth)
+                iRightmostX = iWidth - 1;
+            if(iLowerY > iHeight)
+                iLowerY = iHeight - 1;
+    
+            image_fmt origImg = origImage->get_crop(iLeftmostX, iUpperY, 0,
+                                                iRightmostX,
+                                                iLowerY, 0);
+            image_fmt *ptr = &origImg;
+            origImageList.push_back(ptr);
+            image_fmt rhoPush = rho->get_crop(iLeftmostX, iUpperY, 0,
+                                            iRightmostX,
+                                            iLowerY, 0) ;
+            rhoList.push_back(&rhoPush);
+    
+            image_fmt retRegion(origImg, "xyz", 0);
+            cimg_for_borderXY(origImg,x,y,BORDER_SIZE)
+            {
+                retRegion(x,y) = origImg(x,y);
+            }
+            guessList.push_back(&retRegion);
+        }
+    }
+
+    int a = 1;
 }
 
 /** Compute a prior for an image.
@@ -472,11 +482,11 @@ void stageDirectSolvers(std::vector<solver::Solver*> &vSolvers,
     std::string sPrefix= "";
     //TODO: more clever to prefix label with type, end with filename, and then
     //      put optional in middle, that way the code scales easilier
-    if(dNoise)
+    if(dNoise != 0.0)
         sPrefix += "noise__" + std::to_string(dNoise);
     else
         sPrefix += "__";
-    if(fieldModifier)
+    if(fieldModifier != 1.0)
         sPrefix += "re__";
     else
         sPrefix += "__";
@@ -520,28 +530,21 @@ void stageDirectSolvers(std::vector<solver::Solver*> &vSolvers,
 }
 
 void stageIterativeSolvers(std::vector<solver::Solver*> &vSolvers,
-        image_fmt &img, const data_fmt fieldModifier,
-        const double dNoise, const double dTolerance, const std::string sFilename,
+        image_fmt &img, const double dTolerance, const data_fmt fieldModifier,
+        const double dNoise, const std::string sFilename,
         const bool gauss, const bool jacobi, const bool sor)
 {
     // if(dNoise != 0.0)
     //     use_img.noise(dNoise);
     const int DIVISION_SIZE = 4;
     image_fmt* use_img  = &img;
-    image_fmt* field = new image_fmt;
+    image_fmt* field = new image_fmt; // TODO: excessive: field is also made in direct solvers
     makeField(img, fieldModifier, *field);
     std::string sPrefix = "";
 
     std::vector<image_fmt *> origList, guessList, rhoList;
-    
-    // MLOG(severity_type::extensive, "Image:\n", printImageAligned(use_img));
-    // MLOG(severity_type::extensive, "Field\n:", printImageAligned(field));
-    
     divide(DIVISION_SIZE, use_img, field, origList, rhoList, guessList);
     
-    
-    //TODO: more clever to prefix label with type, end with filename, and then
-    //      put optional in middle, that way the code scales easilier
     if(dNoise)
         sPrefix += "noise__" + std::to_string(dNoise);
     else
@@ -608,6 +611,18 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
     if(dNoise != 0.0 && resolve != 1.0)
         stageDirectSolvers(vSolvers, use_img, resolve, dNoise, sFilename, dst, dct,
                             wavelet_5x5, wavelet_7x7, multiwavelet);
+
+    stageIterativeSolvers(vSolvers, use_img, dTolerance, 1.0, 0.0, sFilename, 
+                          gauss, jacobi, sor);
+    if(dNoise != 0.0)
+        stageIterativeSolvers(vSolvers, use_img, 1.0, dTolerance, dNoise, sFilename,
+                          gauss, jacobi, sor);
+    if(resolve != 1.0)
+        stageIterativeSolvers(vSolvers, use_img, dTolerance, resolve, 0.0, sFilename,
+                            gauss, jacobi, sor);
+    if(dNoise != 0.0 && resolve != 1.0)
+        stageIterativeSolvers(vSolvers, use_img, dTolerance, resolve, dNoise, sFilename, 
+                            gauss, jacobi, sor);
     const int DIVISION_SIZE = 4;
     
     
