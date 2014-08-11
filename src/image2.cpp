@@ -29,8 +29,6 @@ using namespace image_display;
 
 namespace image_psb
 {
-image_fmt makeInitialGuess(const image_fmt &image);
-
 /** Simple function to render a CImg (useful for threading)
 */
 void renderImage(CImgDisplay disp)
@@ -43,6 +41,28 @@ void renderImage(CImgDisplay disp)
 
     disp.close();
 }
+
+
+void makeInitialGuess(
+        const image_fmt &input, image_fmt &ret)
+{
+    if(input.size() < 1)
+    {
+        std::string sMsg = "input was not initialized before creating border"
+                           " [[ width: " + std::to_string(input.width()) 
+                           + " height: " + std::to_string(input.height()) + " ]]";
+        throw ImageException(sMsg.c_str());
+    }
+
+    const int DEFAULT_GUESS_VAL = 0;
+    ret.assign(input, "xyz", DEFAULT_GUESS_VAL);
+
+    cimg_for_borderXY(input,x,y,BORDER_SIZE)
+    {
+        ret(x,y) = input(x,y);
+    }
+}
+
 
 /** Round the pixel values of an image to default RGB values, so that it can
    be presented on a screen
@@ -241,7 +261,8 @@ void toGrayScale(image_fmt &image)
 
 /** Compute the field from an image
 */
-image_fmt makeField(const image_fmt &input)
+void makeField(
+        const image_fmt &input, const data_fmt modifier, image_fmt &ret)
 {
     int iKernDim = 3;
     /* Discrete poison stencil */
@@ -249,7 +270,10 @@ image_fmt makeField(const image_fmt &input)
                     0,1,0,
                     1,-4,1,
                     0,1,0);
-    return input.get_convolve(kernel, 0);
+    ret = input.get_convolve(kernel, 0);
+    // const image_fmt ret = input.get_convolve(kernel, 0);
+    // return &ret;
+    // if(modifier != 1.0) return ret * modifier;
 }
 
 
@@ -280,7 +304,7 @@ bool readImage(image_fmt &image, std::string sFileName)
   */
 double imageDiff(const image_fmt &source, const image_fmt &comparator)
 {
-        return (double)(source.MSE(comparator));
+    return (double)(source.MSE(comparator));
 }
 
 /** Split an image, its field and guess separated regions
@@ -291,101 +315,81 @@ double imageDiff(const image_fmt &source, const image_fmt &comparator)
   @param rhoList a return list with iDivSize different splits
   @param guessList a return list with iDivSize different splits
 */
-void divide(int iDivSize, const image_fmt &origImage, const image_fmt &rho,
-            imageList_fmt &origImageList, imageList_fmt &rhoList, imageList_fmt &guessList)
+void divide(int iDivSize, image_fmt* const origImage, image_fmt* const rho,
+            std::vector<image_fmt *> &origImageList,
+            std::vector<image_fmt *> &rhoList,
+            std::vector<image_fmt *> &guessList)
 {
-
     if(iDivSize == 1)
     {
         origImageList.push_back(origImage);
         rhoList.push_back(rho);
-        guessList.push_back(makeInitialGuess(origImage));
+        image_fmt* guess = new image_fmt;
+        makeInitialGuess(*origImage, *guess);
+        guessList.push_back(guess);
         return;
     }
-    
-    if(iDivSize == 2)
-    {
-        int w = origImage.width(); int h = origImage.height();
-        origImageList.push_back(origImage.get_crop(0, 0, 0, 0, w, h / 2, 0, 0));
-        origImageList.push_back(origImage.get_crop(0, h / 2, 0, 0, w, h, 0, 0));
-        rhoList.push_back(rho.get_crop(0, 0, 0, 0, w, h / 2, 0, 0));
-        rhoList.push_back(rho.get_crop(0, h / 2, 0, 0, w, h, 0, 0));
-
-        image_fmt guess = makeInitialGuess(origImage);
-        guessList.push_back(guess.get_crop(0, 0, 0, 0, w, h / 2, 0, 0));
-        guessList.push_back(guess.get_crop(0, h / 2, 0, 0, w, h, 0, 0));
-        return;
-    }
-
-
-    const int WIDHT_REGION = (origImage.width() / (iDivSize / 2));
-    const int HEIGHT_REGION = (origImage.height() / (iDivSize / 2));
-
-    for(int xSlice = 0; xSlice < iDivSize / 2; xSlice++)
-    {
-        for(int ySlice = 0; ySlice < iDivSize / 2; ySlice++)
-        {
-            int iLeftmostX = xSlice * WIDHT_REGION,
-                iUpperY = ySlice * HEIGHT_REGION;
-            int iRightmostX = iLeftmostX + WIDHT_REGION -1,
-                iLowerY = iUpperY + HEIGHT_REGION - 1;
-
-            if(WIDHT_REGION % 2 == 0 && xSlice == 0)
-                iRightmostX++;
-            if(HEIGHT_REGION % 2 == 0 && ySlice == 0)
-                iLowerY++;
-
-            if(iRightmostX > origImage.width())
-                iRightmostX = origImage.width() - 1;
-            if(iLowerY > origImage.height())
-                iLowerY = origImage.height() - 1;
-
-            image_fmt origImg = origImage.get_crop(iLeftmostX, iUpperY, 0,
-                                                iRightmostX,
-                                                iLowerY, 0);
-            origImageList.push_back(origImg);
-
-            rhoList.push_back(rho.get_crop(iLeftmostX, iUpperY, 0,
-                                                                iRightmostX,
-                                                                iLowerY, 0));
-
-            image_fmt retRegion(origImg, "xyz", 0);
-            cimg_for_borderXY(origImg,x,y,BORDER_SIZE)
-            {
-                retRegion(x,y) = origImg(x,y);
-            }
-            guessList.push_back(retRegion);
-        }
-    }
+    //
+    // if(iDivSize == 2)
+    // {
+    //     int w = origImage.width(); int h = origImage.height();
+    //     origImageList.push_back(&origImage.get_crop(0, 0, 0, 0, w, h / 2, 0, 0));
+    //     origImageList.push_back(origImage.get_crop(0, h / 2, 0, 0, w, h, 0, 0));
+    //     rhoList.push_back(rho.get_crop(0, 0, 0, 0, w, h / 2, 0, 0));
+    //     rhoList.push_back(rho.get_crop(0, h / 2, 0, 0, w, h, 0, 0));
+    //
+    //     image_fmt guess = makeInitialGuess(origImage);
+    //     guessList.push_back(guess.get_crop(0, 0, 0, 0, w, h / 2, 0, 0));
+    //     guessList.push_back(guess.get_crop(0, h / 2, 0, 0, w, h, 0, 0));
+    //     return;
+    // }
+    //
+    //
+    // const int WIDHT_REGION = (origImage.width() / (iDivSize / 2));
+    // const int HEIGHT_REGION = (origImage.height() / (iDivSize / 2));
+    //
+    // for(int xSlice = 0; xSlice < iDivSize / 2; xSlice++)
+    // {
+    //     for(int ySlice = 0; ySlice < iDivSize / 2; ySlice++)
+    //     {
+    //         int iLeftmostX = xSlice * WIDHT_REGION,
+    //             iUpperY = ySlice * HEIGHT_REGION;
+    //         int iRightmostX = iLeftmostX + WIDHT_REGION -1,
+    //             iLowerY = iUpperY + HEIGHT_REGION - 1;
+    //
+    //         if(WIDHT_REGION % 2 == 0 && xSlice == 0)
+    //             iRightmostX++;
+    //         if(HEIGHT_REGION % 2 == 0 && ySlice == 0)
+    //             iLowerY++;
+    //
+    //         if(iRightmostX > origImage.width())
+    //             iRightmostX = origImage.width() - 1;
+    //         if(iLowerY > origImage.height())
+    //             iLowerY = origImage.height() - 1;
+    //
+    //         image_fmt origImg = origImage.get_crop(iLeftmostX, iUpperY, 0,
+    //                                             iRightmostX,
+    //                                             iLowerY, 0);
+    //         origImageList.push_back(origImg);
+    //
+    //         rhoList.push_back(rho.get_crop(iLeftmostX, iUpperY, 0,
+    //                                                             iRightmostX,
+    //                                                             iLowerY, 0));
+    //
+    //         image_fmt retRegion(origImg, "xyz", 0);
+    //         cimg_for_borderXY(origImg,x,y,BORDER_SIZE)
+    //         {
+    //             retRegion(x,y) = origImg(x,y);
+    //         }
+    //         guessList.push_back(retRegion);
+    //     }
+    // }
 
 }
 
 /** Compute a prior for an image.
   The border condition used it ZZ
 */
-
-image_fmt makeInitialGuess(const image_fmt &image)
-{
-    if(image.size() < 1)
-    {
-        std::string sMsg = "Image was not initialized before creating border"
-                           " [[ width: " + std::to_string(image.width()) 
-                           + " height: " + std::to_string(image.height()) + " ]]";
-        throw ImageException(sMsg.c_str());
-    }
-
-    image_fmt U;
-    const int DEFAULT_GUESS_VAL = 0;
-
-    U.assign(image, "xyz", DEFAULT_GUESS_VAL);
-
-    cimg_for_borderXY(image,x,y,BORDER_SIZE)
-    {
-        U(x,y) = image(x,y);
-    }
-
-    return U;
-}
 
 /** Put together an image that has been divided into regions.
     The method will assume the image was split along the y axis first,
@@ -425,7 +429,9 @@ void addIterativeSolver(std::vector<solver::Solver*> &vIn,
         const int DIVISION_SIZE, const double dTolerance,
         const std::string sFilename, const std::string sLabel,
         const iterative_func func,
-        const imageList_fmt &origList, imageList_fmt &rhoList, const imageList_fmt &guessList)
+        const std::vector<image_fmt *> &origList,
+        const std::vector<image_fmt *> &rhoList,
+        const std::vector<image_fmt *> &guessList)
 {
     for(int iPos = 0; iPos < origList.size() - 1; iPos++)
     {
@@ -450,12 +456,129 @@ image_fmt padCore(int iNewWidth, int iNewHeight, const image_fmt &input)
     return ret;
 }
 
+void stageDirectSolvers(std::vector<solver::Solver*> &vSolvers,
+        image_fmt &img, const data_fmt fieldModifier,
+        const double dNoise, const std::string sFilename,
+        const bool dst, const bool dct,
+        const bool wavelet_5x5, const bool wavelet_7x7, const bool multiwavelet)
+{
+    // if(dNoise != 0.0)
+    //     use_img.noise(dNoise);
+    const image_fmt* use_img  = &img;
+    image_fmt* field = new image_fmt;
+    makeField(img, fieldModifier, *field);
+    image_fmt negField = (*field) * -1;
+    image_fmt *negPtr = &negField;
+    std::string sPrefix= "";
+    //TODO: more clever to prefix label with type, end with filename, and then
+    //      put optional in middle, that way the code scales easilier
+    if(dNoise)
+        sPrefix += "noise__" + std::to_string(dNoise);
+    else
+        sPrefix += "__";
+    if(fieldModifier)
+        sPrefix += "re__";
+    else
+        sPrefix += "__";
+
+    if(dst)
+    {
+        std::string sLabel = sPrefix + "dst";
+        vSolvers.push_back(new solver::DirectSolver(use_img, negPtr,
+                                                    solver::FFT_DST,
+                                                    sFilename, sLabel, true));
+    }
+    if(dct)
+    {
+        std::string sLabel = sPrefix + "dct";
+        vSolvers.push_back(new solver::DirectSolver(use_img, field,
+                                                    solver::FFT_DCT,
+                                                    sFilename, sLabel, false));
+    }
+    
+    if(wavelet_5x5)
+    {
+        std::string sLabel = sPrefix + "wavelet5x5";
+        vSolvers.push_back(new solver::DirectSolver(use_img, negPtr,
+                                                    wavelet::wavelet_5x5,
+                                                    sFilename, sLabel, false));
+    }
+    if(wavelet_7x7)
+    {
+        std::string sLabel = sPrefix + "wavelet7x7";
+        vSolvers.push_back(new solver::DirectSolver(use_img, negPtr,
+                                                    wavelet::wavelet_7x7,
+                                                    sFilename, sLabel, false));
+    }
+    if(multiwavelet)
+    {
+        std::string sLabel = sPrefix + "multiwavelet";
+        vSolvers.push_back(new solver::DirectSolver(use_img, negPtr,
+                                                    wavelet::hermite_wavelet,
+                                                    sFilename, sLabel, false));
+    }
+}
+
+void stageIterativeSolvers(std::vector<solver::Solver*> &vSolvers,
+        image_fmt &img, const data_fmt fieldModifier,
+        const double dNoise, const double dTolerance, const std::string sFilename,
+        const bool gauss, const bool jacobi, const bool sor)
+{
+    // if(dNoise != 0.0)
+    //     use_img.noise(dNoise);
+    const int DIVISION_SIZE = 4;
+    image_fmt* use_img  = &img;
+    image_fmt* field = new image_fmt;
+    makeField(img, fieldModifier, *field);
+    std::string sPrefix = "";
+
+    std::vector<image_fmt *> origList, guessList, rhoList;
+    
+    // MLOG(severity_type::extensive, "Image:\n", printImageAligned(use_img));
+    // MLOG(severity_type::extensive, "Field\n:", printImageAligned(field));
+    
+    divide(DIVISION_SIZE, use_img, field, origList, rhoList, guessList);
+    
+    
+    //TODO: more clever to prefix label with type, end with filename, and then
+    //      put optional in middle, that way the code scales easilier
+    if(dNoise)
+        sPrefix += "noise__" + std::to_string(dNoise);
+    else
+        sPrefix += "__";
+    if(fieldModifier)
+        sPrefix += "re__";
+    else
+        sPrefix += "__";
+
+
+    if(gauss)
+    {
+        std::string sLabel = sPrefix + "gauss";
+        addIterativeSolver(vSolvers, DIVISION_SIZE, dTolerance, sFilename, sLabel,
+                            solver::iterate_gauss, origList, rhoList, guessList);
+    }
+    if(jacobi)
+    {
+        std::string sLabel = sPrefix + "jacobi";
+        addIterativeSolver(vSolvers, DIVISION_SIZE, dTolerance, sFilename, sLabel,
+                            solver::iterate_jacobi, origList, rhoList, guessList);
+    }
+    if(sor)
+    {
+        std::string sLabel = sPrefix + "sor";
+        addIterativeSolver(vSolvers, DIVISION_SIZE, dTolerance, sFilename, sLabel,
+                            solver::iterate_sor, origList, rhoList, guessList);
+    }
+}
+    
 /** The main entry point for solvers to an image.
 
   For each solver(boolean), add the corresponding method and field,
   then execute solve().
 */
-void processImage(std::string sFilename, double dTolerance, double dResolve,
+//TODO: there are so many booleans that I should use a struct for this.
+void processImage(std::string sFilename, double dNoise, double dTolerance, data_fmt resolve,
                   const bool gauss, const bool jacobi, const bool sor,
                   const bool dst, const bool dct,
                   const bool wavelet_5x5, const bool wavelet_7x7,
@@ -464,85 +587,34 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
 
     image_fmt use_img;
     std::vector<solver::Solver*> vSolvers;
-    const int DIVISION_SIZE = 4;
 
     if(!readImage(use_img, sFilename))
     {
         std::cerr << "Error:: could not load image: " << sFilename << std::endl;
         return;
     }
+
     toGrayScale(use_img);
     use_img = padCore(use_img.width() + 2, use_img.height() + 2, use_img);
-    image_fmt field = makeField(use_img),
-              guess = makeInitialGuess(use_img);
-    imageList_fmt origList, guessList, rhoList;
 
-
-    // MLOG(severity_type::extensive, "Image:\n", printImageAligned(use_img));
-    // MLOG(severity_type::extensive, "Field\n:", printImageAligned(field));
-
-
-    divide(DIVISION_SIZE, use_img, field, origList, rhoList, guessList);
-
-    if(gauss)
-    {
-        std::string sLabel = "gauss";
-        addIterativeSolver(vSolvers, DIVISION_SIZE, dTolerance, sFilename, sLabel,
-                            solver::iterate_gauss, origList, rhoList, guessList);
-    }
-    if(jacobi)
-    {
-        std::string sLabel = "jacobi";
-        addIterativeSolver(vSolvers, DIVISION_SIZE, dTolerance, sFilename, sLabel,
-                            solver::iterate_jacobi, origList, rhoList, guessList);
-    }
-    if(sor)
-    {
-        std::string sLabel = "sor";
-        addIterativeSolver(vSolvers, DIVISION_SIZE, dTolerance, sFilename, sLabel,
-                            solver::iterate_sor, origList, rhoList, guessList);
-    }
-    if(dst)
-    {
-        std::string sLabel = "dst";
-        vSolvers.push_back(new solver::DirectSolver(use_img, field,
-                                                    solver::FFT_DST,
-                                                    sFilename, sLabel, true));
-    }
-    if(dct)
-    {
-        std::string sLabel = "dct";
-        vSolvers.push_back(new solver::DirectSolver(use_img, field,
-                                                    solver::FFT_DCT,
-                                                    sFilename, sLabel, false));
-    }
-
-    if(wavelet_5x5)
-    {
-        std::string sLabel = "wavelet";
-        vSolvers.push_back(new solver::DirectSolver(use_img, field,
-                                                    wavelet::wavelet_5x5,
-                                                    sFilename, sLabel, false));
-    }
-    if(wavelet_7x7)
-    {
-        std::string sLabel = "wavelet";
-        vSolvers.push_back(new solver::DirectSolver(use_img, field,
-                                                    wavelet::wavelet_7x7,
-                                                    sFilename, sLabel, false));
-    }
-    if(multiwavelet)
-    {
-        std::string sLabel = "multiwavelet";
-        vSolvers.push_back(new solver::DirectSolver(use_img, field,
-                                                    wavelet::hermite_wavelet,
-                                                    sFilename, sLabel, false));
-    }
-
+    stageDirectSolvers(vSolvers, use_img, 1.0, 0.0, sFilename, dst, dct,
+                        wavelet_5x5, wavelet_7x7, multiwavelet);
+    if(dNoise != 0.0)
+        stageDirectSolvers(vSolvers, use_img, 1.0, dNoise, sFilename, dst, dct,
+                            wavelet_5x5, wavelet_7x7, multiwavelet);
+    if(resolve != 1.0)
+        stageDirectSolvers(vSolvers, use_img, resolve, 0.0, sFilename, dst, dct,
+                            wavelet_5x5, wavelet_7x7, multiwavelet);
+    if(dNoise != 0.0 && resolve != 1.0)
+        stageDirectSolvers(vSolvers, use_img, resolve, dNoise, sFilename, dst, dct,
+                            wavelet_5x5, wavelet_7x7, multiwavelet);
+    const int DIVISION_SIZE = 4;
+    
+    
     imageList_fmt accumulator; /*< container for subdivisions of solved image */
     rawdata_fmt vResults;
     int iPartIndex = 0;
-
+    
     for(auto it : vSolvers) // for each solver for each image (and its divisions)
     {
         image_fmt result = it->solve(vResults); /*< result now holds the resulting image,
@@ -567,7 +639,7 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
                 continue;
             }
         }
-
+    
         /* Before saving the image, round the values so that the image can
            be viewed later */
         roundValues(result);
@@ -578,49 +650,49 @@ void processImage(std::string sFilename, double dTolerance, double dResolve,
         vResults.erase(vResults.begin(), vResults.end());
         // DO_IF_LOGLEVEL(logging::severity_type::extensive)
         // {
-            std::string sMsg = "Final image(cut)\n" + printImageAligned(result);
-            it->log(1, sMsg);
+        //     std::string sMsg = "Final image(cut)\n" + printImageAligned(result);
+        //     it->log(1, sMsg);
         // }
-
-
+    
+    
     }
-        if(dResolve != 1.0)
-        {
-            for(auto it : vSolvers) // for each solver for each image (and its divisions)
-            {
-                it->alterField(dResolve);
-                image_fmt result = it->solve(vResults); /*< result now holds the resulting image,
-                                                        < vResults holds the imagediffs */
-                /* Multipart images: solve each region before moving past this if block */
-                if(it->isMultipart()) 
-                {
-                    accumulator.push_back(result);
-                    /* We can now merge the regions together */
-                    if(it->isFinal())
-                    {
-                        result = joinImage(accumulator, DIVISION_SIZE);
-                        accumulator.clear();
-                        iPartIndex = 0;
-                    }
-                    else
-                    {
-                        std::string sFilename = it->getFilename() + std::to_string(iPartIndex);
-                        file_IO::writeData(vResults, it->getLabel(), sFilename);
-                        iPartIndex++;
-                        vResults.clear(); // important, otherwise it stacks results
-                        continue;
-                    }
-                }
-
-                roundValues(result);
-                std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), true);
-                // roundValues(result);
-                file_IO::saveImage(result, sSavename, true);
-                file_IO::writeData(vResults, it->getLabel(), it->getFilename());
-                /* Erase before re-iterating */
-                vResults.erase(vResults.begin(), vResults.end());
-            }
-        }
+        // if(resolve != 1.0)
+        // {
+        //     for(auto it : vSolvers) // for each solver for each image (and its divisions)
+        //     {
+        //         it->alterField(resolve);
+        //         image_fmt result = it->solve(vResults); /*< result now holds the resulting image,
+        //                                                 < vResults holds the imagediffs */
+        //         /* Multipart images: solve each region before moving past this if block */
+        //         if(it->isMultipart()) 
+        //         {
+        //             accumulator.push_back(result);
+        //             /* We can now merge the regions together */
+        //             if(it->isFinal())
+        //             {
+        //                 result = joinImage(accumulator, DIVISION_SIZE);
+        //                 accumulator.clear();
+        //                 iPartIndex = 0;
+        //             }
+        //             else
+        //             {
+        //                 std::string sFilename = it->getFilename() + std::to_string(iPartIndex);
+        //                 file_IO::writeData(vResults, it->getLabel(), sFilename);
+        //                 iPartIndex++;
+        //                 vResults.clear(); // important, otherwise it stacks results
+        //                 continue;
+        //             }
+        //         }
+        //
+        //         roundValues(result);
+        //         std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), true);
+        //         // roundValues(result);
+        //         file_IO::saveImage(result, sSavename, true);
+        //         file_IO::writeData(vResults, it->getLabel(), it->getFilename());
+        //         /* Erase before re-iterating */
+        //         vResults.erase(vResults.begin(), vResults.end());
+        //     }
+        // }
 }
 
 } /* EndOfNameSpace */

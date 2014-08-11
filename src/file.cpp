@@ -47,8 +47,7 @@ std::string SaveBehaviour::getSavename(
                                 const bool bResolve) const
 {
     std::string sFilename = getFilename(sName);
-    std::string sResolve = (bResolve) ? this->sResolveTag : "";
-    std::string sRet = this->sOutdir + sResolve + this->sDelimiter
+    std::string sRet = this->sOutdir 
                 + sLabel + this->sDelimiter
                 + sFilename + this->sSuffix;
     return sRet;
@@ -87,6 +86,10 @@ void SaveBehaviour::getNames(std::string sSearch,
 
     searchPos=sSearch.find(this->sDelimiter);
     isResolved = sSearch.substr(0,searchPos).length() > 1 == true;
+    sSearch.erase(0, searchPos + sDelimiter.length());
+
+    searchPos=sSearch.find(this->sDelimiter);
+    sLabel = sSearch.substr(0, searchPos);
     sSearch.erase(0, searchPos + sDelimiter.length());
 
     searchPos=sSearch.find(this->sDelimiter);

@@ -180,12 +180,12 @@ image_fmt getControlMatrix(int iLevel, const data_fmt p1, const data_fmt p2)
 const image_fmt scalingFunction(const int iIndex, const int iWidth)
 {
     image_fmt ret(iWidth, 1, 1, 1);
-    int iWidthShift = +0;
+    int iWidthShift = -1;
     double pos, scalar;
     const double unitLength = (1.0 / (iWidth + iWidthShift));
     MLOG(severity_type::debug, "Unit step size: ", unitLength, " from width ", iWidth);
     pos = 0;
-    pos = unitLength;
+    // pos = unitLength;
 
     int iPos = 1;
 
@@ -370,9 +370,12 @@ void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
             field.width() - 2, field.height() - 2, 0, 0);
     useField.crop(0,0,0,0,
                   3,0,0,0);useField(3) = 0;
-    useField.assign(8,1,1,1,
-            -10, -100, -100, -100,
-            100, 100, 100, 10);
+    useField = field;
+    // useField.assign(8,1,1,1,
+    //         10, 100, 100, 100,
+    //         100, 100, 100, 10);
+            // -10, -100, -100, -100,
+            // 100, 100, 100, 10);
 
 
 
@@ -397,9 +400,9 @@ void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
     MLOG(severity_type::debug, "psi2\n", printImage(psi2));
     MLOG(severity_type::debug, "psi3\n", printImage(psi3));
     MLOG(severity_type::debug, "psi4\n", printImage(psi4));
-    // test_splines(iWidth);
-    // test_scales(100);
-    // test_wavelets(100);
+    test_splines(100);
+    test_scales(100);
+    test_wavelets(100);
     // test_motherWavelet(100);
     MLOG(severity_type::debug, "\np1: ", p1, "\t\tp2: ", p2, "\t\tp3: ", p3, "\t\tp4: ", p4);
     std::vector<data_fmt> Phi;
@@ -416,29 +419,11 @@ void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
         sum = 0;
         for(int iPos = 0; iPos < 4; iPos++)
         {
-            sum += testBase[iPos][iImageIndex] * Phi[iPos];
-        }
-        *ptr = sum;
-        iImageIndex++;
-    }
-
-    retImg.fill(0); iImageIndex = 0;
-    cimg_for(retImg, ptr, data_fmt)
-    {
-        sum = 0;
-        for(int iPos = 0; iPos < 4; iPos++)
-        {
             sum += useField.dot(testBase[iPos]) * testBase[iPos][iImageIndex];
         }
         *ptr = sum;
         iImageIndex++;
     }
-
-    // cimglist_for(testBase, i)
-    // {
-    //     retImg += ( testBase[i] * Phi.at(i) ) ;
-    // }
-
     MLOG(severity_type::debug, "returned image\n", printImage(retImg));
 }
 
@@ -466,10 +451,6 @@ void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
         const int SCALE = 2;
         const int iMaxLevel = ceil(cimg::log2(cimg::max(field.width(), field.height())))
                             - 1;
-        // MLOG(severity_type::debug, "forw:\n", printImageAligned(forward_mask_5x5));
-        // MLOG(severity_type::debug, "back:\n", printImageAligned(backward_mask_5x5));
-        // MLOG(severity_type::debug, "g:\n", printImageAligned(g_5x5));
-
         image_fmt initPyr = downSample(field.width() + forward_mask_5x5.width() * 2,
                                     field.height() + forward_mask_5x5.width() * 2,
                                     field);
@@ -522,9 +503,6 @@ void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
                     back_pyramid.back().height() - backward_mask_5x5.height() - 1, 0, 0);
     }
 
-
-
-
     data_fmt vals[] = { 0.06110, 0.26177, 0.53034, 0.65934, 0.51106, 0.05407, 0.24453, 0.57410};
     const int WEIGHTS_LEN = 8;
     const image_fmt weights(vals, WEIGHTS_LEN);
@@ -539,17 +517,19 @@ void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
                         .resize(WEIGHTS_LEN - 3, 1, 1, 1, 0, 0);
     image_fmt gg = tmp2.draw_image(3,0,0,0,tmp2.get_resize(2,1,1,1,0).mirror('x'));
     image_fmt g = gg.get_transpose() * gg;
+    const int SCALE = 2;
+    const int iForwMaskWidth = forward_mask.width(),
+              iBackMaskWidth = backward_mask.width();
 
 
 
     void wavelet_7x7(const image_fmt &field, image_fmt &retImg)
     {
-        const int SCALE = 2;
         const int iMaxLevel = ceil(cimg::log2(cimg::max(field.width(), field.height())))
                             - 1;
 
-        image_fmt initPyr = downSample(field.width() + forward_mask.width() * 2,
-                                    field.height() + forward_mask.width() * 2,
+        image_fmt initPyr = downSample(field.width() + iForwMaskWidth * 2,
+                                    field.height() + iForwMaskWidth  * 2,
                                     field);
         imageList_fmt forw_pyramid(initPyr);
         
@@ -572,8 +552,8 @@ void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
 
             image_fmt imgCore = curPyr.get_resize(iCropWidth / SCALE,
                                                 iCropHeight / SCALE, 1, 1, 1);
-            forw_pyramid.push_back(downSample(imgCore.width() + forward_mask.width() * 2,
-                                    imgCore.height() + forward_mask.height() * 2,
+        forw_pyramid.push_back(downSample(imgCore.width() + iForwMaskWidth * 2,
+                                    imgCore.height() + iForwMaskWidth * 2,
                                     imgCore));
         }
 
@@ -586,18 +566,19 @@ void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
         {
             image_fmt imgCore = back_pyramid.back().get_crop(
                     backward_mask.width() + 0, backward_mask.height() + 0, 0, 0,
-                    back_pyramid.back().width() - backward_mask.width() - 1,
-                    back_pyramid.back().height() - backward_mask.height() - 1, 0, 0);
-            imgCore = upSample(imgCore, forw_pyramid.back().width(), forw_pyramid.back().height());
+                    back_pyramid.back().width() - iBackMaskWidth - 1,
+                    back_pyramid.back().height() - iBackMaskWidth - 1, 0, 0);
+            imgCore = upSample(imgCore,
+                    forw_pyramid.back().width(), forw_pyramid.back().height());
             back_pyramid.push_back(
                     imgCore.get_convolve(backward_mask)
                     + forw_pyramid.back().get_convolve(g));
             forw_pyramid.pop_back();
         }
         retImg = back_pyramid.back().get_crop(
-                    backward_mask.width(), backward_mask.height(), 0, 0,
-                    back_pyramid.back().width() - backward_mask.width() - 1,
-                    back_pyramid.back().height() - backward_mask.height() - 1, 0, 0);
+                    iBackMaskWidth, backward_mask.height(), 0, 0,
+                    back_pyramid.back().width() - iBackMaskWidth - 1,
+                    back_pyramid.back().height() - iBackMaskWidth - 1, 0, 0);
     }
 
     } /* EndOfNamespace */

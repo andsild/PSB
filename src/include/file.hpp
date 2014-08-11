@@ -67,7 +67,7 @@ class SaveBehaviour
         std::string getLogname(const std::string,
                               const std::string, const bool) const;
         void getNames(const std::string, std::string &arg1, std::string &arg2,
-                    std::string &arg3, bool &arg4);
+                    std::string &arg3, bool &arg);
         std::string getResolveLabel(std::string arg);
         std::string getOutdir() { return this->sOutdir; }
         std::string getDelimiter();
