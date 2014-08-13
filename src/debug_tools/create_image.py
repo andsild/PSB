@@ -6,7 +6,6 @@ from random import randint, seed
 
 seed(10)
 
-
 COLOR_RANGE = 255;
 
 
@@ -62,6 +61,14 @@ def circle(x,y,w,h,*args):
     if lhs >= (rhs - 1) and lhs <= (rhs + 1):
         return 100
     return 0
+global_variable = 0
+def dim1DStep(x,y,w,_h, _s, COLOR_RANGE):
+    global global_variable
+    border = 2
+    if x >= border and x < w - border:
+        global_variable += 50
+        return global_variable % COLOR_RANGE
+    return 0
 
 def findFilename(prefix):
     if(hasattr(prefix, '__call__')):
@@ -83,6 +90,7 @@ if not len(sys.argv) > 1:
     # _createImage(8, 8, square);
     # _createImage(11, 11, circle);
     # _createImage(10, 10, randomBordered);
+    _createImage(8, 1, dim1DStep);
     pass
 else:
     for arg in sys.argv[1:]:

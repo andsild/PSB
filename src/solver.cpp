@@ -18,6 +18,46 @@ inline double getDiff(const double origVal, const double dPixels)
 }
 
 
+Solver::Solver(const image_fmt *origImg, const image_fmt* const f,
+        std::string sFile, std::string sLab,
+        bool bMulPart, bool bFin)
+    : origImage(origImg), field(*f), logInst(),
+        sFilename(sFile), sLabel(sLab), bMultipart(bMulPart), bFinal(bFin)
+{
+    // this->logInst.setName(
+    //         file_IO::SAVE_PATTERN.getLogname(this->sFilename, this->sLabel, false));
+    // this->logInst.setLevel(GETLEVEL);
+
+    // DO_IF_LOGLEVEL(severity_type::extensive)
+    // {
+    //     this->logInst.print< severity_type::extensive>("Initial image:\n", image_psb::printImage(this->origImage));
+    //     this->logInst.print< severity_type::extensive>("Initial field:\n", image_psb::printImage(this->field));
+    // }
+}
+
+IterativeSolver::IterativeSolver(
+        const image_fmt* const origImg, const image_fmt* const f,
+        const image_fmt* const U, iterative_func func,
+        double dStopCriterion, std::string sFile, std::string sLabel,
+        bool bMultiPart, bool bFinal)
+    : Solver(origImg, f, sFile, sLabel, bMultiPart, bFinal), func(func),
+        dStopCriterion(dStopCriterion), guess(*U)
+{
+    // DO_IF_LOGLEVEL(severity_type::extensive)
+    //     this->logInst.print< severity_type::extensive>("Initial guess:\n", image_psb::printImage(this->guess));
+}
+
+
+DirectSolver::DirectSolver(
+    const image_fmt* const origImg, const image_fmt* const f, direct_func func,
+    std::string sFilename, std::string sLabel,
+    bool dirichet,
+    bool bMultiPart, bool bFin)
+    : Solver(origImg, f, sFilename, sLabel, bMultiPart, bFinal),
+        func(func), isDirichet(dirichet)
+{
+}
+
 image_fmt IterativeSolver::solve(rawdata_fmt &vResults)
 {
     int iIter = 0;
@@ -32,7 +72,7 @@ image_fmt IterativeSolver::solve(rawdata_fmt &vResults)
     for(iIter = 0; this->dStopCriterion < dIterationDiff; iIter++)
     {
         this->func(this->field, guess, dIterationDiff, iWidth, iHeight);
-        double dDiff = getDiff(this->origImage.MSE(guess), iNumPixels);
+        double dDiff = getDiff(this->origImage->MSE(guess), iNumPixels);
                        
         vResults.push_back(dDiff);
 
@@ -73,23 +113,18 @@ std::string Solver::getLabel() { return this->sLabel; }
 
 image_fmt DirectSolver::solve(rawdata_fmt &vResults)
 {
-    image_fmt ret(this->origImage, "xyz", 0);
-    MLOG(severity_type::debug, "Returned image:\n", image_psb::printImageAligned(ret));
+    image_fmt ret(*(this->origImage), "xyz", 0);
     this->func(this->field, ret);
+    if(this->isDirichet == false)
+        ret += (this->origImage->mean() - ret.mean());
+    MLOG(severity_type::extensive, "Returned image:\n", image_psb::printImageAligned(ret));
     ret.crop(1,1,0,0, ret.width() - 2, ret.height() - 2 , 0, 0);
-    const int iPixels = (this->origImage.width() - 2) * (this->origImage.height() - 2);
-    vResults.push_back(getDiff(image_psb::imageDiff(this->origImage.get_crop(1,1,0,0,
-                                                    this->origImage.width() - 2,
-                                                    this->origImage.height() - 2,
-                                                    0, 0), ret), iPixels));
+    const int iPixels = (this->origImage->width() - 2) * (this->origImage->height() - 2);
+    vResults.push_back(getDiff(image_psb::imageDiff(
+            this->origImage->get_crop(1,1,0,0, this->origImage->width() - 2,
+                                              this->origImage->height() - 2, 0,0)
+            ,ret), iPixels));
     return ret;
-}
-
-/** Modify the field of a solver (multiply by scalar)
-*/
-void Solver::alterField(data_fmt dScalar)
-{
-    this->field *= dScalar;
 }
 
 } /* EndOfNamespace */

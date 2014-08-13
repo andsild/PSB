@@ -9,6 +9,7 @@
 #include "loginstance.hpp"
 #include "file.hpp"
 #include "image2.hpp"
+#include "image_types.hpp"
 #include "imageedit.hpp"
 #include "plot.hpp"
 
@@ -25,23 +26,24 @@ using namespace logging;
 */
 void setVerboseLevel(int iLevel, const bool isConsole)
 {
-    // if(iLevel >= severity_type::no_output && iLevel <= severity_type::debug)
-    // {
-    //     if(iLevel == severity_type::debug)
-    //         std::cout << "WARNING: debug mode will slow down the"
-    //                         " program by * a lot *" << std::endl;
-    //     if(isConsole)
-    //         CSETLEVEL(iLevel);
-    //     else SETLEVEL(iLevel);
-    // }
-    // else
-    //     std::cerr << "Error: stdout verbose level out of range" << std::endl;
+#ifdef LOGGING
+    if(iLevel >= severity_type::no_output && iLevel <= severity_type::debug)
+    {
+        if(iLevel == severity_type::debug)
+            std::cout << "WARNING: debug mode will slow down the"
+                            " program by * a lot *" << std::endl;
+        if(isConsole)
+            CSETLEVEL(iLevel);
+        else SETLEVEL(iLevel);
+    }
+    else
+        std::cerr << "Error: stdout verbose level out of range" << std::endl;
+#endif
 }
 
 int main(int argc, char **argv) 
 {
-    std::string logDir = LOG_DIR;
-    // MLOG(severity_type::info, "Started program");
+    MLOG(severity_type::info, "Started program");
 
     std::string sUsageMsg = std::string(argv[0]) + " <name of image file or directory> <solvers>"
                             "\n\nreport bugs to sildnes@mpi-cbg.de";
@@ -63,18 +65,21 @@ int main(int argc, char **argv)
                sor = cimg_option("--sor", false, "use successive over-relaxation solver"),
                fft_dst = cimg_option("--dst", false, "use discrete sine solver"),
                fft_dct = cimg_option("--dct", false, "use discrete cosine solver"),
-               wavelet = cimg_option("--wavelet", false, "use wavelet solver");
+               wavelet_5x5 = cimg_option("--wavelet5", false, "use wavelet solver with a 5x5 kernel"),
+               wavelet_7x7 = cimg_option("--wavelet7", false, "use wavelet solver with a 7x7 kernel"),
+               multi_wavelet = cimg_option("--multi-wavelet", false, "use multi-wavelet solver");
     const char *dirname = cimg_option("-d", (char*)0, "Input image directory");
     const char *filename = cimg_option("-f", (char*)0, "Input image file");
     const bool compare = cimg_option("-c", false, "Compare original images to solved images");
     const bool average =  cimg_option("-a", false, "average the results for each solver (writes to end of output file");
-    const bool nosolve = cimg_option("-n", false, "do not compute anything");
+    const bool nosolve = cimg_option("--nosolve", false, "do not compute anything");
+    const double dNoise = cimg_option("-n", (0.0), "add <percent> noise to the image before solving");
     /** If you want a cimg plot */
     const bool plot = cimg_option("-p", false, "visualize the results in a graph");
     const int iVerbosityLevel = cimg_option("-v", 1, "verbosity level: from .. to .. "),
               iFileVerbosityLevel = cimg_option("-x", 1, "written verbosity level");
     const double dTolerance = cimg_option("-t", DEFAULT_TOLERANCE, sToleranceHelpStr.c_str());
-    const double dResolve = cimg_option("-r", 1.0, "resolve the image using a modified field, multiplied by a scalar (used for testing)");
+    const double resolve = cimg_option("-r", 1.0, "resolve the image using a modified field, multiplied by a scalar (used for testing)");
 
     std::string sFilename = (filename) ? std::string(filename) : std::string(),
                 sDirname = (dirname) ? std::string(dirname) : std::string();
@@ -120,16 +125,18 @@ int main(int argc, char **argv)
             }catch(file_IO::DirNotFound dnf) { std::cerr << "Failed to open " << sDirname << std::endl << " exiting..." << std::endl; exit(EXIT_FAILURE);}
             for(auto const it : vFiles)
             {
-                image_psb::processImage(it, dTolerance, dResolve,
+                image_psb::processImage(it, dNoise, dTolerance, resolve,
                                         gauss, jacobi, sor,
-                                        wavelet, fft_dst, fft_dct);
+                                        fft_dst, fft_dct,
+                                        wavelet_5x5, wavelet_7x7, multi_wavelet);
             }
         }
         if(sFilename.empty() == false)
         {
-            image_psb::processImage(sFilename, dTolerance, dResolve,
+            image_psb::processImage(sFilename, dNoise, dTolerance, resolve,
                                     gauss, jacobi, sor,
-                                    wavelet, fft_dst, fft_dct);
+                                    fft_dst, fft_dct,
+                                    wavelet_5x5, wavelet_7x7, multi_wavelet);
         }
     }
 
@@ -159,6 +166,6 @@ int main(int argc, char **argv)
     if(compareLoop.joinable())
         compareLoop.join();
 
-    // MLOG(severity_type::info, "Program exited successfully");
+    MLOG(severity_type::info, "Program exited successfully");
     return EXIT_SUCCESS;
 }

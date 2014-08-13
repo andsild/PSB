@@ -47,8 +47,7 @@ std::string SaveBehaviour::getSavename(
                                 const bool bResolve) const
 {
     std::string sFilename = getFilename(sName);
-    std::string sResolve = (bResolve) ? this->sResolveTag : "";
-    std::string sRet = this->sOutdir + sResolve + this->sDelimiter
+    std::string sRet = this->sOutdir 
                 + sLabel + this->sDelimiter
                 + sFilename + this->sSuffix;
     return sRet;
@@ -84,6 +83,11 @@ void SaveBehaviour::getNames(std::string sSearch,
     sOutdir = getFoldername(sSearch);
     size_t searchPos = sSearch.find_last_of("/\\");
     sSearch.erase(0, searchPos + 1);
+
+
+    searchPos=sSearch.find(this->sDelimiter);
+    sLabel = sSearch.substr(0, searchPos);
+    sSearch.erase(0, searchPos + sDelimiter.length());
 
     searchPos=sSearch.find(this->sDelimiter);
     isResolved = sSearch.substr(0,searchPos).length() > 1 == true;
@@ -323,15 +327,19 @@ void writeData(const rawdata_fmt &vData, std::string sLabel, std::string sFilena
 }
 
 
-void saveImage(const image_fmt &image, const std::string sSaveName, const bool bResolve)
+void saveImage(const image_fmt &image, const std::string sSavename, const bool bResolve)
 {
     mkdirp(SAVE_PATTERN.getOutdir().c_str());
+    bool isResolved = false;
+    std::string _, __, ___;
+    std::string tmp = sSavename;
+    SAVE_PATTERN.getNames(tmp, _, __, ___, isResolved);
     try
     {
-        if(bResolve)
-            image.save_ascii(sSaveName.c_str());
+        if(isResolved)
+            image.save_ascii(sSavename.c_str());
         else
-            image.save(sSaveName.c_str());
+            image.save(sSavename.c_str());
     }
     catch(cimg_library::CImgIOException &cioe)
     {
