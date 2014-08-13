@@ -49,7 +49,7 @@ void makeInitialGuess(
     if(input.size() < 1)
     {
         std::string sMsg = "input was not initialized before creating border"
-                           " [[ width: " + std::to_string(input.width()) 
+                           " [[ width: " + std::to_string(input.width())
                            + " height: " + std::to_string(input.height()) + " ]]";
         throw ImageException(sMsg.c_str());
     }
@@ -103,12 +103,12 @@ image_fmt padImage(const image_fmt &input, const int iPadLength)
 }
 
 /** Average the result from a nested set of vectors
-  If vector i is longer than vector j, then the average will 
+  If vector i is longer than vector j, then the average will
   calculate the average between i and j for as long as j has elements.
   After j is empty, the average will continue, calculating average of the
-  remaining vectors. 
-  I.e. the average function is (sum from iterator vector elements) 
-                                            / 
+  remaining vectors.
+  I.e. the average function is (sum from iterator vector elements)
+                                            /
                              (number of vectors that still has elements)
 */
 rawdata_fmt averageResult(const std::vector<rawdata_fmt> &vInput, int iDivSize)
@@ -125,7 +125,7 @@ rawdata_fmt averageResult(const std::vector<rawdata_fmt> &vInput, int iDivSize)
     }
 
     rawdata_fmt vRes(iLongest, 0);
-    
+
     for(const auto it : vInput)
     {
         for(int iPos = 0; iPos < it.size(); iPos++)
@@ -329,7 +329,7 @@ void divide(int iDivSize, image_fmt* const origImage, image_fmt* const rho,
         guessList.push_back(guess);
         return;
     }
-    
+
     if(iDivSize == 2)
     {
         int w = origImage->width(); int h = origImage->height();
@@ -342,7 +342,7 @@ void divide(int iDivSize, image_fmt* const origImage, image_fmt* const rho,
                   rhoC2 = rho->get_crop(0, h / 2, 0, 0, w, h, 0, 0);
         rhoList.push_back(&rhoC1);
         rhoList.push_back(&rhoC2);
-    
+
         image_fmt* guess = new image_fmt;
         makeInitialGuess(*origImage, *guess);
         image_fmt guessC1 = guess->get_crop(0, 0, 0, 0, w, h / 2, 0, 0),
@@ -355,7 +355,13 @@ void divide(int iDivSize, image_fmt* const origImage, image_fmt* const rho,
     const int iWidth = origImage->width(), iHeight = origImage->height();
     const int WIDHT_REGION = (iWidth / (iDivSize / 2));
     const int HEIGHT_REGION = (iHeight / (iDivSize / 2));
-    
+    image_fmt* ptr;
+    imageList_fmt tmpOrigList, tmpRhoList, tmpGuessList;
+
+    /* Since the code pushes back pointers, we need two iterations: one to
+       allocate the images, and one to push back their addresses. Otherwise,
+       all the pointers would point to different regions.
+    */
     for(int xSlice = 0; xSlice < iDivSize / 2; xSlice++)
     {
         for(int ySlice = 0; ySlice < iDivSize / 2; ySlice++)
@@ -364,37 +370,46 @@ void divide(int iDivSize, image_fmt* const origImage, image_fmt* const rho,
                 iUpperY = ySlice * HEIGHT_REGION;
             int iRightmostX = iLeftmostX + WIDHT_REGION -1,
                 iLowerY = iUpperY + HEIGHT_REGION - 1;
-    
+
             if(WIDHT_REGION % 2 == 0 && xSlice == 0)
                 iRightmostX++;
             if(HEIGHT_REGION % 2 == 0 && ySlice == 0)
                 iLowerY++;
-    
+
             if(iRightmostX > iWidth)
                 iRightmostX = iWidth - 1;
             if(iLowerY > iHeight)
                 iLowerY = iHeight - 1;
-    
+
             image_fmt origImg = origImage->get_crop(iLeftmostX, iUpperY, 0,
                                                 iRightmostX,
                                                 iLowerY, 0);
-            image_fmt *ptr = &origImg;
-            origImageList.push_back(ptr);
+            tmpOrigList.push_back(origImg);
             image_fmt rhoPush = rho->get_crop(iLeftmostX, iUpperY, 0,
                                             iRightmostX,
                                             iLowerY, 0) ;
-            rhoList.push_back(&rhoPush);
-    
+            tmpRhoList.push_back(rhoPush);
+
             image_fmt retRegion(origImg, "xyz", 0);
             cimg_for_borderXY(origImg,x,y,BORDER_SIZE)
             {
                 retRegion(x,y) = origImg(x,y);
             }
-            guessList.push_back(&retRegion);
+            tmpGuessList.push_back(retRegion);
         }
     }
-
-    int a = 1;
+    for(int iPos = 0; iPos < tmpOrigList.size(); iPos++)
+    {
+        image_fmt* origImg  =  new image_fmt(),
+                 * rhoImg   =  new image_fmt(),
+                 * guessImg =  new image_fmt();
+        *origImg    =  tmpOrigList[iPos];
+        *rhoImg     =  tmpRhoList[iPos];
+        *guessImg =  tmpGuessList[iPos];
+        origImageList.push_back(origImg);
+        rhoList.push_back(rhoImg);
+        guessList.push_back(guessImg);
+    }
 }
 
 /** Compute a prior for an image.
@@ -505,7 +520,7 @@ void stageDirectSolvers(std::vector<solver::Solver*> &vSolvers,
                                                     solver::FFT_DCT,
                                                     sFilename, sLabel, false));
     }
-    
+
     if(wavelet_5x5)
     {
         std::string sLabel = sPrefix + "wavelet5x5";
@@ -544,7 +559,7 @@ void stageIterativeSolvers(std::vector<solver::Solver*> &vSolvers,
 
     std::vector<image_fmt *> origList, guessList, rhoList;
     divide(DIVISION_SIZE, use_img, field, origList, rhoList, guessList);
-    
+
     if(dNoise)
         sPrefix += "noise__" + std::to_string(dNoise);
     else
@@ -554,6 +569,10 @@ void stageIterativeSolvers(std::vector<solver::Solver*> &vSolvers,
     else
         sPrefix += "__";
 
+    for(auto it : rhoList)
+    {
+        MLOG(severity_type::debug, "\n", printImage(*it));
+    }
 
     if(gauss)
     {
@@ -574,7 +593,7 @@ void stageIterativeSolvers(std::vector<solver::Solver*> &vSolvers,
                             solver::iterate_sor, origList, rhoList, guessList);
     }
 }
-    
+
 /** The main entry point for solvers to an image.
 
   For each solver(boolean), add the corresponding method and field,
@@ -612,7 +631,7 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
         stageDirectSolvers(vSolvers, use_img, resolve, dNoise, sFilename, dst, dct,
                             wavelet_5x5, wavelet_7x7, multiwavelet);
 
-    stageIterativeSolvers(vSolvers, use_img, dTolerance, 1.0, 0.0, sFilename, 
+    stageIterativeSolvers(vSolvers, use_img, dTolerance, 1.0, 0.0, sFilename,
                           gauss, jacobi, sor);
     if(dNoise != 0.0)
         stageIterativeSolvers(vSolvers, use_img, 1.0, dTolerance, dNoise, sFilename,
@@ -621,21 +640,21 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
         stageIterativeSolvers(vSolvers, use_img, dTolerance, resolve, 0.0, sFilename,
                             gauss, jacobi, sor);
     if(dNoise != 0.0 && resolve != 1.0)
-        stageIterativeSolvers(vSolvers, use_img, dTolerance, resolve, dNoise, sFilename, 
+        stageIterativeSolvers(vSolvers, use_img, dTolerance, resolve, dNoise, sFilename,
                             gauss, jacobi, sor);
     const int DIVISION_SIZE = 4;
-    
-    
+
+
     imageList_fmt accumulator; /*< container for subdivisions of solved image */
     rawdata_fmt vResults;
     int iPartIndex = 0;
-    
+
     for(auto it : vSolvers) // for each solver for each image (and its divisions)
     {
         image_fmt result = it->solve(vResults); /*< result now holds the resulting image,
                                                   < vResults holds the imagediffs */
         /* Multipart images: solve each region before moving past this if block */
-        if(it->isMultipart()) 
+        if(it->isMultipart())
         {
             accumulator.push_back(result);
             /* We can now merge the regions together */
@@ -654,7 +673,7 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
                 continue;
             }
         }
-    
+
         /* Before saving the image, round the values so that the image can
            be viewed later */
         roundValues(result);
@@ -668,8 +687,8 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
         //     std::string sMsg = "Final image(cut)\n" + printImageAligned(result);
         //     it->log(1, sMsg);
         // }
-    
-    
+
+
     }
         // if(resolve != 1.0)
         // {
@@ -679,7 +698,7 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
         //         image_fmt result = it->solve(vResults); /*< result now holds the resulting image,
         //                                                 < vResults holds the imagediffs */
         //         /* Multipart images: solve each region before moving past this if block */
-        //         if(it->isMultipart()) 
+        //         if(it->isMultipart())
         //         {
         //             accumulator.push_back(result);
         //             /* We can now merge the regions together */
