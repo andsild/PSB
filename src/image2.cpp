@@ -482,27 +482,34 @@ image_fmt padCore(int iNewWidth, int iNewHeight, const image_fmt &input)
 }
 
 void stageDirectSolvers(std::vector<solver::Solver*> &vSolvers,
-        image_fmt &img, const data_fmt fieldModifier,
+        const image_fmt &img, const data_fmt fieldModifier,
         const double dNoise, const std::string sFilename,
         const bool dst, const bool dct,
         const bool wavelet_5x5, const bool wavelet_7x7, const bool multiwavelet)
 {
-    // if(dNoise != 0.0)
-    //     use_img.noise(dNoise);
-    const image_fmt* use_img  = &img;
-    image_fmt* field = new image_fmt;
-    makeField(img, fieldModifier, *field);
-    image_fmt negField = (*field) * -1;
-    image_fmt *negPtr = &negField;
     std::string sPrefix= "";
-    //TODO: more clever to prefix label with type, end with filename, and then
-    //      put optional in middle, that way the code scales easilier
+    image_fmt* const use_img = new image_fmt();
     if(dNoise != 0.0)
+    {
         sPrefix += "noise" + std::to_string(dNoise);
+        image_fmt tmp = img.get_noise(dNoise);
+        *use_img = tmp;
+    }
+    else
+    {
+        *use_img = img;
+    }
     sPrefix += "__";
+
     if(fieldModifier != 1.0)
         sPrefix += "re";
     sPrefix += "__";
+
+    // const image_fmt* use_img  = &img;
+    image_fmt* field = new image_fmt;
+    makeField(*use_img, fieldModifier, *field);
+    image_fmt negField = (*field) * -1;
+    image_fmt *negPtr = &negField;
 
     if(dst)
     {
@@ -613,7 +620,7 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
     }
 
     toGrayScale(use_img);
-    use_img = padCore(use_img.width() + 2, use_img.height() + 2, use_img);
+    // use_img = padCore(use_img.width() + 2, use_img.height() + 2, use_img);
 
     stageDirectSolvers(vSolvers, use_img, 1.0, 0.0, sFilename, dst, dct,
                         wavelet_5x5, wavelet_7x7, multiwavelet);

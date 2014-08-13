@@ -336,10 +336,13 @@ void saveImage(const image_fmt &image, const std::string sSavename, const bool b
     SAVE_PATTERN.getNames(tmp, _, __, ___, isResolved);
     try
     {
-        if(isResolved)
+        if(isResolved){
             image.save_ascii(sSavename.c_str());
-        else
+        }
+        else{
+            std::cerr << "not going here" << std::endl;
             image.save(sSavename.c_str());
+        }
     }
     catch(cimg_library::CImgIOException &cioe)
     {
