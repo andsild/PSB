@@ -128,9 +128,22 @@ image_fmt DirectSolver::solve(rawdata_fmt &vResults)
 {
     // const int iPixels = (this->origImage->width() - 2) * (this->origImage->height() - 2);
     image_fmt ret(*(this->origImage), "xyz", 0);
-    this->func(this->field, ret);
+    image_fmt useField;
     if(this->isDirichet == false)
+    {
+        useField = image_psb::padCore(field.width() + 2, field.height() + 2, field);
+    }
+    else
+    {
+        useField = field;
+    }
+    this->func(useField, ret);
+    if(this->isDirichet == false)
+    {
+        ret.crop(1,1,0,0,
+                field.width(), field.height(), 0, 0);
         ret += (this->origImage->mean() - ret.mean());
+    }
     MLOG(severity_type::extensive, "Returned image:\n",
             image_psb::printImageAligned(ret));
     // ret.crop(1,1,0,0, ret.width() - 2, ret.height() - 2 , 0, 0);

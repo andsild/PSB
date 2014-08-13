@@ -183,7 +183,7 @@ void ImageDisplay::loadImmy(std::string &sMainfile, std::string &sSolverfile,
     }
     catch(ImageException ie)
     {
-        std::cerr << ie.what() << std::endl;
+        // std::cerr << ie.what() << std::endl;
         this->vMainImages.erase(this->vMainImages.begin() + this->iIndex);
         if(iIndex != 0)
             this->iIndex--;

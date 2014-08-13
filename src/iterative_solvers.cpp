@@ -34,17 +34,12 @@ void iterate_jacobi(const image_fmt &field, image_fmt &U,
 {
     dDiff = 0;
     image_fmt origGuess(U);
-    // CImg_3x3(I,data_fmt);
-    CImg_2x2(I,data_fmt);
-    // cimg_for_in3x3(origGuess, BORDER_SIZE, BORDER_SIZE,
-    //                iWidth - BORDER_SIZE - 1, iHeight - BORDER_SIZE - 1,
-    //                x,y,0,0,I,data_fmt) // uses Neumann borders
-    cimg_for_in2x2(origGuess, BORDER_SIZE, BORDER_SIZE,
+    CImg_3x3(I,data_fmt );
+    cimg_for_in3x3(origGuess, BORDER_SIZE, BORDER_SIZE,
                    iWidth - BORDER_SIZE - 1, iHeight - BORDER_SIZE - 1,
-                   x,y,0,0,I,data_fmt) // uses Neumann borders
+                   x,y,0,0,I,data_fmt) 
     {
-        // dNewVal = .25 * (Icn + Icp + Ipc + Inc - field(x,y));
-        dNewVal = .25 * (Icn + origGuess(x,y-1) + origGuess(x-1,y) + Inc - field(x,y));
+        dNewVal = .25 * (Icn + Icp + Ipc + Inc - field(x,y));
         dCurDiff = fabs(Icc - dNewVal);
         U(x,y) = dNewVal;
         if( dCurDiff > dDiff)

@@ -360,7 +360,7 @@ void divide(int iDivSize, image_fmt* const origImage, image_fmt* const rho,
 
     /* Since the code pushes back pointers, we need two iterations: one to
        allocate the images, and one to push back their addresses. Otherwise,
-       all the pointers would point to different regions.
+       all the pointers would point to same address.
     */
     for(int xSlice = 0; xSlice < iDivSize / 2; xSlice++)
     {
@@ -371,9 +371,9 @@ void divide(int iDivSize, image_fmt* const origImage, image_fmt* const rho,
             int iRightmostX = iLeftmostX + WIDHT_REGION -1,
                 iLowerY = iUpperY + HEIGHT_REGION - 1;
 
-            if(WIDHT_REGION % 2 == 0 && xSlice == 0)
+            if(WIDHT_REGION % 2 == 1 && xSlice == 0)
                 iRightmostX++;
-            if(HEIGHT_REGION % 2 == 0 && ySlice == 0)
+            if(HEIGHT_REGION % 2 == 1 && ySlice == 0)
                 iLowerY++;
 
             if(iRightmostX > iWidth)
@@ -620,8 +620,6 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
     }
 
     toGrayScale(use_img);
-    // use_img = padCore(use_img.width() + 2, use_img.height() + 2, use_img);
-
     stageDirectSolvers(vSolvers, use_img, 1.0, 0.0, sFilename, dst, dct,
                         wavelet_5x5, wavelet_7x7, multiwavelet);
     stageIterativeSolvers(vSolvers, use_img, dTolerance, 1.0, 0.0, sFilename,

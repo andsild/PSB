@@ -340,7 +340,6 @@ void saveImage(const image_fmt &image, const std::string sSavename, const bool b
             image.save_ascii(sSavename.c_str());
         }
         else{
-            std::cerr << "not going here" << std::endl;
             image.save(sSavename.c_str());
         }
     }
