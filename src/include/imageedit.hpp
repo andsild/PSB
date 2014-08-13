@@ -11,12 +11,55 @@
 namespace image_display
 {
 
+template <class baseIter>
+class circularIterator
+{
+    private:
+       baseIter cur;
+        baseIter begin;
+        baseIter end;
+    public:
+        circularIterator() {};
+        void setIterator(baseIter b, baseIter e, baseIter i)
+        {
+            this->begin = b;
+            this->end = e;
+            this->cur = i;
+        }
+        circularIterator & operator ++() 
+        {
+            ++cur;
+            if(cur == end)
+                cur = begin;
+            return cur;
+        }
+        circularIterator & operator ++(int)
+        {
+            operator++();
+            return cur;
+        }
+        circularIterator & operator --()
+        {
+            --cur;
+            if(std::distance(begin, cur) == 0)
+                cur = end;
+            return cur;
+        }
+        // circularIterator & operator ()(void) {
+        //     return cur;
+        // }
+};
+
+
 class ImageContainer
 {
     private:
     std::vector<std::string> vSolvedImages,
-                      vResolvedImages;
+                             vResolvedImages;
     std::string fileName;
+
+    circularIterator<std::vector<std::string>::const_iterator > itSolved,
+                                                                itResolved;
     public:
     static int iSolvedIndex, iResolvedIndex;
     ImageContainer(std::string);
@@ -35,12 +78,13 @@ class ImageContainer
     std::string getNextResolver();
     std::string getPrevResolver();
     bool hasResolved() const;
+    void sortLists();
+    void initializeIterators();
 };
 
 class ImageDisplay
 {
     private:
-    std::vector<ImageContainer> vMainImages;
     int iIndex;
     cimg_library::CImgDisplay main_disp,
                 solved_disp,
@@ -58,6 +102,8 @@ class ImageDisplay
     void prevSolver();
     void loadImmy(std::string &arg1, std::string &arg2, std::string &arg3);
     public:
+    std::vector<ImageContainer> vMainImages;
+    void sortImageLists();
     void loop();
     ImageDisplay();
     void addMainImage(std::string);
@@ -68,6 +114,6 @@ class ImageDisplay
 
 void scanAndAddImage(std::string sRootdir, std::string sSolverdir);
 
-}
+} /* EndOfNamespace */
 
 #endif

@@ -23,8 +23,8 @@ class Solver
                 sLabel;
 
     protected:
-    const image_fmt origImage,
-                    field;
+    const image_fmt* const origImage;
+    const image_fmt field;
     logging::Logger< logging::FileLogPolicy > logInst;
     bool bMultipart, bFinal;
 
@@ -49,8 +49,8 @@ class IterativeSolver : public virtual Solver
 
     public:
     image_fmt solve(rawdata_fmt &arg1);
-    IterativeSolver(const image_fmt* const origImage, const image_fmt *field,
-            const image_fmt* const U, iterative_func func,
+    IterativeSolver(const image_fmt* const origImage, const image_fmt* field,
+            const image_fmt * const U, iterative_func func,
             double dStopCriterion, std::string sFile, std::string sLabel,
             bool bMultiPart, bool bFinal = false);
 };

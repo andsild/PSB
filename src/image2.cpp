@@ -498,13 +498,11 @@ void stageDirectSolvers(std::vector<solver::Solver*> &vSolvers,
     //TODO: more clever to prefix label with type, end with filename, and then
     //      put optional in middle, that way the code scales easilier
     if(dNoise != 0.0)
-        sPrefix += "noise__" + std::to_string(dNoise);
-    else
-        sPrefix += "__";
+        sPrefix += "noise" + std::to_string(dNoise);
+    sPrefix += "__";
     if(fieldModifier != 1.0)
-        sPrefix += "re__";
-    else
-        sPrefix += "__";
+        sPrefix += "re";
+    sPrefix += "__";
 
     if(dst)
     {
@@ -560,14 +558,12 @@ void stageIterativeSolvers(std::vector<solver::Solver*> &vSolvers,
     std::vector<image_fmt *> origList, guessList, rhoList;
     divide(DIVISION_SIZE, use_img, field, origList, rhoList, guessList);
 
-    if(dNoise)
-        sPrefix += "noise__" + std::to_string(dNoise);
-    else
-        sPrefix += "__";
-    if(fieldModifier)
-        sPrefix += "re__";
-    else
-        sPrefix += "__";
+    if(dNoise != 0.0)
+        sPrefix += "noise" + std::to_string(dNoise);
+    sPrefix += "__";
+    if(fieldModifier != 1.0)
+        sPrefix += "re";
+    sPrefix += "__";
 
     for(auto it : rhoList)
     {
@@ -621,25 +617,21 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
 
     stageDirectSolvers(vSolvers, use_img, 1.0, 0.0, sFilename, dst, dct,
                         wavelet_5x5, wavelet_7x7, multiwavelet);
-    if(dNoise != 0.0)
-        stageDirectSolvers(vSolvers, use_img, 1.0, dNoise, sFilename, dst, dct,
-                            wavelet_5x5, wavelet_7x7, multiwavelet);
-    if(resolve != 1.0)
-        stageDirectSolvers(vSolvers, use_img, resolve, 0.0, sFilename, dst, dct,
-                            wavelet_5x5, wavelet_7x7, multiwavelet);
-    if(dNoise != 0.0 && resolve != 1.0)
-        stageDirectSolvers(vSolvers, use_img, resolve, dNoise, sFilename, dst, dct,
-                            wavelet_5x5, wavelet_7x7, multiwavelet);
-
     stageIterativeSolvers(vSolvers, use_img, dTolerance, 1.0, 0.0, sFilename,
                           gauss, jacobi, sor);
     if(dNoise != 0.0)
+        stageDirectSolvers(vSolvers, use_img, 1.0, dNoise, sFilename, dst, dct,
+                            wavelet_5x5, wavelet_7x7, multiwavelet);
         stageIterativeSolvers(vSolvers, use_img, 1.0, dTolerance, dNoise, sFilename,
                           gauss, jacobi, sor);
     if(resolve != 1.0)
+        stageDirectSolvers(vSolvers, use_img, resolve, 0.0, sFilename, dst, dct,
+                            wavelet_5x5, wavelet_7x7, multiwavelet);
         stageIterativeSolvers(vSolvers, use_img, dTolerance, resolve, 0.0, sFilename,
                             gauss, jacobi, sor);
     if(dNoise != 0.0 && resolve != 1.0)
+        stageDirectSolvers(vSolvers, use_img, resolve, dNoise, sFilename, dst, dct,
+                            wavelet_5x5, wavelet_7x7, multiwavelet);
         stageIterativeSolvers(vSolvers, use_img, dTolerance, resolve, dNoise, sFilename,
                             gauss, jacobi, sor);
     const int DIVISION_SIZE = 4;
@@ -670,6 +662,7 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
                 file_IO::writeData(vResults, it->getLabel(), sFilename);
                 iPartIndex++;
                 vResults.clear(); // important, otherwise it stacks results
+                // delete it->orig
                 continue;
             }
         }
@@ -687,8 +680,6 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
         //     std::string sMsg = "Final image(cut)\n" + printImageAligned(result);
         //     it->log(1, sMsg);
         // }
-
-
     }
         // if(resolve != 1.0)
         // {

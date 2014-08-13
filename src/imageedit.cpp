@@ -15,26 +15,12 @@ using namespace cimg_library;
 using namespace logging;
 using namespace image_psb;
 
-
 namespace image_display
 {
 
 int ImageContainer::iSolvedIndex = 0;
 int ImageContainer::iResolvedIndex = 0;
 
-template <class baseIter>
-class circularIterator
-{
-    private:
-       baseIter cur;
-        baseIter begin;
-        baseIter end;
-    public:
-        circularIterator(baseIter b, baseIter e, baseIter i)
-            :cur(i), begin(b), end(e) {}
-        baseIter & operator ++(void) {++cur; if(cur == end) {cur = begin;}}
-        baseIter & operator --(void) {--cur; if(std::distance(begin, cur) == 0) { cur = end;}}
-};
 
 
 ImageContainer::ImageContainer(std::string fileName)
@@ -42,6 +28,10 @@ ImageContainer::ImageContainer(std::string fileName)
 {
     this->iSolvedIndex = 0;
     this->iResolvedIndex = 0;
+    // circularIterator<std::vector<std::string>::const_iterator >
+    //     it(this->vSolvedImages.begin(), this->vSolvedImages.end(),
+    //         this->vSolvedImages.begin()); 
+
 }
 
 std::string ImageContainer::getFileName() const
@@ -53,13 +43,11 @@ std::string ImageContainer::getFileName() const
 
 void ImageContainer::addSolverImage(std::string fileName)
 {
-    // MLOG(severity_type::extensive, " pushed image ", fileName, " back");
     this->vSolvedImages.push_back(fileName);
 }
 
 void ImageContainer::addResolvedImage(std::string fileName)
 {
-    // MLOG(severity_type::extensive, " pushed image ", fileName, " back");
     this->vResolvedImages.push_back(fileName);
 }
 
@@ -67,6 +55,7 @@ bool ImageContainer::hasResolved() const
 {
     return (this->vResolvedImages.size() > 0);
 }
+
 std::string ImageContainer::getMain() const
 {
     if(this->fileName.length() < 1)
@@ -74,6 +63,13 @@ std::string ImageContainer::getMain() const
         throw ImageException(std::string("no filename for image container!"));
     }
     return this->fileName;
+}
+void ImageDisplay::sortImageLists()
+{
+}
+
+void ImageContainer::sortLists()
+{
 }
 std::string ImageContainer::getSolved() const
 {
@@ -128,7 +124,6 @@ std::string ImageContainer::getNextSolver()
     this->iSolvedIndex++;
     return sElem;
 }
-
 
 std::string ImageContainer::getPrevSolver()
 {
@@ -387,6 +382,17 @@ void ImageDisplay::addResolvedImage2(std::string sFilename, std::string sCommon,
     throw ImageException(sErr);
 }
 
+void ImageContainer::initializeIterators()
+{
+    itSolved.setIterator(this->vSolvedImages.begin(),
+                                this->vSolvedImages.end(),
+                                this->vSolvedImages.begin());
+    itResolved.setIterator(this->vResolvedImages.begin(),
+                                this->vResolvedImages.end(),
+                                this->vResolvedImages.begin());
+   // MLOG(severity_type::debug, itSolved()); 
+}
+
 
 void scanAndAddImage(std::string sRootdir, std::string sSolverdir)
 {
@@ -410,14 +416,22 @@ void scanAndAddImage(std::string sRootdir, std::string sSolverdir)
     }
     for(auto const it : vSolvedNames)
     {
-        bool isResolved = false; std::string _, sLabel, sFilename;
+        bool isResolved = false;
+        std::string _, sLabel, sFilename;
+
         file_IO::SAVE_PATTERN.getNames(it, _, sLabel, sFilename, isResolved);
-        try{
-        id.addResolvedImage2(it, sFilename, isResolved);
+        try
+        {
+            id.addResolvedImage2(it, sFilename, isResolved);
         }
-        catch(ImageException ie) {
+        catch(ImageException ie)
+        {
             std::cerr << ie.what() << "\n continuing..." << std::endl;
         }
+    }
+    for(auto it : id.vMainImages)
+    {
+        it.initializeIterators();
     }
     id.show();
     id.loop();
@@ -425,4 +439,3 @@ void scanAndAddImage(std::string sRootdir, std::string sSolverdir)
 
 
 } /* EndOfNameSpace */
- /* EndOfNameSpace */

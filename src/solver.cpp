@@ -21,7 +21,7 @@ inline double getDiff(const double origVal, const double dPixels)
 Solver::Solver(const image_fmt *origImg, const image_fmt* const f,
         std::string sFile, std::string sLab,
         bool bMulPart, bool bFin)
-    : origImage(*origImg), field(*f), logInst(),
+    : origImage(origImg), field(*f), logInst(),
         sFilename(sFile), sLabel(sLab), bMultipart(bMulPart), bFinal(bFin)
 {
     // this->logInst.setName(
@@ -72,7 +72,7 @@ image_fmt IterativeSolver::solve(rawdata_fmt &vResults)
     for(iIter = 0; this->dStopCriterion < dIterationDiff; iIter++)
     {
         this->func(this->field, guess, dIterationDiff, iWidth, iHeight);
-        double dDiff = getDiff(this->origImage.MSE(guess), iNumPixels);
+        double dDiff = getDiff(this->origImage->MSE(guess), iNumPixels);
                        
         vResults.push_back(dDiff);
 
@@ -113,16 +113,16 @@ std::string Solver::getLabel() { return this->sLabel; }
 
 image_fmt DirectSolver::solve(rawdata_fmt &vResults)
 {
-    image_fmt ret(this->origImage, "xyz", 0);
+    image_fmt ret(*(this->origImage), "xyz", 0);
     this->func(this->field, ret);
     if(this->isDirichet == false)
-        ret += (this->origImage.mean() - ret.mean());
+        ret += (this->origImage->mean() - ret.mean());
     MLOG(severity_type::extensive, "Returned image:\n", image_psb::printImageAligned(ret));
     ret.crop(1,1,0,0, ret.width() - 2, ret.height() - 2 , 0, 0);
-    const int iPixels = (this->origImage.width() - 2) * (this->origImage.height() - 2);
+    const int iPixels = (this->origImage->width() - 2) * (this->origImage->height() - 2);
     vResults.push_back(getDiff(image_psb::imageDiff(
-            this->origImage.get_crop(1,1,0,0, this->origImage.width() - 2,
-                                              this->origImage.height() - 2, 0,0)
+            this->origImage->get_crop(1,1,0,0, this->origImage->width() - 2,
+                                              this->origImage->height() - 2, 0,0)
             ,ret), iPixels));
     return ret;
 }
