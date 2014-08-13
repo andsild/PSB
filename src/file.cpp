@@ -77,21 +77,35 @@ std::string SaveBehaviour::getResolveLabel(std::string sLabel)
 
 void SaveBehaviour::getNames(std::string sSearch,
                             std::string &sOutdir, std::string &sLabel, std::string &sFilename,
-                            bool &isResolved)
+                            bool &isResolved, bool &isNoised, bool &isNoisedOrig)
 {
     std::string sCopy = sSearch;
     sOutdir = getFoldername(sSearch);
     size_t searchPos = sSearch.find_last_of("/\\");
     sSearch.erase(0, searchPos + 1);
 
+    int count = 0;
+    for (size_t offset = sSearch.find(sDelimiter); offset != std::string::npos;
+            offset = sSearch.find(sDelimiter, offset + sDelimiter.length()))
+    {
+        ++count;
+    }
+    if(count < 2)
+    {
+        isNoisedOrig = true;
+        sSearch.erase(0, sDelimiter.length());
+    }
+    else
+    {
+        searchPos=sSearch.find(this->sDelimiter);
+        sLabel = sSearch.substr(0, searchPos);
+        isNoised = sSearch.substr(0,searchPos).length() > 1 == true;
+        sSearch.erase(0, searchPos + sDelimiter.length());
 
-    searchPos=sSearch.find(this->sDelimiter);
-    sLabel = sSearch.substr(0, searchPos);
-    sSearch.erase(0, searchPos + sDelimiter.length());
-
-    searchPos=sSearch.find(this->sDelimiter);
-    isResolved = sSearch.substr(0,searchPos).length() > 1 == true;
-    sSearch.erase(0, searchPos + sDelimiter.length());
+        searchPos=sSearch.find(this->sDelimiter);
+        isResolved = sSearch.substr(0,searchPos).length() > 1 == true;
+        sSearch.erase(0, searchPos + sDelimiter.length());
+    }
 
     searchPos=sSearch.find(this->sDelimiter);
     sLabel = sSearch.substr(0, searchPos);
@@ -331,13 +345,13 @@ void saveImage(const image_fmt &image, const std::string sSavename, const bool b
 {
     mkdirp(SAVE_PATTERN.getOutdir().c_str());
     bool isResolved = false;
-    std::string _, __, ___;
+    std::string _, __, ___; bool ____, _1;
     std::string tmp = sSavename;
-    SAVE_PATTERN.getNames(tmp, _, __, ___, isResolved);
+    SAVE_PATTERN.getNames(tmp, _, __, ___, isResolved, ____, _1);
     try
     {
         if(isResolved){
-            image.save_ascii(sSavename.c_str());
+            image.save_ascii(sSavename.c_str()); // Needs to be ascii to get good plotting data from imageedit.cpp
         }
         else{
             image.save(sSavename.c_str());

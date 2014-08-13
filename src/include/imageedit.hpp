@@ -50,49 +50,21 @@ class circularIterator
         // }
 };
 
-
-class ImageContainer
-{
-    private:
-    std::vector<std::string> vSolvedImages,
-                             vResolvedImages;
-    std::string fileName;
-
-    circularIterator<std::vector<std::string>::const_iterator > itSolved,
-                                                                itResolved;
-    public:
-    static int iSolvedIndex, iResolvedIndex;
-    ImageContainer(std::string);
-    
-    void addSolverImage(std::string);
-    void addResolvedImage(std::string);
-
-    bool hasResolvedImages();
-
-    std::string getFileName() const;
-    std::string getMain() const;
-    std::string getSolved() const;
-    std::string getResolved() const;
-    std::string getNextSolver();
-    std::string getPrevSolver();
-    std::string getNextResolver();
-    std::string getPrevResolver();
-    bool hasResolved() const;
-    void sortLists();
-    void initializeIterators();
-};
-
+class ImageContainer;
 class ImageDisplay
 {
     private:
     int iIndex;
     cimg_library::CImgDisplay main_disp,
                 solved_disp,
-                resolved_disp;
+                resolved_disp,
+                noised_disp,
+                orignoised_disp;
     image_fmt main_image,
-              // solved_image,
-              resolved_image;
-    cimg_library::CImg<unsigned char> solved_image;
+              solved_image,
+              resolved_image,
+              noised_image,
+              orig_noised_image;
     image_fmt visu;
     cimg_library::CImgDisplay graph_disp;
     ImageContainer getCurrent();
@@ -100,14 +72,14 @@ class ImageDisplay
     void prevImage();
     void nextSolver();
     void prevSolver();
-    void loadImmy(std::string &arg1, std::string &arg2, std::string &arg3);
+    void loadImmy(std::string &arg1, std::string &arg2,
+                    std::string &arg3, std::string &arg4, std::string &arg5);
     public:
     std::vector<ImageContainer> vMainImages;
-    void sortImageLists();
     void loop();
     ImageDisplay();
     void addMainImage(std::string);
-    void addResolvedImage2(std::string sFilename, std::string sCommon, bool);
+    void addResolvedImage2(std::string, std::string, bool, bool, bool);
     void show();
 };
 

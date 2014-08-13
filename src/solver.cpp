@@ -132,24 +132,17 @@ image_fmt DirectSolver::solve(rawdata_fmt &vResults)
     if(this->isDirichet == false)
     {
         useField = image_psb::padCore(field.width() + 2, field.height() + 2, field);
+        this->func(useField, ret);
+        ret.crop(1,1,0,0,
+                field.width() - 0, field.height() - 0, 0, 0);
+        ret += (this->origImage->mean() - ret.mean());
     }
     else
     {
-        useField = field;
-    }
-    this->func(useField, ret);
-    if(this->isDirichet == false)
-    {
-        ret.crop(1,1,0,0,
-                field.width(), field.height(), 0, 0);
-        ret += (this->origImage->mean() - ret.mean());
+        this->func(field, ret);
     }
     MLOG(severity_type::extensive, "Returned image:\n",
             image_psb::printImageAligned(ret));
-    // ret.crop(1,1,0,0, ret.width() - 2, ret.height() - 2 , 0, 0);
-    // image_fmt noBorder = this->origImage->get_crop(1,1,0,0,
-    //                     this->origImage->width() - 2,
-    //                     this->origImage->height() - 2, 0,0)
     vResults.push_back(getDiff(
                 image_psb::imageDiff(*(this->origImage),ret),
                                     this->origImage->size()));

@@ -1,3 +1,7 @@
+/** Render the original and solved images for the user.
+*/
+// To refactor this code, I'd recommend starting from scratch
+// I started out with something small in mind, and the code does not at all scale.
 #include "imageedit.hpp"
 
 #include <iostream>
@@ -18,20 +22,57 @@ using namespace image_psb;
 namespace image_display
 {
 
-int ImageContainer::iSolvedIndex = 0;
-int ImageContainer::iResolvedIndex = 0;
 
 
+class ImageContainer
+{
+    private:
+    std::vector<std::string> vSolvedImages,
+                             vResolvedImages,
+                             vNoisedImages;
+                             
+    std::string fileName, noisedFileName;
+
+    circularIterator<std::vector<std::string>::const_iterator > itSolved,
+                                                                itResolved;
+    public:
+    static int iSolvedIndex, iResolvedIndex, iNoisedIndex, isNoisedOrigImages;
+    ImageContainer(std::string);
+    
+    void addSolverImage(std::string);
+    void addResolvedImage(std::string);
+    void addNoisedImage(std::string);
+    void addNoisedImageOrig(std::string);
+
+    bool hasResolvedImages();
+
+    std::string getFileName() const;
+    std::string getMain() const;
+    std::string getSolved() const;
+    std::string getResolved() const;
+    std::string getNoised() const;
+    std::string getOrigNoised() const;
+    std::string getNextSolver();
+    std::string getPrevSolver();
+    std::string getNextResolver();
+    std::string getPrevResolver();
+    bool hasResolved() const;
+    bool hasNoised() const;
+    void initializeIterators();
+};
+
+int ImageContainer::iSolvedIndex       = 0;
+int ImageContainer::iResolvedIndex     = 0;
+int ImageContainer::iNoisedIndex       = 0;
+int ImageContainer::isNoisedOrigImages = 0;
 
 ImageContainer::ImageContainer(std::string fileName)
                : fileName(fileName)
 {
-    this->iSolvedIndex = 0;
-    this->iResolvedIndex = 0;
-    // circularIterator<std::vector<std::string>::const_iterator >
-    //     it(this->vSolvedImages.begin(), this->vSolvedImages.end(),
-    //         this->vSolvedImages.begin()); 
-
+    this->iSolvedIndex       = 0;
+    this->iResolvedIndex     = 0;
+    this->iNoisedIndex       = 0;
+    this->isNoisedOrigImages = 0;
 }
 
 std::string ImageContainer::getFileName() const
@@ -51,9 +92,23 @@ void ImageContainer::addResolvedImage(std::string fileName)
     this->vResolvedImages.push_back(fileName);
 }
 
+void ImageContainer::addNoisedImage(std::string fileName)
+{
+    this->vNoisedImages.push_back(fileName);
+}
+
+void ImageContainer::addNoisedImageOrig(std::string fileName)
+{
+    this->noisedFileName = fileName;
+}
+
 bool ImageContainer::hasResolved() const
 {
     return (this->vResolvedImages.size() > 0);
+}
+bool ImageContainer::hasNoised() const
+{
+    return (this->vNoisedImages.size() > 0);
 }
 
 std::string ImageContainer::getMain() const
@@ -64,13 +119,7 @@ std::string ImageContainer::getMain() const
     }
     return this->fileName;
 }
-void ImageDisplay::sortImageLists()
-{
-}
 
-void ImageContainer::sortLists()
-{
-}
 std::string ImageContainer::getSolved() const
 {
     if(this->vSolvedImages.empty())
@@ -113,6 +162,14 @@ std::string ImageContainer::getResolved() const
         throw ImageException(sErr);
     }
     return this->vResolvedImages.at(iResolvedIndex);
+}
+std::string ImageContainer::getNoised() const
+{
+    return this->vNoisedImages.at(0);
+}
+std::string ImageContainer::getOrigNoised() const
+{
+    return this->noisedFileName;
 }
 std::string ImageContainer::getNextSolver()
 {
@@ -162,7 +219,7 @@ ImageDisplay::ImageDisplay()
     this->iIndex = 0;
     visu.assign(500, 256, 1, 3, 0);
     graph_disp = visu;
-    graph_disp.set_title("Color intensities");
+    graph_disp.set_title("Color intensities: orig image=white, solved=red");
 }
 
 bool ImageContainer::hasResolvedImages()
@@ -171,7 +228,8 @@ bool ImageContainer::hasResolvedImages()
 }
 
 void ImageDisplay::loadImmy(std::string &sMainfile, std::string &sSolverfile,
-                            std::string &sResolvedfile)
+                            std::string &sResolvedfile, std::string &sNoisedfile,
+                            std::string &sOrigNoisedfile)
 {
     ImageContainer inst = this->vMainImages.at(this->iIndex);
     try
@@ -180,6 +238,11 @@ void ImageDisplay::loadImmy(std::string &sMainfile, std::string &sSolverfile,
         sSolverfile = inst.getSolved();
         if(inst.hasResolvedImages())
             sResolvedfile = inst.getResolved();
+        if(inst.hasNoised())
+        {
+            sNoisedfile = inst.getNoised();
+            sOrigNoisedfile = inst.getOrigNoised();
+        }
     }
     catch(ImageException ie)
     {
@@ -191,7 +254,7 @@ void ImageDisplay::loadImmy(std::string &sMainfile, std::string &sSolverfile,
             std::cerr << "Lookup for solved images exhausted, exiting" << std::endl;
             exit(EXIT_FAILURE);
         }
-        this->loadImmy(sMainfile, sSolverfile, sResolvedfile);
+        this->loadImmy(sMainfile, sSolverfile, sResolvedfile, sNoisedfile, sOrigNoisedfile);
     }
 }
 
@@ -199,15 +262,14 @@ void ImageDisplay::show()
 {
     if(this->vMainImages.empty())
         return;
-    std::string sMainfile, sSolverfile, sResolvedfile;
-    loadImmy(sMainfile, sSolverfile, sResolvedfile);
+    std::string sMainfile, sSolverfile, sResolvedfile, sNoisedfile, sOrigNoisedfile;
+    loadImmy(sMainfile, sSolverfile, sResolvedfile, sNoisedfile, sOrigNoisedfile);
 
     cimg::exception_mode(0);
     try
     {
         this->main_image.assign(sMainfile.c_str());
         toGrayScale(this->main_image);
-        // this->solved_image.load_ascii(sSolverfile.c_str());
         this->solved_image.load(sSolverfile.c_str());
     }
     catch(CImgIOException ciie)
@@ -226,6 +288,20 @@ void ImageDisplay::show()
         this->resolved_image.load_ascii(sResolvedfile.c_str());
         this->resolved_disp = this->resolved_image;
         this->resolved_disp.set_title(sResolvedfile.c_str());
+    }
+    if(this->vMainImages.at(this->iIndex).hasNoised())
+    {
+        this->noised_image.assign(sNoisedfile.c_str());
+        this->noised_disp = this->noised_image;
+        this->noised_disp.set_title(sNoisedfile.c_str());
+
+        this->orig_noised_image.assign(sOrigNoisedfile.c_str());
+        this->orignoised_disp = this->orig_noised_image;
+        this->orignoised_disp.set_title(sOrigNoisedfile.c_str());
+
+        const char *graphTitle = this->graph_disp.title();
+        std::string sNewTitle = graphTitle + std::string(", orignoise = yellow, solvednoise = green");
+        this->graph_disp.set_title(sNewTitle.c_str());
     }
 
 }
@@ -293,7 +369,9 @@ void ImageDisplay::loop()
 {
     const double blackWhite[] = {255, 255, 255},
                  red[] = {255, 0, 0},
-                 green[] = {0, 255, 0};
+                 green[] = {0, 150, 0},
+                 blue[] = {0, 0, 255},
+                 yellow[] = {200,200,0};
     int yMin = 0, yMax = 0;
     if(this->resolved_disp.is_empty() == false)
     {
@@ -320,8 +398,17 @@ void ImageDisplay::loop()
             {
                 image_fmt resolved_cropped = this->resolved_image.get_crop(
                     0, yPos, 0, 0, resolved_image.width()-1, yPos, 0, 0);
-                // yMax = resolved_cropped.max();
                 visu.draw_graph(resolved_cropped, green, 1, 1, yMin, yMax, 0);
+            }
+            if(this->noised_disp.is_empty() == false)
+            {
+                image_fmt noised_crop = this->noised_image.get_crop(
+                    0, yPos, 0, 0, this->noised_image.width()-1, yPos, 0, 0);
+                image_fmt orig_noised_crop = this->orig_noised_image.get_crop(
+                    0, yPos, 0, 0, this->noised_image.width()-1, yPos, 0, 0);
+
+                visu.draw_graph(noised_crop,      green,  1, 1, yMin, yMax, 0);
+                visu.draw_graph(orig_noised_crop, yellow, 1, 1, yMin, yMax, 0);
             }
             image_fmt main_cropped =  this->main_image.get_crop(
                     0, yPos, 0, 0, this->main_image.width()-1, yPos, 0, 0);
@@ -364,7 +451,7 @@ void ImageDisplay::addMainImage(std::string fileName)
 }
 
 void ImageDisplay::addResolvedImage2(std::string sFilename, std::string sCommon,
-                                     bool isResolved)
+                                     bool isResolved, bool isNoised, bool isNoisedOrig)
 {
     for(auto &it : this->vMainImages)
     {
@@ -373,6 +460,14 @@ void ImageDisplay::addResolvedImage2(std::string sFilename, std::string sCommon,
         {
             if(isResolved)
                 it.addResolvedImage(sFilename);
+            else if(isNoised)
+            {
+                it.addNoisedImage(sFilename);
+            }
+            else if(isNoisedOrig)
+            {
+                it.addNoisedImageOrig(sFilename);
+            }
             else
                 it.addSolverImage(sFilename);
             return;
@@ -416,13 +511,16 @@ void scanAndAddImage(std::string sRootdir, std::string sSolverdir)
     }
     for(auto const it : vSolvedNames)
     {
-        bool isResolved = false;
+        bool isResolved   =  false,
+             isNoised     =  false,
+             isNoisedOrig =  false;
         std::string _, sLabel, sFilename;
 
-        file_IO::SAVE_PATTERN.getNames(it, _, sLabel, sFilename, isResolved);
+        file_IO::SAVE_PATTERN.getNames(it, _, sLabel, sFilename, isResolved,
+                                        isNoised, isNoisedOrig);
         try
         {
-            id.addResolvedImage2(it, sFilename, isResolved);
+            id.addResolvedImage2(it, sFilename, isResolved, isNoised, isNoisedOrig);
         }
         catch(ImageException ie)
         {

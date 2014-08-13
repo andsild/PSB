@@ -17,6 +17,9 @@ using namespace image_psb;
 namespace solver
 {
 
+/** Perform a gradient reconstriction using Discrete Cosine Transform.
+  The field is padded with zeroes 1 pixel to each side (Neumann border condition)
+*/
 void FFT_DCT(const image_fmt &field, image_fmt &ret)
 {
     imageList_fmt FFT = field.get_FFT();

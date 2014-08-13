@@ -477,6 +477,7 @@ image_fmt padCore(int iNewWidth, int iNewHeight, const image_fmt &input)
     int iStartX = iNewWidth  / 2 - input.width()  / 2,
         iStartY = iNewHeight / 2 - input.height() / 2;
     image_fmt ret(iNewWidth, iNewHeight, 1, 1, 0);
+    std::cerr << iStartX << "\t" << iStartY << std::endl;
     ret.draw_image(iStartX, iStartY, input);
     return ret;
 }
@@ -493,7 +494,10 @@ void stageDirectSolvers(std::vector<solver::Solver*> &vSolvers,
     {
         sPrefix += "noise" + std::to_string(dNoise);
         image_fmt tmp = img.get_noise(dNoise);
+        tmp.normalize(0,255);
         *use_img = tmp;
+        std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, sPrefix, false);
+        file_IO::saveImage(tmp, sSavename, false);
     }
     else
     {
@@ -550,18 +554,36 @@ void stageDirectSolvers(std::vector<solver::Solver*> &vSolvers,
 }
 
 void stageIterativeSolvers(std::vector<solver::Solver*> &vSolvers,
-        image_fmt &img, const double dTolerance, const data_fmt fieldModifier,
+        const image_fmt &img, const double dTolerance, const data_fmt fieldModifier,
         const double dNoise, const std::string sFilename,
         const bool gauss, const bool jacobi, const bool sor)
 {
     // if(dNoise != 0.0)
     //     use_img.noise(dNoise);
     const int DIVISION_SIZE = 4;
-    image_fmt* use_img  = &img;
-    image_fmt* field = new image_fmt; // TODO: excessive: field is also made in direct solvers
-    makeField(img, fieldModifier, *field);
-    std::string sPrefix = "";
+    std::string sPrefix= "";
+    image_fmt* const use_img = new image_fmt();
+    if(dNoise != 0.0)
+    {
+        sPrefix += "noise" + std::to_string(dNoise);
+        image_fmt tmp = img.get_noise(dNoise);
+        tmp.normalize(0,255);
+        *use_img = tmp;
+        std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, sPrefix, false);
+        file_IO::saveImage(tmp, sSavename, false);
+    }
+    else
+    {
+        *use_img = img;
+    }
+    sPrefix += "__";
 
+    if(fieldModifier != 1.0)
+        sPrefix += "re";
+    sPrefix += "__";
+
+    image_fmt* field = new image_fmt;
+    makeField(*use_img, fieldModifier, *field);
     std::vector<image_fmt *> origList, guessList, rhoList;
     divide(DIVISION_SIZE, use_img, field, origList, rhoList, guessList);
 
@@ -625,20 +647,26 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
     stageIterativeSolvers(vSolvers, use_img, dTolerance, 1.0, 0.0, sFilename,
                           gauss, jacobi, sor);
     if(dNoise != 0.0)
+    {
         stageDirectSolvers(vSolvers, use_img, 1.0, dNoise, sFilename, dst, dct,
                             wavelet_5x5, wavelet_7x7, multiwavelet);
         stageIterativeSolvers(vSolvers, use_img, 1.0, dTolerance, dNoise, sFilename,
                           gauss, jacobi, sor);
+    }
     if(resolve != 1.0)
+    {
         stageDirectSolvers(vSolvers, use_img, resolve, 0.0, sFilename, dst, dct,
                             wavelet_5x5, wavelet_7x7, multiwavelet);
         stageIterativeSolvers(vSolvers, use_img, dTolerance, resolve, 0.0, sFilename,
                             gauss, jacobi, sor);
+    }
     if(dNoise != 0.0 && resolve != 1.0)
+    {
         stageDirectSolvers(vSolvers, use_img, resolve, dNoise, sFilename, dst, dct,
                             wavelet_5x5, wavelet_7x7, multiwavelet);
         stageIterativeSolvers(vSolvers, use_img, dTolerance, resolve, dNoise, sFilename,
                             gauss, jacobi, sor);
+    }
     const int DIVISION_SIZE = 4;
 
 
