@@ -22,14 +22,17 @@
 
 # Images
 *.png
-!nice_example/*
 *.jpg
 *.bmp
+!nice_example/* # These are quite useful for me to debug
 
 # To build - these are specific for each arch
 *build/*
 
-# 
+# output from execution
+data/*
+
+# My personal working files
 resources/
 
 # Large files
