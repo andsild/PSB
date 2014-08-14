@@ -80,36 +80,13 @@ image_fmt IterativeSolver::solve(rawdata_fmt &vResults)
     const int iHeight = this->guess.height();
     const double iNumPixels = guess.size();
 
-    // this->logInst.print< severity_type::info>("Stop criteria set to :", dStopCriterion);
-
     for(iIter = 0; this->dStopCriterion < dIterationDiff; iIter++)
     {
         this->func(this->field, guess, dIterationDiff, iWidth, iHeight);
         double dDiff = getDiff(this->origImage->MSE(guess), iNumPixels);
                        
         vResults.push_back(dDiff);
-
-        // if(iIter % 100 == 0)
-        // {
-        //     this->logInst.print< severity_type::info >("Iteration number :", iIter, " with iteration diff ", dIterationDiff, " and image difference ", dDiff );
-        //     CLOG(severity_type::info)("Solver ", this->getLabel(), " for ", this->getFilename(), ":: iteration number :", iIter, " with iteration diff ", dIterationDiff, " and image difference ", dDiff );
-        // }
-        
-        // DO_IF_LOGLEVEL(severity_type::debug)
-        // {
-        //     std::string sImage = image_psb::printImage(guess);
-        //     this->logInst.print< severity_type::debug >("Process:\n", sImage);
-        //     CLOG(severity_type::debug)("Process for ", this->getLabel(), " on image ", this->getFilename(), ":\n", sImage);
-        // }
     }
-
-    // DO_IF_LOGLEVEL(severity_type::debug)
-    // {
-    //     std::string sImage = image_psb::printImage(guess);
-    //     this->logInst.print< severity_type::debug >("Finished image:\n", sImage );
-    //     CLOG(severity_type::debug)("Final product with ", this->getLabel(), " on image ", this->getFilename(), ":\n", sImage);
-    // }
-    // this->logInst.print< severity_type::info>("Finished in ", iIter, " iterations\nFinal MSE: ", vResults.back());
 
     return guess;
 }
@@ -131,10 +108,10 @@ image_fmt DirectSolver::solve(rawdata_fmt &vResults)
     image_fmt useField;
     if(this->isDirichet == false)
     {
-        useField = image_psb::padCore(field.width() + 2, field.height() + 2, field);
-        this->func(useField, ret);
+        MLOG(severity_type::debug, "\n", image_psb::printImageAligned(field));
+        this->func(field, ret);
         ret.crop(1,1,0,0,
-                field.width() - 0, field.height() - 0, 0, 0);
+                field.width() - 2, field.height() - 2, 0, 0);
         ret += (this->origImage->mean() - ret.mean());
     }
     else

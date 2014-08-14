@@ -271,9 +271,10 @@ void makeField(
                     1,-4,1,
                     0,1,0);
     ret = input.get_convolve(kernel, 0);
-    // const image_fmt ret = input.get_convolve(kernel, 0);
-    // return &ret;
-    // if(modifier != 1.0) return ret * modifier;
+    if(modifier != 1.0)
+    {
+        ret *= modifier;
+    }
 }
 
 
@@ -477,7 +478,6 @@ image_fmt padCore(int iNewWidth, int iNewHeight, const image_fmt &input)
     int iStartX = iNewWidth  / 2 - input.width()  / 2,
         iStartY = iNewHeight / 2 - input.height() / 2;
     image_fmt ret(iNewWidth, iNewHeight, 1, 1, 0);
-    std::cerr << iStartX << "\t" << iStartY << std::endl;
     ret.draw_image(iStartX, iStartY, input);
     return ret;
 }
@@ -506,26 +506,33 @@ void stageDirectSolvers(std::vector<solver::Solver*> &vSolvers,
     sPrefix += "__";
 
     if(fieldModifier != 1.0)
+    {
         sPrefix += "re";
+    }
     sPrefix += "__";
 
     // const image_fmt* use_img  = &img;
-    image_fmt* field = new image_fmt;
-    makeField(*use_img, fieldModifier, *field);
-    image_fmt negField = (*field) * -1;
-    image_fmt *negPtr = &negField;
+    image_fmt* field = new image_fmt();
+    image_fmt *neuMannField = new image_fmt();
+    image_fmt neuMannBorder = padCore(img.width() + 2, img.height() + 2, img);
+
+    makeField(*use_img, -1.0 * fieldModifier, *field);
+    makeField(neuMannBorder, -1.0 * fieldModifier, *neuMannField);
 
     if(dst)
     {
         std::string sLabel = sPrefix + "dst";
-        vSolvers.push_back(new solver::DirectSolver(use_img, negPtr,
+        vSolvers.push_back(new solver::DirectSolver(use_img, field,
                                                     solver::FFT_DST,
                                                     sFilename, sLabel, true));
     }
     if(dct)
     {
+        image_fmt *negNeuPtr = new image_fmt();
+        image_fmt negNeumann = (*neuMannField) * -1;
+        *negNeuPtr = negNeumann;
         std::string sLabel = sPrefix + "dct";
-        vSolvers.push_back(new solver::DirectSolver(use_img, field,
+        vSolvers.push_back(new solver::DirectSolver(use_img, negNeuPtr,
                                                     solver::FFT_DCT,
                                                     sFilename, sLabel, false));
     }
@@ -533,23 +540,23 @@ void stageDirectSolvers(std::vector<solver::Solver*> &vSolvers,
     if(wavelet_5x5)
     {
         std::string sLabel = sPrefix + "wavelet5x5";
-        vSolvers.push_back(new solver::DirectSolver(use_img, negPtr,
+        vSolvers.push_back(new solver::DirectSolver(use_img, neuMannField,
                                                     wavelet::wavelet_5x5,
                                                     sFilename, sLabel, false));
     }
     if(wavelet_7x7)
     {
         std::string sLabel = sPrefix + "wavelet7x7";
-        vSolvers.push_back(new solver::DirectSolver(use_img, negPtr,
+        vSolvers.push_back(new solver::DirectSolver(use_img, neuMannField,
                                                     wavelet::wavelet_7x7,
                                                     sFilename, sLabel, false));
     }
     if(multiwavelet)
     {
-        std::string sLabel = sPrefix + "multiwavelet";
-        vSolvers.push_back(new solver::DirectSolver(use_img, negPtr,
-                                                    wavelet::hermite_wavelet,
-                                                    sFilename, sLabel, false));
+        // std::string sLabel = sPrefix + "multiwavelet";
+        // vSolvers.push_back(new solver::DirectSolver(use_img, negPtr,
+        //                                             wavelet::hermite_wavelet,
+        //                                             sFilename, sLabel, false));
     }
 }
 
@@ -558,15 +565,14 @@ void stageIterativeSolvers(std::vector<solver::Solver*> &vSolvers,
         const double dNoise, const std::string sFilename,
         const bool gauss, const bool jacobi, const bool sor)
 {
-    // if(dNoise != 0.0)
-    //     use_img.noise(dNoise);
     const int DIVISION_SIZE = 4;
     std::string sPrefix= "";
     image_fmt* const use_img = new image_fmt();
     if(dNoise != 0.0)
     {
+        std::cerr << "NOTHING TO DO HERE" << std::endl;
         sPrefix += "noise" + std::to_string(dNoise);
-        image_fmt tmp = img.get_noise(dNoise);
+        image_fmt tmp = img.get_noise(dNoise, 3);/* Salt and pepper noise */
         tmp.normalize(0,255);
         *use_img = tmp;
         std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, sPrefix, false);
@@ -579,7 +585,9 @@ void stageIterativeSolvers(std::vector<solver::Solver*> &vSolvers,
     sPrefix += "__";
 
     if(fieldModifier != 1.0)
+    {
         sPrefix += "re";
+    }
     sPrefix += "__";
 
     image_fmt* field = new image_fmt;
@@ -593,11 +601,6 @@ void stageIterativeSolvers(std::vector<solver::Solver*> &vSolvers,
     if(fieldModifier != 1.0)
         sPrefix += "re";
     sPrefix += "__";
-
-    for(auto it : rhoList)
-    {
-        MLOG(severity_type::debug, "\n", printImage(*it));
-    }
 
     if(gauss)
     {
