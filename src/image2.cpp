@@ -595,12 +595,6 @@ void stageIterativeSolvers(std::vector<solver::Solver*> &vSolvers,
     std::vector<image_fmt *> origList, guessList, rhoList;
     divide(DIVISION_SIZE, use_img, field, origList, rhoList, guessList);
 
-    if(dNoise != 0.0)
-        sPrefix += "noise" + std::to_string(dNoise);
-    sPrefix += "__";
-    if(fieldModifier != 1.0)
-        sPrefix += "re";
-    sPrefix += "__";
 
     if(gauss)
     {
