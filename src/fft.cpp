@@ -17,10 +17,12 @@ using namespace image_psb;
 namespace solver
 {
 
+/** Perform a gradient reconstriction using Discrete Cosine Transform.
+  The field is padded with zeroes 1 pixel to each side (Neumann border condition)
+*/
 void FFT_DCT(const image_fmt &field, image_fmt &ret)
 {
-    image_fmt useField = field;
-    imageList_fmt FFT = useField.get_FFT();
+    imageList_fmt FFT = field.get_FFT();
     image_fmt factor(FFT[0].width(),FFT[0].height());
     cimg_forXY(factor,x,y) factor(x,y) = 
                 -(4-2*std::cos(2*x*cimg::PI/factor.width())

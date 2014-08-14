@@ -24,6 +24,7 @@ class Solver
 
     protected:
     const image_fmt* const origImage;
+    const image_fmt* const noisedImage;
     const image_fmt field;
     logging::Logger< logging::FileLogPolicy > logInst;
     bool bMultipart, bFinal;
@@ -35,9 +36,14 @@ class Solver
     void log(int, std::string);
     bool isMultipart();
     bool isFinal();
-    Solver(const image_fmt *origImage, const image_fmt *field,
+    Solver(const image_fmt* const origImage, const image_fmt* const field,
             std::string sFile, std::string sLab,
             bool bMulPart, bool bFin = false);
+    Solver(const image_fmt* const origImage, const image_fmt* const noise,
+            const image_fmt* const field,
+            std::string sFile, std::string sLab,
+            bool bMulPart, bool bFin = false);
+    Solver();
 };
 
 class IterativeSolver : public virtual Solver
@@ -53,6 +59,7 @@ class IterativeSolver : public virtual Solver
             const image_fmt * const U, iterative_func func,
             double dStopCriterion, std::string sFile, std::string sLabel,
             bool bMultiPart, bool bFinal = false);
+    IterativeSolver();
 };
 
 class DirectSolver : public virtual Solver
@@ -67,6 +74,13 @@ class DirectSolver : public virtual Solver
                 std::string sFilename, std::string sLabel,
                 bool dirichet,
                 bool bMultiPart = false, bool bFin = false);
+    DirectSolver(const image_fmt* const origImage, const image_fmt* const noiseImg,
+                const image_fmt* const field,
+                direct_func func,
+                std::string sFilename, std::string sLabel,
+                bool dirichet,
+                bool bMultiPart = false, bool bFin = false);
+    DirectSolver();
 };
 
 } /* EndOfNamespace */

@@ -271,9 +271,10 @@ void makeField(
                     1,-4,1,
                     0,1,0);
     ret = input.get_convolve(kernel, 0);
-    // const image_fmt ret = input.get_convolve(kernel, 0);
-    // return &ret;
-    // if(modifier != 1.0) return ret * modifier;
+    if(modifier != 1.0)
+    {
+        ret *= modifier;
+    }
 }
 
 
@@ -360,7 +361,7 @@ void divide(int iDivSize, image_fmt* const origImage, image_fmt* const rho,
 
     /* Since the code pushes back pointers, we need two iterations: one to
        allocate the images, and one to push back their addresses. Otherwise,
-       all the pointers would point to different regions.
+       all the pointers would point to same address.
     */
     for(int xSlice = 0; xSlice < iDivSize / 2; xSlice++)
     {
@@ -371,9 +372,9 @@ void divide(int iDivSize, image_fmt* const origImage, image_fmt* const rho,
             int iRightmostX = iLeftmostX + WIDHT_REGION -1,
                 iLowerY = iUpperY + HEIGHT_REGION - 1;
 
-            if(WIDHT_REGION % 2 == 0 && xSlice == 0)
+            if(WIDHT_REGION % 2 == 1 && xSlice == 0)
                 iRightmostX++;
-            if(HEIGHT_REGION % 2 == 0 && ySlice == 0)
+            if(HEIGHT_REGION % 2 == 1 && ySlice == 0)
                 iLowerY++;
 
             if(iRightmostX > iWidth)
@@ -482,39 +483,56 @@ image_fmt padCore(int iNewWidth, int iNewHeight, const image_fmt &input)
 }
 
 void stageDirectSolvers(std::vector<solver::Solver*> &vSolvers,
-        image_fmt &img, const data_fmt fieldModifier,
+        const image_fmt &img, const data_fmt fieldModifier,
         const double dNoise, const std::string sFilename,
         const bool dst, const bool dct,
         const bool wavelet_5x5, const bool wavelet_7x7, const bool multiwavelet)
 {
-    // if(dNoise != 0.0)
-    //     use_img.noise(dNoise);
-    const image_fmt* use_img  = &img;
-    image_fmt* field = new image_fmt;
-    makeField(img, fieldModifier, *field);
-    image_fmt negField = (*field) * -1;
-    image_fmt *negPtr = &negField;
     std::string sPrefix= "";
-    //TODO: more clever to prefix label with type, end with filename, and then
-    //      put optional in middle, that way the code scales easilier
+    image_fmt* const use_img = new image_fmt();
     if(dNoise != 0.0)
+    {
         sPrefix += "noise" + std::to_string(dNoise);
+        image_fmt tmp = img.get_noise(dNoise);
+        tmp.normalize(0,255);
+        *use_img = tmp;
+        std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, sPrefix, false);
+        file_IO::saveImage(tmp, sSavename, false);
+    }
+    else
+    {
+        *use_img = img;
+    }
     sPrefix += "__";
+
     if(fieldModifier != 1.0)
+    {
         sPrefix += "re";
+    }
     sPrefix += "__";
+
+    // const image_fmt* use_img  = &img;
+    image_fmt* field = new image_fmt();
+    image_fmt *neuMannField = new image_fmt();
+    image_fmt neuMannBorder = padCore(img.width() + 2, img.height() + 2, img);
+
+    makeField(*use_img, -1.0 * fieldModifier, *field);
+    makeField(neuMannBorder, -1.0 * fieldModifier, *neuMannField);
 
     if(dst)
     {
         std::string sLabel = sPrefix + "dst";
-        vSolvers.push_back(new solver::DirectSolver(use_img, negPtr,
+        vSolvers.push_back(new solver::DirectSolver(use_img, field,
                                                     solver::FFT_DST,
                                                     sFilename, sLabel, true));
     }
     if(dct)
     {
+        image_fmt *negNeuPtr = new image_fmt();
+        image_fmt negNeumann = (*neuMannField) * -1;
+        *negNeuPtr = negNeumann;
         std::string sLabel = sPrefix + "dct";
-        vSolvers.push_back(new solver::DirectSolver(use_img, field,
+        vSolvers.push_back(new solver::DirectSolver(use_img, negNeuPtr,
                                                     solver::FFT_DCT,
                                                     sFilename, sLabel, false));
     }
@@ -522,39 +540,58 @@ void stageDirectSolvers(std::vector<solver::Solver*> &vSolvers,
     if(wavelet_5x5)
     {
         std::string sLabel = sPrefix + "wavelet5x5";
-        vSolvers.push_back(new solver::DirectSolver(use_img, negPtr,
+        vSolvers.push_back(new solver::DirectSolver(use_img, neuMannField,
                                                     wavelet::wavelet_5x5,
                                                     sFilename, sLabel, false));
     }
     if(wavelet_7x7)
     {
         std::string sLabel = sPrefix + "wavelet7x7";
-        vSolvers.push_back(new solver::DirectSolver(use_img, negPtr,
+        vSolvers.push_back(new solver::DirectSolver(use_img, neuMannField,
                                                     wavelet::wavelet_7x7,
                                                     sFilename, sLabel, false));
     }
     if(multiwavelet)
     {
-        std::string sLabel = sPrefix + "multiwavelet";
-        vSolvers.push_back(new solver::DirectSolver(use_img, negPtr,
-                                                    wavelet::hermite_wavelet,
-                                                    sFilename, sLabel, false));
+        // std::string sLabel = sPrefix + "multiwavelet";
+        // vSolvers.push_back(new solver::DirectSolver(use_img, negPtr,
+        //                                             wavelet::hermite_wavelet,
+        //                                             sFilename, sLabel, false));
     }
 }
 
 void stageIterativeSolvers(std::vector<solver::Solver*> &vSolvers,
-        image_fmt &img, const double dTolerance, const data_fmt fieldModifier,
+        const image_fmt &img, const double dTolerance, const data_fmt fieldModifier,
         const double dNoise, const std::string sFilename,
         const bool gauss, const bool jacobi, const bool sor)
 {
-    // if(dNoise != 0.0)
-    //     use_img.noise(dNoise);
     const int DIVISION_SIZE = 4;
-    image_fmt* use_img  = &img;
-    image_fmt* field = new image_fmt; // TODO: excessive: field is also made in direct solvers
-    makeField(img, fieldModifier, *field);
-    std::string sPrefix = "";
+    std::string sPrefix= "";
+    image_fmt* const use_img = new image_fmt();
+    if(dNoise != 0.0)
+    {
+        std::cerr << "NOTHING TO DO HERE" << std::endl;
+        sPrefix += "noise" + std::to_string(dNoise);
+        image_fmt tmp = img.get_noise(dNoise, 3);/* Salt and pepper noise */
+        tmp.normalize(0,255);
+        *use_img = tmp;
+        std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, sPrefix, false);
+        file_IO::saveImage(tmp, sSavename, false);
+    }
+    else
+    {
+        *use_img = img;
+    }
+    sPrefix += "__";
 
+    if(fieldModifier != 1.0)
+    {
+        sPrefix += "re";
+    }
+    sPrefix += "__";
+
+    image_fmt* field = new image_fmt;
+    makeField(*use_img, fieldModifier, *field);
     std::vector<image_fmt *> origList, guessList, rhoList;
     divide(DIVISION_SIZE, use_img, field, origList, rhoList, guessList);
 
@@ -564,11 +601,6 @@ void stageIterativeSolvers(std::vector<solver::Solver*> &vSolvers,
     if(fieldModifier != 1.0)
         sPrefix += "re";
     sPrefix += "__";
-
-    for(auto it : rhoList)
-    {
-        MLOG(severity_type::debug, "\n", printImage(*it));
-    }
 
     if(gauss)
     {
@@ -613,27 +645,31 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
     }
 
     toGrayScale(use_img);
-    use_img = padCore(use_img.width() + 2, use_img.height() + 2, use_img);
-
     stageDirectSolvers(vSolvers, use_img, 1.0, 0.0, sFilename, dst, dct,
                         wavelet_5x5, wavelet_7x7, multiwavelet);
     stageIterativeSolvers(vSolvers, use_img, dTolerance, 1.0, 0.0, sFilename,
                           gauss, jacobi, sor);
     if(dNoise != 0.0)
+    {
         stageDirectSolvers(vSolvers, use_img, 1.0, dNoise, sFilename, dst, dct,
                             wavelet_5x5, wavelet_7x7, multiwavelet);
         stageIterativeSolvers(vSolvers, use_img, 1.0, dTolerance, dNoise, sFilename,
                           gauss, jacobi, sor);
+    }
     if(resolve != 1.0)
+    {
         stageDirectSolvers(vSolvers, use_img, resolve, 0.0, sFilename, dst, dct,
                             wavelet_5x5, wavelet_7x7, multiwavelet);
         stageIterativeSolvers(vSolvers, use_img, dTolerance, resolve, 0.0, sFilename,
                             gauss, jacobi, sor);
+    }
     if(dNoise != 0.0 && resolve != 1.0)
+    {
         stageDirectSolvers(vSolvers, use_img, resolve, dNoise, sFilename, dst, dct,
                             wavelet_5x5, wavelet_7x7, multiwavelet);
         stageIterativeSolvers(vSolvers, use_img, dTolerance, resolve, dNoise, sFilename,
                             gauss, jacobi, sor);
+    }
     const int DIVISION_SIZE = 4;
 
 

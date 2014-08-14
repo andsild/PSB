@@ -1,4 +1,4 @@
-/** Pyramid convolution.
+/** wavelet reconstruction
 */
 #include "wavelet.hpp"
 
