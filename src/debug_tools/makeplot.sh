@@ -23,7 +23,7 @@ POINT_TYPE="1" #http://stelweb.asu.cas.cz/~nemeth/work/stuff/gnuplot/gnuplot-lin
 POINT_SIZE="2"
 IFS=$'\n'
 
-function fillRows()
+function findMax()
 {
     max=0
     for line in $(sed -n 2~2p ${1})
@@ -34,7 +34,30 @@ function fillRows()
             max=${x}
         fi
     done
-    awk -v max=${max} '
+
+    printf "%s" "${max}"
+}
+
+function MSE()
+{
+    awk 'BEGIN { totalAvg=0; }
+    {
+        if(NR%2==0)
+        {
+            sum = 0;
+            for(i = 0; i < NF; i++)
+            {
+                sum += ($i * $i);
+            }
+            totalAvg += sqrt(sum);
+        }
+    }
+    END { print totalAvg / NR; } ' ${1}
+}
+
+function fillRows()
+{
+    awk -v max=${2} '  
     {
         if(NR%2==0)
         {
@@ -48,37 +71,69 @@ function fillRows()
         {
             print;
         }
-    }' ${1}
+    } ' ${1}
 }
 
-cmdParse=""
+# outdir="./out/"
+# rm -rv ${outdir} && mkdir ${outdir}
 function readFile()
 {
-    solverName=$(head -n1 ${1})
+    local solverName=$(head -n1 ${1})
     solverName=${solverName%%_*}
+    local imageName="${1##*_}"
+    imageName="${imageName%%.*}"
+    local max=$(findMax ${1})
+    local lastAvg=$(MSE ${1})
+    fillRows ${1} ${max} \
+        >> "${outdir}${solverName}_${imageName}_${lastAvg}_${max}.tmp"
     
-    cmdParse+="\"<( printf \"%s\" \"$(fillRows ${1})\" | sed -n 2~2p)\" matrix with lines \
-                \"#${colors[${solverName}]}\", \
-                "
+    # cmdParse+="\"<( printf \"%s\" \"$(fillRows ${1})\" | sed -n 2~2p)\" matrix with lines \
+    #             \"#${colors[${solverName}]}\", \
+                # "
 }
 
-for file in $(find . -name "*.dat")
+# findDir=${1:-.}
+# for file in $(find ${findDir} -name "*.dat")
+# do
+#     readFile ${file}
+# done
+
+newMax=0
+for file in $(find ../../XData/ -maxdepth 1 -type f)
 do
-    readFile ${file}
+    num=$(printf "%s" "${file}" | sed 's/.*_.*_//g; s/\..*//g')
+    if [[ ${num} -gt ${newMax} ]]
+    then
+        newMax=${num}
+    fi
 done
+echo ${newMax}
+
+# newOut="../../newXData/"
+# mkdir ${newOut}
+# # iPos=0
+# for file in $(find ../../XData/ -maxdepth 1 -type f)
+# do
+#     fillRows ${file} ${newMax} >> "${newOut}massive.tmp"
+#     # if [[ ${iPos} -gt 10 ]]
+#     # then
+#     #     break;
+#     # fi
+#     # iPos=$(( ${iPos} + 1))
+# done
 
 
 cmdParse=$(echo ${cmdParse} | sed -e 's/,$//g ; s/,/&\n/g' )
 cmdParse="plot ${cmdParse} ;"
 echo ${cmdParse}
-
-cmd="set terminal png; set output 'test.png';
-    set key outside;
-    set ylabel \"Mean Square difference from input and solution\";
-    set xlabel \"(logscale) Iterations\";
-    set logscale x;
-    ${cmdParse}
-     "
-gnuplot -e "${cmd}" 2>&1 | sed '/.*arial.*/d'
-
+#
+# cmd="set terminal png; set output 'test.png';
+#     set key outside;
+#     set ylabel \"Mean Square difference from input and solution\";
+#     set xlabel \"(logscale) Iterations\";
+#     set logscale x;
+#     ${cmdParse}
+#      "
+# gnuplot -e "${cmd}" 2>&1 | sed '/.*arial.*/d'
+#
 # EOF
