@@ -18,18 +18,19 @@ filetype="png"
 newPlotFile="${2:-"/tmp/out.${filetype}"}"
 joinedOutFile="${3:-"/tmp/joined.${filetype}"}"
 
-outwidth=640
-outheight=480
+outwidth=700
+outheight=800
 xRange=100000
 yRange=10
 
 margins="
-    set lmargin at screen 0.1;
-    set rmargin at screen 0.9;
-    set bmargin at screen 0.1;
-    set tmargin at screen 0.9;
+        set lmargin at screen 0.15;
+        set rmargin at screen 1;
+        set tmargin at screen 1;
+        set bmargin at screen 0.15;
 "
 setRange="
+    set link x; set link y;
     set xrange [1:${xRange}] ;
     set yrange [0.1:${yRange}] ;
     set logscale x;
@@ -56,8 +57,8 @@ function doOverlay()
         ${unsetRatios}
         set lmargin at screen 0.0;
         set rmargin at screen 1.0;
-        set bmargin at screen 0.0;
         set tmargin at screen 1.0;
+        set bmargin at screen 0.0;
         plot \"${2}\" binary filetype=${filetype} w rgbimage notitle ;
 
         set key; set tics; set border;
@@ -73,7 +74,7 @@ function doSinglePlot()
     gnuplot -e "${setTerm}
         set output \"${2}\" ;
         set datafile missing \"X\" ;
-        set origin 1.0, 1.0;
+        set origin 0.0, 0.0;
         ${unsetRatios}
 
         ${margins}
@@ -90,14 +91,17 @@ function doMidPlot()
         set output \"${tmpDraw}\";
         set datafile missing \"X\" ;
         set multiplot;
-        set origin 1.0,1.0 ;
+        set origin 0.00,0.0 ;
+
+        unset tics;
+        
 
         ${unsetRatios}
-        set lmargin at screen 0.000;
+        set lmargin at screen 0.0;
         set rmargin at screen 1.0;
-        set bmargin at screen 0.000;
         set tmargin at screen 1.0;
-        plot \"${2}\" binary filetype=${filetype} w rgbimage ;
+        set bmargin at screen 0.0;
+        plot \"${2}\" binary filetype=${filetype} with rgbimage ;
 
         ${margins}
         ${setRange}
@@ -109,31 +113,33 @@ function doMidPlot()
 }
 tmpDraw="/tmp/test.png"
 [ -f ${joinedOutFile} ] && rm ${joinedOutFile}
-[ -f ${newPlotFile} ] && rm ${newPlotFile}
-[ -f ${tmpDraw} ] && rm ${tmpDraw}
+[ -f ${newPlotFile} ]   && rm ${newPlotFile}
+[ -f ${tmpDraw} ]       && rm ${tmpDraw}
 for file in $(find ${1} -type f | head --lines=1)
 do
-    doSinglePlot ${file} ${newPlotFile}
-    # doSinglePlot "./testdata/jacobi__projectsNaturalnessdata130001jpg_55326_507.917823.dat" ${newPlotFile}
+    # doSinglePlot ${file} ${newPlotFile}
+    doSinglePlot "./gauss__projectsNaturalnessdata100400jpg_8446_51.234816.dat" ${joinedOutFile} ${tmpDraw}
     break;
 done
 cp -vi ${newPlotFile} ${joinedOutFile}
 # setsid sxiv ${newPlotFile} & 2>/dev/null
 
 for file in $(find ${1} -type f | tail --lines=+2 | head --lines=-1)
+# for file in $(seq 1 1000 1)
 do
-    # doMidPlot ${file} ${joinedOutFile} ${tmpDraw}
+    doMidPlot ${file} ${joinedOutFile} ${tmpDraw}
     doMidPlot "./gauss__projectsNaturalnessdata100400jpg_8446_51.234816.dat" ${joinedOutFile} ${tmpDraw}
-    sxiv ${joinedOutFile}
+    # setsid sxiv ${joinedOutFile} &
 done
 
 for file in $(find ${1} -type f | tail --lines=1)
 do
-    doOverlay ${file} ${joinedOutFile} ${tmpDraw}
-    cp -v ${tmpDraw} ${joinedOutFile}
+    # doOverlay ${file} ${joinedOutFile} ${tmpDraw}
+    doOverlay "./gauss__projectsNaturalnessdata100400jpg_8446_51.234816.dat"  ${joinedOutFile} ${tmpDraw}
+   cp -v ${tmpDraw} ${joinedOutFile}
 done
 
-setsid sxiv ${joinedOutFile} & 2>/dev/null
+setsid sxiv ${tmpDraw} & 2>/dev/null
 
 
 
