@@ -4,38 +4,24 @@
 #: Author       : Anders Sildnes
 #: Version      : 2.0 (1.0 used column data)
 #: Desctiption  : Convert output from PSB to a format for gnuplot
-#: Options      : $1 should be a file that the info is dumped into 
+#: Options      : $1 should be a file that the info is dumped into
 #:                (default to terminal)
 
-# if [ -z "${1}" ]
-# then
-#     printf  "usage: %s < inputfile directory >\n" "${0}"
-#     exit 1;
-# fi
+if [ -z "${1}" ]
+then
+    printf  "usage: %s < inputfile directory >\n" "${0##*/}"
+    exit 1;
+fi
 
-declare -a arrayvar solvers
-declare -A colors
-colors["gauss"]="FFB801"
-colors["jacobi"]="15A600"
-colors["sor"]="5141FF"
-
-POINT_TYPE="1" #http://stelweb.asu.cas.cz/~nemeth/work/stuff/gnuplot/gnuplot-line-and-point-types-bw.png
-POINT_SIZE="2"
-IFS=$'\n'
 
 function findMax()
 {
     max=0
-    for line in $(sed -n 2~2p ${1})
-    do
-        x=$(printf "%s" ${line} | awk ' { print NF } ')
-        if [[ ${x} -gt ${max} ]]
-        then
-            max=${x}
-        fi
-    done
-
-    printf "%s" "${max}"
+    awk 'BEGIN {maxCol = 0 }
+    {
+        maxCol = (NF > maxCol) ? NF : maxCol;
+    }
+    END { print maxCol; }' ${1}
 }
 
 function MSE()
@@ -57,7 +43,7 @@ function MSE()
 
 function fillRows()
 {
-    awk -v max=${2} '  
+    awk -v max=${2} '
     {
         if(NR%2==0)
         {
@@ -65,75 +51,30 @@ function fillRows()
             {
                 $i = "X";
             }
-            print
-        }
-        if(NR%2==1)
-        {
-            print;
+            printf ("%s\n", $0);
         }
     } ' ${1}
 }
 
-# outdir="./out/"
-# rm -rv ${outdir} && mkdir ${outdir}
+outdir="./out/" ; [ -d "${outdir}" ] && rm -rv ${outdir}; mkdir -v ${outdir}
+
 function readFile()
 {
-    local solverName=$(head -n1 ${1})
-    solverName=${solverName%%_*}
-    local imageName="${1##*_}"
-    imageName="${imageName%%.*}"
-    local max=$(findMax ${1})
-    local lastAvg=$(MSE ${1})
+    local  solverName=$(head -n1 ${1})
+           solverName=${solverName%%_*}
+    local  imageName=${1##*/}
+           imageName=${imageName##*_}
+           imageName="${imageName%%.*}"
+    local  max=$(findMax ${1})
+    local  lastAvg=$(MSE ${1})
     fillRows ${1} ${max} \
         >> "${outdir}${solverName}_${imageName}_${lastAvg}_${max}.tmp"
-    
-    # cmdParse+="\"<( printf \"%s\" \"$(fillRows ${1})\" | sed -n 2~2p)\" matrix with lines \
-    #             \"#${colors[${solverName}]}\", \
-                # "
 }
 
-# findDir=${1:-.}
-# for file in $(find ${findDir} -name "*.dat")
-# do
-#     readFile ${file}
-# done
 
-newMax=0
-for file in $(find ../../XData/ -maxdepth 1 -type f)
+for file in $(find ${1} -type f)
 do
-    num=$(printf "%s" "${file}" | sed 's/.*_.*_//g; s/\..*//g')
-    if [[ ${num} -gt ${newMax} ]]
-    then
-        newMax=${num}
-    fi
+    readFile ${file}
 done
-echo ${newMax}
 
-# newOut="../../newXData/"
-# mkdir ${newOut}
-# # iPos=0
-# for file in $(find ../../XData/ -maxdepth 1 -type f)
-# do
-#     fillRows ${file} ${newMax} >> "${newOut}massive.tmp"
-#     # if [[ ${iPos} -gt 10 ]]
-#     # then
-#     #     break;
-#     # fi
-#     # iPos=$(( ${iPos} + 1))
-# done
-
-
-cmdParse=$(echo ${cmdParse} | sed -e 's/,$//g ; s/,/&\n/g' )
-cmdParse="plot ${cmdParse} ;"
-echo ${cmdParse}
-#
-# cmd="set terminal png; set output 'test.png';
-#     set key outside;
-#     set ylabel \"Mean Square difference from input and solution\";
-#     set xlabel \"(logscale) Iterations\";
-#     set logscale x;
-#     ${cmdParse}
-#      "
-# gnuplot -e "${cmd}" 2>&1 | sed '/.*arial.*/d'
-#
 # EOF
