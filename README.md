@@ -13,5 +13,5 @@ cd build && cmake ../src && make
 # Images
 To get the images: 
 ```bash
-mkdir "./media" && wget http://pascal.inrialpes.fr/data/holidays/jpg1.tar.gz && tar -xvf jpg1.tar.gz --strip-components=1 -C media
+mkdir "./media" && wget http://pascal.inrialpes.fr/data/holidays/jpg{1,2}.tar.gz && tar -xvf jpg{1,2}.tar.gz --strip-components=1 -C media
 ```
