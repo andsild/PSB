@@ -57,13 +57,13 @@ if __name__ == "__main__":
         print "Usage: bin < folder>"
         exit(1)
 
-    color="black"
-    if(len(argv) > 2):
-        color=argv[2]
+    colors=[]
+    files=[]
+    for index in range(1, len(argv), 2):
+        colors.append(argv[index+1])
+        files.append((argv[index], sorted([ f for f in listdir(argv[index]) if isfile(join(argv[index], f))])))
 
-    dirFiles=argv[1]
-    files = [ f for f in listdir(dirFiles) if isfile(join(dirFiles, f))]
-    files.sort();
+    colors.reverse()
 
     plt.xlabel("Iterations")
     plt.ylabel("Error")
@@ -84,6 +84,56 @@ if __name__ == "__main__":
     #             main([float(x) for x in line.split()], color)
     #
 
+    # facecolor = transparancy
+    fig, ax = plt.subplots(facecolor='none') # note that ax and fig are now related
+    size=100
+    ax.set_xscale("log") # base 10 is default
+    ax.set_yscale("log")
+    ax.axis([1, 450000 + 1, 0.0, size + 0]) # xmin xmax ymin ymax
+    ax.set_ybound(9.999999e-11, size)
+    fig.canvas.draw() # draw canvas first
+    # import ipdb; ipdb.set_trace();
+
+    import gc
+    import objgraph
+    from mem_top import mem_top
+    iterIndex = 0
+    for (path, folder) in files:
+        useColor=colors.pop()
+        for readfile in folder:
+            index=0;
+            with open(join(path,readfile), 'r') as f:
+                print readfile
+                for line in f:
+                    index += 1
+                    if(index % 2 == 1):
+                        continue
+                    ax = fig.axes[0]
+                    dataY = [float(x) for x in line.split()]
+                    dataX = range(1, len(dataY) + 1)
+
+                    line = matplotlib.lines.Line2D(dataX, dataY,
+                                                transform=ax.transData, color=useColor)
+                    ax.draw_artist(line)
+                    # import ipdb; ipdb.set_trace()
+                    del dataX; del dataY;
+            iterIndex += 1
+            if iterIndex % 300 == 0:
+                gc.collect()
+                import ipdb; ipdb.set_trace();
+
+
+
+
+    print "Done with plot!"
+    # import ipdb; ipdb.set_trace();
+    save(fig, "out.png")
+    # plt.savefig("out.png");
+    # plt.show();
+
+
+# EOF
+
 
     # datatype = [("index", np.float32), ("floati", np.float32), ('floatq', np.float32)]
     # # data = np.memmap("./testdata/monster/monster.tmp", datatype, 'r');
@@ -96,63 +146,3 @@ if __name__ == "__main__":
     # plt.show()
     # save(plt);
     # plt.savefig("out.png")
-
-
-    # facecolor = transparancy
-    fig, ax = plt.subplots(facecolor='none') # note that ax and fig are now related
-    fig.set_frameon(True)
-    size=10
-    ax.axis([0, 10000, 0, size]) # xmin xmax ymin ymax
-    fig.canvas.draw() # draw canvas first
-
-    import gc
-    import objgraph
-    from mem_top import mem_top
-    # for i in range(0, 100):
-    #     ax = fig.axes[0]
-    #     dataX = range(size)
-    #     dataY = range(100+i, size+100+i)
-    #     line = matplotlib.lines.Line2D(dataX, dataY,
-    #                                 transform=ax.transData)
-    #     ax.draw_artist(line)
-    #     del ax
-    #     del dataX; del dataY;
-    #     gc.collect()
-    #     pass
-    # import ipdb; ipdb.set_trace()
-    #
-    # line2 = matplotlib.lines.Line2D(range(4), [1,2.5,2,3],
-    #                                figure=fig, transform=ax.transData)
-    # ax.draw_artist(line2)
-    # fig.lines.extend([line2]);
-    # fig.canvas.draw()
-    # fig.lines.pop()
-
-    for readfile in files:
-        index=0;
-        with open(join(dirFiles,readfile), 'r') as f:
-            print readfile
-            for line in f:
-                index += 1
-                if(index % 2 == 1):
-                    continue
-                ax = fig.axes[0]
-                dataY = [float(x) for x in line.split()]
-                dataX = range(0, len(dataY))
-
-                line = matplotlib.lines.Line2D(dataX, dataY,
-                                            transform=ax.transData, color=color)
-                ax.draw_artist(line)
-                del dataX; del dataY;
-                gc.collect()
-                if index % 100 == 0:
-                    import ipdb; ipdb.set_trace();
-
-    print "Done with plot!"
-    # import ipdb; ipdb.set_trace();
-    save(fig, "out.png")
-    # plt.savefig("out.png");
-    # plt.show();
-
-
-
