@@ -25,12 +25,13 @@
 *.jpg
 *.bmp
 !nice_example/* # These are quite useful for me to debug
+!useData/*.png # Some output results (that I just don't want to loose)
+
+# Data files
+*.dat
 
 # To build - these are specific for each arch
 *build/*
-
-# output from execution
-data/*
 
 # My personal working files
 resources/
@@ -39,4 +40,3 @@ resources/
 media/
 small_media/*
 test_media/
-data/*/*.dat
