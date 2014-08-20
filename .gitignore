@@ -29,6 +29,7 @@
 
 # Data files
 *.dat
+*.zip
 
 # To build - these are specific for each arch
 *build/*
