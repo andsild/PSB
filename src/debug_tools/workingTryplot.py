@@ -58,8 +58,8 @@ def plot2D(files, colors, fig, ax):
 
 def primHeatMap(files, fig, ax, xMin, yMin, xMax, yMax):
 
-    X_MAX_RANGE = 3000
-    Y_MAX_RANGE = 100
+    X_MAX_RANGE = 3000 # max for sor
+    Y_MAX_RANGE = 10
 
     DPI = 80
     # the pixel-width/height is not entirely accurate, misses by 40/20/10...
@@ -72,29 +72,11 @@ def primHeatMap(files, fig, ax, xMin, yMin, xMax, yMax):
 
     width, height = fig.canvas.get_width_height()
 
-    xdim = 560
-    ydim = 560
-    xbins = np.linspace(0, X_MAX_RANGE, xdim + 1)
-    ybins = np.linspace(0, Y_MAX_RANGE, ydim + 1)
-
-    xbins = np.linspace(1, width,  xdim + 1)
-    ybins = np.linspace(1, height, ydim + 1)
-
     for (path, folder) in files:
         useColor=colors.pop()
         plt.clf()
-        sumHistogram = np.zeros( (ydim, xdim) )
+        sumHistogram = np.zeros( (height,width) )
         index=0;
-        iterIndex = 0
-
-        fig = plt.figure(frameon=False, facecolor='none',
-                        figsize=(BINS_X,BINS_Y), dpi=DPI)
-        ax = fig.add_axes([0,0,1,1])
-        ax.set_xlim( (0, X_MAX_RANGE) )
-        ax.set_ylim( (9.99999999e-11 , Y_MAX_RANGE) )
-        ax.axis('off')
-        ax.set_yscale("log")
-
         for readfile in folder:
             with open(join(path,readfile), 'r') as f:
                 print readfile
@@ -103,28 +85,52 @@ def primHeatMap(files, fig, ax, xMin, yMin, xMax, yMax):
                     if(index % 2 == 1):
                         continue
                     dataY = [float(x) for x in line.split()]
-                    cords = ax.transData.transform( 
-                        np.array([(x,y) for (x,y) in enumerate(dataY, 1) ]))
-                    xcords, ycords = zip(*cords)
-                    tmp, _, _ = np.histogram2d([height-int(y) for y in ycords],
-                                               [int(x) for x in xcords],
-                                               bins=[ybins, xbins])
-                    sumHistogram += tmp
+                    dataX = range(1, len(dataY) + 1)
+
+                    fig = plt.figure(frameon=False, facecolor='none',
+                                    figsize=(BINS_X,BINS_Y), dpi=DPI)
+                    ax = fig.add_axes([0,0,1,1])
+                    ax.axis('off')
+                    ax.plot(dataY, color="blue", transform=ax.transData)
+                    ax.set_autoscale_on(False)
+                    ax.set_yscale("log")
+                    ax.set_xlim( (0, X_MAX_RANGE) )
+                    ax.set_ylim( (9.99999999e-11, Y_MAX_RANGE) )
+
+                    fig.canvas.draw()
+                    data=np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+                    # tuple with width and height, reversed, with padded 3 (for z = 3)
+                    d3 = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+                    colRange=[ [num[2] for num in s] for s in d3]
+                    COORDS_LIST = [ x for x in chain.from_iterable(
+                        [ [ (height-rowIndex, pos) for (pos,pixel) in enumerate(row) \
+                             if pixel > 0] \
+                          for (rowIndex, row) in enumerate(colRange)])]
+                    dataY, dataX = zip(*COORDS_LIST)
+                    htmp, xedge, yedge = np.histogram2d(dataY, dataX,
+                        bins=[np.linspace(0, height, num=height+1), np.linspace(1, width, num=width+1)])
+                    
+                    sumHistogram += htmp
+                    plt.close(fig)
+
+
 
         plt.clf()
         fig = plt.figure(frameon=False, facecolor='none',
                         figsize=(BINS_X,BINS_Y), dpi=DPI)
         ax = fig.add_axes([0,0,1,1])
         ax.axis('off')
-        # ax.set_xlim(1, 10)
-        # ax.set_xlim(0, width-1)
-        # ax.set_ylim(1, height-1)
-        # ax.pcolor(sumHistogram, cmap=colormap.OrRd)
-        ax.imshow(sumHistogram, cmap=colormap.OrRd)
+        ax.set_xlim(0, width-1)
+        ax.set_ylim(1, height-1)
+        ax.pcolor(sumHistogram, cmap=colormap.OrRd)
         # ax.contourf(sumHistogram, cmap=colormap.OrRd)
+        # ax.set_yscale("log")
+        # ax.set_xscale("log")
         # ax.imshow(sumHistogram, cmap=colormap.OrRd)
+        # ax.invert_yaxis()
         fig.canvas.print_png("test.png")
         print "wrote test.png"
+        plt.show()
         exit(0)
 
 def heatmap(numFiles, fig, ax, xStart, yStart, xMax, yMin):
