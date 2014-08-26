@@ -8,7 +8,7 @@ from matplotlib import cm as colormap
 from matplotlib.colors import LogNorm
 import pylab
 from matplotlib import _png
-from itertools import chain
+from itertools import chain, tee, izip
 from ipdb import set_trace
 from PIL import Image
 from scipy.interpolate import interp1d
@@ -23,11 +23,17 @@ import gc
 import objgraph
 from mem_top import mem_top
 
+np.set_printoptions(threshold=np.nan)
+
 
 DPI = 80
 # the pixel-width/height is not entirely accurate, misses by 40/20/10...
 BINS_X = float(600 / DPI) # where the scalar is pixel width
 BINS_Y = float(600 / DPI) # where the scalar is pixel height
+xMin = 100
+yMin = 100
+xMax = 450000 + xMin
+yMax = 9.999999e-11
 
 def save(fig, filename):
     """We have to work around `fig.canvas.print_png`, etc calling `draw`."""
@@ -36,9 +42,15 @@ def save(fig, filename):
         _png.write_png(renderer._renderer.buffer_rgba(),
                        renderer.width, renderer.height,
                        outfile, fig.dpi)
-def plot2D(files, colors, fig, ax):
+def plot2D(files, colors):
+    global xMin, yMin, xMax, yMax
     plt.xlabel("Iterations")
     plt.ylabel("Error")
+    fig, ax = plt.subplots(facecolor='none')
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.axis([xMin, xMax, yMin, yMax]) 
+    ax.set_ybound(yMax, size)
 
     iterIndex = 0
     for (path, folder) in files:
@@ -63,13 +75,17 @@ def plot2D(files, colors, fig, ax):
             iterIndex += 1
             if iterIndex % 300 == 0:
                 gc.collect()
-                import ipdb; ipdb.set_trace();
+                set_trace()
 
-def primHeatMap(files, colors, xMin, yMin, xMax, yMax):
+def pairwise(iterable):
+    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    a, b = tee(iterable)
+    next(b, None)
+    return izip(a, b)
+
+def primHeatMap(files, colors):
     global DPI, BINS_X, BINS_Y
-
-    X_MAX_RANGE = xMax
-    Y_MAX_RANGE = yMin
+    global xMin, yMin, xMax, yMax
 
     fig = plt.figure(frameon=False, facecolor='none',
                      figsize=(BINS_X,BINS_Y), dpi=DPI)
@@ -77,31 +93,26 @@ def primHeatMap(files, colors, xMin, yMin, xMax, yMax):
     ax.axis('off')
 
     width, height = fig.canvas.get_width_height()
-
-    xdim = 560
-    ydim = 560
-
-    xbins = np.linspace(1, width,  xdim + 1)
-    ybins = np.linspace(1, height, ydim + 1)
+    xbins = np.linspace(1, width,  width + 1)
+    ybins = np.linspace(1, height, height + 1)
 
     histograms = []
-
 
     fig = plt.figure(frameon=False, facecolor='none',
                     figsize=(BINS_X,BINS_Y), dpi=DPI)
     ax = fig.add_axes([0,0,1,1])
-    ax.set_xlim( (10, X_MAX_RANGE) )
-    ax.set_ylim( (yMax, Y_MAX_RANGE) )
+    ax.set_xlim( (xMin, xMax) )
+    ax.set_ylim( (yMax, yMin) )
     ax.axis('off')
     ax.set_xscale("log")
     ax.set_yscale("log")
 
     for (path, folder) in files:
-        sumHistogram = np.zeros( (ydim, xdim) )
+        sumHistogram = np.zeros( (height, width) )
         index=0;
         iterIndex = 0
 
-        for readfile in folder:
+        for readfile in folder[:5]:
             with open(join(path,readfile), 'r') as f:
                 print readfile
                 for line in f:
@@ -111,30 +122,42 @@ def primHeatMap(files, colors, xMin, yMin, xMax, yMax):
                     dataY = [float(x) for x in line.split()]
                     cords = ax.transData.transform( 
                         np.array([(x,y) for (x,y) in enumerate(dataY, 1) ]))
-                    xcords, ycords = zip(*cords)
-                    tmp, _, _ = np.histogram2d([int(y) for y in ycords],
-                                               [int(x) for x in xcords],
+                    # cords = ax.transData.transform( 
+                    #     np.array([(x,y) for (x,y) in zip(dataY, np.logspace(0,5.0, len(dataY))) ]))
+                    xcords, ycords = zip(*cords.astype(np.int))
+                    interPolateSize = len(xcords)
+                    # for cur,nxt in pairwise(xcords):
+                    #     interPolateSize += abs(nxt - cur)
+                    #
+                    # xnew = np.linspace(0, max(xcords), num=interPolateSize)
+                    # interFunc = interp1d(xcords, ycords,
+                    #                     kind="linear")
+                    # ynew = interFunc(xnew)
+                    # tmp, _, _ = np.histogram2d(ynew, xnew,
+                    #                            bins=[ybins, xbins])
+
+                    tmp, _, _ = np.histogram2d(ycords, xcords,
                                                bins=[ybins, xbins])
+                    tmp[tmp > 1] = 1
+                    
                     sumHistogram += tmp
         histograms.append(sumHistogram)
         
-    for hist in histograms:
-        useColor = colors.pop()
-        plt.clf()
-        fig = plt.figure(frameon=False, facecolor='none',
-                        figsize=(BINS_X,BINS_Y), dpi=DPI)
-        ax = fig.add_axes([0,0,1,1])
-        ax.axis('off')
-        # ax.pcolor(sumHistogram, cmap=colormap.OrRd)
-        # ax.imshow(sumHistogram, cmap=colormap.OrRd)
-        # ax.contourf(sumHistogram, cmap=colormap.OrRd)
-        light_jet = cmap_map(lambda x: x/2+0.5, colormap.jet)
-        orange = cmap_map(lambda x: x, colormap.OrRd)
-        # orange = cmap_map(lambda x: func(x), colormap.OrRd)
-        ax.imshow(sumHistogram, cmap=orange, interpolation="quadric", vmin=0)
-        ax.invert_yaxis()
-        fig.canvas.print_png("test" + useColor + ".png")
-        print "wrote test" + useColor + ".png"
+    filenames = []
+    for hist,color in zip(histograms, colors):
+        filenames.append(renderHistogram(hist, color))
+
+    if len(histograms) == 3:
+        renderedImages = []
+        for filename in filenames:
+            img = Image.open(filename).convert("L")
+            # renderedImages.append(plt.imread(filename).astype(np.uint8))
+            renderedImages.append(np.asarray(img).astype(np.uint8))
+            x = renderedImages[-1]
+
+        rgb = np.dstack( x.astype(np.uint8) for x in renderedImages)
+        img = Image.fromarray(rgb)
+        img.save("combined.png")
 
 def func(x):
     ret = [ int( 200 *  log(255 * x[0]) / 255.0) ]
@@ -191,7 +214,6 @@ def theo_line(colors):
     global ERROR
     solverFuncs = [sorBound, jacobiBound, gaussBound]
     solverStart = 1
-
     yPlotPoints = np.array([10, ERROR])
 
     for solverFunc,color in zip(solverFuncs, colors):
@@ -211,7 +233,8 @@ def theo_line(colors):
         fig.canvas.print_png("test" + str(color) + ".png")
         plt.close(fig)
 
-def theoretical_bound(files, solvers, xMin, yMin, xMax, yMax):
+def theoretical_bound(files, solvers):
+    global xMin, yMin, xMax, yMax
     solverFuncs = [sorBound, jacobiBound, gaussBound]
     global START_POINT, BINS_X, BINS_Y, DPI, ERROR
     X_MAX_RANGE = 2000000
@@ -221,7 +244,7 @@ def theoretical_bound(files, solvers, xMin, yMin, xMax, yMax):
     fig = plt.figure(frameon=False, facecolor='none',
                     figsize=(BINS_X, BINS_Y), dpi=DPI)
     ax = fig.add_axes([0,0,1,1])
-    ax.set_xlim( (100, X_MAX_RANGE) )
+    ax.set_xlim( (xMin, X_MAX_RANGE) )
     ax.set_ylim( (yMax, Y_MAX_RANGE) )
     ax.axis('off')
     ax.set_xscale("log")
@@ -267,10 +290,6 @@ def theoretical_bound(files, solvers, xMin, yMin, xMax, yMax):
         plt.clf()
         fig = plt.figure(figsize=(BINS_X+1,BINS_Y+1), dpi=DPI)
         ax = fig.add_axes([0.125,0.125,(1.0 - 0.125), (1.0-0.125)])
-        # ax.axis('off')
-        # ax.pcolor(hist, cmap=colormap.OrRd)
-        # ax.imshow(sumHistogram, cmap=colormap.OrRd)
-        # ax.contourf(sumHistogram, cmap=colormap.OrRd)
         ax.set_xlim(0, 200)
         ax.set_ylim(0, 200)
         light_jet = cmap_map(lambda x: x/2+0.5, colormap.jet)
@@ -282,8 +301,70 @@ def theoretical_bound(files, solvers, xMin, yMin, xMax, yMax):
         ax.invert_yaxis()
         fig.canvas.print_png("test" + useColor + ".png")
         print "wrote test" + useColor + ".png"
+def renderHistogram(histoGram, color):
+    global DPI, BINS_X, BINS_Y
+    global xMin, yMin, xMax, yMax
 
+    plt.clf()
+    fig = plt.figure(facecolor="none",figsize=(BINS_X+1,BINS_Y+1), dpi=DPI)
+    xShift = yShift = (1.0 / ((BINS_X + 1) * DPI)) * DPI - 0.05
+    ax = fig.add_axes([xShift,yShift,1.0-xShift-0.03,1.0-yShift-0.03])
+    ax.set_frame_on(False)
+    
+    light_jet = cmap_map(lambda x: x/2+0.5, colormap.jet)
+    orange = cmap_map(lambda x: x, colormap.OrRd)
+    # orange = cmap_map(lambda x: func(x), colormap.OrRd)
+    vmin=histoGram.min()
 
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    if vmin == 0: vmin += 1
+    ax.imshow(histoGram, cmap=orange, interpolation="quadric",
+                norm=LogNorm(vmin=vmin, vmax=histoGram.max()),
+                extent=[xMin, xMax, yMax, yMin],
+                aspect="auto", origin="lower")
+    fig.canvas.print_png("WHAAT.png")
+    ax.invert_yaxis()
+    ax.set_xlim(xMin, xMax)
+    ax.set_ylim(yMax, yMin)
+    filename = "test" + color + ".png"
+    fig.canvas.print_png(filename)
+    print "wrote " + filename
+    return filename
+
+def directSolverHeatmap(files, colors):
+    global xMin, yMin, xMax, yMax
+    for (path, folder) in files:
+        index=0;
+        iterIndex = 0
+        dataX, dataY = [], []
+
+        for readfile in folder[:5]:
+            with open(join(path,readfile), 'r') as f:
+                print readfile
+                for line in f:
+                    index += 1
+                    if(index % 2 == 1):
+                        continue
+                    line = line.split()
+                    dataX.append(float(line[1]))
+                    dataY.append(float(line[0]))
+        heatmap, _, _ = np.histogram2d(dataX, dataY)
+
+        plt.clf()
+        fig, ax = plt.subplots(facecolor='none')
+        _, _, _, ref = ax.hist2d(dataX, dataY,
+                                 bins=[np.linspace(1,      15000, num=20),
+                                       np.linspace(10e-11, 10e2 , num=20)],
+                                 cmap=colormap.OrRd)
+        ax.set_xlim(1, 15000)
+        ax.set_ylim(10e2, 10e-11)
+        ax.invert_yaxis()
+        ax.set_yscale("log")
+        fig.colorbar(ref)
+        # plt.imshow(heatmap, cmap=colormap.OrRd)
+        plt.savefig("heatmap.png")
+    
 
 if __name__ == "__main__":
     if(len(argv) < 2):
@@ -292,40 +373,37 @@ if __name__ == "__main__":
 
     colors=[]
     files=[]
+    directSolverFiles = []
     method=argv[1].upper()
+    directsolvers = ["dst", "dct", "wavelet5", "wavelet7"]
+    iterativeColors, directColors = [], []
 
     shiftargs = 2
     for index in range(shiftargs, len(argv), 2):
-        colors.append(argv[index+1])
-        files.append((argv[index], sorted([ f for f in listdir(argv[index]) \
+        if any(x.upper() in argv[index].upper() for x in directsolvers):
+            directSolverFiles.append((argv[index],
+                                    sorted([ f for f in listdir(argv[index]) \
                                            if isfile(join(argv[index], f))])))
+            directColors.append(argv[index+1])
+        else:
+            files.append((argv[index], sorted([ f for f in listdir(argv[index]) \
+                                            if isfile(join(argv[index], f))])))
+            iterativeColors.append(argv[index+1])
 
     numFiles=sum(len(x) for x in files)
 
-    colors.reverse()
-
-    plt.xscale('log')
-    plt.yscale('log')
     plt.ioff()
 
     # facecolor = transparancy
-    fig, ax = plt.subplots(facecolor='none') # note that ax and fig are now related
-    size=100
-    ax.set_xscale("log") # base 10 is default
-    ax.set_yscale("log")
-    xStart = 1; yStart = 100
-    xMax = 450000 + xStart; yMax = 9.999999e-11
-    ax.axis([xStart, xMax, yStart, yMax]) # xmin xmax ymin ymax
-    ax.set_ybound(9.999999e-11, size)
-    fig.canvas.draw() # draw canvas first
     if method == 'plot2d'.upper():
-        plot2D(files, colors, fig, ax)
+        plot2D(files, colors)
     elif method == "primHM".upper():
-        primHeatMap(files, colors, xStart, yStart, xMax, yMax)
+        primHeatMap(files, iterativeColors)
+        directSolverHeatmap(directSolverFiles, directColors)
     elif method == "tboundOMG".upper():
-        theoretical_bound(files, colors, xStart, yStart, xMax, yMax)
+        theoretical_bound(files, iterativeColors)
     elif method == "tbound".upper():
-        theo_line(colors)
+        theo_line(iterativeColors)
     else:
         print "no method found for %s" % (method)
         exit(1)
