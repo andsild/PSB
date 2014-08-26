@@ -171,22 +171,50 @@ def cmap_map(function,cmap):
 
     return matplotlib.colors.LinearSegmentedColormap('colormap',cdict,1024)
 
-def sorBound(pixels):
-    return 1
-def jacobiBound(pixels):
-    return 2
 piSq = np.square(np.pi)
 ERROR=0.01
 START_POINT = 10
+def sorBound(pixels):
+    global ERROR
+    scalar = (np.sqrt(pixels) / -4.0) / (np.pi * 2)
+    return scalar * np.log(ERROR)
+def jacobiBound(pixels):
+    global piSq, ERROR
+    scalar = (pixels * 2 / -4.0) / piSq
+    return scalar * np.log(ERROR)
 def gaussBound(pixels):
     global piSq, ERROR
     scalar = (pixels / -4.0) / piSq
     return scalar * np.log(ERROR)
 
+def theo_line(colors):
+    global ERROR
+    solverFuncs = [sorBound, jacobiBound, gaussBound]
+    solverStart = 1
+
+    yPlotPoints = np.array([10, ERROR])
+
+    for solverFunc,color in zip(solverFuncs, colors):
+        plt.clf()
+        fig, ax = plt.subplots()
+        ax.set_ylim(10e-3, 10e1)
+        ax.set_xscale("log")
+        ax.set_yscale("log")
+        for n in np.logspace(4, 8, num=8):
+            iterationEnd = solverFunc(n)
+            xnew = np.linspace(1, iterationEnd, num=10000)
+            interFunc = interp1d(np.array([1, iterationEnd]), yPlotPoints,
+                                 kind="linear")
+            ynew = interFunc(xnew)
+            ax.plot(xnew, ynew, color=color)
+         
+        fig.canvas.print_png("test" + str(color) + ".png")
+        plt.close(fig)
+
 def theoretical_bound(files, solvers, xMin, yMin, xMax, yMax):
     solverFuncs = [sorBound, jacobiBound, gaussBound]
     global START_POINT, BINS_X, BINS_Y, DPI, ERROR
-    X_MAX_RANGE = 1100000
+    X_MAX_RANGE = 2000000
     Y_MAX_RANGE = 100
     yMax = 9.99999999e-3
 
@@ -220,7 +248,8 @@ def theoretical_bound(files, solvers, xMin, yMin, xMax, yMax):
             iterationEnd = solver(pixels)
 
             xnew = np.linspace(1, iterationEnd, xdim)
-            interFunc = interp1d(np.array([1, iterationEnd]), yPlotPoints, kind="linear")
+            interFunc = interp1d(np.array([1, iterationEnd]), yPlotPoints,
+                                 kind="linear")
             ynew = interFunc(xnew)
             
             cords = ax.transData.transform( 
@@ -236,17 +265,20 @@ def theoretical_bound(files, solvers, xMin, yMin, xMax, yMax):
     for hist in histograms:
         useColor = colors.pop()
         plt.clf()
-        fig = plt.figure(frameon=False, facecolor='none',
-                        figsize=(BINS_X,BINS_Y), dpi=DPI)
-        ax = fig.add_axes([0,0,1,1])
-        ax.axis('off')
-        # ax.pcolor(sumHistogram, cmap=colormap.OrRd)
+        fig = plt.figure(figsize=(BINS_X+1,BINS_Y+1), dpi=DPI)
+        ax = fig.add_axes([0.125,0.125,(1.0 - 0.125), (1.0-0.125)])
+        # ax.axis('off')
+        # ax.pcolor(hist, cmap=colormap.OrRd)
         # ax.imshow(sumHistogram, cmap=colormap.OrRd)
         # ax.contourf(sumHistogram, cmap=colormap.OrRd)
+        ax.set_xlim(0, 200)
+        ax.set_ylim(0, 200)
         light_jet = cmap_map(lambda x: x/2+0.5, colormap.jet)
         orange = cmap_map(lambda x: x, colormap.OrRd)
         # orange = cmap_map(lambda x: func(x), colormap.OrRd)
-        ax.imshow(sumHistogram, cmap=orange, interpolation="quadric", vmin=0)
+        ax.imshow(hist, cmap=orange, norm=LogNorm(),
+                  extent=[0, 200, 0, 200],
+                  interpolation="bilinear")
         ax.invert_yaxis()
         fig.canvas.print_png("test" + useColor + ".png")
         print "wrote test" + useColor + ".png"
@@ -290,8 +322,10 @@ if __name__ == "__main__":
         plot2D(files, colors, fig, ax)
     elif method == "primHM".upper():
         primHeatMap(files, colors, xStart, yStart, xMax, yMax)
-    elif method == "tbound".upper():
+    elif method == "tboundOMG".upper():
         theoretical_bound(files, colors, xStart, yStart, xMax, yMax)
+    elif method == "tbound".upper():
+        theo_line(colors)
     else:
         print "no method found for %s" % (method)
         exit(1)
