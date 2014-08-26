@@ -25,7 +25,7 @@ class Solver
     protected:
     const image_fmt* const origImage;
     const image_fmt* const noisedImage;
-    const image_fmt field;
+    const image_fmt* const field;
     logging::Logger< logging::FileLogPolicy > logInst;
     bool bMultipart, bFinal;
 

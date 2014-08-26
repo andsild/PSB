@@ -521,8 +521,6 @@ void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
     const int iForwMaskWidth = forward_mask.width(),
               iBackMaskWidth = backward_mask.width();
 
-
-
     void wavelet_7x7(const image_fmt &field, image_fmt &retImg)
     {
         const int iMaxLevel = ceil(cimg::log2(cimg::max(field.width(), field.height())))

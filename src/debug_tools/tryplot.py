@@ -318,28 +318,28 @@ def renderHistogram(histoGram, color):
 
     ax.set_xscale("log")
     ax.set_yscale("log")
+    ax.set_xlabel("Iterations (logscale)")
+    ax.set_ylabel("Difference from original image (logscale)")
     if vmin == 0: vmin += 1
     ax.imshow(histoGram, cmap=orange, interpolation="quadric",
                 norm=LogNorm(vmin=vmin, vmax=histoGram.max()),
                 extent=[xMin, xMax, yMax, yMin],
                 aspect="auto", origin="lower")
-    fig.canvas.print_png("WHAAT.png")
     ax.invert_yaxis()
     ax.set_xlim(xMin, xMax)
     ax.set_ylim(yMax, yMin)
-    filename = "test" + color + ".png"
+    filename = "solverHeatmap" + color + ".png"
     fig.canvas.print_png(filename)
     print "wrote " + filename
     return filename
 
 def directSolverHeatmap(files, colors):
-    global xMin, yMin, xMax, yMax
     for (path, folder) in files:
         index=0;
         iterIndex = 0
         dataX, dataY = [], []
 
-        for readfile in folder[:5]:
+        for readfile in folder:
             with open(join(path,readfile), 'r') as f:
                 print readfile
                 for line in f:
@@ -352,16 +352,21 @@ def directSolverHeatmap(files, colors):
         heatmap, _, _ = np.histogram2d(dataX, dataY)
 
         plt.clf()
+        xMin = 1
+        xMax = 3500
+        yMin = 10e-15
+        yMax = 10e2
         fig, ax = plt.subplots(facecolor='none')
         _, _, _, ref = ax.hist2d(dataX, dataY,
-                                 bins=[np.linspace(1,      15000, num=20),
-                                       np.linspace(10e-11, 10e2 , num=20)],
-                                 cmap=colormap.OrRd)
-        ax.set_xlim(1, 15000)
-        ax.set_ylim(10e2, 10e-11)
-        ax.invert_yaxis()
+                                 cmap=colormap.OrRd, cmin=0.9)
+        set_trace()
+        ax.set_xlabel("Solver time in ms")
+        ax.set_ylabel("Difference from original image ")
+        ax.set_xlim(xMin, xMax)
+        ax.set_ylim(yMin, yMax)
         ax.set_yscale("log")
-        fig.colorbar(ref)
+        cb = fig.colorbar(ref)
+        cb.set_label("Number of solvers in buckets")
         # plt.imshow(heatmap, cmap=colormap.OrRd)
         plt.savefig("heatmap.png")
     
