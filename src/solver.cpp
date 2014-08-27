@@ -18,6 +18,13 @@ inline double getDiff(const double origVal, const double dPixels)
     return ((origVal / dPixels) * MULTIPLIER_CONSTANT);
 }
 
+void Solver::clear()
+{
+    delete this->origImage;
+    delete this->field;
+    delete this->noisedImage;
+}
+
 Solver::Solver(const image_fmt *origImg, const image_fmt* const f,
         std::string sFile, std::string sLab,
         bool bMulPart, bool bFin)

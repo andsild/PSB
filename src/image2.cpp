@@ -692,7 +692,6 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
                 file_IO::writeData(vResults, vTimes, it->getLabel(), sFilename);
                 iPartIndex++;
                 vResults.clear(); // important, otherwise it stacks results
-                // delete it->orig
                 continue;
             }
         }
@@ -712,6 +711,7 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
         //     it->log(1, sMsg);
         // }
     }
+    vSolvers.back()->clear(); // XXX: this breaks if multiple solvers are invoked!!
 }
 
 } /* EndOfNameSpace */

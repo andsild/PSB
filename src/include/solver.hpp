@@ -36,6 +36,7 @@ class Solver
     void log(int, std::string);
     bool isMultipart();
     bool isFinal();
+    void clear();
     Solver(const image_fmt* const origImage, const image_fmt* const field,
             std::string sFile, std::string sLab,
             bool bMulPart, bool bFin = false);
