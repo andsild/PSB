@@ -464,7 +464,7 @@ void addIterativeSolver(std::vector<solver::Solver*> &vIn,
         vIn.push_back(new solver::IterativeSolver(origList[iPos],
                                             rhoList[iPos], guessList[iPos],
                                             func, dTolerance,
-                                            sFilename, sLabel, true));
+                                            sFilename, sLabel, true ));
     }
     /* Tag the last image with "isFinal" */
     vIn.push_back(new solver::IterativeSolver(origList.back(),
@@ -595,12 +595,6 @@ void stageIterativeSolvers(std::vector<solver::Solver*> &vSolvers,
     std::vector<image_fmt *> origList, guessList, rhoList;
     divide(DIVISION_SIZE, use_img, field, origList, rhoList, guessList);
 
-    if(dNoise != 0.0)
-        sPrefix += "noise" + std::to_string(dNoise);
-    sPrefix += "__";
-    if(fieldModifier != 1.0)
-        sPrefix += "re";
-    sPrefix += "__";
 
     if(gauss)
     {
@@ -674,13 +668,13 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
 
 
     imageList_fmt accumulator; /*< container for subdivisions of solved image */
-    rawdata_fmt vResults;
+    rawdata_fmt vResults, vTimes;
     int iPartIndex = 0;
 
     for(auto it : vSolvers) // for each solver for each image (and its divisions)
     {
-        image_fmt result = it->solve(vResults); /*< result now holds the resulting image,
-                                                  < vResults holds the imagediffs */
+        image_fmt result = it->solve(vResults, vTimes); /*< result now holds the resulting image,
+                                                          < vResults holds the imagediffs */
         /* Multipart images: solve each region before moving past this if block */
         if(it->isMultipart())
         {
@@ -695,7 +689,7 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
             else
             {
                 std::string sFilename = it->getFilename() + std::to_string(iPartIndex);
-                file_IO::writeData(vResults, it->getLabel(), sFilename);
+                file_IO::writeData(vResults, vTimes, it->getLabel(), sFilename);
                 iPartIndex++;
                 vResults.clear(); // important, otherwise it stacks results
                 // delete it->orig
@@ -708,52 +702,16 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
         roundValues(result);
         std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), false);
         file_IO::saveImage(result, sSavename, false);
-        file_IO::writeData(vResults, it->getLabel(), it->getFilename());
+        file_IO::writeData(vResults, vTimes, it->getLabel(), it->getFilename());
         /* Erase before re-iterating */
         vResults.erase(vResults.begin(), vResults.end());
+        vTimes.erase(vTimes.begin(), vTimes.end());
         // DO_IF_LOGLEVEL(logging::severity_type::extensive)
         // {
         //     std::string sMsg = "Final image(cut)\n" + printImageAligned(result);
         //     it->log(1, sMsg);
         // }
     }
-        // if(resolve != 1.0)
-        // {
-        //     for(auto it : vSolvers) // for each solver for each image (and its divisions)
-        //     {
-        //         it->alterField(resolve);
-        //         image_fmt result = it->solve(vResults); /*< result now holds the resulting image,
-        //                                                 < vResults holds the imagediffs */
-        //         /* Multipart images: solve each region before moving past this if block */
-        //         if(it->isMultipart())
-        //         {
-        //             accumulator.push_back(result);
-        //             /* We can now merge the regions together */
-        //             if(it->isFinal())
-        //             {
-        //                 result = joinImage(accumulator, DIVISION_SIZE);
-        //                 accumulator.clear();
-        //                 iPartIndex = 0;
-        //             }
-        //             else
-        //             {
-        //                 std::string sFilename = it->getFilename() + std::to_string(iPartIndex);
-        //                 file_IO::writeData(vResults, it->getLabel(), sFilename);
-        //                 iPartIndex++;
-        //                 vResults.clear(); // important, otherwise it stacks results
-        //                 continue;
-        //             }
-        //         }
-        //
-        //         roundValues(result);
-        //         std::string sSavename = file_IO::SAVE_PATTERN.getSavename(sFilename, it->getLabel(), true);
-        //         // roundValues(result);
-        //         file_IO::saveImage(result, sSavename, true);
-        //         file_IO::writeData(vResults, it->getLabel(), it->getFilename());
-        //         /* Erase before re-iterating */
-        //         vResults.erase(vResults.begin(), vResults.end());
-        //     }
-        // }
 }
 
 } /* EndOfNameSpace */

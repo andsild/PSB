@@ -1,8 +1,8 @@
 ################
 Thu 12 Jun 2014
 ################
-Changed from CImg<T> to vector<T>. The translation from CImg to vector
-takes some time, but it is much faster to iterate over a 1d vector.
+Changed from CImg<T> to STL std::vector<T>. The translation from CImg to vector
+takes some time, but it is faster to iterate over a 1d vector.
 This NEEDS to be TESTED later
 
 ################
@@ -23,10 +23,8 @@ Realized that I was confusing stopping criteria with relative differences
 ################
 Mon 01 Jul 2014
 ################
-Changed from 1d std::vector to Cimg macro-loops, which was much faster
-
-
-
+Changed from 1d STL std::vector to Cimg macro-loops, which was much faster
+Ignore the first changelog
 
 ################
 Mon 07 Jul 2014
@@ -57,6 +55,11 @@ you would still have to find some clever way to avoid the border
 
 Accessing by float instead of double gave about 5 ms speedup per iteration
 The results look the same in double and float
+
 ################
+Thu 10t Aug 2014
 ################
+After profiling, I found out that debug printing took a lot of time.
+Thus, I addded the compiler flag to enable logging per build.
+
 ################

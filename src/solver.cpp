@@ -2,9 +2,10 @@
 
 #include <vector>
 
+#include "CImg.h"
+
 #include "image2.hpp"
 #include "loginstance.hpp"
-
 using namespace logging;
 
 namespace solver
@@ -20,7 +21,7 @@ inline double getDiff(const double origVal, const double dPixels)
 Solver::Solver(const image_fmt *origImg, const image_fmt* const f,
         std::string sFile, std::string sLab,
         bool bMulPart, bool bFin)
-    : origImage(origImg), noisedImage(nullptr), field(*f), logInst(),
+    : origImage(origImg), noisedImage(nullptr), field(f), logInst(),
         sFilename(sFile), sLabel(sLab), bMultipart(bMulPart), bFinal(bFin)
 {
 }
@@ -29,11 +30,11 @@ Solver::Solver(const image_fmt* const origImg, const image_fmt* const noisedImg,
         const image_fmt* const f,
         std::string sFile, std::string sLab,
         bool bMulPart, bool bFin)
-    : origImage(origImg), noisedImage(noisedImage), field(*f), logInst(),
+    : origImage(origImg), noisedImage(noisedImage), field(f), logInst(),
         sFilename(sFile), sLabel(sLab), bMultipart(bMulPart), bFinal(bFin)
 {
 }
-Solver::Solver() : origImage(nullptr), noisedImage(nullptr)
+Solver::Solver() : origImage(nullptr), noisedImage(nullptr), field(nullptr)
 {}
 
 IterativeSolver::IterativeSolver(
@@ -71,7 +72,7 @@ DirectSolver::DirectSolver(
 
 DirectSolver::DirectSolver() : Solver(), isDirichet(false) {}
 
-image_fmt IterativeSolver::solve(rawdata_fmt &vResults)
+image_fmt IterativeSolver::solve(rawdata_fmt &vResults, rawdata_fmt &vTimes)
 {
     int iIter = 0;
     double dIterationDiff = 9001;
@@ -79,13 +80,17 @@ image_fmt IterativeSolver::solve(rawdata_fmt &vResults)
     const int iWidth = this->guess.width();
     const int iHeight = this->guess.height();
     const double iNumPixels = guess.size();
+    unsigned long lTime = 0;
 
     for(iIter = 0; this->dStopCriterion < dIterationDiff; iIter++)
     {
-        this->func(this->field, guess, dIterationDiff, iWidth, iHeight);
+        cimg_library::cimg::tic();
+        this->func(*(this->field), guess, dIterationDiff, iWidth, iHeight);
+        lTime = cimg_library::cimg::toc();
         double dDiff = getDiff(this->origImage->MSE(guess), iNumPixels);
                        
         vResults.push_back(dDiff);
+        vTimes.push_back((double)lTime);
     }
 
     return guess;
@@ -101,28 +106,36 @@ bool Solver::isFinal() { return this->bFinal; }
 std::string Solver::getFilename() { return this->sFilename; }
 std::string Solver::getLabel() { return this->sLabel; }
 
-image_fmt DirectSolver::solve(rawdata_fmt &vResults)
+image_fmt DirectSolver::solve(rawdata_fmt &vResults, rawdata_fmt &vTimes)
 {
     // const int iPixels = (this->origImage->width() - 2) * (this->origImage->height() - 2);
     image_fmt ret(*(this->origImage), "xyz", 0);
     image_fmt useField;
+    unsigned long time = 0;
     if(this->isDirichet == false)
     {
-        MLOG(severity_type::debug, "\n", image_psb::printImageAligned(field));
-        this->func(field, ret);
+        MLOG(severity_type::debug, "\n", image_psb::printImageAligned(*(field)));
+
+        cimg_library::cimg::tic();
+        this->func(*(field), ret);
+        time = cimg_library::cimg::toc();
+
         ret.crop(1,1,0,0,
-                field.width() - 2, field.height() - 2, 0, 0);
+                field->width() - 2, field->height() - 2, 0, 0);
         ret += (this->origImage->mean() - ret.mean());
     }
     else
     {
-        this->func(field, ret);
+        cimg_library::cimg::tic();
+        this->func(*(field), ret);
+        time = cimg_library::cimg::toc();
     }
     MLOG(severity_type::extensive, "Returned image:\n",
             image_psb::printImageAligned(ret));
     vResults.push_back(getDiff(
                 image_psb::imageDiff(*(this->origImage),ret),
                                     this->origImage->size()));
+    vTimes.push_back(time);
     if(this->noisedImage != nullptr)
     {
         vResults.push_back(getDiff(image_psb::imageDiff(

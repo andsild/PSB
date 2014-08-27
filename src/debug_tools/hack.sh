@@ -4,7 +4,8 @@
 #: Author       : Anders Sildnes
 #: Version      : 1.0
 #: Desctiption  : Convert output from PSB to a format for gnuplot
-#: Options   	: $1 should be a file that the info is dumped into (default to terminal)
+#: Options      : $1 should be a file that the info is dumped into 
+#:                (default to terminal)
 
 if [ -z "${1}" ]
 then
@@ -66,26 +67,33 @@ END {
     }
 }' ${TMP_OUT} | sed 's/^\t/X\t/g' > ${TMP_FILTERED_OUT}
 
-numcols="$(awk '{print NF}' ${TMP_FILTERED_OUT} | sort | tail -n1)"
-solverCols=$(( $numSolvers / $numcols ))
-iterInc=$(( $numcols / ${numSolvers}))
-iterend=$(( ${numcols} ))
-printf "Number of solvers:\t\t\t\t%s\nNumber of columns (solutions):\t%s \
-       \nNumber of iterations:\t\t\t%s\n" \
-       "${numSolvers}" "${numcols}" "$(( $iterend / $iterInc ))"
+numCols="$(awk '{print NF}' ${TMP_FILTERED_OUT} | sort | tail -n1)"
+solverCols=$(( $numSolvers / $numCols ))
+iterInc=$(( $numCols / ${numSolvers}))
+iterEnd=$(( ${numCols} ))
+printf "%-30s: %s\n%-30s: %s\n%-30s: %s\n" \
+       "Number of solvers" "${numSolvers}"  \
+       "Number of columns (solutions)" "${numCols}"  \
+       "Number of iterations" "$(( $iterEnd / $iterInc ))" 
 
 solverIter=0
 # seq: start inc end
-for iPos in $(seq 1 ${iterInc} ${iterend})
+for iPos in $(seq 1 ${iterInc} ${iterEnd})
 do
     range=$(( $iPos + ${iterInc} ))
     curSolver="${solvers[$solverIter]}"
     solverIter=$(( $solverIter + 1 ))
     cmdParse+=" for [col=${iPos}:${range}] '${TMP_OUT}a' using 0:col  \
-                title \"${curSolver}\" \
-                with points pointtype ${POINT_TYPE} pointsize ${POINT_SIZE} \
+                notitle  \
+                with lines \
                 lc rgb \"#${colors[${curSolver}]}\"
                  ,"
+
+    # cmdParse+=" for [col=${iPos}:${range}] '${TMP_OUT}a' using 0:col  \
+    #             title \"${curSolver}\" \
+    #             with points pointtype ${POINT_TYPE} pointsize ${POINT_SIZE} \
+    #             lc rgb \"#${colors[${curSolver}]}\"
+    #              ,"
 done
 cmdParse=$(echo ${cmdParse} | sed -e 's/,$//g ; s/,/&\n/g' )
 cmdParse="plot ${cmdParse} ;"
@@ -97,9 +105,9 @@ cmd="set terminal png; set output 'test.png';
     set logscale x;
     ${cmdParse}
     "
-#     # plot for [col=1:${numcols}] '${TMP_OUT}a' using 0:col with lines"
-echo ${cmd}
-gnuplot -e "${cmd}"
-cat ${TMP_FILTERED_OUT}
+#     # plot for [col=1:${numCols}] '${TMP_OUT}a' using 0:col with lines"
+# echo ${cmd}
+gnuplot -e "${cmd}" 2>&1 | sed '/.*arial.*/d'
+# cat ${TMP_FILTERED_OUT}
 
 # EOF

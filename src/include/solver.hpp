@@ -25,12 +25,12 @@ class Solver
     protected:
     const image_fmt* const origImage;
     const image_fmt* const noisedImage;
-    const image_fmt field;
+    const image_fmt* const field;
     logging::Logger< logging::FileLogPolicy > logInst;
     bool bMultipart, bFinal;
 
     public:
-    virtual image_fmt solve(rawdata_fmt &arg) = 0;
+    virtual image_fmt solve(rawdata_fmt &arg1, rawdata_fmt &arg2) = 0;
     std::string getLabel();
     std::string getFilename();
     void log(int, std::string);
@@ -54,7 +54,7 @@ class IterativeSolver : public virtual Solver
     double dStopCriterion;
 
     public:
-    image_fmt solve(rawdata_fmt &arg1);
+    image_fmt solve(rawdata_fmt &arg1, rawdata_fmt &arg2);
     IterativeSolver(const image_fmt* const origImage, const image_fmt* field,
             const image_fmt * const U, iterative_func func,
             double dStopCriterion, std::string sFile, std::string sLabel,
@@ -68,7 +68,7 @@ class DirectSolver : public virtual Solver
     direct_func func;
     const bool isDirichet;
     public:
-    image_fmt solve(rawdata_fmt &arg1);
+    image_fmt solve(rawdata_fmt &arg1, rawdata_fmt &arg2);
     DirectSolver(const image_fmt* const origImage, const image_fmt* const field,
                 direct_func func,
                 std::string sFilename, std::string sLabel,
