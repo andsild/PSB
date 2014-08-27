@@ -1,0 +1,1517 @@
+desc: (none)
+cmd: ../bin/main.out --dct --dst --wavelet5 ../test_media/
+time_unit: i
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=6363282
+mem_heap_B=420746
+mem_heap_extra_B=1358
+mem_stacks_B=0
+heap_tree=detailed
+n5: 420746 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n3: 240132 0x1B362B: cimg_library::CImg<float>::assign(unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9756)
+  n2: 120096 0x1C810F: cimg_library::CImg<float>::assign(float const*, unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9830)
+   n1: 120000 0x1BF423: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&) (CImg.h:9900)
+    n1: 120000 0x1BE1CA: cimg_library::CImg<float>::operator=(cimg_library::CImg<float> const&) (CImg.h:10292)
+     n1: 120000 0x1D4CBD: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:504)
+      n1: 120000 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+       n0: 120000 0x227D00: main (main.cpp:131)
+   n0: 96 in 1 place, below massif's threshold (01.00%)
+  n1: 120000 0x1EFD10: cimg_library::CImg<float>::_load_pnm(_IO_FILE*, char const*) (CImg.h:36198)
+   n1: 120000 0x1F1465: cimg_library::CImg<float>::load_pnm(_IO_FILE*) (CImg.h:36111)
+    n1: 120000 0x1F8941: cimg_library::CImg<float>::load_imagemagick_external(char const*) (CImg.h:37994)
+     n1: 120000 0x1EA3FB: cimg_library::CImg<float>::load_other(char const*) (CImg.h:38216)
+      n1: 120000 0x1EEE3C: cimg_library::CImg<float>::_load_jpeg(_IO_FILE*, char const*) (CImg.h:35758)
+       n1: 120000 0x1E84D6: cimg_library::CImg<float>::load_jpeg(char const*) (CImg.h:35711)
+        n1: 120000 0x1DA80C: cimg_library::CImg<float>::load(char const*) (CImg.h:35301)
+         n1: 120000 0x1D3770: image_psb::readImage(cimg_library::CImg<float>&, std::string) (image2.cpp:291)
+          n1: 120000 0x1D5E82: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:635)
+           n0: 120000 0x227D00: main (main.cpp:131)
+  n0: 36 in 4 places, all below massif's threshold (01.00%)
+ n1: 123216 0x161B30: cimg_library::CImg<float>::CImg(unsigned int, unsigned int, unsigned int, unsigned int, float) (CImg.h:9340)
+  n1: 123216 0x1D49C6: image_psb::padCore(int, int, cimg_library::CImg<float> const&) (image2.cpp:480)
+   n1: 123216 0x1D4D92: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:517)
+    n1: 123216 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+     n0: 123216 0x227D00: main (main.cpp:131)
+ n1: 32808 0x6DA4F72: ??? (in /lib64/libc-2.17.so)
+  n1: 32808 0x154F45: file_IO::getFilesInFolder(std::string) (file.cpp:431)
+   n0: 32808 0x227B7F: main (main.cpp:124)
+ n1: 16384 0x6580AF2: std::basic_filebuf<char, std::char_traits<char> >::_M_allocate_internal_buffer() (in /usr/lib64/gcc/x86_64-pc-linux-gnu/4.7.3/libstdc++.so.6.0.17)
+  n1: 16384 0x65831CE: std::basic_filebuf<char, std::char_traits<char> >::open(char const*, std::_Ios_Openmode) (in /usr/lib64/gcc/x86_64-pc-linux-gnu/4.7.3/libstdc++.so.6.0.17)
+   n1: 16384 0x6583342: std::basic_ofstream<char, std::char_traits<char> >::open(char const*, std::_Ios_Openmode) (in /usr/lib64/gcc/x86_64-pc-linux-gnu/4.7.3/libstdc++.so.6.0.17)
+    n1: 16384 0x21CD4B: logging::FileLogPolicy::open_ostream(std::string const&) (logger.cpp:19)
+     n1: 16384 0x21D9DF: logging::Logger<logging::FileLogPolicy>::setName(std::string const&) (logger.hpp:120)
+      n2: 16384 0x21D6B3: logging::Logger<logging::FileLogPolicy>::Logger(std::string const&) (logger.hpp:115)
+       n1: 8192 0x21D21C: __static_initialization_and_destruction_0(int, int) (logger.cpp:59)
+        n1: 8192 0x21D3DA: _GLOBAL__sub_I__ZN7logging13FileLogPolicy12open_ostreamERKSs (logger.cpp:60)
+         n1: 8192 0x23019B: __libc_csu_init (in /home/andesil/PSB/bin/main.out)
+          n0: 8192 0x6D10BD3: (below main) (in /lib64/libc-2.17.so)
+       n1: 8192 0x21D287: __static_initialization_and_destruction_0(int, int) (logger.cpp:60)
+        n1: 8192 0x21D3DA: _GLOBAL__sub_I__ZN7logging13FileLogPolicy12open_ostreamERKSs (logger.cpp:60)
+         n1: 8192 0x23019B: __libc_csu_init (in /home/andesil/PSB/bin/main.out)
+          n0: 8192 0x6D10BD3: (below main) (in /lib64/libc-2.17.so)
+ n0: 8206 in 23 places, all below massif's threshold (01.00%)
+#-----------
+snapshot=2
+#-----------
+time=42117742
+mem_heap_B=660710
+mem_heap_extra_B=1354
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=3
+#-----------
+time=42494641
+mem_heap_B=540746
+mem_heap_extra_B=1366
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=4
+#-----------
+time=79198470
+mem_heap_B=787142
+mem_heap_extra_B=1362
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=5
+#-----------
+time=80076751
+mem_heap_B=907279
+mem_heap_extra_B=1537
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=6
+#-----------
+time=115830769
+mem_heap_B=1027279
+mem_heap_extra_B=1545
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=7
+#-----------
+time=122703920
+mem_heap_B=1752518
+mem_heap_extra_B=16578
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=8
+#-----------
+time=128859800
+mem_heap_B=1752518
+mem_heap_extra_B=16578
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=9
+#-----------
+time=138330928
+mem_heap_B=1750918
+mem_heap_extra_B=16578
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=10
+#-----------
+time=144417290
+mem_heap_B=1750918
+mem_heap_extra_B=16578
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=11
+#-----------
+time=152963028
+mem_heap_B=1760050
+mem_heap_extra_B=17494
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=12
+#-----------
+time=159529300
+mem_heap_B=1760050
+mem_heap_extra_B=17494
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=13
+#-----------
+time=169289827
+mem_heap_B=1759266
+mem_heap_extra_B=17502
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=14
+#-----------
+time=175815411
+mem_heap_B=1759266
+mem_heap_extra_B=17502
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=15
+#-----------
+time=182704438
+mem_heap_B=1388078
+mem_heap_extra_B=1714
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=16
+#-----------
+time=188017080
+mem_heap_B=2264274
+mem_heap_extra_B=22598
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=17
+#-----------
+time=194714359
+mem_heap_B=2335210
+mem_heap_extra_B=27518
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=18
+#-----------
+time=202934572
+mem_heap_B=2781602
+mem_heap_extra_B=24510
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=19
+#-----------
+time=208480641
+mem_heap_B=2287714
+mem_heap_extra_B=24494
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=20
+#-----------
+time=220909657
+mem_heap_B=1760762
+mem_heap_extra_B=1854
+mem_stacks_B=0
+heap_tree=detailed
+n4: 1760762 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n5: 1572960 0x1B362B: cimg_library::CImg<float>::assign(unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9756)
+  n2: 1209744 0x1C810F: cimg_library::CImg<float>::assign(float const*, unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9830)
+   n1: 1086432 0x1BF423: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&) (CImg.h:9900)
+    n8: 1086432 0x1BE1CA: cimg_library::CImg<float>::operator=(cimg_library::CImg<float> const&) (CImg.h:10292)
+     n3: 363216 0x1D3687: image_psb::makeField(cimg_library::CImg<float> const&, float, cimg_library::CImg<float>&) (image2.cpp:273)
+      n1: 123216 0x1D4DE4: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:520)
+       n1: 123216 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+        n0: 123216 0x227D00: main (main.cpp:131)
+      n1: 120000 0x1D4DBE: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:519)
+       n1: 120000 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+        n0: 120000 0x227D00: main (main.cpp:131)
+      n1: 120000 0x1D588E: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:594)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 123216 0x1D4F4C: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:533)
+      n1: 123216 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+       n0: 123216 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D41B0: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:407)
+      n1: 120000 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D41E1: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:408)
+      n1: 120000 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D4212: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:409)
+      n1: 120000 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D4CBD: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:504)
+      n1: 120000 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+       n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D57E1: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:583)
+      n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+       n0: 120000 0x227D00: main (main.cpp:131)
+     n0: 0 in 2 places, all below massif's threshold (01.00%)
+   n1: 123312 0x1BE017: cimg_library::CImg<float>::assign(float const*, unsigned int, unsigned int, unsigned int, unsigned int, bool) (CImg.h:9872)
+    n2: 123312 0x19E39C: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&, bool) (CImg.h:9909)
+     n1: 123216 0x1EA7D3: cimg_library::CImgList<float>::CImgList<float, float>(cimg_library::CImg<float> const&, cimg_library::CImg<float> const&, bool) (CImg.h:41697)
+      n1: 123216 0x22EBEE: cimg_library::CImg<float>::get_FFT(bool) const (CImg.h:26283)
+       n1: 123216 0x22E3C1: solver::FFT_DCT(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (fft.cpp:25)
+        n1: 123216 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+         n1: 123216 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+          n0: 123216 0x227D00: main (main.cpp:131)
+     n0: 96 in 3 places, all below massif's threshold (01.00%)
+  n2: 123216 0x19BC9C: cimg_library::CImg<float>::assign(unsigned int, unsigned int, unsigned int, unsigned int, float) (CImg.h:9774)
+   n1: 123216 0x22F022: cimg_library::CImg<float>::FFT(cimg_library::CImg<float>&, cimg_library::CImg<float>&, bool, unsigned int) (CImg.h:26538)
+    n1: 123216 0x22EC2C: cimg_library::CImg<float>::get_FFT(bool) const (CImg.h:26284)
+     n1: 123216 0x22E3C1: solver::FFT_DCT(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (fft.cpp:25)
+      n1: 123216 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+       n1: 123216 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+        n0: 123216 0x227D00: main (main.cpp:131)
+   n0: 0 in 1 place, below massif's threshold (01.00%)
+  n1: 120000 0x1EFD10: cimg_library::CImg<float>::_load_pnm(_IO_FILE*, char const*) (CImg.h:36198)
+   n1: 120000 0x1F1465: cimg_library::CImg<float>::load_pnm(_IO_FILE*) (CImg.h:36111)
+    n1: 120000 0x1F8941: cimg_library::CImg<float>::load_imagemagick_external(char const*) (CImg.h:37994)
+     n1: 120000 0x1EA3FB: cimg_library::CImg<float>::load_other(char const*) (CImg.h:38216)
+      n1: 120000 0x1EEE3C: cimg_library::CImg<float>::_load_jpeg(_IO_FILE*, char const*) (CImg.h:35758)
+       n1: 120000 0x1E84D6: cimg_library::CImg<float>::load_jpeg(char const*) (CImg.h:35711)
+        n1: 120000 0x1DA80C: cimg_library::CImg<float>::load(char const*) (CImg.h:35301)
+         n1: 120000 0x1D3770: image_psb::readImage(cimg_library::CImg<float>&, std::string) (image2.cpp:291)
+          n1: 120000 0x1D5E82: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:635)
+           n0: 120000 0x227D00: main (main.cpp:131)
+  n1: 120000 0x1DCC06: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&, char const*) (CImg.h:9942)
+   n2: 120000 0x1DBC1C: cimg_library::CImg<float>::CImg<float>(cimg_library::CImg<float> const&, char const*, float) (CImg.h:9714)
+    n1: 120000 0x208192: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:119)
+     n1: 120000 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+      n0: 120000 0x227D00: main (main.cpp:131)
+    n0: 0 in 1 place, below massif's threshold (01.00%)
+  n0: 0 in 3 places, all below massif's threshold (01.00%)
+ n2: 123648 0x195FC7: cimg_library::CImg<float>::CImg(unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9311)
+  n1: 123216 0x22E406: solver::FFT_DCT(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (fft.cpp:26)
+   n1: 123216 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+    n1: 123216 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+     n0: 123216 0x227D00: main (main.cpp:131)
+  n0: 432 in 4 places, all below massif's threshold (01.00%)
+ n1: 32808 0x6DA4F72: ??? (in /lib64/libc-2.17.so)
+  n1: 32808 0x154F45: file_IO::getFilesInFolder(std::string) (file.cpp:431)
+   n0: 32808 0x227B7F: main (main.cpp:124)
+ n0: 31346 in 45 places, all below massif's threshold (01.00%)
+#-----------
+snapshot=21
+#-----------
+time=229971754
+mem_heap_B=3144778
+mem_heap_extra_B=24670
+mem_stacks_B=0
+heap_tree=peak
+n6: 3144778 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n5: 1819392 0x1B362B: cimg_library::CImg<float>::assign(unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9756)
+  n2: 1456176 0x1C810F: cimg_library::CImg<float>::assign(float const*, unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9830)
+   n1: 1086432 0x1BF423: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&) (CImg.h:9900)
+    n8: 1086432 0x1BE1CA: cimg_library::CImg<float>::operator=(cimg_library::CImg<float> const&) (CImg.h:10292)
+     n3: 363216 0x1D3687: image_psb::makeField(cimg_library::CImg<float> const&, float, cimg_library::CImg<float>&) (image2.cpp:273)
+      n1: 123216 0x1D4DE4: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:520)
+       n1: 123216 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+        n0: 123216 0x227D00: main (main.cpp:131)
+      n1: 120000 0x1D4DBE: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:519)
+       n1: 120000 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+        n0: 120000 0x227D00: main (main.cpp:131)
+      n1: 120000 0x1D588E: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:594)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 123216 0x1D4F4C: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:533)
+      n1: 123216 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+       n0: 123216 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D41B0: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:407)
+      n1: 120000 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D41E1: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:408)
+      n1: 120000 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D4212: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:409)
+      n1: 120000 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D4CBD: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:504)
+      n1: 120000 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+       n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D57E1: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:583)
+      n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+       n0: 120000 0x227D00: main (main.cpp:131)
+     n0: 0 in 2 places, all below massif's threshold (01.00%)
+   n1: 369744 0x1BE017: cimg_library::CImg<float>::assign(float const*, unsigned int, unsigned int, unsigned int, unsigned int, bool) (CImg.h:9872)
+    n3: 369744 0x19E39C: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&, bool) (CImg.h:9909)
+     n1: 246432 0x22FA2D: cimg_library::CImgList<float>::CImgList<float>(cimg_library::CImgList<float> const&, bool) (CImg.h:41832)
+      n1: 246432 0x22EEC9: cimg_library::CImgList<float>::get_FFT(bool) const (CImg.h:46159)
+       n1: 246432 0x22E5A5: solver::FFT_DCT(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (fft.cpp:33)
+        n1: 246432 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+         n1: 246432 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+          n0: 246432 0x227D00: main (main.cpp:131)
+     n1: 123216 0x1EA7D3: cimg_library::CImgList<float>::CImgList<float, float>(cimg_library::CImg<float> const&, cimg_library::CImg<float> const&, bool) (CImg.h:41697)
+      n1: 123216 0x22EBEE: cimg_library::CImg<float>::get_FFT(bool) const (CImg.h:26283)
+       n1: 123216 0x22E3C1: solver::FFT_DCT(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (fft.cpp:25)
+        n1: 123216 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+         n1: 123216 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+          n0: 123216 0x227D00: main (main.cpp:131)
+     n0: 96 in 3 places, all below massif's threshold (01.00%)
+  n2: 123216 0x19BC9C: cimg_library::CImg<float>::assign(unsigned int, unsigned int, unsigned int, unsigned int, float) (CImg.h:9774)
+   n1: 123216 0x22F022: cimg_library::CImg<float>::FFT(cimg_library::CImg<float>&, cimg_library::CImg<float>&, bool, unsigned int) (CImg.h:26538)
+    n1: 123216 0x22EC2C: cimg_library::CImg<float>::get_FFT(bool) const (CImg.h:26284)
+     n1: 123216 0x22E3C1: solver::FFT_DCT(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (fft.cpp:25)
+      n1: 123216 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+       n1: 123216 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+        n0: 123216 0x227D00: main (main.cpp:131)
+   n0: 0 in 1 place, below massif's threshold (01.00%)
+  n1: 120000 0x1EFD10: cimg_library::CImg<float>::_load_pnm(_IO_FILE*, char const*) (CImg.h:36198)
+   n1: 120000 0x1F1465: cimg_library::CImg<float>::load_pnm(_IO_FILE*) (CImg.h:36111)
+    n1: 120000 0x1F8941: cimg_library::CImg<float>::load_imagemagick_external(char const*) (CImg.h:37994)
+     n1: 120000 0x1EA3FB: cimg_library::CImg<float>::load_other(char const*) (CImg.h:38216)
+      n1: 120000 0x1EEE3C: cimg_library::CImg<float>::_load_jpeg(_IO_FILE*, char const*) (CImg.h:35758)
+       n1: 120000 0x1E84D6: cimg_library::CImg<float>::load_jpeg(char const*) (CImg.h:35711)
+        n1: 120000 0x1DA80C: cimg_library::CImg<float>::load(char const*) (CImg.h:35301)
+         n1: 120000 0x1D3770: image_psb::readImage(cimg_library::CImg<float>&, std::string) (image2.cpp:291)
+          n1: 120000 0x1D5E82: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:635)
+           n0: 120000 0x227D00: main (main.cpp:131)
+  n1: 120000 0x1DCC06: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&, char const*) (CImg.h:9942)
+   n2: 120000 0x1DBC1C: cimg_library::CImg<float>::CImg<float>(cimg_library::CImg<float> const&, char const*, float) (CImg.h:9714)
+    n1: 120000 0x208192: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:119)
+     n1: 120000 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+      n0: 120000 0x227D00: main (main.cpp:131)
+    n0: 0 in 1 place, below massif's threshold (01.00%)
+  n0: 0 in 3 places, all below massif's threshold (01.00%)
+ n4: 644720 0x4E4C493: fftw_malloc_plain (in /usr/lib64/libfftw3.so.3.3.2)
+  n2: 492864 0x4E534FA: ??? (in /usr/lib64/libfftw3.so.3.3.2)
+   n1: 492864 0x4E4E87A: ??? (in /usr/lib64/libfftw3.so.3.3.2)
+    n1: 492864 0x4E4EAE3: ??? (in /usr/lib64/libfftw3.so.3.3.2)
+     n2: 492864 0x4E4EFA5: fftw_mkplan_d (in /usr/lib64/libfftw3.so.3.3.2)
+      n1: 492864 0x4E587AB: ??? (in /usr/lib64/libfftw3.so.3.3.2)
+       n1: 492864 0x4E4E87A: ??? (in /usr/lib64/libfftw3.so.3.3.2)
+        n1: 492864 0x4E4EAE3: ??? (in /usr/lib64/libfftw3.so.3.3.2)
+         n1: 492864 0x4F137BA: ??? (in /usr/lib64/libfftw3.so.3.3.2)
+          n1: 492864 0x4F13972: fftw_mkapiplan (in /usr/lib64/libfftw3.so.3.3.2)
+           n1: 492864 0x4F1817E: fftw_plan_many_dft (in /usr/lib64/libfftw3.so.3.3.2)
+            n1: 492864 0x4F17427: fftw_plan_dft (in /usr/lib64/libfftw3.so.3.3.2)
+             n1: 492864 0x4F1722B: fftw_plan_dft_3d (in /usr/lib64/libfftw3.so.3.3.2)
+              n2: 492864 0x22F392: cimg_library::CImg<float>::FFT(cimg_library::CImg<float>&, cimg_library::CImg<float>&, bool, unsigned int) (CImg.h:26563)
+               n1: 492864 0x22FB19: cimg_library::CImgList<float>::FFT(bool) (CImg.h:46153)
+                n1: 492864 0x22EED7: cimg_library::CImgList<float>::get_FFT(bool) const (CImg.h:46159)
+                 n1: 492864 0x22E5A5: solver::FFT_DCT(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (fft.cpp:33)
+                  n1: 492864 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+                   n1: 492864 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+                    n0: 492864 0x227D00: main (main.cpp:131)
+               n0: 0 in 1 place, below massif's threshold (01.00%)
+      n0: 0 in 4 places, all below massif's threshold (01.00%)
+   n0: 0 in 1 place, below massif's threshold (01.00%)
+  n1: 77208 0x4E50277: fftw_mksolver (in /usr/lib64/libfftw3.so.3.3.2)
+   n0: 77208 in 60 places, all below massif's threshold (01.00%)
+  n2: 44384 0x4E4D844: ??? (in /usr/lib64/libfftw3.so.3.3.2)
+   n2: 44384 0x4E50306: fftw_solvtab_exec (in /usr/lib64/libfftw3.so.3.3.2)
+    n1: 44384 0x4E8A22F: fftw_rdft_conf_standard (in /usr/lib64/libfftw3.so.3.3.2)
+     n1: 44384 0x4F13AFF: fftw_configure_planner (in /usr/lib64/libfftw3.so.3.3.2)
+      n1: 44384 0x4F18536: fftw_the_planner (in /usr/lib64/libfftw3.so.3.3.2)
+       n2: 44384 0x5A6E236: fftw_init_threads (in /usr/lib64/libfftw3_threads.so.3.3.2)
+        n1: 44384 0x5A6E2D2: fftw_plan_with_nthreads (in /usr/lib64/libfftw3_threads.so.3.3.2)
+         n1: 44384 0x22F1F1: cimg_library::CImg<float>::FFT(cimg_library::CImg<float>&, cimg_library::CImg<float>&, bool, unsigned int) (CImg.h:26551)
+          n1: 44384 0x22FB19: cimg_library::CImgList<float>::FFT(bool) (CImg.h:46153)
+           n1: 44384 0x22EED7: cimg_library::CImgList<float>::get_FFT(bool) const (CImg.h:46159)
+            n1: 44384 0x22E5A5: solver::FFT_DCT(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (fft.cpp:33)
+             n1: 44384 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+              n1: 44384 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+               n0: 44384 0x227D00: main (main.cpp:131)
+        n0: 0 in 1 place, below massif's threshold (01.00%)
+    n0: 0 in 3 places, all below massif's threshold (01.00%)
+   n0: 0 in 11 places, all below massif's threshold (01.00%)
+  n0: 30264 in 21 places, all below massif's threshold (01.00%)
+ n2: 492864 0x22F228: cimg_library::CImg<float>::FFT(cimg_library::CImg<float>&, cimg_library::CImg<float>&, bool, unsigned int) (CImg.h:26555)
+  n1: 492864 0x22FB19: cimg_library::CImgList<float>::FFT(bool) (CImg.h:46153)
+   n1: 492864 0x22EED7: cimg_library::CImgList<float>::get_FFT(bool) const (CImg.h:46159)
+    n1: 492864 0x22E5A5: solver::FFT_DCT(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (fft.cpp:33)
+     n1: 492864 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+      n1: 492864 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+       n0: 492864 0x227D00: main (main.cpp:131)
+  n0: 0 in 1 place, below massif's threshold (01.00%)
+ n2: 123648 0x195FC7: cimg_library::CImg<float>::CImg(unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9311)
+  n1: 123216 0x22E406: solver::FFT_DCT(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (fft.cpp:26)
+   n1: 123216 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+    n1: 123216 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+     n0: 123216 0x227D00: main (main.cpp:131)
+  n0: 432 in 4 places, all below massif's threshold (01.00%)
+ n1: 32808 0x6DA4F72: ??? (in /lib64/libc-2.17.so)
+  n1: 32808 0x154F45: file_IO::getFilesInFolder(std::string) (file.cpp:431)
+   n0: 32808 0x227B7F: main (main.cpp:124)
+ n0: 31346 in 43 places, all below massif's threshold (01.00%)
+#-----------
+snapshot=22
+#-----------
+time=241012424
+mem_heap_B=3151826
+mem_heap_extra_B=24454
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=23
+#-----------
+time=250124289
+mem_heap_B=1407318
+mem_heap_extra_B=1898
+mem_stacks_B=0
+heap_tree=detailed
+n6: 1407318 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n3: 1206528 0x1B362B: cimg_library::CImg<float>::assign(unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9756)
+  n2: 1086528 0x1C810F: cimg_library::CImg<float>::assign(float const*, unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9830)
+   n1: 1086432 0x1BF423: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&) (CImg.h:9900)
+    n8: 1086432 0x1BE1CA: cimg_library::CImg<float>::operator=(cimg_library::CImg<float> const&) (CImg.h:10292)
+     n3: 363216 0x1D3687: image_psb::makeField(cimg_library::CImg<float> const&, float, cimg_library::CImg<float>&) (image2.cpp:273)
+      n1: 123216 0x1D4DE4: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:520)
+       n1: 123216 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+        n0: 123216 0x227D00: main (main.cpp:131)
+      n1: 120000 0x1D4DBE: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:519)
+       n1: 120000 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+        n0: 120000 0x227D00: main (main.cpp:131)
+      n1: 120000 0x1D588E: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:594)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 123216 0x1D4F4C: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:533)
+      n1: 123216 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+       n0: 123216 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D41B0: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:407)
+      n1: 120000 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D41E1: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:408)
+      n1: 120000 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D4212: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:409)
+      n1: 120000 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D4CBD: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:504)
+      n1: 120000 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+       n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D57E1: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:583)
+      n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+       n0: 120000 0x227D00: main (main.cpp:131)
+     n0: 0 in 3 places, all below massif's threshold (01.00%)
+   n0: 96 in 1 place, below massif's threshold (01.00%)
+  n1: 120000 0x1EFD10: cimg_library::CImg<float>::_load_pnm(_IO_FILE*, char const*) (CImg.h:36198)
+   n1: 120000 0x1F1465: cimg_library::CImg<float>::load_pnm(_IO_FILE*) (CImg.h:36111)
+    n1: 120000 0x1F8941: cimg_library::CImg<float>::load_imagemagick_external(char const*) (CImg.h:37994)
+     n1: 120000 0x1EA3FB: cimg_library::CImg<float>::load_other(char const*) (CImg.h:38216)
+      n1: 120000 0x1EEE3C: cimg_library::CImg<float>::_load_jpeg(_IO_FILE*, char const*) (CImg.h:35758)
+       n1: 120000 0x1E84D6: cimg_library::CImg<float>::load_jpeg(char const*) (CImg.h:35711)
+        n1: 120000 0x1DA80C: cimg_library::CImg<float>::load(char const*) (CImg.h:35301)
+         n1: 120000 0x1D3770: image_psb::readImage(cimg_library::CImg<float>&, std::string) (image2.cpp:291)
+          n1: 120000 0x1D5E82: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:635)
+           n0: 120000 0x227D00: main (main.cpp:131)
+  n0: 0 in 5 places, all below massif's threshold (01.00%)
+ n2: 120432 0x195FC7: cimg_library::CImg<float>::CImg(unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9311)
+  n2: 120000 0x19F101: cimg_library::CImg<float>::get_crop(int, int, int, int, int, int, int, int, bool) const (CImg.h:21934)
+   n1: 120000 0x209A0D: cimg_library::CImg<float>::crop(int, int, int, int, int, int, int, int, bool) (CImg.h:21918)
+    n1: 120000 0x208284: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:131)
+     n1: 120000 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+      n0: 120000 0x227D00: main (main.cpp:131)
+   n0: 0 in 3 places, all below massif's threshold (01.00%)
+  n0: 432 in 4 places, all below massif's threshold (01.00%)
+ n1: 32808 0x6DA4F72: ??? (in /lib64/libc-2.17.so)
+  n1: 32808 0x154F45: file_IO::getFilesInFolder(std::string) (file.cpp:431)
+   n0: 32808 0x227B7F: main (main.cpp:124)
+ n2: 16520 0x6518C30: __cxa_allocate_exception (in /usr/lib64/gcc/x86_64-pc-linux-gnu/4.7.3/libstdc++.so.6.0.17)
+  n1: 16520 0x191434: cimg_library::CImg<float>::save_magick(char const*, unsigned int) const (CImg.h:39759)
+   n1: 16520 0x16FD51: cimg_library::CImg<float>::save_other(char const*, unsigned int) const (CImg.h:41401)
+    n1: 16520 0x180749: cimg_library::CImg<float>::_save_jpeg(_IO_FILE*, char const*, unsigned int) const (CImg.h:39605)
+     n1: 16520 0x16DE14: cimg_library::CImg<float>::save_jpeg(char const*, unsigned int) const (CImg.h:39584)
+      n1: 16520 0x165E91: cimg_library::CImg<float>::save(char const*, int, unsigned int) const (CImg.h:39313)
+       n1: 16520 0x154A7B: file_IO::saveImage(cimg_library::CImg<float> const&, std::string, bool) (file.cpp:362)
+        n1: 16520 0x1D675B: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:703)
+         n0: 16520 0x227D00: main (main.cpp:131)
+  n0: 0 in 1 place, below massif's threshold (01.00%)
+ n1: 16384 0x6580AF2: std::basic_filebuf<char, std::char_traits<char> >::_M_allocate_internal_buffer() (in /usr/lib64/gcc/x86_64-pc-linux-gnu/4.7.3/libstdc++.so.6.0.17)
+  n2: 16384 0x65831CE: std::basic_filebuf<char, std::char_traits<char> >::open(char const*, std::_Ios_Openmode) (in /usr/lib64/gcc/x86_64-pc-linux-gnu/4.7.3/libstdc++.so.6.0.17)
+   n1: 16384 0x6583342: std::basic_ofstream<char, std::char_traits<char> >::open(char const*, std::_Ios_Openmode) (in /usr/lib64/gcc/x86_64-pc-linux-gnu/4.7.3/libstdc++.so.6.0.17)
+    n1: 16384 0x21CD4B: logging::FileLogPolicy::open_ostream(std::string const&) (logger.cpp:19)
+     n1: 16384 0x21D9DF: logging::Logger<logging::FileLogPolicy>::setName(std::string const&) (logger.hpp:120)
+      n1: 16384 0x21D6B3: logging::Logger<logging::FileLogPolicy>::Logger(std::string const&) (logger.hpp:115)
+       n0: 16384 in 2 places, all below massif's threshold (01.00%)
+   n0: 0 in 1 place, below massif's threshold (01.00%)
+ n0: 14646 in 43 places, all below massif's threshold (01.00%)
+#-----------
+snapshot=24
+#-----------
+time=285060814
+mem_heap_B=2089574
+mem_heap_extra_B=1874
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=25
+#-----------
+time=296184803
+mem_heap_B=1845542
+mem_heap_extra_B=1882
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=26
+#-----------
+time=304926824
+mem_heap_B=1754106
+mem_heap_extra_B=1974
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=27
+#-----------
+time=310060594
+mem_heap_B=1772502
+mem_heap_extra_B=1994
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=28
+#-----------
+time=317734223
+mem_heap_B=1814662
+mem_heap_extra_B=2018
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=29
+#-----------
+time=322806102
+mem_heap_B=1882086
+mem_heap_extra_B=1994
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=30
+#-----------
+time=333724261
+mem_heap_B=1925974
+mem_heap_extra_B=2002
+mem_stacks_B=0
+heap_tree=detailed
+n6: 1925974 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n4: 1590040 0x1B362B: cimg_library::CImg<float>::assign(unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9756)
+  n2: 1350040 0x1C810F: cimg_library::CImg<float>::assign(float const*, unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9830)
+   n1: 1208320 0x1BF423: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&) (CImg.h:9900)
+    n10: 1208320 0x1BE1CA: cimg_library::CImg<float>::operator=(cimg_library::CImg<float> const&) (CImg.h:10292)
+     n3: 363216 0x1D3687: image_psb::makeField(cimg_library::CImg<float> const&, float, cimg_library::CImg<float>&) (image2.cpp:273)
+      n1: 123216 0x1D4DE4: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:520)
+       n1: 123216 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+        n0: 123216 0x227D00: main (main.cpp:131)
+      n1: 120000 0x1D4DBE: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:519)
+       n1: 120000 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+        n0: 120000 0x227D00: main (main.cpp:131)
+      n1: 120000 0x1D588E: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:594)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 123216 0x1D4F4C: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:533)
+      n1: 123216 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+       n0: 123216 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D4CBD: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:504)
+      n1: 120000 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+       n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D57E1: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:583)
+      n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+       n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D41B0: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:407)
+      n1: 120000 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D41E1: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:408)
+      n1: 120000 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D4212: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:409)
+      n1: 120000 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 78064 0x1C8B72: cimg_library::CImgList<float>::insert(cimg_library::CImg<float> const&, unsigned int, bool) (CImg.h:43241)
+      n3: 78064 0x1DBB87: cimg_library::CImgList<float>& cimg_library::CImgList<float>::push_back<float>(cimg_library::CImg<float> const&) (CImg.h:43569)
+       n1: 43824 0x20DB83: wavelet::wavelet_5x5(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (wavelet.cpp:480)
+        n1: 43824 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+         n1: 43824 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+          n0: 43824 0x227D00: main (main.cpp:131)
+       n1: 34240 0x20DE1D: wavelet::wavelet_5x5(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (wavelet.cpp:497)
+        n1: 34240 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+         n1: 34240 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+          n0: 34240 0x227D00: main (main.cpp:131)
+       n0: 0 in 3 places, all below massif's threshold (01.00%)
+     n1: 43824 0x20DD83: wavelet::wavelet_5x5(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (wavelet.cpp:494)
+      n1: 43824 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+       n1: 43824 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+        n0: 43824 0x227D00: main (main.cpp:131)
+     n0: 0 in 2 places, all below massif's threshold (01.00%)
+   n1: 141720 0x1BE017: cimg_library::CImg<float>::assign(float const*, unsigned int, unsigned int, unsigned int, unsigned int, bool) (CImg.h:9872)
+    n2: 141720 0x19E39C: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&, bool) (CImg.h:9909)
+     n2: 141624 0x183861: cimg_library::CImgList<float>::CImgList<float>(cimg_library::CImg<float> const&, bool) (CImg.h:41684)
+      n1: 139776 0x20D9B8: wavelet::wavelet_5x5(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (wavelet.cpp:457)
+       n1: 139776 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+        n1: 139776 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+         n0: 139776 0x227D00: main (main.cpp:131)
+      n0: 1848 in 1 place, below massif's threshold (01.00%)
+     n0: 96 in 6 places, all below massif's threshold (01.00%)
+  n1: 120000 0x1EFD10: cimg_library::CImg<float>::_load_pnm(_IO_FILE*, char const*) (CImg.h:36198)
+   n1: 120000 0x1F1465: cimg_library::CImg<float>::load_pnm(_IO_FILE*) (CImg.h:36111)
+    n1: 120000 0x1F8941: cimg_library::CImg<float>::load_imagemagick_external(char const*) (CImg.h:37994)
+     n1: 120000 0x1EA3FB: cimg_library::CImg<float>::load_other(char const*) (CImg.h:38216)
+      n1: 120000 0x1EEE3C: cimg_library::CImg<float>::_load_jpeg(_IO_FILE*, char const*) (CImg.h:35758)
+       n1: 120000 0x1E84D6: cimg_library::CImg<float>::load_jpeg(char const*) (CImg.h:35711)
+        n1: 120000 0x1DA80C: cimg_library::CImg<float>::load(char const*) (CImg.h:35301)
+         n1: 120000 0x1D3770: image_psb::readImage(cimg_library::CImg<float>&, std::string) (image2.cpp:291)
+          n1: 120000 0x1D5E82: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:635)
+           n0: 120000 0x227D00: main (main.cpp:131)
+  n1: 120000 0x1DCC06: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&, char const*) (CImg.h:9942)
+   n2: 120000 0x1DBC1C: cimg_library::CImg<float>::CImg<float>(cimg_library::CImg<float> const&, char const*, float) (CImg.h:9714)
+    n1: 120000 0x208192: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:119)
+     n1: 120000 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+      n0: 120000 0x227D00: main (main.cpp:131)
+    n0: 0 in 1 place, below massif's threshold (01.00%)
+  n0: 0 in 5 places, all below massif's threshold (01.00%)
+ n2: 139776 0x161B30: cimg_library::CImg<float>::CImg(unsigned int, unsigned int, unsigned int, unsigned int, float) (CImg.h:9340)
+  n2: 139776 0x20F71B: wavelet::downSample(int, int, cimg_library::CImg<float> const&) (wavelet.cpp:111)
+   n1: 139776 0x20D99A: wavelet::wavelet_5x5(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (wavelet.cpp:456)
+    n1: 139776 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+     n1: 139776 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+      n0: 139776 0x227D00: main (main.cpp:131)
+   n0: 0 in 1 place, below massif's threshold (01.00%)
+  n0: 0 in 3 places, all below massif's threshold (01.00%)
+ n2: 88204 0x1617D4: cimg_library::CImg<float>::CImg(cimg_library::CImg<float> const&) (CImg.h:9604)
+  n1: 87648 0x1E8195: cimg_library::CImg<cimg_library::cimg::superset2<float, float, float>::type> cimg_library::CImg<float>::get_correlate<float>(cimg_library::CImg<float> const&, unsigned int, bool) const (CImg.h:23178)
+   n3: 87648 0x1DA3C0: cimg_library::CImg<cimg_library::cimg::superset2<float, float, float>::type> cimg_library::CImg<float>::get_convolve<float>(cimg_library::CImg<float> const&, unsigned int, bool) const (CImg.h:23201)
+    n1: 43824 0x20DDC5: wavelet::wavelet_5x5(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (wavelet.cpp:497)
+     n1: 43824 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+      n1: 43824 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+       n0: 43824 0x227D00: main (main.cpp:131)
+    n1: 43824 0x20DDEA: wavelet::wavelet_5x5(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (wavelet.cpp:497)
+     n1: 43824 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+      n1: 43824 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+       n0: 43824 0x227D00: main (main.cpp:131)
+    n0: 0 in 3 places, all below massif's threshold (01.00%)
+  n0: 556 in 16 places, all below massif's threshold (01.00%)
+ n2: 44256 0x195FC7: cimg_library::CImg<float>::CImg(unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9311)
+  n1: 43824 0x1DD5EA: cimg_library::CImg<cimg_library::cimg::superset2<float, float, float>::type> cimg_library::CImg<float>::get_correlate<float>(cimg_library::CImg<float> const&, unsigned int, bool) const (CImg.h:22891)
+   n2: 43824 0x1DA3C0: cimg_library::CImg<cimg_library::cimg::superset2<float, float, float>::type> cimg_library::CImg<float>::get_convolve<float>(cimg_library::CImg<float> const&, unsigned int, bool) const (CImg.h:23201)
+    n1: 43824 0x20DDEA: wavelet::wavelet_5x5(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (wavelet.cpp:497)
+     n1: 43824 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+      n1: 43824 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+       n0: 43824 0x227D00: main (main.cpp:131)
+    n0: 0 in 4 places, all below massif's threshold (01.00%)
+  n0: 432 in 4 places, all below massif's threshold (01.00%)
+ n1: 32808 0x6DA4F72: ??? (in /lib64/libc-2.17.so)
+  n1: 32808 0x154F45: file_IO::getFilesInFolder(std::string) (file.cpp:431)
+   n0: 32808 0x227B7F: main (main.cpp:124)
+ n0: 30890 in 43 places, all below massif's threshold (01.00%)
+#-----------
+snapshot=31
+#-----------
+time=334302822
+mem_heap_B=1890354
+mem_heap_extra_B=1958
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=32
+#-----------
+time=349852658
+mem_heap_B=2169942
+mem_heap_extra_B=1994
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=33
+#-----------
+time=384661099
+mem_heap_B=2309782
+mem_heap_extra_B=2002
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=34
+#-----------
+time=391957145
+mem_heap_B=1137154
+mem_heap_extra_B=1718
+mem_stacks_B=0
+heap_tree=detailed
+n5: 1137154 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n3: 1016112 0x1B362B: cimg_library::CImg<float>::assign(unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9756)
+  n2: 843312 0x1C810F: cimg_library::CImg<float>::assign(float const*, unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9830)
+   n1: 843216 0x1BF423: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&) (CImg.h:9900)
+    n7: 843216 0x1BE1CA: cimg_library::CImg<float>::operator=(cimg_library::CImg<float> const&) (CImg.h:10292)
+     n3: 240000 0x1D3687: image_psb::makeField(cimg_library::CImg<float> const&, float, cimg_library::CImg<float>&) (image2.cpp:273)
+      n1: 120000 0x1D4DBE: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:519)
+       n1: 120000 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+        n0: 120000 0x227D00: main (main.cpp:131)
+      n1: 120000 0x1D588E: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:594)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+      n0: 0 in 1 place, below massif's threshold (01.00%)
+     n1: 123216 0x1D4F4C: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:533)
+      n1: 123216 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+       n0: 123216 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D41E1: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:408)
+      n1: 120000 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D4212: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:409)
+      n1: 120000 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D57E1: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:583)
+      n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+       n0: 120000 0x227D00: main (main.cpp:131)
+     n1: 120000 0x1D41B0: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:407)
+      n1: 120000 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 120000 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 120000 0x227D00: main (main.cpp:131)
+     n0: 0 in 6 places, all below massif's threshold (01.00%)
+   n0: 96 in 1 place, below massif's threshold (01.00%)
+  n1: 172800 0x1F001D: cimg_library::CImg<float>::_load_pnm(_IO_FILE*, char const*) (CImg.h:36224)
+   n1: 172800 0x1F1465: cimg_library::CImg<float>::load_pnm(_IO_FILE*) (CImg.h:36111)
+    n1: 172800 0x1F8941: cimg_library::CImg<float>::load_imagemagick_external(char const*) (CImg.h:37994)
+     n1: 172800 0x1EA3FB: cimg_library::CImg<float>::load_other(char const*) (CImg.h:38216)
+      n1: 172800 0x1EEE3C: cimg_library::CImg<float>::_load_jpeg(_IO_FILE*, char const*) (CImg.h:35758)
+       n1: 172800 0x1E84D6: cimg_library::CImg<float>::load_jpeg(char const*) (CImg.h:35711)
+        n1: 172800 0x1DA80C: cimg_library::CImg<float>::load(char const*) (CImg.h:35301)
+         n1: 172800 0x1D3770: image_psb::readImage(cimg_library::CImg<float>&, std::string) (image2.cpp:291)
+          n1: 172800 0x1D5E82: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:635)
+           n0: 172800 0x227D00: main (main.cpp:131)
+  n0: 0 in 7 places, all below massif's threshold (01.00%)
+ n2: 57600 0x161B30: cimg_library::CImg<float>::CImg(unsigned int, unsigned int, unsigned int, unsigned int, float) (CImg.h:9340)
+  n1: 57600 0x1D3502: image_psb::toGrayScale(cimg_library::CImg<float>&) (image2.cpp:257)
+   n1: 57600 0x1D5EED: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:641)
+    n0: 57600 0x227D00: main (main.cpp:131)
+  n0: 0 in 4 places, all below massif's threshold (01.00%)
+ n1: 32808 0x6DA4F72: ??? (in /lib64/libc-2.17.so)
+  n1: 32808 0x154F45: file_IO::getFilesInFolder(std::string) (file.cpp:431)
+   n0: 32808 0x227B7F: main (main.cpp:124)
+ n1: 16384 0x6580AF2: std::basic_filebuf<char, std::char_traits<char> >::_M_allocate_internal_buffer() (in /usr/lib64/gcc/x86_64-pc-linux-gnu/4.7.3/libstdc++.so.6.0.17)
+  n2: 16384 0x65831CE: std::basic_filebuf<char, std::char_traits<char> >::open(char const*, std::_Ios_Openmode) (in /usr/lib64/gcc/x86_64-pc-linux-gnu/4.7.3/libstdc++.so.6.0.17)
+   n1: 16384 0x6583342: std::basic_ofstream<char, std::char_traits<char> >::open(char const*, std::_Ios_Openmode) (in /usr/lib64/gcc/x86_64-pc-linux-gnu/4.7.3/libstdc++.so.6.0.17)
+    n1: 16384 0x21CD4B: logging::FileLogPolicy::open_ostream(std::string const&) (logger.cpp:19)
+     n1: 16384 0x21D9DF: logging::Logger<logging::FileLogPolicy>::setName(std::string const&) (logger.hpp:120)
+      n1: 16384 0x21D6B3: logging::Logger<logging::FileLogPolicy>::Logger(std::string const&) (logger.hpp:115)
+       n0: 16384 in 2 places, all below massif's threshold (01.00%)
+   n0: 0 in 1 place, below massif's threshold (01.00%)
+ n0: 14250 in 44 places, all below massif's threshold (01.00%)
+#-----------
+snapshot=35
+#-----------
+time=409231467
+mem_heap_B=1196887
+mem_heap_extra_B=1817
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=36
+#-----------
+time=427209449
+mem_heap_B=1258359
+mem_heap_extra_B=1825
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=37
+#-----------
+time=427593527
+mem_heap_B=1318936
+mem_heap_extra_B=1864
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=38
+#-----------
+time=444871993
+mem_heap_B=1374976
+mem_heap_extra_B=2024
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=39
+#-----------
+time=451523134
+mem_heap_B=1769311
+mem_heap_extra_B=18001
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=40
+#-----------
+time=456635165
+mem_heap_B=1767383
+mem_heap_extra_B=17657
+mem_stacks_B=0
+heap_tree=detailed
+n6: 1767383 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n3: 1480784 0x1B362B: cimg_library::CImg<float>::assign(unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9756)
+  n2: 1423184 0x1C810F: cimg_library::CImg<float>::assign(float const*, unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9830)
+   n1: 1423088 0x1BF423: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&) (CImg.h:9900)
+    n9: 1423088 0x1BE1CA: cimg_library::CImg<float>::operator=(cimg_library::CImg<float> const&) (CImg.h:10292)
+     n3: 414736 0x1D3687: image_psb::makeField(cimg_library::CImg<float> const&, float, cimg_library::CImg<float>&) (image2.cpp:273)
+      n1: 177600 0x1D4DBE: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:519)
+       n1: 177600 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+        n0: 177600 0x227D00: main (main.cpp:131)
+      n1: 177600 0x1D588E: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:594)
+       n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 177600 0x227D00: main (main.cpp:131)
+      n1: 59536 0x1D4DE4: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:520)
+       n1: 59536 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+        n0: 59536 0x227D00: main (main.cpp:131)
+     n1: 182752 0x1D4F4C: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:533)
+      n1: 182752 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+       n0: 182752 0x227D00: main (main.cpp:131)
+     n1: 177600 0x1D4212: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:409)
+      n1: 177600 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 177600 0x227D00: main (main.cpp:131)
+     n1: 177600 0x1D57E1: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:583)
+      n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+       n0: 177600 0x227D00: main (main.cpp:131)
+     n1: 177600 0x1D41B0: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:407)
+      n1: 177600 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 177600 0x227D00: main (main.cpp:131)
+     n1: 177600 0x1D41E1: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:408)
+      n1: 177600 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 177600 0x227D00: main (main.cpp:131)
+     n1: 57600 0x1D4CBD: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:504)
+      n1: 57600 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+       n0: 57600 0x227D00: main (main.cpp:131)
+     n1: 57600 0x1D3562: image_psb::toGrayScale(cimg_library::CImg<float>&) (image2.cpp:259)
+      n1: 57600 0x1D5EED: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:641)
+       n0: 57600 0x227D00: main (main.cpp:131)
+     n0: 0 in 5 places, all below massif's threshold (01.00%)
+   n0: 96 in 1 place, below massif's threshold (01.00%)
+  n1: 57600 0x1DCC06: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&, char const*) (CImg.h:9942)
+   n2: 57600 0x1DBC1C: cimg_library::CImg<float>::CImg<float>(cimg_library::CImg<float> const&, char const*, float) (CImg.h:9714)
+    n1: 57600 0x208192: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:119)
+     n1: 57600 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+      n0: 57600 0x227D00: main (main.cpp:131)
+    n0: 0 in 1 place, below massif's threshold (01.00%)
+  n0: 0 in 7 places, all below massif's threshold (01.00%)
+ n3: 104124 0x51C3723: fftwf_malloc_plain (in /usr/lib64/libfftw3f.so.3.3.2)
+  n2: 51552 0x51C7597: fftwf_mksolver (in /usr/lib64/libfftw3f.so.3.3.2)
+   n0: 31320 in 51 places, all below massif's threshold (01.00%)
+   n1: 20232 0x51CB2AD: fftwf_mksolver_ct (in /usr/lib64/libfftw3f.so.3.3.2)
+    n0: 20232 in 4 places, all below massif's threshold (01.00%)
+  n2: 35488 0x51C4B64: ??? (in /usr/lib64/libfftw3f.so.3.3.2)
+   n1: 35488 0x520AB83: fftwf_regsolver_hc2c_direct (in /usr/lib64/libfftw3f.so.3.3.2)
+    n2: 35488 0x51C7626: fftwf_solvtab_exec (in /usr/lib64/libfftw3f.so.3.3.2)
+     n1: 35488 0x51FF68F: fftwf_rdft_conf_standard (in /usr/lib64/libfftw3f.so.3.3.2)
+      n1: 35488 0x528417F: fftwf_configure_planner (in /usr/lib64/libfftw3f.so.3.3.2)
+       n1: 35488 0x5288BB6: fftwf_the_planner (in /usr/lib64/libfftw3f.so.3.3.2)
+        n1: 35488 0x5283F1C: fftwf_mkapiplan (in /usr/lib64/libfftw3f.so.3.3.2)
+         n1: 35488 0x5288931: fftwf_plan_many_r2r (in /usr/lib64/libfftw3f.so.3.3.2)
+          n1: 35488 0x5288A77: fftwf_plan_r2r (in /usr/lib64/libfftw3f.so.3.3.2)
+           n1: 35488 0x52889CA: fftwf_plan_r2r_2d (in /usr/lib64/libfftw3f.so.3.3.2)
+            n1: 35488 0x22E745: solver::FFT_DST(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (fft.cpp:69)
+             n1: 35488 0x208335: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:137)
+              n1: 35488 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+               n0: 35488 0x227D00: main (main.cpp:131)
+     n0: 0 in 1 place, below massif's threshold (01.00%)
+   n0: 0 in 9 places, all below massif's threshold (01.00%)
+  n0: 17084 in 19 places, all below massif's threshold (01.00%)
+ n2: 58032 0x195FC7: cimg_library::CImg<float>::CImg(unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9311)
+  n1: 57600 0x22EA6A: solver::getDST(int, int) (fft.cpp:38)
+   n1: 57600 0x22E6A6: solver::FFT_DST(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (fft.cpp:60)
+    n1: 57600 0x208335: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:137)
+     n1: 57600 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+      n0: 57600 0x227D00: main (main.cpp:131)
+  n0: 432 in 5 places, all below massif's threshold (01.00%)
+ n2: 57600 0x161B30: cimg_library::CImg<float>::CImg(unsigned int, unsigned int, unsigned int, unsigned int, float) (CImg.h:9340)
+  n1: 57600 0x22E70B: solver::FFT_DST(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (fft.cpp:62)
+   n1: 57600 0x208335: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:137)
+    n1: 57600 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+     n0: 57600 0x227D00: main (main.cpp:131)
+  n0: 0 in 4 places, all below massif's threshold (01.00%)
+ n0: 34035 in 43 places, all below massif's threshold (01.00%)
+ n1: 32808 0x6DA4F72: ??? (in /lib64/libc-2.17.so)
+  n1: 32808 0x154F45: file_IO::getFilesInFolder(std::string) (file.cpp:431)
+   n0: 32808 0x227B7F: main (main.cpp:124)
+#-----------
+snapshot=41
+#-----------
+time=463039178
+mem_heap_B=1762783
+mem_heap_extra_B=17289
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=42
+#-----------
+time=471646054
+mem_heap_B=2099795
+mem_heap_extra_B=23165
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=43
+#-----------
+time=480979338
+mem_heap_B=2055507
+mem_heap_extra_B=25037
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=44
+#-----------
+time=486019757
+mem_heap_B=2090795
+mem_heap_extra_B=29029
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=45
+#-----------
+time=492770883
+mem_heap_B=2062315
+mem_heap_extra_B=25893
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=46
+#-----------
+time=498837342
+mem_heap_B=1727715
+mem_heap_extra_B=2277
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=47
+#-----------
+time=506416455
+mem_heap_B=2481643
+mem_heap_extra_B=25941
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=48
+#-----------
+time=510638589
+mem_heap_B=2295507
+mem_heap_extra_B=25069
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=49
+#-----------
+time=518294857
+mem_heap_B=2246499
+mem_heap_extra_B=26349
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=50
+#-----------
+time=518680326
+mem_heap_B=2246499
+mem_heap_extra_B=26349
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=51
+#-----------
+time=519063650
+mem_heap_B=2246499
+mem_heap_extra_B=26349
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=52
+#-----------
+time=519447328
+mem_heap_B=2247459
+mem_heap_extra_B=26357
+mem_stacks_B=0
+heap_tree=detailed
+n6: 2247459 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n4: 1718928 0x1B362B: cimg_library::CImg<float>::assign(unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9756)
+  n2: 1601792 0x1C810F: cimg_library::CImg<float>::assign(float const*, unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9830)
+   n1: 1423088 0x1BF423: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&) (CImg.h:9900)
+    n9: 1423088 0x1BE1CA: cimg_library::CImg<float>::operator=(cimg_library::CImg<float> const&) (CImg.h:10292)
+     n3: 414736 0x1D3687: image_psb::makeField(cimg_library::CImg<float> const&, float, cimg_library::CImg<float>&) (image2.cpp:273)
+      n1: 177600 0x1D4DBE: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:519)
+       n1: 177600 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+        n0: 177600 0x227D00: main (main.cpp:131)
+      n1: 177600 0x1D588E: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:594)
+       n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 177600 0x227D00: main (main.cpp:131)
+      n1: 59536 0x1D4DE4: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:520)
+       n1: 59536 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+        n0: 59536 0x227D00: main (main.cpp:131)
+     n1: 182752 0x1D4F4C: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:533)
+      n1: 182752 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+       n0: 182752 0x227D00: main (main.cpp:131)
+     n1: 177600 0x1D4212: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:409)
+      n1: 177600 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 177600 0x227D00: main (main.cpp:131)
+     n1: 177600 0x1D57E1: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:583)
+      n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+       n0: 177600 0x227D00: main (main.cpp:131)
+     n1: 177600 0x1D41B0: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:407)
+      n1: 177600 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 177600 0x227D00: main (main.cpp:131)
+     n1: 177600 0x1D41E1: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:408)
+      n1: 177600 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 177600 0x227D00: main (main.cpp:131)
+     n1: 57600 0x1D4CBD: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:504)
+      n1: 57600 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+       n0: 57600 0x227D00: main (main.cpp:131)
+     n1: 57600 0x1D3562: image_psb::toGrayScale(cimg_library::CImg<float>&) (image2.cpp:259)
+      n1: 57600 0x1D5EED: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:641)
+       n0: 57600 0x227D00: main (main.cpp:131)
+     n0: 0 in 5 places, all below massif's threshold (01.00%)
+   n1: 178704 0x1BE017: cimg_library::CImg<float>::assign(float const*, unsigned int, unsigned int, unsigned int, unsigned int, bool) (CImg.h:9872)
+    n3: 178704 0x19E39C: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&, bool) (CImg.h:9909)
+     n1: 119072 0x22FA2D: cimg_library::CImgList<float>::CImgList<float>(cimg_library::CImgList<float> const&, bool) (CImg.h:41832)
+      n1: 119072 0x22EEC9: cimg_library::CImgList<float>::get_FFT(bool) const (CImg.h:46159)
+       n1: 119072 0x22E5A5: solver::FFT_DCT(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (fft.cpp:33)
+        n1: 119072 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+         n1: 119072 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+          n0: 119072 0x227D00: main (main.cpp:131)
+     n1: 59536 0x1EA7D3: cimg_library::CImgList<float>::CImgList<float, float>(cimg_library::CImg<float> const&, cimg_library::CImg<float> const&, bool) (CImg.h:41697)
+      n1: 59536 0x22EBEE: cimg_library::CImg<float>::get_FFT(bool) const (CImg.h:26283)
+       n1: 59536 0x22E3C1: solver::FFT_DCT(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (fft.cpp:25)
+        n1: 59536 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+         n1: 59536 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+          n0: 59536 0x227D00: main (main.cpp:131)
+     n0: 96 in 5 places, all below massif's threshold (01.00%)
+  n2: 59536 0x19BC9C: cimg_library::CImg<float>::assign(unsigned int, unsigned int, unsigned int, unsigned int, float) (CImg.h:9774)
+   n1: 59536 0x22F022: cimg_library::CImg<float>::FFT(cimg_library::CImg<float>&, cimg_library::CImg<float>&, bool, unsigned int) (CImg.h:26538)
+    n1: 59536 0x22EC2C: cimg_library::CImg<float>::get_FFT(bool) const (CImg.h:26284)
+     n1: 59536 0x22E3C1: solver::FFT_DCT(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (fft.cpp:25)
+      n1: 59536 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+       n1: 59536 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+        n0: 59536 0x227D00: main (main.cpp:131)
+   n0: 0 in 1 place, below massif's threshold (01.00%)
+  n1: 57600 0x1DCC06: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&, char const*) (CImg.h:9942)
+   n2: 57600 0x1DBC1C: cimg_library::CImg<float>::CImg<float>(cimg_library::CImg<float> const&, char const*, float) (CImg.h:9714)
+    n1: 57600 0x208192: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:119)
+     n1: 57600 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+      n0: 57600 0x227D00: main (main.cpp:131)
+    n0: 0 in 1 place, below massif's threshold (01.00%)
+  n0: 0 in 6 places, all below massif's threshold (01.00%)
+ n2: 238144 0x22F228: cimg_library::CImg<float>::FFT(cimg_library::CImg<float>&, cimg_library::CImg<float>&, bool, unsigned int) (CImg.h:26555)
+  n1: 238144 0x22FB19: cimg_library::CImgList<float>::FFT(bool) (CImg.h:46153)
+   n1: 238144 0x22EED7: cimg_library::CImgList<float>::get_FFT(bool) const (CImg.h:46159)
+    n1: 238144 0x22E5A5: solver::FFT_DCT(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (fft.cpp:33)
+     n1: 238144 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+      n1: 238144 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+       n0: 238144 0x227D00: main (main.cpp:131)
+  n0: 0 in 1 place, below massif's threshold (01.00%)
+ n3: 162528 0x4E4C493: fftw_malloc_plain (in /usr/lib64/libfftw3.so.3.3.2)
+  n1: 77208 0x4E50277: fftw_mksolver (in /usr/lib64/libfftw3.so.3.3.2)
+   n0: 77208 in 60 places, all below massif's threshold (01.00%)
+  n2: 44384 0x4E4D844: ??? (in /usr/lib64/libfftw3.so.3.3.2)
+   n2: 44384 0x4E50306: fftw_solvtab_exec (in /usr/lib64/libfftw3.so.3.3.2)
+    n1: 44384 0x4E8A22F: fftw_rdft_conf_standard (in /usr/lib64/libfftw3.so.3.3.2)
+     n1: 44384 0x4F13AFF: fftw_configure_planner (in /usr/lib64/libfftw3.so.3.3.2)
+      n1: 44384 0x4F18536: fftw_the_planner (in /usr/lib64/libfftw3.so.3.3.2)
+       n2: 44384 0x5A6E236: fftw_init_threads (in /usr/lib64/libfftw3_threads.so.3.3.2)
+        n1: 44384 0x5A6E2D2: fftw_plan_with_nthreads (in /usr/lib64/libfftw3_threads.so.3.3.2)
+         n2: 44384 0x22F1F1: cimg_library::CImg<float>::FFT(cimg_library::CImg<float>&, cimg_library::CImg<float>&, bool, unsigned int) (CImg.h:26551)
+          n1: 44384 0x22FB19: cimg_library::CImgList<float>::FFT(bool) (CImg.h:46153)
+           n1: 44384 0x22EED7: cimg_library::CImgList<float>::get_FFT(bool) const (CImg.h:46159)
+            n1: 44384 0x22E5A5: solver::FFT_DCT(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (fft.cpp:33)
+             n1: 44384 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+              n1: 44384 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+               n0: 44384 0x227D00: main (main.cpp:131)
+          n0: 0 in 1 place, below massif's threshold (01.00%)
+        n0: 0 in 1 place, below massif's threshold (01.00%)
+    n0: 0 in 3 places, all below massif's threshold (01.00%)
+   n0: 0 in 11 places, all below massif's threshold (01.00%)
+  n0: 40936 in 22 places, all below massif's threshold (01.00%)
+ n2: 59968 0x195FC7: cimg_library::CImg<float>::CImg(unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9311)
+  n1: 59536 0x22E406: solver::FFT_DCT(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (fft.cpp:26)
+   n1: 59536 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+    n1: 59536 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+     n0: 59536 0x227D00: main (main.cpp:131)
+  n0: 432 in 5 places, all below massif's threshold (01.00%)
+ n0: 35083 in 43 places, all below massif's threshold (01.00%)
+ n1: 32808 0x6DA4F72: ??? (in /lib64/libc-2.17.so)
+  n1: 32808 0x154F45: file_IO::getFilesInFolder(std::string) (file.cpp:431)
+   n0: 32808 0x227B7F: main (main.cpp:124)
+#-----------
+snapshot=53
+#-----------
+time=519832252
+mem_heap_B=2246499
+mem_heap_extra_B=26349
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=54
+#-----------
+time=520215159
+mem_heap_B=2246499
+mem_heap_extra_B=26349
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=55
+#-----------
+time=520600198
+mem_heap_B=2246499
+mem_heap_extra_B=26349
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=56
+#-----------
+time=520982996
+mem_heap_B=2246499
+mem_heap_extra_B=26349
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=57
+#-----------
+time=521366120
+mem_heap_B=2247459
+mem_heap_extra_B=26357
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=58
+#-----------
+time=521750919
+mem_heap_B=2246499
+mem_heap_extra_B=26349
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=59
+#-----------
+time=522133876
+mem_heap_B=2246499
+mem_heap_extra_B=26349
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=60
+#-----------
+time=523321955
+mem_heap_B=2242275
+mem_heap_extra_B=26333
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=61
+#-----------
+time=524645021
+mem_heap_B=1548102
+mem_heap_extra_B=2242
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=62
+#-----------
+time=525098416
+mem_heap_B=1565312
+mem_heap_extra_B=2320
+mem_stacks_B=0
+heap_tree=detailed
+n6: 1565312 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 1423184 0x1B362B: cimg_library::CImg<float>::assign(unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9756)
+  n2: 1423184 0x1C810F: cimg_library::CImg<float>::assign(float const*, unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9830)
+   n1: 1423088 0x1BF423: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&) (CImg.h:9900)
+    n9: 1423088 0x1BE1CA: cimg_library::CImg<float>::operator=(cimg_library::CImg<float> const&) (CImg.h:10292)
+     n3: 414736 0x1D3687: image_psb::makeField(cimg_library::CImg<float> const&, float, cimg_library::CImg<float>&) (image2.cpp:273)
+      n1: 177600 0x1D4DBE: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:519)
+       n1: 177600 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+        n0: 177600 0x227D00: main (main.cpp:131)
+      n1: 177600 0x1D588E: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:594)
+       n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 177600 0x227D00: main (main.cpp:131)
+      n1: 59536 0x1D4DE4: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:520)
+       n1: 59536 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+        n0: 59536 0x227D00: main (main.cpp:131)
+     n1: 182752 0x1D4F4C: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:533)
+      n1: 182752 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+       n0: 182752 0x227D00: main (main.cpp:131)
+     n1: 177600 0x1D4212: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:409)
+      n1: 177600 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 177600 0x227D00: main (main.cpp:131)
+     n1: 177600 0x1D57E1: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:583)
+      n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+       n0: 177600 0x227D00: main (main.cpp:131)
+     n1: 177600 0x1D41B0: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:407)
+      n1: 177600 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 177600 0x227D00: main (main.cpp:131)
+     n1: 177600 0x1D41E1: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:408)
+      n1: 177600 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 177600 0x227D00: main (main.cpp:131)
+     n1: 57600 0x1D4CBD: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:504)
+      n1: 57600 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+       n0: 57600 0x227D00: main (main.cpp:131)
+     n1: 57600 0x1D3562: image_psb::toGrayScale(cimg_library::CImg<float>&) (image2.cpp:259)
+      n1: 57600 0x1D5EED: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:641)
+       n0: 57600 0x227D00: main (main.cpp:131)
+     n0: 0 in 5 places, all below massif's threshold (01.00%)
+   n0: 96 in 1 place, below massif's threshold (01.00%)
+  n0: 0 in 8 places, all below massif's threshold (01.00%)
+ n2: 58032 0x195FC7: cimg_library::CImg<float>::CImg(unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9311)
+  n2: 57600 0x19F101: cimg_library::CImg<float>::get_crop(int, int, int, int, int, int, int, int, bool) const (CImg.h:21934)
+   n1: 57600 0x209A0D: cimg_library::CImg<float>::crop(int, int, int, int, int, int, int, int, bool) (CImg.h:21918)
+    n1: 57600 0x208284: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:131)
+     n1: 57600 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+      n0: 57600 0x227D00: main (main.cpp:131)
+   n0: 0 in 5 places, all below massif's threshold (01.00%)
+  n0: 432 in 5 places, all below massif's threshold (01.00%)
+ n1: 32808 0x6DA4F72: ??? (in /lib64/libc-2.17.so)
+  n1: 32808 0x154F45: file_IO::getFilesInFolder(std::string) (file.cpp:431)
+   n0: 32808 0x227B7F: main (main.cpp:124)
+ n0: 18384 in 43 places, all below massif's threshold (01.00%)
+ n2: 16520 0x6518C30: __cxa_allocate_exception (in /usr/lib64/gcc/x86_64-pc-linux-gnu/4.7.3/libstdc++.so.6.0.17)
+  n1: 16520 0x191434: cimg_library::CImg<float>::save_magick(char const*, unsigned int) const (CImg.h:39759)
+   n1: 16520 0x16FD51: cimg_library::CImg<float>::save_other(char const*, unsigned int) const (CImg.h:41401)
+    n1: 16520 0x180749: cimg_library::CImg<float>::_save_jpeg(_IO_FILE*, char const*, unsigned int) const (CImg.h:39605)
+     n1: 16520 0x16DE14: cimg_library::CImg<float>::save_jpeg(char const*, unsigned int) const (CImg.h:39584)
+      n1: 16520 0x165E91: cimg_library::CImg<float>::save(char const*, int, unsigned int) const (CImg.h:39313)
+       n1: 16520 0x154A7B: file_IO::saveImage(cimg_library::CImg<float> const&, std::string, bool) (file.cpp:362)
+        n1: 16520 0x1D675B: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:703)
+         n0: 16520 0x227D00: main (main.cpp:131)
+  n0: 0 in 1 place, below massif's threshold (01.00%)
+ n1: 16384 0x6580AF2: std::basic_filebuf<char, std::char_traits<char> >::_M_allocate_internal_buffer() (in /usr/lib64/gcc/x86_64-pc-linux-gnu/4.7.3/libstdc++.so.6.0.17)
+  n2: 16384 0x65831CE: std::basic_filebuf<char, std::char_traits<char> >::open(char const*, std::_Ios_Openmode) (in /usr/lib64/gcc/x86_64-pc-linux-gnu/4.7.3/libstdc++.so.6.0.17)
+   n1: 16384 0x6583342: std::basic_ofstream<char, std::char_traits<char> >::open(char const*, std::_Ios_Openmode) (in /usr/lib64/gcc/x86_64-pc-linux-gnu/4.7.3/libstdc++.so.6.0.17)
+    n1: 16384 0x21CD4B: logging::FileLogPolicy::open_ostream(std::string const&) (logger.cpp:19)
+     n1: 16384 0x21D9DF: logging::Logger<logging::FileLogPolicy>::setName(std::string const&) (logger.hpp:120)
+      n1: 16384 0x21D6B3: logging::Logger<logging::FileLogPolicy>::Logger(std::string const&) (logger.hpp:115)
+       n0: 16384 in 2 places, all below massif's threshold (01.00%)
+   n0: 0 in 1 place, below massif's threshold (01.00%)
+#-----------
+snapshot=63
+#-----------
+time=542551942
+mem_heap_B=1897167
+mem_heap_extra_B=2297
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=64
+#-----------
+time=548421091
+mem_heap_B=1780495
+mem_heap_extra_B=2305
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=65
+#-----------
+time=550763673
+mem_heap_B=1748047
+mem_heap_extra_B=2313
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=66
+#-----------
+time=551939935
+mem_heap_B=1738895
+mem_heap_extra_B=2321
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=67
+#-----------
+time=552683520
+mem_heap_B=1736687
+mem_heap_extra_B=2377
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=68
+#-----------
+time=553280159
+mem_heap_B=1737155
+mem_heap_extra_B=2349
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=69
+#-----------
+time=553778345
+mem_heap_B=1739547
+mem_heap_extra_B=2389
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=70
+#-----------
+time=554356670
+mem_heap_B=1741915
+mem_heap_extra_B=2397
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=71
+#-----------
+time=555438283
+mem_heap_B=1744363
+mem_heap_extra_B=2445
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=72
+#-----------
+time=555985991
+mem_heap_B=1746507
+mem_heap_extra_B=2389
+mem_stacks_B=0
+heap_tree=detailed
+n4: 1746507 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n3: 1599204 0x1B362B: cimg_library::CImg<float>::assign(unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9756)
+  n2: 1541604 0x1C810F: cimg_library::CImg<float>::assign(float const*, unsigned int, unsigned int, unsigned int, unsigned int) (CImg.h:9830)
+   n1: 1469876 0x1BF423: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&) (CImg.h:9900)
+    n10: 1469876 0x1BE1CA: cimg_library::CImg<float>::operator=(cimg_library::CImg<float> const&) (CImg.h:10292)
+     n3: 414736 0x1D3687: image_psb::makeField(cimg_library::CImg<float> const&, float, cimg_library::CImg<float>&) (image2.cpp:273)
+      n1: 177600 0x1D4DBE: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:519)
+       n1: 177600 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+        n0: 177600 0x227D00: main (main.cpp:131)
+      n1: 177600 0x1D588E: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:594)
+       n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 177600 0x227D00: main (main.cpp:131)
+      n1: 59536 0x1D4DE4: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:520)
+       n1: 59536 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+        n0: 59536 0x227D00: main (main.cpp:131)
+     n1: 182752 0x1D4F4C: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:533)
+      n1: 182752 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+       n0: 182752 0x227D00: main (main.cpp:131)
+     n1: 177600 0x1D41E1: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:408)
+      n1: 177600 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 177600 0x227D00: main (main.cpp:131)
+     n1: 177600 0x1D57E1: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:583)
+      n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+       n0: 177600 0x227D00: main (main.cpp:131)
+     n1: 177600 0x1D4212: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:409)
+      n1: 177600 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 177600 0x227D00: main (main.cpp:131)
+     n1: 177600 0x1D41B0: image_psb::divide(int, cimg_library::CImg<float>*, cimg_library::CImg<float>*, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&, std::vector<cimg_library::CImg<float>*, std::allocator<cimg_library::CImg<float>*> >&) (image2.cpp:407)
+      n1: 177600 0x1D58DF: image_psb::stageIterativeSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, double, float, double, std::string, bool, bool, bool) (image2.cpp:596)
+       n1: 177600 0x1D5FEA: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:645)
+        n0: 177600 0x227D00: main (main.cpp:131)
+     n1: 57600 0x1D4CBD: image_psb::stageDirectSolvers(std::vector<solver::Solver*, std::allocator<solver::Solver*> >&, cimg_library::CImg<float> const&, float, double, std::string, bool, bool, bool, bool, bool) (image2.cpp:504)
+      n1: 57600 0x1D5F67: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:643)
+       n0: 57600 0x227D00: main (main.cpp:131)
+     n1: 57600 0x1D3562: image_psb::toGrayScale(cimg_library::CImg<float>&) (image2.cpp:259)
+      n1: 57600 0x1D5EED: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:641)
+       n0: 57600 0x227D00: main (main.cpp:131)
+     n1: 42164 0x1C8B72: cimg_library::CImgList<float>::insert(cimg_library::CImg<float> const&, unsigned int, bool) (CImg.h:43241)
+      n2: 42164 0x1DBB87: cimg_library::CImgList<float>& cimg_library::CImgList<float>::push_back<float>(cimg_library::CImg<float> const&) (CImg.h:43569)
+       n1: 36944 0x20DB83: wavelet::wavelet_5x5(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (wavelet.cpp:480)
+        n1: 36944 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+         n1: 36944 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+          n0: 36944 0x227D00: main (main.cpp:131)
+       n0: 5220 in 4 places, all below massif's threshold (01.00%)
+     n0: 4624 in 4 places, all below massif's threshold (01.00%)
+   n1: 71728 0x1BE017: cimg_library::CImg<float>::assign(float const*, unsigned int, unsigned int, unsigned int, unsigned int, bool) (CImg.h:9872)
+    n2: 71728 0x19E39C: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&, bool) (CImg.h:9909)
+     n2: 71632 0x183861: cimg_library::CImgList<float>::CImgList<float>(cimg_library::CImg<float> const&, bool) (CImg.h:41684)
+      n1: 69696 0x20D9B8: wavelet::wavelet_5x5(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (wavelet.cpp:457)
+       n1: 69696 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+        n1: 69696 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+         n0: 69696 0x227D00: main (main.cpp:131)
+      n0: 1936 in 1 place, below massif's threshold (01.00%)
+     n0: 96 in 6 places, all below massif's threshold (01.00%)
+  n1: 57600 0x1DCC06: cimg_library::CImg<float>& cimg_library::CImg<float>::assign<float>(cimg_library::CImg<float> const&, char const*) (CImg.h:9942)
+   n2: 57600 0x1DBC1C: cimg_library::CImg<float>::CImg<float>(cimg_library::CImg<float> const&, char const*, float) (CImg.h:9714)
+    n1: 57600 0x208192: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:119)
+     n1: 57600 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+      n0: 57600 0x227D00: main (main.cpp:131)
+    n0: 0 in 1 place, below massif's threshold (01.00%)
+  n0: 0 in 7 places, all below massif's threshold (01.00%)
+ n2: 69696 0x161B30: cimg_library::CImg<float>::CImg(unsigned int, unsigned int, unsigned int, unsigned int, float) (CImg.h:9340)
+  n2: 69696 0x20F71B: wavelet::downSample(int, int, cimg_library::CImg<float> const&) (wavelet.cpp:111)
+   n1: 69696 0x20D99A: wavelet::wavelet_5x5(cimg_library::CImg<float> const&, cimg_library::CImg<float>&) (wavelet.cpp:456)
+    n1: 69696 0x2081EE: solver::DirectSolver::solve(std::vector<float, std::allocator<float> >&, std::vector<float, std::allocator<float> >&) (solver.cpp:127)
+     n1: 69696 0x1D64D5: image_psb::processImage(std::string, double, double, float, bool, bool, bool, bool, bool, bool, bool, bool) (image2.cpp:676)
+      n0: 69696 0x227D00: main (main.cpp:131)
+   n0: 0 in 1 place, below massif's threshold (01.00%)
+  n0: 0 in 4 places, all below massif's threshold (01.00%)
+ n0: 44799 in 45 places, all below massif's threshold (01.00%)
+ n1: 32808 0x6DA4F72: ??? (in /lib64/libc-2.17.so)
+  n1: 32808 0x154F45: file_IO::getFilesInFolder(std::string) (file.cpp:431)
+   n0: 32808 0x227B7F: main (main.cpp:124)
+#-----------
+snapshot=73
+#-----------
+time=557142705
+mem_heap_B=1751195
+mem_heap_extra_B=2397
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=74
+#-----------
+time=558221579
+mem_heap_B=1760283
+mem_heap_extra_B=2389
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=75
+#-----------
+time=560522554
+mem_heap_B=1769563
+mem_heap_extra_B=2397
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=76
+#-----------
+time=563206536
+mem_heap_B=1801947
+mem_heap_extra_B=2389
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=77
+#-----------
+time=568966900
+mem_heap_B=1825115
+mem_heap_extra_B=2397
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=78
+#-----------
+time=577023467
+mem_heap_B=1941723
+mem_heap_extra_B=2389
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=79
+#-----------
+time=594388208
+mem_heap_B=2011483
+mem_heap_extra_B=2397
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=80
+#-----------
+time=595905122
+mem_heap_B=1548102
+mem_heap_extra_B=2242
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=81
+#-----------
+time=596359087
+mem_heap_B=1565329
+mem_heap_extra_B=2335
+mem_stacks_B=0
+heap_tree=empty
