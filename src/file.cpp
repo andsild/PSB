@@ -280,8 +280,9 @@ image_fmt readData(const bool doAverage, const bool doPlot)
         {
             std::string sWriteHeader = it->first;
             rawdata_fmt vRes = image_psb::averageResult(it->second, it->second.size());
+            rawdata_fmt vTimes(1,1);
 
-            writeData(vRes, sWriteHeader, "average");
+            writeData(vRes, vTimes, sWriteHeader, "average");
     
             if(doPlot)
             {
@@ -323,7 +324,8 @@ void trimFilename(std::string &s)
     s.erase(it, std::end(s));
 }
 
-void writeData(const rawdata_fmt &vData, std::string sLabel, std::string sFilename)
+void writeData(const rawdata_fmt &vData, const rawdata_fmt &vTimes,
+                std::string sLabel, std::string sFilename)
 {
     const char *filename = DATA_OUTFILE;
     trimFilename(sFilename);
@@ -335,6 +337,9 @@ void writeData(const rawdata_fmt &vData, std::string sLabel, std::string sFilena
     fout << sLabel << sDelim << sFilename << std::endl;
 
     for(auto const item : vData)
+        fout << item << SAVE_PATTERN.getValueDelimiter();
+    fout << std::endl;
+    for(auto const item : vTimes)
         fout << item << SAVE_PATTERN.getValueDelimiter();
     fout << std::endl;
     fout.close();

@@ -72,7 +72,7 @@ DirectSolver::DirectSolver(
 
 DirectSolver::DirectSolver() : Solver(), isDirichet(false) {}
 
-image_fmt IterativeSolver::solve(rawdata_fmt &vResults)
+image_fmt IterativeSolver::solve(rawdata_fmt &vResults, rawdata_fmt &vTimes)
 {
     int iIter = 0;
     double dIterationDiff = 9001;
@@ -80,13 +80,17 @@ image_fmt IterativeSolver::solve(rawdata_fmt &vResults)
     const int iWidth = this->guess.width();
     const int iHeight = this->guess.height();
     const double iNumPixels = guess.size();
+    unsigned long lTime = 0;
 
     for(iIter = 0; this->dStopCriterion < dIterationDiff; iIter++)
     {
+        cimg_library::cimg::tic();
         this->func(*(this->field), guess, dIterationDiff, iWidth, iHeight);
+        lTime = cimg_library::cimg::toc();
         double dDiff = getDiff(this->origImage->MSE(guess), iNumPixels);
                        
         vResults.push_back(dDiff);
+        vTimes.push_back((double)lTime);
     }
 
     return guess;
@@ -102,7 +106,7 @@ bool Solver::isFinal() { return this->bFinal; }
 std::string Solver::getFilename() { return this->sFilename; }
 std::string Solver::getLabel() { return this->sLabel; }
 
-image_fmt DirectSolver::solve(rawdata_fmt &vResults)
+image_fmt DirectSolver::solve(rawdata_fmt &vResults, rawdata_fmt &vTimes)
 {
     // const int iPixels = (this->origImage->width() - 2) * (this->origImage->height() - 2);
     image_fmt ret(*(this->origImage), "xyz", 0);
@@ -131,7 +135,7 @@ image_fmt DirectSolver::solve(rawdata_fmt &vResults)
     vResults.push_back(getDiff(
                 image_psb::imageDiff(*(this->origImage),ret),
                                     this->origImage->size()));
-    vResults.push_back(time);
+    vTimes.push_back(time);
     if(this->noisedImage != nullptr)
     {
         vResults.push_back(getDiff(image_psb::imageDiff(

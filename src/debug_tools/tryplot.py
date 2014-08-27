@@ -369,6 +369,11 @@ def directSolverHeatmap(files, colors):
         cb.set_label("Number of solvers in buckets")
         # plt.imshow(heatmap, cmap=colormap.OrRd)
         plt.savefig("heatmap.png")
+
+def doAverage(directFiles, iterativeFiles, colors):
+    global DPI, BINS_X, BINS_Y
+    global xMin, yMin, xMax, yMax
+
     
 
 if __name__ == "__main__":
@@ -402,6 +407,8 @@ if __name__ == "__main__":
     # facecolor = transparancy
     if method == 'plot2d'.upper():
         plot2D(files, colors)
+    elif method == "average".upper():
+        doAverage(directSolverFiles, files, colors)
     elif method == "primHM".upper():
         primHeatMap(files, iterativeColors)
         directSolverHeatmap(directSolverFiles, directColors)

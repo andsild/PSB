@@ -225,9 +225,7 @@ std::vector<std::string> getFilesInFolder(std::string sDir)
     return vRet;
 }
 
-
-
-int main(int argc, char **argv)
+int pain(int argc, char **argv)
 {
     std::string sOutdir = "out/";
     std::string sFilename = "./emptyARG.dat";
