@@ -56,7 +56,7 @@ def drange(start, stop, step):
         yield r
         r += step
 
-def genCanvas():
+def genCanvas(fileList1, fileList2):
     plt.clf()
     fig, ax = plt.subplots(facecolor='none', frameon=False)
     ax.axis([xMin, xMax, yMax, yMin])
@@ -65,6 +65,21 @@ def genCanvas():
     ax.set_xlabel("(time * iterationCount) / pixelSize")
     ax.set_ylabel("MSE from solver domain and image")
     ax.set_ybound(yMax, yMin)
+
+    colorDict = { "dct": "yellow",
+                 "dst": "orange",
+                 "wavelet5": "blue",
+                 "wavelet7": "pink",
+                 "sor" : "green",
+                 "jacobi" : "cyan",
+                 "gauss" : "black",
+                }
+    legends = []
+    for solver in fileList1:
+        legends.append(ax.plot([], [], color=colorDict[solver], label=str(solver)))
+    for solver in fileList2:
+        legends.append(ax.plot([], [], color=colorDict[solver], label=str(solver)))
+    ax.legend(loc="center left", bbox_to_anchor=(0.7, 0.5))
 
     fig.savefig("canvas.png")
 
@@ -539,7 +554,7 @@ if __name__ == "__main__":
     if method == 'plot2d'.upper():
         plot2DIterative(files, iterativeColors)
         plot2D(directSolverFiles, directColors)
-        genCanvas()
+        genCanvas([s[2] for s in files], [s[2] for s in directSolverFiles])
     elif method == "average".upper():
         doAverage(directSolverFiles, files, colors)
     elif method == "primHM".upper():
