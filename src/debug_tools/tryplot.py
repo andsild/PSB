@@ -27,6 +27,10 @@ np.set_printoptions(threshold=np.nan)
 GAUSS_C  = 8.5
 JACOBI_C = 6.95
 SOR_C    = 11.07
+cdict = {"gauss" : GAUSS_C,
+         "jacobi" : JACOBI_C,
+         "sor" : SOR_C,
+        }
 
 DPI = 80
 # the pixel-width/height is not entirely accurate, misses by 40/20/10...
@@ -36,6 +40,7 @@ xMin = 100
 yMin = 100
 xMax = 450000 + xMin
 yMax = 9.999999e-11
+xMin = 9.999999e-7; xMax = 3600
 
 def save(fig, filename):
     """We have to work around `fig.canvas.print_png`, etc calling `draw`."""
@@ -45,6 +50,11 @@ def save(fig, filename):
                        renderer.width, renderer.height,
                        outfile, fig.dpi)
         
+def drange(start, stop, step):
+    r = start
+    while r < stop:
+        yield r
+        r += step
 
 def plot2DIterative(files, colors):
     global xMin, yMin, xMax, yMax
@@ -61,34 +71,52 @@ def plot2DIterative(files, colors):
     iterIndex = 0
     error = 0
     for (path, folder, solver), useColor in zip(files, colors):
+        c = float(cdict[solver])
         for readfile in folder:
+            print readfile
             index=0;
             with open(join(path,readfile), 'r') as f:
-                print readfile
+                origImage = join("/home/andesil/media", readfile[readfile.find("__")+2:-7] + ".jpg").replace("projectsNaturalnessdata", "")
+                try:
+                    im = Image.open(origImage);
+                except IOError:
+                    print "SKIPPING" + origImage
+                    continue
+                pixels = (im.size[0] * im.size[1]) / 4
                 for line in f:
                     index += 1
-                    if(index % 3 == 1):
-                        continue
-                    elif(index % 3 == 2):
-                        error = float(line.split()[0])
+                    if(index % 2 == 1):
                         continue
                     # ax = fig.axes[0]
+                    lineData = line.split()
+                    index = 0
+                    dataY = lineData
+                    # dataY = [0.0] * len(lineData)
+                    # if len(lineData) > 1000:
+                    #     for (r,s) in zip(range(1000), lineData):
+                    #         dataY[r] = s
+                    #     for (r,s) in zip(range(1000, len(lineData), 1000), lineData):
+                    #         dataY[r] = s
+                    # else:
+                    #     dataY = lineData
                     # dataY = [float(x) for x in line.split()]
-                    dataY = error
-                    dataX = float(line.split()[0])
-                    set_trace()
+                    dataX = [0.0] * len(dataY)
+                    for rangeIndex,x in enumerate(drange(0.1, xMax+1, c)):
+                        if  rangeIndex > len(dataY) - 1: break
+                        dataX[rangeIndex] = ((c * rangeIndex) / pixels)
 
-                    line = matplotlib.lines.Line2D(dataX, dataY,
+                    plotLine = matplotlib.lines.Line2D(dataX, dataY,
                                                 transform=ax.transData, color=useColor)
-                    ax.draw_artist(line)
+                    ax.draw_artist(plotLine)
+                    lineData = []
                     # import ipdb; ipdb.set_trace()
                     # del dataX; del dataY;
             iterIndex += 1
             if iterIndex % 300 == 0:
                 gc.collect()
-                # set_trace()
+                set_trace()
 
-        save(fig, "plot2d" + str(solver) + ".png")
+        save(fig, "plot2DIterative" + str(solver) + ".png")
 
 
 
@@ -120,9 +148,10 @@ def plot2D(files, colors):
                     elif(index % 3 == 2):
                         error = float(line.split()[0])
                         continue
-                    dataX.append(float(line.split()[0]))
+                    dataX.append(float(line.split()[0]) / 1000.0)
                     dataY.append(error)
-    ax.scatter(dataX, dataY)
+        ax.scatter(dataX, dataY, color=useColor)
+        dataX, dataY = [], []
     fig.savefig("plot2d" + "all.png")
 
 def pairwise(iterable):
@@ -436,6 +465,15 @@ if __name__ == "__main__":
     directsolvers = ["dst", "dct", "wavelet5", "wavelet7"]
     iterativeColors, directColors = [], []
 
+    colorDict = { "dct": "yellow",
+                 "dst": "orange",
+                 "wavelet5": "blue",
+                 "wavelet7": "pink",
+                 "sor" : "green",
+                 "jacobi" : "cyan",
+                 "gauss" : "black",
+                }
+
     shiftargs = 2
     for index in range(shiftargs, len(argv), 2):
         boolFlag = False
@@ -445,13 +483,19 @@ if __name__ == "__main__":
                                         sorted([ f for f in listdir(argv[index]) \
                                             if isfile(join(argv[index], f))]),
                                           s))
-                directColors.append(argv[index+1])
+                directColors.append(colorDict[s])
+                set_trace()
+                # directColors.append(colorDict[s]argv[index+1])
                 boolFlag = True
         if not boolFlag:
-            set_trace()
+            solver = argv[index].split("/")
+            if solver[-1] == '':
+                solver = solver[-2]
+            else:
+                solver = solver[-1]
             files.append((argv[index], sorted([ f for f in listdir(argv[index]) \
-                                            if isfile(join(argv[index], f))]), s))
-            iterativeColors.append(argv[index+1])
+                                               if isfile(join(argv[index], f))]), solver))
+            iterativeColors.append(colorDict[solver])
 
     numFiles=sum(len(x) for x in files)
 
