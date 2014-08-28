@@ -56,25 +56,44 @@ def drange(start, stop, step):
         yield r
         r += step
 
-def plot2DIterative(files, colors):
-    global xMin, yMin, xMax, yMax
+def genCanvas():
     plt.clf()
-    plt.xlabel("Iterations")
-    plt.ylabel("Error")
-    fig, ax = plt.subplots(facecolor='none')
+    fig, ax = plt.subplots(facecolor='none', frameon=False)
     ax.axis([xMin, xMax, yMax, yMin])
     ax.set_xscale("log")
     ax.set_yscale("log")
+    ax.set_xlabel("(time * iterationCount) / pixelSize")
+    ax.set_ylabel("MSE from solver domain and image")
     ax.set_ybound(yMax, yMin)
-    fig.canvas.draw()
+
+    fig.savefig("canvas.png")
+
+def plot2DIterative(files, colors):
+    global xMin, yMin, xMax, yMax
+    plt.clf()
+    fig, ax = plt.subplots(facecolor='none', frameon=False)
+    ax.axis([xMin, xMax, yMax, yMin])
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlabel("(time * iterationCount) / pixelSize")
+    ax.set_ylabel("MSE from solver domain and image")
+    ax.set_ybound(yMax, yMin)
 
     iterIndex = 0
     error = 0
+    skipdict = { "gauss" : 1000,
+                 "jacobi": 2000,
+                "sor" : 1,
+            }
     for (path, folder, solver), useColor in zip(files, colors):
         c = float(cdict[solver])
-        for readfile in folder:
+        skipCont = skipdict[solver]
+        iterIndex = 0
+        while folder:
+            readfile = folder.pop()
             print readfile
             index=0;
+            if iterIndex > 10: break;
             with open(join(path,readfile), 'r') as f:
                 origImage = join("/home/andesil/media", readfile[readfile.find("__")+2:-7] + ".jpg").replace("projectsNaturalnessdata", "")
                 try:
@@ -90,56 +109,71 @@ def plot2DIterative(files, colors):
                     # ax = fig.axes[0]
                     lineData = line.split()
                     index = 0
-                    dataY = lineData
-                    # dataY = [0.0] * len(lineData)
-                    # if len(lineData) > 1000:
-                    #     for (r,s) in zip(range(1000), lineData):
-                    #         dataY[r] = s
-                    #     for (r,s) in zip(range(1000, len(lineData), 1000), lineData):
-                    #         dataY[r] = s
-                    # else:
-                    #     dataY = lineData
-                    # dataY = [float(x) for x in line.split()]
+                    # dataY = lineData
+                    dataY = [0.0] * len(lineData)
+                    if len(lineData) > 1000:
+                        for (r,s) in zip(range(1000), lineData):
+                            dataY[r] = s
+                        for (r,s) in zip(range(1000, len(lineData), skipCont), lineData):
+                            dataY[r] = s
+                    else:
+                        dataY = lineData
+                    dataY = [float(x) for x in line.split()]
                     dataX = [0.0] * len(dataY)
-                    for rangeIndex,x in enumerate(drange(0.1, xMax+1, c)):
+                    for rangeIndex,x in enumerate(drange(0.1, 10000000.0, c)):
                         if  rangeIndex > len(dataY) - 1: break
                         dataX[rangeIndex] = ((c * rangeIndex) / pixels)
 
-                    plotLine = matplotlib.lines.Line2D(dataX, dataY,
-                                                transform=ax.transData, color=useColor)
-                    ax.draw_artist(plotLine)
+                    # plotLine = matplotlib.lines.Line2D(dataX, dataY,
+                    #                             transform=ax.transData, color=useColor)
+                    ax.plot(dataX, dataY, transform=ax.transData,
+                            color=useColor)
+                    # ax.draw_artist(plotLine)
                     lineData = []
                     # import ipdb; ipdb.set_trace()
                     # del dataX; del dataY;
             iterIndex += 1
-            if iterIndex % 300 == 0:
+            if iterIndex % 900 == 0:
                 gc.collect()
                 set_trace()
 
-        save(fig, "plot2DIterative" + str(solver) + ".png")
+        # save(fig, "plot2DIterative" + str(solver) + ".png")
+    # fig.canvas.draw()
+    fig.savefig("plot2DIterativeALL.png", transparent=True)
+    # fig.canvas.print_png("plot2DIterativeALL.png")
+    # if len(files) > 0:
+    #     print "printing plot2DIterativeALL.png"
+    #     save(fig, "plot2DIterativeALL.png")
 
 
 
 def plot2D(files, colors):
     global xMin, yMin, xMax, yMax
     plt.clf()
-    fig, ax = plt.subplots(facecolor='none')
-
-    ax.set_xlabel("Iterations")
-    ax.set_ylabel("Error")
+    fig, ax = plt.subplots(facecolor='none', frameon=False)
     ax.axis([xMin, xMax, yMax, yMin])
     ax.set_xscale("log")
     ax.set_yscale("log")
-    # ax.set_ybound(yMax, yMin)
-    # fig.canvas.draw()
+    ax.set_xlabel("(time * iterationCount) / pixelSize")
+    ax.set_ylabel("MSE from solver domain and image")
+    ax.set_ybound(yMax, yMin)
 
     iterIndex = 0
     error = 0
     dataX, dataY = [], []
     for (path, folder, solver), useColor in zip(files, colors):
-        for readfile in folder:
+        while folder:
+            readfile = folder.pop()
             index=0;
             with open(join(path,readfile), 'r') as f:
+                origImage = join("/home/andesil/media",
+                    readfile[readfile.find("dia")+3:-7] + ".jpg")
+                try:
+                    im = Image.open(origImage);
+                except IOError:
+                    print "SKIPPING" + origImage
+                    continue
+                pixels = (im.size[0] * im.size[1])
                 print readfile
                 for line in f:
                     index += 1
@@ -148,11 +182,13 @@ def plot2D(files, colors):
                     elif(index % 3 == 2):
                         error = float(line.split()[0])
                         continue
-                    dataX.append(float(line.split()[0]) / 1000.0)
+                    dataX.append(float(line.split()[0]) / pixels)
                     dataY.append(error)
         ax.scatter(dataX, dataY, color=useColor)
         dataX, dataY = [], []
-    fig.savefig("plot2d" + "all.png")
+    if len(files) > 0:
+        print "saving to plot2ddirectALL.png"
+        fig.savefig("plot2ddirectALL.png", transparent=True)
 
 def pairwise(iterable):
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
@@ -436,7 +472,6 @@ def directSolverHeatmap(files, colors):
         fig, ax = plt.subplots(facecolor='none')
         _, _, _, ref = ax.hist2d(dataX, dataY,
                                  cmap=colormap.OrRd, cmin=0.9)
-        set_trace()
         ax.set_xlabel("Solver time in ms")
         ax.set_ylabel("Difference from original image ")
         ax.set_xlim(xMin, xMax)
@@ -484,7 +519,6 @@ if __name__ == "__main__":
                                             if isfile(join(argv[index], f))]),
                                           s))
                 directColors.append(colorDict[s])
-                set_trace()
                 # directColors.append(colorDict[s]argv[index+1])
                 boolFlag = True
         if not boolFlag:
@@ -505,6 +539,7 @@ if __name__ == "__main__":
     if method == 'plot2d'.upper():
         plot2DIterative(files, iterativeColors)
         plot2D(directSolverFiles, directColors)
+        genCanvas()
     elif method == "average".upper():
         doAverage(directSolverFiles, files, colors)
     elif method == "primHM".upper():
