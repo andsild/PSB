@@ -6,28 +6,34 @@ from itertools import product
 from subprocess import call
 
 def main(path):
-    cmdArgs = []
-    cmdArgs.append(("-f", [ path + s for s in \
-                    ["105400.jpg", "121701.jpg", "121901.jpg", "146001.jpg",
-                     "136006.jpg", "123400.jpg", "110000.jpg", "117102.jpg",
-                     "100000.jpg", "1113000.jpg"]]))
-    cmdArgs.append(("--", ["gauss", "jacobi", "sor"]))
-    cmdArgs.append(("-t", ["0.01"]))
+    cmdArgs = [
+        ("-f", [ path + s for s in \
+                        ["105400.jpg", "121701.jpg", "121901.jpg", "146001.jpg",
+                        "136006.jpg", "123400.jpg", "110000.jpg", "117102.jpg",
+                        "100000.jpg", "1113000.jpg"]]),
+        ("--", ["gauss", "jacobi", "sor"]),
+        ("-t", ["0.01"]) \
+    ]
 
     #TODO: put your command prefix here, e.g. "bjob -p main.out"
-    exeLine = ["main.out"]
+    exeLine = "./main.out"
+    exeArgs = [""]
+
 
     for (param,arg) in cmdArgs:
         sep = " "
         if param == "--": sep = ""
         tmpHist = [ ' '.join(item) for item in \
-                   (product(exeLine, [ param + sep + val for val in arg ]))]
-        exeLine = tmpHist
+                   (product(exeArgs, [ param + sep + val for val in arg ]))]
+        exeArgs = tmpHist
 
-    for cmd in exeLine:
+    for cmd in exeArgs:
         try:
-            call(cmd)
-        except OSError:
+            print "Executing:\t" + str([exeLine] + [s for s in cmd.split()]),
+            retVal = call([exeLine] + [s for s in cmd.split()])
+            print "with value " + str(retVal)
+        except OSError as oe:
+            print oe
             print "Failed to execute command line:\n\t " + cmd
             continue;
 

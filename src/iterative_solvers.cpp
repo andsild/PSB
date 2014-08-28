@@ -7,9 +7,8 @@
    x B B
 
    A 3x3 neigbourhood fetches all the adjacent within a range of 1
-
-   Speedup from 2x2 with two extra backward fetches to 3x3 is marginal.
 */
+//Speedup from 2x2 with two extra backward fetches to 3x3 is trivial.
 #include "iterative_solvers.hpp"
 
 #include <iostream>
@@ -24,7 +23,7 @@
 
 using namespace cimg_library;
 
-namespace solver //[p]oison-[e]quation
+namespace solver 
 {
 
 data_fmt dOldVal, dNewVal, dCurDiff;

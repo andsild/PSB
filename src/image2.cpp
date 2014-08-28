@@ -592,9 +592,9 @@ void stageIterativeSolvers(std::vector<solver::Solver*> &vSolvers,
 
     image_fmt* field = new image_fmt;
     makeField(*use_img, fieldModifier, *field);
+
     std::vector<image_fmt *> origList, guessList, rhoList;
     divide(DIVISION_SIZE, use_img, field, origList, rhoList, guessList);
-
 
     if(gauss)
     {

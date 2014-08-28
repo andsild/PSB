@@ -11,20 +11,22 @@ from matplotlib import _png
 from itertools import chain, tee, izip
 from ipdb import set_trace
 from PIL import Image
-from scipy.interpolate import interp1d
-
+# from scipy.interpolate import interp1d
 
 from sys import argv, exit
 from os import listdir
 from os.path import isfile, join
 from math import log
 
+from time import sleep
+
 import gc
-import objgraph
-from mem_top import mem_top
 
 np.set_printoptions(threshold=np.nan)
 
+GAUSS_C  = 8.5
+JACOBI_C = 6.95
+SOR_C    = 11.07
 
 DPI = 80
 # the pixel-width/height is not entirely accurate, misses by 40/20/10...
@@ -42,40 +44,86 @@ def save(fig, filename):
         _png.write_png(renderer._renderer.buffer_rgba(),
                        renderer.width, renderer.height,
                        outfile, fig.dpi)
-def plot2D(files, colors):
+        
+
+def plot2DIterative(files, colors):
     global xMin, yMin, xMax, yMax
+    plt.clf()
     plt.xlabel("Iterations")
     plt.ylabel("Error")
     fig, ax = plt.subplots(facecolor='none')
+    ax.axis([xMin, xMax, yMax, yMin])
     ax.set_xscale("log")
     ax.set_yscale("log")
-    ax.axis([xMin, xMax, yMin, yMax]) 
-    ax.set_ybound(yMax, size)
+    ax.set_ybound(yMax, yMin)
+    fig.canvas.draw()
 
     iterIndex = 0
-    for (path, folder) in files:
-        useColor=colors.pop()
+    error = 0
+    for (path, folder, solver), useColor in zip(files, colors):
         for readfile in folder:
             index=0;
             with open(join(path,readfile), 'r') as f:
                 print readfile
                 for line in f:
                     index += 1
-                    if(index % 2 == 1):
+                    if(index % 3 == 1):
                         continue
-                    ax = fig.axes[0]
-                    dataY = [float(x) for x in line.split()]
-                    dataX = range(1, len(dataY) + 1)
+                    elif(index % 3 == 2):
+                        error = float(line.split()[0])
+                        continue
+                    # ax = fig.axes[0]
+                    # dataY = [float(x) for x in line.split()]
+                    dataY = error
+                    dataX = float(line.split()[0])
+                    set_trace()
 
                     line = matplotlib.lines.Line2D(dataX, dataY,
                                                 transform=ax.transData, color=useColor)
                     ax.draw_artist(line)
                     # import ipdb; ipdb.set_trace()
-                    del dataX; del dataY;
+                    # del dataX; del dataY;
             iterIndex += 1
             if iterIndex % 300 == 0:
                 gc.collect()
-                set_trace()
+                # set_trace()
+
+        save(fig, "plot2d" + str(solver) + ".png")
+
+
+
+def plot2D(files, colors):
+    global xMin, yMin, xMax, yMax
+    plt.clf()
+    fig, ax = plt.subplots(facecolor='none')
+
+    ax.set_xlabel("Iterations")
+    ax.set_ylabel("Error")
+    ax.axis([xMin, xMax, yMax, yMin])
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    # ax.set_ybound(yMax, yMin)
+    # fig.canvas.draw()
+
+    iterIndex = 0
+    error = 0
+    dataX, dataY = [], []
+    for (path, folder, solver), useColor in zip(files, colors):
+        for readfile in folder:
+            index=0;
+            with open(join(path,readfile), 'r') as f:
+                print readfile
+                for line in f:
+                    index += 1
+                    if(index % 3 == 1):
+                        continue
+                    elif(index % 3 == 2):
+                        error = float(line.split()[0])
+                        continue
+                    dataX.append(float(line.split()[0]))
+                    dataY.append(error)
+    ax.scatter(dataX, dataY)
+    fig.savefig("plot2d" + "all.png")
 
 def pairwise(iterable):
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
@@ -120,9 +168,9 @@ def primHeatMap(files, colors):
                     if(index % 2 == 1):
                         continue
                     dataY = [float(x) for x in line.split()]
-                    cords = ax.transData.transform( 
+                    cords = ax.transData.transform(
                         np.array([(x,y) for (x,y) in enumerate(dataY, 1) ]))
-                    # cords = ax.transData.transform( 
+                    # cords = ax.transData.transform(
                     #     np.array([(x,y) for (x,y) in zip(dataY, np.logspace(0,5.0, len(dataY))) ]))
                     xcords, ycords = zip(*cords.astype(np.int))
                     interPolateSize = len(xcords)
@@ -139,10 +187,10 @@ def primHeatMap(files, colors):
                     tmp, _, _ = np.histogram2d(ycords, xcords,
                                                bins=[ybins, xbins])
                     tmp[tmp > 1] = 1
-                    
+                   
                     sumHistogram += tmp
         histograms.append(sumHistogram)
-        
+       
     filenames = []
     for hist,color in zip(histograms, colors):
         filenames.append(renderHistogram(hist, color))
@@ -229,7 +277,7 @@ def theo_line(colors):
                                  kind="linear")
             ynew = interFunc(xnew)
             ax.plot(xnew, ynew, color=color)
-         
+        
         fig.canvas.print_png("test" + str(color) + ".png")
         plt.close(fig)
 
@@ -274,8 +322,8 @@ def theoretical_bound(files, solvers):
             interFunc = interp1d(np.array([1, iterationEnd]), yPlotPoints,
                                  kind="linear")
             ynew = interFunc(xnew)
-            
-            cords = ax.transData.transform( 
+           
+            cords = ax.transData.transform(
                 np.array([(x,y) for (x,y) in zip(xnew, ynew) ]))
             xcords, ycords = zip(*cords)
 
@@ -310,7 +358,7 @@ def renderHistogram(histoGram, color):
     xShift = yShift = (1.0 / ((BINS_X + 1) * DPI)) * DPI - 0.05
     ax = fig.add_axes([xShift,yShift,1.0-xShift-0.03,1.0-yShift-0.03])
     ax.set_frame_on(False)
-    
+   
     light_jet = cmap_map(lambda x: x/2+0.5, colormap.jet)
     orange = cmap_map(lambda x: x, colormap.OrRd)
     # orange = cmap_map(lambda x: func(x), colormap.OrRd)
@@ -374,7 +422,7 @@ def doAverage(directFiles, iterativeFiles, colors):
     global DPI, BINS_X, BINS_Y
     global xMin, yMin, xMax, yMax
 
-    
+   
 
 if __name__ == "__main__":
     if(len(argv) < 2):
@@ -390,23 +438,29 @@ if __name__ == "__main__":
 
     shiftargs = 2
     for index in range(shiftargs, len(argv), 2):
-        if any(x.upper() in argv[index].upper() for x in directsolvers):
-            directSolverFiles.append((argv[index],
-                                    sorted([ f for f in listdir(argv[index]) \
-                                           if isfile(join(argv[index], f))])))
-            directColors.append(argv[index+1])
-        else:
+        boolFlag = False
+        for s in directsolvers:
+            if s.upper() in argv[index].upper():
+                directSolverFiles.append((argv[index],
+                                        sorted([ f for f in listdir(argv[index]) \
+                                            if isfile(join(argv[index], f))]),
+                                          s))
+                directColors.append(argv[index+1])
+                boolFlag = True
+        if not boolFlag:
+            set_trace()
             files.append((argv[index], sorted([ f for f in listdir(argv[index]) \
-                                            if isfile(join(argv[index], f))])))
+                                            if isfile(join(argv[index], f))]), s))
             iterativeColors.append(argv[index+1])
 
     numFiles=sum(len(x) for x in files)
 
-    plt.ioff()
+    # plt.ioff()
 
     # facecolor = transparancy
     if method == 'plot2d'.upper():
-        plot2D(files, colors)
+        plot2DIterative(files, iterativeColors)
+        plot2D(directSolverFiles, directColors)
     elif method == "average".upper():
         doAverage(directSolverFiles, files, colors)
     elif method == "primHM".upper():
