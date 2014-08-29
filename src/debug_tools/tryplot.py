@@ -11,7 +11,7 @@ from matplotlib import _png
 from itertools import chain, tee, izip
 from ipdb import set_trace
 from PIL import Image
-# from scipy.interpolate import interp1d
+from scipy.interpolate import interp1d
 
 from sys import argv, exit
 from os import listdir
@@ -23,6 +23,8 @@ from time import sleep
 import gc
 
 np.set_printoptions(threshold=np.nan)
+XLABEL = "(logscale) (time * iterationCount) / pixelSize"
+YLABEL = "(logscale) MSE between solver domain and image"
 
 GAUSS_C  = 8.5
 JACOBI_C = 6.95
@@ -62,8 +64,8 @@ def genCanvas(fileList1, fileList2):
     ax.axis([xMin, xMax, yMax, yMin])
     ax.set_xscale("log")
     ax.set_yscale("log")
-    ax.set_xlabel("(time * iterationCount) / pixelSize")
-    ax.set_ylabel("MSE from solver domain and image")
+    ax.set_xlabel(XLABEL)
+    ax.set_ylabel(YLABEL)
     ax.set_ybound(yMax, yMin)
 
     colorDict = { "dct": "yellow",
@@ -90,8 +92,8 @@ def plot2DIterative(files, colors):
     ax.axis([xMin, xMax, yMax, yMin])
     ax.set_xscale("log")
     ax.set_yscale("log")
-    ax.set_xlabel("(time * iterationCount) / pixelSize")
-    ax.set_ylabel("MSE from solver domain and image")
+    ax.set_xlabel(XLABEL)
+    ax.set_ylabel(YLABEL)
     ax.set_ybound(yMax, yMin)
 
     iterIndex = 0
@@ -125,14 +127,14 @@ def plot2DIterative(files, colors):
                     lineData = line.split()
                     index = 0
                     # dataY = lineData
-                    dataY = [0.0] * len(lineData)
-                    if len(lineData) > 1000:
-                        for (r,s) in zip(range(1000), lineData):
-                            dataY[r] = s
-                        for (r,s) in zip(range(1000, len(lineData), skipCont), lineData):
-                            dataY[r] = s
-                    else:
-                        dataY = lineData
+                    # dataY = [0.0] * len(lineData)
+                    # if len(lineData) > 1000:
+                    #     for (r,s) in zip(range(1000), lineData):
+                    #         dataY[r] = s
+                    #     for (r,s) in zip(range(1000, len(lineData), skipCont), lineData):
+                    #         dataY[r] = s
+                    # else:
+                    #     dataY = lineData
                     dataY = [float(x) for x in line.split()]
                     dataX = [0.0] * len(dataY)
                     for rangeIndex,x in enumerate(drange(0.1, 10000000.0, c)):
@@ -169,8 +171,8 @@ def plot2D(files, colors):
     ax.axis([xMin, xMax, yMax, yMin])
     ax.set_xscale("log")
     ax.set_yscale("log")
-    ax.set_xlabel("(time * iterationCount) / pixelSize")
-    ax.set_ylabel("MSE from solver domain and image")
+    ax.set_xlabel(XLABEL)
+    ax.set_ylabel(YLABEL)
     ax.set_ybound(yMax, yMin)
 
     iterIndex = 0
@@ -221,8 +223,8 @@ def primHeatMap(files, colors):
     ax.axis('off')
 
     width, height = fig.canvas.get_width_height()
-    xbins = np.linspace(1, width,  width + 1)
-    ybins = np.linspace(1, height, height + 1)
+    xbins = np.linspace(0, width,  width + 1)
+    ybins = np.linspace(0, height, height + 1)
 
     histograms = []
 
@@ -234,26 +236,46 @@ def primHeatMap(files, colors):
     ax.axis('off')
     ax.set_xscale("log")
     ax.set_yscale("log")
+    ax.set_xlabel(XLABEL)
+    ax.set_ylabel(YLABEL)
 
-    for (path, folder) in files:
+    for (path, folder, solver) in files:
+        c = float(cdict[solver])
+
         sumHistogram = np.zeros( (height, width) )
         index=0;
         iterIndex = 0
-
-        for readfile in folder[:5]:
+        while folder:
+            readfile = folder.pop()
+            iterIndex += 1
+            # if iterIndex > 5: break;
             with open(join(path,readfile), 'r') as f:
+                origImage = join("/home/andesil/media",
+                        readfile[readfile.find("__")+2:-7] + ".jpg") \
+                        .replace("projectsNaturalnessdata", "")
+                try:
+                    im = Image.open(origImage);
+                except IOError:
+                    print "SKIPPING" + origImage
+                    continue
+                pixels = (im.size[0] * im.size[1]) / 4
                 print readfile
                 for line in f:
                     index += 1
                     if(index % 2 == 1):
                         continue
                     dataY = [float(x) for x in line.split()]
+                    dataX = [0.0] * len(dataY)
+                    for rangeIndex,x in enumerate(drange(0.1, 10000000.0, c)):
+                        if  rangeIndex > len(dataY) - 1: break
+                        dataX[rangeIndex] = ((c * rangeIndex) / pixels)
+
                     cords = ax.transData.transform(
-                        np.array([(x,y) for (x,y) in enumerate(dataY, 1) ]))
+                        np.array([(x,y) for (x,y) in zip(dataX, dataY) ]))
                     # cords = ax.transData.transform(
                     #     np.array([(x,y) for (x,y) in zip(dataY, np.logspace(0,5.0, len(dataY))) ]))
                     xcords, ycords = zip(*cords.astype(np.int))
-                    interPolateSize = len(xcords)
+                    # interPolateSize = len(xcords)
                     # for cur,nxt in pairwise(xcords):
                     #     interPolateSize += abs(nxt - cur)
                     #
@@ -328,23 +350,34 @@ START_POINT = 10
 def sorBound(pixels):
     global ERROR
     scalar = (np.sqrt(pixels) / -4.0) / (np.pi * 2)
-    return scalar * np.log(ERROR)
+    return (scalar * np.log(ERROR) * SOR_C)
 def jacobiBound(pixels):
     global piSq, ERROR
     scalar = (pixels * 2 / -4.0) / piSq
-    return scalar * np.log(ERROR)
+    return (scalar * np.log(ERROR) * JACOBI_C)
 def gaussBound(pixels):
     global piSq, ERROR
     scalar = (pixels / -4.0) / piSq
-    return scalar * np.log(ERROR)
+    return (scalar * np.log(ERROR) * GAUSS_C)
 
-def theo_line(colors):
+def theo_line():
     global ERROR
     solverFuncs = [sorBound, jacobiBound, gaussBound]
+    colors = ["sor", "jacobi", "gauss"]
     solverStart = 1
     yPlotPoints = np.array([10, ERROR])
 
+    colorDict = { "dct": "yellow",
+                 "dst": "orange",
+                 "wavelet5": "blue",
+                 "wavelet7": "pink",
+                 "sor" : "green",
+                 "jacobi" : "cyan",
+                 "gauss" : "black",
+                }
+
     for solverFunc,color in zip(solverFuncs, colors):
+        color =  colorDict[color]
         plt.clf()
         fig, ax = plt.subplots()
         ax.set_ylim(10e-3, 10e1)
@@ -436,7 +469,7 @@ def renderHistogram(histoGram, color):
     plt.clf()
     fig = plt.figure(facecolor="none",figsize=(BINS_X+1,BINS_Y+1), dpi=DPI)
     xShift = yShift = (1.0 / ((BINS_X + 1) * DPI)) * DPI - 0.05
-    ax = fig.add_axes([xShift,yShift,1.0-xShift-0.03,1.0-yShift-0.03])
+    ax = fig.add_axes([xShift*2,yShift,1.0-xShift-0.03,1.0-yShift-0.03])
     ax.set_frame_on(False)
    
     light_jet = cmap_map(lambda x: x/2+0.5, colormap.jet)
@@ -446,18 +479,21 @@ def renderHistogram(histoGram, color):
 
     ax.set_xscale("log")
     ax.set_yscale("log")
-    ax.set_xlabel("Iterations (logscale)")
-    ax.set_ylabel("Difference from original image (logscale)")
-    if vmin == 0: vmin += 1
-    ax.imshow(histoGram, cmap=orange, interpolation="quadric",
+    ax.set_xlabel(XLABEL)
+    ax.set_ylabel(YLABEL)
+    if vmin == 0: vmin += 0.09
+    ax.imshow(histoGram, cmap=colormap.autumn,
                 norm=LogNorm(vmin=vmin, vmax=histoGram.max()),
                 extent=[xMin, xMax, yMax, yMin],
                 aspect="auto", origin="lower")
+    # set_trace()
+    # ax.contourf(histoGram, cmap=orange,
+    #             norm=LogNorm(vmin=vmin, vmax=histoGram.max()))
     ax.invert_yaxis()
     ax.set_xlim(xMin, xMax)
     ax.set_ylim(yMax, yMin)
     filename = "solverHeatmap" + color + ".png"
-    fig.canvas.print_png(filename)
+    fig.canvas.print_png(filename, transparent=True)
     print "wrote " + filename
     return filename
 
@@ -487,8 +523,8 @@ def directSolverHeatmap(files, colors):
         fig, ax = plt.subplots(facecolor='none')
         _, _, _, ref = ax.hist2d(dataX, dataY,
                                  cmap=colormap.OrRd, cmin=0.9)
-        ax.set_xlabel("Solver time in ms")
-        ax.set_ylabel("Difference from original image ")
+        ax.set_xlabel(XLABEL)
+        ax.set_ylabel(YLABEL)
         ax.set_xlim(xMin, xMax)
         ax.set_ylim(yMin, yMax)
         ax.set_yscale("log")
@@ -500,8 +536,6 @@ def directSolverHeatmap(files, colors):
 def doAverage(directFiles, iterativeFiles, colors):
     global DPI, BINS_X, BINS_Y
     global xMin, yMin, xMax, yMax
-
-   
 
 if __name__ == "__main__":
     if(len(argv) < 2):
@@ -533,8 +567,8 @@ if __name__ == "__main__":
                                         sorted([ f for f in listdir(argv[index]) \
                                             if isfile(join(argv[index], f))]),
                                           s))
-                directColors.append(colorDict[s])
-                # directColors.append(colorDict[s]argv[index+1])
+                if s in colorDict:
+                    directColors.append(colorDict[s])
                 boolFlag = True
         if not boolFlag:
             solver = argv[index].split("/")
@@ -544,7 +578,8 @@ if __name__ == "__main__":
                 solver = solver[-1]
             files.append((argv[index], sorted([ f for f in listdir(argv[index]) \
                                                if isfile(join(argv[index], f))]), solver))
-            iterativeColors.append(colorDict[solver])
+            if solver in colorDict:
+                iterativeColors.append(colorDict[solver])
 
     numFiles=sum(len(x) for x in files)
 
@@ -563,7 +598,7 @@ if __name__ == "__main__":
     elif method == "tboundOMG".upper():
         theoretical_bound(files, iterativeColors)
     elif method == "tbound".upper():
-        theo_line(iterativeColors)
+        theo_line()
     else:
         print "no method found for %s" % (method)
         exit(1)
