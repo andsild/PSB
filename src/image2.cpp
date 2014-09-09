@@ -12,7 +12,6 @@
 
 #include "imageedit.hpp"
 #include "loginstance.hpp"
-// #include "loadingbar.hpp"
 #include "iterative_solvers.hpp"
 #include "wavelet.hpp"
 #include "solver.hpp"
@@ -111,11 +110,12 @@ image_fmt padImage(const image_fmt &input, const int iPadLength)
                                             /
                              (number of vectors that still has elements)
 */
-rawdata_fmt averageResult(const std::vector<rawdata_fmt> &vInput, int iDivSize)
+rawdata_fmt averageResult(const std::vector<rawdata_fmt> &vInput)
 {
     int iShortest = INT_MAX, iLongest = INT_MIN;
     std::vector<rawdata_fmt>::iterator it;
     std::list<int> lLengths;
+    int iDivisionCounter = DIVISION_SIZE;
     for(auto const it : vInput)
     {
         int iSize = it.size();
@@ -138,12 +138,12 @@ rawdata_fmt averageResult(const std::vector<rawdata_fmt> &vInput, int iDivSize)
     int iPos = 0;
     for(auto & it : vRes)
     {
-        it = (double)( it / (double)iDivSize);
+        it = (double)( it / (double)iDivisionCounter);
         iPos++;
         if(iPos >= lLengths.front())
         {
             lLengths.pop_front();
-            iDivSize--;
+            iDivisionCounter--;
         }
     }
 
@@ -316,12 +316,12 @@ double imageDiff(const image_fmt &source, const image_fmt &comparator)
   @param rhoList a return list with iDivSize different splits
   @param guessList a return list with iDivSize different splits
 */
-void divide(int iDivSize, image_fmt* const origImage, image_fmt* const rho,
+void divide(image_fmt* const origImage, image_fmt* const rho,
             std::vector<image_fmt *> &origImageList,
             std::vector<image_fmt *> &rhoList,
             std::vector<image_fmt *> &guessList)
 {
-    if(iDivSize == 1)
+    if(DIVISION_SIZE == 1 || DIVISION_SIZE == 0)
     {
         origImageList.push_back(origImage);
         rhoList.push_back(rho);
@@ -331,7 +331,7 @@ void divide(int iDivSize, image_fmt* const origImage, image_fmt* const rho,
         return;
     }
 
-    if(iDivSize == 2)
+    if(DIVISION_SIZE == 2)
     {
         int w = origImage->width(); int h = origImage->height();
         image_fmt origImageC1 = origImage->get_crop(0, 0, 0, 0, w, h / 2, 0, 0),
@@ -354,8 +354,16 @@ void divide(int iDivSize, image_fmt* const origImage, image_fmt* const rho,
     }
 
     const int iWidth = origImage->width(), iHeight = origImage->height();
-    const int WIDHT_REGION = (iWidth / (iDivSize / 2));
-    const int HEIGHT_REGION = (iHeight / (iDivSize / 2));
+/* G++ will complain here that there might be a division by zero if DIVISION_SIZE < 2. 
+   However, all valid cases should be caught in the conditional branches
+   above. Thus the pragma. Note that it is popped afterward to re-enable warnings.
+*/
+#pragma GCC diagnostic ignored "-Wdiv-by-zero"
+    const int WIDHT_REGION = (iWidth / (DIVISION_SIZE / 2));
+    const int HEIGHT_REGION = (iHeight / (DIVISION_SIZE / 2));
+#pragma GCC diagnostic pop
+    std::cerr << DIVISION_SIZE << std::endl;
+    exit(EXIT_FAILURE);
     image_fmt* ptr;
     imageList_fmt tmpOrigList, tmpRhoList, tmpGuessList;
 
@@ -363,9 +371,9 @@ void divide(int iDivSize, image_fmt* const origImage, image_fmt* const rho,
        allocate the images, and one to push back their addresses. Otherwise,
        all the pointers would point to same address.
     */
-    for(int xSlice = 0; xSlice < iDivSize / 2; xSlice++)
+    for(int xSlice = 0; xSlice < DIVISION_SIZE / 2; xSlice++)
     {
-        for(int ySlice = 0; ySlice < iDivSize / 2; ySlice++)
+        for(int ySlice = 0; ySlice < DIVISION_SIZE / 2; ySlice++)
         {
             int iLeftmostX = xSlice * WIDHT_REGION,
                 iUpperY = ySlice * HEIGHT_REGION;
@@ -422,10 +430,9 @@ void divide(int iDivSize, image_fmt* const origImage, image_fmt* const rho,
     then x axis.
 
     @param list is the list of image to join together
-    @param DIVISION_SIZE is the number of splits that was made
     @return is the joined image
 */
-image_fmt joinImage(imageList_fmt list, int DIVISION_SIZE)
+image_fmt joinImage(imageList_fmt list)
 {
     image_fmt img((unsigned int)0, (unsigned int)0,(unsigned int)1);
     if(DIVISION_SIZE == 1)
@@ -452,7 +459,7 @@ image_fmt joinImage(imageList_fmt list, int DIVISION_SIZE)
   so that other methods can know how to recombine them.
 */
 void addIterativeSolver(std::vector<solver::Solver*> &vIn,
-        const int DIVISION_SIZE, const double dTolerance,
+        const double dTolerance,
         const std::string sFilename, const std::string sLabel,
         const iterative_func func,
         const std::vector<image_fmt *> &origList,
@@ -565,7 +572,6 @@ void stageIterativeSolvers(std::vector<solver::Solver*> &vSolvers,
         const double dNoise, const std::string sFilename,
         const bool gauss, const bool jacobi, const bool sor)
 {
-    const int DIVISION_SIZE = 4;
     std::string sPrefix= "";
     image_fmt* const use_img = new image_fmt();
     if(dNoise != 0.0)
@@ -593,25 +599,30 @@ void stageIterativeSolvers(std::vector<solver::Solver*> &vSolvers,
     image_fmt* field = new image_fmt;
     makeField(*use_img, fieldModifier, *field);
 
+    // field->save("field.png");
+    // exit(EXIT_FAILURE);
+
     std::vector<image_fmt *> origList, guessList, rhoList;
-    divide(DIVISION_SIZE, use_img, field, origList, rhoList, guessList);
+    divide(use_img, field, origList, rhoList, guessList);
+    // guessList.back()->save("border.png");
+    // exit(EXIT_FAILURE);
 
     if(gauss)
     {
         std::string sLabel = sPrefix + "gauss";
-        addIterativeSolver(vSolvers, DIVISION_SIZE, dTolerance, sFilename, sLabel,
+        addIterativeSolver(vSolvers, dTolerance, sFilename, sLabel,
                             solver::iterate_gauss, origList, rhoList, guessList);
     }
     if(jacobi)
     {
         std::string sLabel = sPrefix + "jacobi";
-        addIterativeSolver(vSolvers, DIVISION_SIZE, dTolerance, sFilename, sLabel,
+        addIterativeSolver(vSolvers, dTolerance, sFilename, sLabel,
                             solver::iterate_jacobi, origList, rhoList, guessList);
     }
     if(sor)
     {
         std::string sLabel = sPrefix + "sor";
-        addIterativeSolver(vSolvers, DIVISION_SIZE, dTolerance, sFilename, sLabel,
+        addIterativeSolver(vSolvers, dTolerance, sFilename, sLabel,
                             solver::iterate_sor, origList, rhoList, guessList);
     }
 }
@@ -664,8 +675,6 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
         stageIterativeSolvers(vSolvers, use_img, dTolerance, resolve, dNoise, sFilename,
                             gauss, jacobi, sor);
     }
-    const int DIVISION_SIZE = 4;
-
 
     imageList_fmt accumulator; /*< container for subdivisions of solved image */
     rawdata_fmt vResults, vTimes;
@@ -682,7 +691,7 @@ void processImage(std::string sFilename, double dNoise, double dTolerance, data_
             /* We can now merge the regions together */
             if(it->isFinal())
             {
-                result = joinImage(accumulator, DIVISION_SIZE);
+                result = joinImage(accumulator);
                 accumulator.clear();
                 iPartIndex = 0;
             }

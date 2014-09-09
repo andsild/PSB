@@ -291,7 +291,7 @@ image_fmt readData(const bool doAverage, const bool doPlot)
         for(auto it = mapRes.begin(); it != mapRes.end(); it++)
         {
             std::string sWriteHeader = it->first;
-            rawdata_fmt vRes = image_psb::averageResult(it->second, it->second.size());
+            rawdata_fmt vRes = image_psb::averageResult(it->second);
             rawdata_fmt vTimes(1,1);
 
             writeData(vRes, vTimes, sWriteHeader, "average");

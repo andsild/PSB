@@ -1,6 +1,8 @@
 #ifndef _IMAGE_H
 #define _IMAGE_H
 
+#define DIVISION_SIZE 1
+
 #include <string>
 
 #include "CImg.h"
@@ -21,7 +23,7 @@ std::string printImageAligned(const image_fmt, int iCols = 8);
 std::string printCore(const image_fmt, const int);
 void scanAndAddImage(std::string sRootdir, std::string sSolverdir);
 image_fmt padCore(int, int, const image_fmt &arg1);
-rawdata_fmt averageResult(const std::vector<rawdata_fmt> &arg, int);
+rawdata_fmt averageResult(const std::vector<rawdata_fmt> &arg);
 
 void processImage(std::string, double, double, data_fmt resolve, 
         const bool, const bool, const bool, /* Iterative */
