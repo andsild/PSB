@@ -23,8 +23,8 @@ from time import sleep
 import gc
 
 np.set_printoptions(threshold=np.nan)
-XLABEL = "(logscale) (time * iterationCount) / pixelSize"
-YLABEL = "(logscale) MSE between solver domain and image"
+XLABEL = "(time * iterationCount) / pixelSize"
+YLABEL = "MSE between solution and image"
 
 GAUSS_C  = 8.5
 JACOBI_C = 6.95
@@ -42,7 +42,7 @@ xMin = 100
 yMin = 100
 xMax = 450000 + xMin
 yMax = 9.999999e-11
-xMin = 9.999999e-7; xMax = 3600
+xMin = 9.999999e-6; xMax = 10e5
 
 def save(fig, filename):
     """We have to work around `fig.canvas.print_png`, etc calling `draw`."""
@@ -81,7 +81,8 @@ def genCanvas(fileList1, fileList2):
         legends.append(ax.plot([], [], color=colorDict[solver], label=str(solver)))
     for solver in fileList2:
         legends.append(ax.plot([], [], color=colorDict[solver], label=str(solver)))
-    ax.legend(loc="center left", bbox_to_anchor=(0.7, 0.5))
+    ax.legend(loc="center left", bbox_to_anchor=(0.77, 0.45), fancybox=True, ncol=1,
+              prop={"size":12})
 
     fig.savefig("canvas.png")
 
@@ -110,7 +111,6 @@ def plot2DIterative(files, colors):
             readfile = folder.pop()
             print readfile
             index=0;
-            if iterIndex > 10: break;
             with open(join(path,readfile), 'r') as f:
                 origImage = join("/home/andesil/media", readfile[readfile.find("__")+2:-7] + ".jpg").replace("projectsNaturalnessdata", "")
                 try:
@@ -139,7 +139,7 @@ def plot2DIterative(files, colors):
                     dataX = [0.0] * len(dataY)
                     for rangeIndex,x in enumerate(drange(0.1, 10000000.0, c)):
                         if  rangeIndex > len(dataY) - 1: break
-                        dataX[rangeIndex] = ((c * rangeIndex) / pixels)
+                        dataX[rangeIndex] = ((c * rangeIndex) / pixels) * 10000
 
                     # plotLine = matplotlib.lines.Line2D(dataX, dataY,
                     #                             transform=ax.transData, color=useColor)
@@ -150,17 +150,16 @@ def plot2DIterative(files, colors):
                     # import ipdb; ipdb.set_trace()
                     # del dataX; del dataY;
             iterIndex += 1
-            if iterIndex % 900 == 0:
+            if iterIndex % 30 == 0:
                 gc.collect()
-                set_trace()
+                # set_trace()
 
         # save(fig, "plot2DIterative" + str(solver) + ".png")
-    # fig.canvas.draw()
     fig.savefig("plot2DIterativeALL.png", transparent=True)
     # fig.canvas.print_png("plot2DIterativeALL.png")
-    # if len(files) > 0:
-    #     print "printing plot2DIterativeALL.png"
-    #     save(fig, "plot2DIterativeALL.png")
+    if len(files) > 0:
+        print "printing plot2DIterativeALL.png"
+        save(fig, "plot2DIterativeALL.png")
 
 
 
@@ -248,7 +247,6 @@ def primHeatMap(files, colors):
         while folder:
             readfile = folder.pop()
             iterIndex += 1
-            # if iterIndex > 5: break;
             with open(join(path,readfile), 'r') as f:
                 origImage = join("/home/andesil/media",
                         readfile[readfile.find("__")+2:-7] + ".jpg") \
@@ -383,6 +381,8 @@ def theo_line():
         ax.set_ylim(10e-3, 10e1)
         ax.set_xscale("log")
         ax.set_yscale("log")
+        ax.set_xlabel("Number of iterations")
+        ax.set_ylabel("Difference from original signal")
         for n in np.logspace(4, 8, num=8):
             iterationEnd = solverFunc(n)
             xnew = np.linspace(1, iterationEnd, num=10000)
@@ -390,6 +390,8 @@ def theo_line():
                                  kind="linear")
             ynew = interFunc(xnew)
             ax.plot(xnew, ynew, color=color)
+
+        ax.set_xlim(1.0, ax.get_xlim()[1] * 10)
         
         fig.canvas.print_png("test" + str(color) + ".png")
         plt.close(fig)
@@ -498,40 +500,93 @@ def renderHistogram(histoGram, color):
     return filename
 
 def directSolverHeatmap(files, colors):
-    for (path, folder) in files:
-        index=0;
-        iterIndex = 0
-        dataX, dataY = [], []
+    # for (path, folder, solver), color in zip(files, colors):
+    #     index=0;
+    #     iterIndex = 0
+    #     dataX, dataY = [], []
+    #
+    #     for readfile in folder:
+    #         with open(join(path,readfile), 'r') as f:
+    #             origImage = join("/home/andesil/media",
+    #                 readfile[readfile.find("dia")+3:-7] + ".jpg")
+    #             try:
+    #                 im = Image.open(origImage);
+    #             except IOError:
+    #                 print "SKIPPING" + origImage
+    #                 continue
+    #             pixels = (im.size[0] * im.size[1])
+    #             print readfile
+    #             for line in f:
+    #                 index += 1
+    #                 if(index % 3 == 1):
+    #                     continue
+    #                 elif(index % 3 == 2):
+    #                     error = float(line.split()[0])
+    #                     continue
+    #                 dataX.append(float(line.split()[0]) / pixels)
+    #                 dataY.append(error)
+    #                 set_trace()
+    #     heatmap, _, _ = np.histogram2d(dataX, dataY)
+    #
+    #     plt.clf()
+    #     # xMin = 1
+    #     # xMax = 3500
+    #     # yMin = 10e-15
+    #     # yMax = 10e2
+    #     fig, ax = plt.subplots(facecolor='none')
+    #     _, _, _, ref = ax.hist2d(dataX, dataY,
+    #                              cmap=colormap.OrRd, cmin=0.9)
+    #     ax.set_xlabel(XLABEL)
+    #     ax.set_ylabel(YLABEL)
+    #     ax.set_xlim(xMin, xMax)
+    #     ax.set_ylim(yMin, yMax)
+    #     ax.set_yscale("log")
 
-        for readfile in folder:
+    global xMin, yMin, xMax, yMax
+
+    iterIndex = 0
+    error = 0
+    dataX, dataY = [], []
+    for (path, folder, solver), useColor in zip(files, colors):
+
+        plt.clf()
+        fig, ax = plt.subplots(facecolor='none', frameon=False)
+        ax.axis([xMin, xMax, yMax, yMin])
+        ax.set_xscale("log")
+        ax.set_yscale("log")
+        ax.set_xlabel(XLABEL)
+        ax.set_ylabel(YLABEL)
+        ax.set_ybound(10e-1, yMin)
+        ax.set_xbound(xMin, xMax)
+        while folder:
+            readfile = folder.pop()
+            index=0;
             with open(join(path,readfile), 'r') as f:
+                origImage = join("/home/andesil/media",
+                    readfile[readfile.find("dia")+3:-7] + ".jpg")
+                try:
+                    im = Image.open(origImage);
+                except IOError:
+                    print "SKIPPING" + origImage
+                    continue
+                pixels = (im.size[0] * im.size[1])
                 print readfile
                 for line in f:
                     index += 1
-                    if(index % 2 == 1):
+                    if(index % 3 == 1):
                         continue
-                    line = line.split()
-                    dataX.append(float(line[1]))
-                    dataY.append(float(line[0]))
-        heatmap, _, _ = np.histogram2d(dataX, dataY)
-
-        plt.clf()
-        xMin = 1
-        xMax = 3500
-        yMin = 10e-15
-        yMax = 10e2
-        fig, ax = plt.subplots(facecolor='none')
-        _, _, _, ref = ax.hist2d(dataX, dataY,
-                                 cmap=colormap.OrRd, cmin=0.9)
-        ax.set_xlabel(XLABEL)
-        ax.set_ylabel(YLABEL)
-        ax.set_xlim(xMin, xMax)
-        ax.set_ylim(yMin, yMax)
-        ax.set_yscale("log")
+                    elif(index % 3 == 2):
+                        error = float(line.split()[0])
+                        continue
+                    dataX.append(float(line.split()[0]) / pixels)
+                    dataY.append(error)
+        _, _, _, ref = ax.hist2d(dataX, dataY, bins=50)
+        dataX, dataY = [], []
+        fig.savefig("heatmap" + solver + ".png", transparent=True)
         cb = fig.colorbar(ref)
         cb.set_label("Number of solvers in buckets")
         # plt.imshow(heatmap, cmap=colormap.OrRd)
-        plt.savefig("heatmap.png")
+        # plt.savefig("heatmap.png")
 
 def doAverage(directFiles, iterativeFiles, colors):
     global DPI, BINS_X, BINS_Y

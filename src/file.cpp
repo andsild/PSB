@@ -1,3 +1,7 @@
+/** Small functions and utilities for I/O action
+
+*/
+
 #include "file.hpp"
 
 #include <algorithm>
@@ -26,6 +30,11 @@ using namespace logging;
 namespace file_IO
 {
 
+/** Split a string into "path/file"
+
+  @param sFilename is the string to be split and returned.
+  @return is the path of sFilename
+*/
 std::string getFoldername(const std::string sFilename)
 {
     size_t found;
@@ -33,7 +42,11 @@ std::string getFoldername(const std::string sFilename)
     return sFilename.substr(0, found);
 }
 
+/** Split a string into "path/file"
 
+  @param sFilename is the string to be split and returned.
+  @return is the path of sFilename
+*/
 std::string getFilename(const std::string sFilename)
 {
     size_t found;
@@ -41,10 +54,9 @@ std::string getFilename(const std::string sFilename)
     return sFilename.substr(found + 1);
 }
 
-std::string SaveBehaviour::getSavename(
-                                const std::string sName,
-                                const std::string sLabel,
-                                const bool bResolve) const
+const std::string SaveBehaviour::getSavename( const std::string sName,
+                                const std::string sLabel, const bool bResolve)
+    const
 {
     std::string sFilename = getFilename(sName);
     std::string sRet = this->sOutdir 
@@ -53,7 +65,7 @@ std::string SaveBehaviour::getSavename(
     return sRet;
 }
 
-std::string SaveBehaviour::getLogname(
+const std::string SaveBehaviour::getLogname(
                                 const std::string sName,
                                 const std::string sLabel,
                                 const bool bResolve) const
@@ -66,17 +78,17 @@ std::string SaveBehaviour::getLogname(
     return sRet;
 }
 
-std::string SaveBehaviour::getDelimiter() { return this->sDelimiter; }
-std::string SaveBehaviour::getValueDelimiter() { return this->sValueDelimiter; }
+const std::string SaveBehaviour::getDelimiter() { return this->sDelimiter; }
+const std::string SaveBehaviour::getValueDelimiter() { return this->sValueDelimiter; }
 
 
-std::string SaveBehaviour::getResolveLabel(std::string sLabel)
+const std::string SaveBehaviour::getResolveLabel(std::string sLabel)
 {
     return std::string(this->sResolveTag + this->sDelimiter + sLabel);
 }
 
-void SaveBehaviour::getNames(std::string sSearch,
-                            std::string &sOutdir, std::string &sLabel, std::string &sFilename,
+const void SaveBehaviour::getNames(std::string sSearch, std::string &sOutdir,
+                                    std::string &sLabel, std::string &sFilename,
                             bool &isResolved, bool &isNoised, bool &isNoisedOrig)
 {
     std::string sCopy = sSearch;
@@ -324,6 +336,15 @@ void trimFilename(std::string &s)
     s.erase(it, std::end(s));
 }
 
+/** Write results from a solver to a file
+
+  @param vData is the vector of dirichlet energies
+  @param vTimes is the vector of execution times for each iteration
+  @param sLabel is the header that is written for each row of results
+  @param sFilename is the filename to write to.
+
+  @note vData and vTimes is assumed to be the same lenght
+*/
 void writeData(const rawdata_fmt &vData, const rawdata_fmt &vTimes,
                 std::string sLabel, std::string sFilename)
 {
@@ -346,7 +367,15 @@ void writeData(const rawdata_fmt &vData, const rawdata_fmt &vTimes,
 }
 
 
-void saveImage(const image_fmt &image, const std::string sSavename, const bool bResolve)
+/** Save an image to a given dest.
+
+  @param image is the CImg<T> instance to save
+  @param sSavename is the absolute or relative filename the file will be saved to
+  @param bSaveAscii says whether or not to save the image as ascii. Note that
+            ascii-saving will not round down the values, whereas other formats
+            will.
+*/
+void saveImage(const image_fmt &image, const std::string sSavename, const bool bSaveAscii)
 {
     mkdirp(SAVE_PATTERN.getOutdir().c_str());
     bool isResolved = false;
@@ -362,6 +391,7 @@ void saveImage(const image_fmt &image, const std::string sSavename, const bool b
             image.save(sSavename.c_str());
         }
     }
+    /* Typically, if the filename is invalid */
     catch(cimg_library::CImgIOException &cioe)
     {
         std::cerr << cioe.what() << std::endl;
@@ -369,12 +399,17 @@ void saveImage(const image_fmt &image, const std::string sSavename, const bool b
 }
 
 
+/** The default handler for when a filename for a directory is not find
+*/
 const char* DirNotFound:: what() const throw() 
 {
     std::string ret = std::string("Could not find folder: ") + msg_;
     return ret.c_str();
 }
 
+/** @param str is a filename of type "folder/name".
+        It is modified to become of type "name" (trim leading)
+*/
 void trimLeadingFileName(std::string &str)
 {
     size_t endpos = str.find_last_of("/");
@@ -386,6 +421,9 @@ void trimLeadingFileName(std::string &str)
     }
 }
 
+/** @param str is a filename of type "folder/name".
+        It is modified to become of type "folder" (trim trailing)
+*/
 void trimTrailingFilename(std::string &str)
 {
     size_t newpos = str.find_last_of(".");
@@ -395,7 +433,12 @@ void trimTrailingFilename(std::string &str)
     }
 }
 
+/** Create a directory, if it does not not already exist
 
+  @param path is the filename of the directory
+  @param mode decides the behaviour. @see unistd.h for more info. This parameter
+    can usually be ignored.
+  */
 void mkdirp(const char* path, mode_t mode) {
   // const cast for hack
   char* p = const_cast<char*>(path);
@@ -419,6 +462,11 @@ void mkdirp(const char* path, mode_t mode) {
   }
 }
 
+/** Read a directory and it's files.
+  
+  @param sDir is the directory to read
+  @return is a vector of strings with files found in sDir
+*/
 std::vector<std::string> getFilesInFolder(std::string sDir)
 {
     std::ifstream fin;

@@ -1,3 +1,6 @@
+/** Perform either a DST or DCT transform of a gradient field
+*/
+
 #include "fft.hpp"
 
 #include <math.h>
@@ -18,7 +21,10 @@ namespace solver
 {
 
 /** Perform a gradient reconstriction using Discrete Cosine Transform.
-  The field is padded with zeroes 1 pixel to each side (Neumann border condition)
+
+  @param field is padded with zeroes 1 pixel to each side
+    (Neumann border condition)
+  @param ret is the reconstructed gradient field.
 */
 void FFT_DCT(const image_fmt &field, image_fmt &ret)
 {
@@ -33,6 +39,8 @@ void FFT_DCT(const image_fmt &field, image_fmt &ret)
     ret = FFT.get_FFT(true)[0];
 }
 
+/** Get the DST coefficient
+*/
 const inline image_fmt getDST(const int iWidth, const int iHeight)
 {
     image_fmt DST(iWidth, iHeight, 1, 1);
@@ -40,7 +48,6 @@ const inline image_fmt getDST(const int iWidth, const int iHeight)
                    tmpC = cimg::PI / (2*(iHeight+1));
     data_fmt tmpD, tmp;
 
-    //DST coefficient
     cimg_forY(DST, y)
     {
         tmpD = std::sin((data_fmt)(y+1) * tmpC);
@@ -54,6 +61,12 @@ const inline image_fmt getDST(const int iWidth, const int iHeight)
     return DST;
 }
 
+/** Comput a DST on a field
+
+  @param field is padded with zeroes 1 pixel to each side
+    (Neumann border condition)
+  @param ret is the reconstructed gradient field.
+*/
 void FFT_DST(const image_fmt &field, image_fmt &ret)
 {
     const int iWidth = field.width(), iHeight = field.height();

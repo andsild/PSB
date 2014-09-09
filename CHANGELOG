@@ -3,7 +3,7 @@ Thu 12 Jun 2014
 ################
 Changed from CImg<T> to STL std::vector<T>. The translation from CImg to vector
 takes some time, but it is faster to iterate over a 1d vector.
-This NEEDS to be TESTED later
+This NEEDS to be TESTED later (Mon 01 Jul 2014)
 
 ################
 Mon 23 Jun 2014 
@@ -40,7 +40,7 @@ a factor of 100 less than SOR to give accurate results, much slower!
 Thu 10 Jul 2014
 ################
 Images with "weird" values has to be saved/read using the ascii-format 
-otherwise CImg will round and cut the values.
+otherwise CImg will automatically round and cut the values when saving.
 
 
 ################
@@ -50,11 +50,12 @@ Did some optimization.
 The bottleneck for the iterative solvers are the for loops which on my computer
 takes about 80 ms each. Here, access to the field values are the slowest.
 
-Accessing them by pointer reduced each iteration with about 10 ms, but
-you would still have to find some clever way to avoid the border
+Accessing them by pointer (not using macro for-loops) 
+reduced each iteration with about 10 ms, but you would still have to find some
+clever way to avoid the border
 
 Accessing by float instead of double gave about 5 ms speedup per iteration
-The results look the same in double and float
+The results look the same in double and float, so I changed to use float
 
 ################
 Thu 10t Aug 2014
