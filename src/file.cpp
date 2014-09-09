@@ -21,9 +21,9 @@
 #include <unistd.h>
 
 #include "image_types.hpp"
+#include "image2.hpp"
 #include "loginstance.hpp"
 
-#include "image2.hpp" // just for printImage, debug
 
 using namespace logging;
 
@@ -266,8 +266,8 @@ image_fmt readData(const bool doAverage, const bool doPlot)
         while(iss >> dtmp)
             vData.push_back(dtmp);
 
-        image_fmt imgData = image_psb::vectorToImage(vData);
-        image_fmt padded = image_psb::padImage(imgData, iLongestLine);
+        image_fmt imgData = image_util::vectorToImage(vData);
+        image_fmt padded = image_util::padImage(imgData, iLongestLine);
         yMin = imgData.min();
 
         const double *color = getColor(sLabel);
@@ -291,7 +291,7 @@ image_fmt readData(const bool doAverage, const bool doPlot)
         for(auto it = mapRes.begin(); it != mapRes.end(); it++)
         {
             std::string sWriteHeader = it->first;
-            rawdata_fmt vRes = image_psb::averageResult(it->second);
+            rawdata_fmt vRes = image_util::averageResult(it->second);
             rawdata_fmt vTimes(1,1);
 
             writeData(vRes, vTimes, sWriteHeader, "average");
@@ -299,12 +299,12 @@ image_fmt readData(const bool doAverage, const bool doPlot)
             if(doPlot)
             {
                 // padding does something bad :(
-                image_fmt imgData = image_psb::vectorToImage(vRes);
+                image_fmt imgData = image_util::vectorToImage(vRes);
                 yMin = imgData.min();
-                std::cerr << image_psb::printImage(imgData) << std::endl;
+                std::cerr << image_util::printImage(imgData) << std::endl;
                 std::cerr << yMin << std::endl;
-                image_fmt padded = image_psb::padImage(imgData, iLongestLine);
-                std::cerr << image_psb::printImage(padded) << std::endl;
+                image_fmt padded = image_util::padImage(imgData, iLongestLine);
+                std::cerr << image_util::printImage(padded) << std::endl;
 
                 const double *color = getColor(it->first, true);
                 resGraph.draw_graph(padded, color, 1, 1, 1, dSmallestVal, dMaxVal);

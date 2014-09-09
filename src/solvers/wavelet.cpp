@@ -13,7 +13,6 @@
 
 using namespace cimg_library;
 using namespace logging;
-using namespace image_psb;
 
 namespace wavelet
 {
@@ -304,7 +303,7 @@ void test_splines(const int iSteps)
         *ptr = getSplineValue_1(dPos);
         dPos += dStepSize;
     }
-    MLOG(severity_type::debug, "spline1\n", printImage(test));
+    MLOG(severity_type::debug, "spline1\n", image_util::printImage(test));
 
 
     dPos = -1; test.fill(0);
@@ -313,7 +312,7 @@ void test_splines(const int iSteps)
         *ptr = getSplineValue_2(dPos);
         dPos += dStepSize;
     }
-    MLOG(severity_type::debug, "spline2\n", printImage(test));
+    MLOG(severity_type::debug, "spline2\n", image_util::printImage(test));
 }
 
 void test_motherWavelet(const int iWidth)
@@ -335,8 +334,8 @@ void test_motherWavelet(const int iWidth)
         *ptr = getMotherWavelet_2(dPos);
         dPos += dStepSize;
     }
-    MLOG(severity_type::debug, "Testing mother wavelet 1,2\n", printImage(test)
-                                ,"\n",printImage(test2));
+    MLOG(severity_type::debug, "Testing mother wavelet 1,2\n", image_util::printImage(test)
+                                ,"\n",image_util::printImage(test2));
 }
 
 void test_scales(int iWidth)
@@ -346,8 +345,8 @@ void test_scales(int iWidth)
                     psi3 = scalingFunction(3, iWidth),
                     psi4 = scalingFunction(4, iWidth);
     MLOG(severity_type::debug, "testing psi's in respective order 1 to 4\n",
-        printImage(psi1),"\n", printImage(psi2),"\n", printImage(psi3),"\n",
-        printImage(psi4));
+        image_util::printImage(psi1),"\n", image_util::printImage(psi2),"\n", image_util::printImage(psi3),"\n",
+        image_util::printImage(psi4));
 }
 
 void test_wavelets(const int iWidth)
@@ -357,8 +356,8 @@ void test_wavelets(const int iWidth)
                     wav3 = waveletSpace(1,3, iWidth),
                     wav4 = waveletSpace(1,4, iWidth);
     MLOG(severity_type::debug, "testing wav's in respective order 1 to 4\n",
-        printImage(wav1),"\n", printImage(wav2),"\n", printImage(wav3),"\n",
-        printImage(wav4));
+        image_util::printImage(wav1),"\n", image_util::printImage(wav2),"\n", image_util::printImage(wav3),"\n",
+        image_util::printImage(wav4));
 }
 
 void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
@@ -379,7 +378,7 @@ void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
 
 
 
-    MLOG(severity_type::debug, "field\n", printImage(useField));
+    MLOG(severity_type::debug, "field\n", image_util::printImage(useField));
     const int iWidth = useField.width();
     // image_fmt spline1 = cubic_spline1(iWidth + 100),
     //           spline2 = cubic_spline2(iWidth);
@@ -396,10 +395,10 @@ void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
                     p3 = useField.dot(psi3),
                     p4 = useField.dot(psi4);
 
-    MLOG(severity_type::debug, "psi1\n", printImage(psi1));
-    MLOG(severity_type::debug, "psi2\n", printImage(psi2));
-    MLOG(severity_type::debug, "psi3\n", printImage(psi3));
-    MLOG(severity_type::debug, "psi4\n", printImage(psi4));
+    MLOG(severity_type::debug, "psi1\n", image_util::printImage(psi1));
+    MLOG(severity_type::debug, "psi2\n", image_util::printImage(psi2));
+    MLOG(severity_type::debug, "psi3\n", image_util::printImage(psi3));
+    MLOG(severity_type::debug, "psi4\n", image_util::printImage(psi4));
     test_splines(100);
     test_scales(100);
     test_wavelets(100);
@@ -424,7 +423,7 @@ void hermite_wavelet(const image_fmt &field, image_fmt &retImg)
         *ptr = sum;
         iImageIndex++;
     }
-    MLOG(severity_type::debug, "returned image\n", printImage(retImg));
+    MLOG(severity_type::debug, "returned image\n", image_util::printImage(retImg));
 }
 
 

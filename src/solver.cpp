@@ -121,7 +121,7 @@ image_fmt DirectSolver::solve(rawdata_fmt &vResults, rawdata_fmt &vTimes)
     unsigned long time = 0;
     if(this->isDirichet == false)
     {
-        MLOG(severity_type::debug, "\n", image_psb::printImageAligned(*(field)));
+        MLOG(severity_type::debug, "\n", image_util::printImageAligned(*(field)));
 
         cimg_library::cimg::tic();
         this->func(*(field), ret);
@@ -138,14 +138,14 @@ image_fmt DirectSolver::solve(rawdata_fmt &vResults, rawdata_fmt &vTimes)
         time = cimg_library::cimg::toc();
     }
     MLOG(severity_type::extensive, "Returned image:\n",
-            image_psb::printImageAligned(ret));
+            image_util::printImageAligned(ret));
     vResults.push_back(getDiff(
-                image_psb::imageDiff(*(this->origImage),ret),
+                image_util::imageDiff(*(this->origImage),ret),
                                     this->origImage->size()));
     vTimes.push_back(time);
     if(this->noisedImage != nullptr)
     {
-        vResults.push_back(getDiff(image_psb::imageDiff(
+        vResults.push_back(getDiff(image_util::imageDiff(
                         *(this->noisedImage), ret), this->noisedImage->size()));
     }
     return ret;

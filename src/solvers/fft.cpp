@@ -15,7 +15,6 @@
 
 using namespace cimg_library;
 using namespace logging;
-using namespace image_psb;
 
 namespace solver
 {

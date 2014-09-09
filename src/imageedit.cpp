@@ -17,7 +17,6 @@
 
 using namespace cimg_library;
 using namespace logging;
-using namespace image_psb;
 
 namespace image_display
 {
@@ -269,7 +268,7 @@ void ImageDisplay::show()
     try
     {
         this->main_image.assign(sMainfile.c_str());
-        toGrayScale(this->main_image);
+        image_util::toGrayScale(this->main_image);
         this->solved_image.load(sSolverfile.c_str());
     }
     catch(CImgIOException ciie)

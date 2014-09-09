@@ -9,12 +9,13 @@
 #include "loginstance.hpp"
 #include "file.hpp"
 #include "image2.hpp"
+#include "imageQueue.hpp"
 #include "image_types.hpp"
 #include "imageedit.hpp"
 #include "plot.hpp"
 
 using namespace cimg_library;
-using namespace image_psb;
+using namespace image_util;
 using namespace file_IO;
 using namespace logging;
 
@@ -125,7 +126,7 @@ int main(int argc, char **argv)
             }catch(file_IO::DirNotFound dnf) { std::cerr << "Failed to open " << sDirname << std::endl << " exiting..." << std::endl; exit(EXIT_FAILURE);}
             for(auto const it : vFiles)
             {
-                image_psb::processImage(it, dNoise, dTolerance, resolve,
+             processImage(it, dNoise, dTolerance, resolve,
                                         gauss, jacobi, sor,
                                         fft_dst, fft_dct,
                                         wavelet_5x5, wavelet_7x7, multi_wavelet);
@@ -133,7 +134,7 @@ int main(int argc, char **argv)
         }
         if(sFilename.empty() == false)
         {
-            image_psb::processImage(sFilename, dNoise, dTolerance, resolve,
+            processImage(sFilename, dNoise, dTolerance, resolve,
                                     gauss, jacobi, sor,
                                     fft_dst, fft_dct,
                                     wavelet_5x5, wavelet_7x7, multi_wavelet);
@@ -146,7 +147,7 @@ int main(int argc, char **argv)
     {
         std::string sDir = (sFilename.empty()) ? sDirname : sFilename;
         sDir = file_IO::getFoldername(sDir);
-        // image_psb::scanAndAddImage(sDir, DATA_DIR);
+        // image_util::scanAndAddImage(sDir, DATA_DIR);
         compareLoop = std::thread(image_display::scanAndAddImage, sDir, DATA_DIR);
     }
 
@@ -158,7 +159,7 @@ int main(int argc, char **argv)
     if(plot)
     {
         cimg_library::CImgDisplay disp = plot::plot(img);
-        plotLoop = std::thread(image_psb::renderImage, disp);
+        plotLoop = std::thread(image_util::renderImage, disp);
     }
 
     if(plotLoop.joinable())

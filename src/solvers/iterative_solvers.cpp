@@ -8,7 +8,8 @@
 
    A 3x3 neigbourhood fetches all the adjacent within a range of 1
 */
-//Speedup from 2x2 with two extra backward fetches to 3x3 is trivial.
+//Speedup between doing 2x2 kernel with two ``manual'' extra fetches,
+//or using a 3x3 kernel is trivial.
 #include "iterative_solvers.hpp"
 
 #include <iostream>

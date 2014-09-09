@@ -1,8 +1,6 @@
 #ifndef SOLVER_H
 #define  SOLVER_H
 
-#define BORDER_SIZE 1
-
 #include <vector>
 #include <string>
 
