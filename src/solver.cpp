@@ -4,7 +4,7 @@
 
 #include "CImg.h"
 
-#include "image2.hpp"
+#include "imageUtil.hpp"
 #include "loginstance.hpp"
 using namespace logging;
 

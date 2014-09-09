@@ -1,6 +1,6 @@
 #include  "imageQueue.hpp"
 
-#include "image2.hpp"
+#include "imageUtil.hpp"
 #include "solver.hpp"
 #include "fft.hpp"
 #include "wavelet.hpp"

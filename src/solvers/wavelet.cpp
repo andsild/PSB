@@ -8,7 +8,7 @@
 
 #include "CImg.h"
 #include "loginstance.hpp"
-#include "image2.hpp"
+#include "imageUtil.hpp"
 #include "image_types.hpp"
 
 using namespace cimg_library;

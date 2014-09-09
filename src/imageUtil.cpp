@@ -1,6 +1,4 @@
-#include "image2.hpp"
-
-#include "imageQueue.hpp"
+#include "imageUtil.hpp"
 
 #include <limits.h>
 #include <math.h>
@@ -12,18 +10,9 @@
 
 #include "CImg.h"
 
-#include "imageedit.hpp"
 #include "loginstance.hpp"
-#include "solver.hpp"
-#include "file.hpp"
-#include "plot.hpp"
 
 using namespace cimg_library;
-using namespace file_IO;
-using namespace plot;
-// using namespace logging;
-using namespace solver;
-using namespace image_display;
 
 namespace image_util
 {

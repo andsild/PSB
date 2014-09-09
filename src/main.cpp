@@ -8,7 +8,7 @@
 
 #include "loginstance.hpp"
 #include "file.hpp"
-#include "image2.hpp"
+#include "imageUtil.hpp"
 #include "imageQueue.hpp"
 #include "image_types.hpp"
 #include "imageedit.hpp"

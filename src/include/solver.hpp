@@ -5,7 +5,7 @@
 #include <string>
 
 #include "image_types.hpp"
-#include "image2.hpp"
+#include "imageUtil.hpp"
 #include "loginstance.hpp"
 #include "file.hpp"
 

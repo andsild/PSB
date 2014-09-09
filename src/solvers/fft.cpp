@@ -11,7 +11,7 @@
 #include "CImg.h"
 #include "image_types.hpp"
 #include "loginstance.hpp"
-#include "image2.hpp"
+#include "imageUtil.hpp"
 
 using namespace cimg_library;
 using namespace logging;
