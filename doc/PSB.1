@@ -21,49 +21,100 @@
 .\"
 .TH SLOCCOUNT 1 "25 Juny 2014 "PSB" "PSB"
 .SH NAME
-psb \- determine the best solver and parameters for a class of images
+PSB \- [P]oisson [S]olver [B]enchmark for gradient field reconstruction.
 .SH SYNOPSIS
-.B sloccount
+.B main.out
 .RB [ --version ]
-[ \fB--folder\fR \fIdirectory\fR ]
+[ \fB--directory\fR \fIdirectory\fR ]
 .RB [ --gauss]
 .RB [ --jacboi]
 .RB [ --sor]
-.RB [ --computeline]
+.RB [ --dst]
+.RB [ --dct]
+.RB [ --wavelet5]
+.RB [ --wavelet7]
 .RB [ --nosolve]
-.RB [ --compare]
-.RB [ --resolve \fIscalar\fR ]
-.RB [ --average]
+.RB [ --r\fR \fIscalar\fR ]
 .RB [ -- ]
-.I directories
+.I [directories/files...]
 .SH DESCRIPTION
+Read one or several images for input, and perform a gradient field reconstruction.
+The results are written to your current directory.
 .PP
-TODO
-.PP
-WRITE ME
-.PP
-yeah
 
 .SH OPTIONS
 .TP 12
 .BI --gauss
-solve using gauss-seidel iterative method
+solve using Gauss-Seidel iterative method
 
 .TP 12
-.BI --cached
-Do not recalculate; instead, use cached results from a previous execution.
-Without the --cached or --append option,
-sloccount automatically removes the data directory
-and recreates it.
+.BI --jacobi
+solve using Jacobi iterative method
 
 .TP 12
-.BI --append
-Do not remove previous calculations from the data directory;
-instead, add the analysis to the current contents of the data directory.
+.BI --sor
+solve using sor iterative method
+
+.TP 12
+.BI --dst
+solve using dst direct method
+
+.TP 12
+.BI --dct
+solve using dct direct method
+
+.TP 12
+.BI --wavelet5
+solve using pyramid convolution, using a 5x5 optimized kernel.
+
+.TP 12
+.BI --wavelet7
+solve using pyramid convolution, using a 7x7 optimized kernel.
 
 .TP
-.BI --folder " directory"
+.BI --d " directory"
 folder to read images from. Currently, you can only specify one.
+
+.TP
+.BI --f " file"
+Image to read. Currently, you can only specify one.
+
+
+
+.TP 12
+.BI --help
+Show help message
+
+.TP 12
+.BI --n " percent"
+Add a given percent of gaussian noise the image before solving.
+
+
+.TP 12
+.BI --p
+Get visual feedback of the results. Does not compute well, but can be useful
+for debugging.
+
+.TP 12
+.BI --r
+Multiply the gradient field with a scalar value before solving.
+
+.TP 12
+.BI --t " tolerance"
+Set the stop criterion (lowest difference between iterations) for iterative solvers.
+The default value is 1.0
+
+
+.TP 12
+.BI --v " verbose level"
+Set the verbose (stdout) log level. The level can be set from 0 (no output)
+to 4 (all output).
+
+
+.TP 12
+.BI --x " verbose level"
+Set the verbose (to file) log level. Useful for long log messages, if stdout
+is loaded. The level can be set from 0 (no output) to 4 (all output).
 
 .SH "NOTES"
 THIS PROGRAM IS IN DEVELOPMENT!!
@@ -73,9 +124,7 @@ Let me know @ https://github.com/andsild/PSB
 
 
 .SH "SEE ALSO"
-See the PSB github https://github.com/andsild/PSB
-Note that more detailed documentation is available both on the website
-and with the SLOCCount package.
+PSB github https://github.com/andsild/PSB
 
 .SH AUTHOR
 Anders Sildnes, with much needed assistance from Yuanhao Gong and

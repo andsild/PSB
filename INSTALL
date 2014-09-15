@@ -1,7 +1,7 @@
-1# Make a build folder (usually bin)
+1# Make a build folder (usually "build")
 2# "cd" into the build folder
 3# run cmake, and point to the source directory: "cmake ../src"
-    (Cmake generates platform-specific makefiles for your system"
-4# make
-5# a binary is written to the project root folder: bin/main
+    (Cmake generates platform-specific makefiles for your system)
+4# Run make
+5# a binary is written to the project root folder: bin/main.out
 6# run the binary

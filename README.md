@@ -18,8 +18,8 @@ mkdir "./media" && wget http://pascal.inrialpes.fr/data/holidays/jpg{1,2}.tar.gz
 
 ### INTRODUCTION
 
-What methods will reduce errors most effectively when iterating over
-images?
+This program will allow you to benchmark methods for solving poissons equation.
+In this case the input is images, and we're performing gradient field reconstruction.
 
 The program is written in C++ for speed, however, concepts like threading
 and multigrids are currently avoided for ease of coding.
@@ -49,22 +49,19 @@ It will per default write to "./output" and "./log" in the ${PWD} from which it 
 ### COMMAND SYNTAX
 
 Please refer to the manpage in our "doc" folder, by "man -l PSB.1",
-or by running the program with "--help".
+or by running the compiled program with "--help".
 
+### PROGRAM SHORTCUTS
 Image previews:
-* <Arrow UP> : next image
-* <Arrow DOWN> : previous image
-* <Arrow LEFT> : next solver (if any)
-* <Arrow RIGHT> : previous solver (if any)
+* Arrow UP : next image
+* Arrow DOWN : previous image
+* Arrow LEFT : next solver (if any)
+* Arrow RIGHT : previous solver (if any)
 
 ### tryPlot.py
 
 The script that does the plotting.
 It is currently not handling large inputs, so use with patience and little care.
-
-### COMMAND LINE ARGUMENTS
-
-Please refer to the manpage in our "doc" folder, by "man -l PSB.1"
 
 ### BUGS
 
