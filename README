@@ -13,7 +13,6 @@ time to time. Do frequent "git pull" if you intend to use it.
 
 #### PSB
 
-* LIST FEATURES HERE
 * PSB keeps it simple, so **you** can modify the code to your needs.
 
 #### CImg
@@ -24,45 +23,26 @@ time to time. Do frequent "git pull" if you intend to use it.
 
 See http://cimg.sourceforge.net/
 
-### Gnuplot
-* Open-source
-* Simple
-* Can be operated from the command line and through open-source interfaces in
-  C++
-
-See http://www.gnuplot.info/
-
-### bitmap
-* Open-source
-* Easily create images to edit
-
-
 ### CONFIGURATION / CONTROL:
 
 PSB is written to be operated from the command line. 
-It will per default write to "./output" in the ${PWD} from which it is invoked.
+It will per default write to "./output" and "./log" in the ${PWD} from which it is invoked.
 
 ### COMMAND SYNTAX
 
-Please refer to the manpage in our "doc" folder, by "man -l PSB.1"
+Please refer to the manpage in our "doc" folder, by "man -l PSB.1",
+or by running the program with "--help".
 
+Image previews:
 * <Arrow UP> : next image
 * <Arrow DOWN> : previous image
 * <Arrow LEFT> : next solver (if any)
 * <Arrow RIGHT> : previous solver (if any)
 
-### VARIABLES AND CONSTANTS
+### tryPlot.py
 
-#### Variables
-
-#### Constants (not dumpable or writeable)
-TODO
-
-### Plot.sh
-
-The script that does the plotting (can also be invoked from the PSB-source code)
-
-It is currently a series of for-loops with UNIX's "find" 
+The script that does the plotting.
+It is currently not handling large inputs, so use with patience and little care.
 
 ### COMMAND LINE ARGUMENTS
 
@@ -70,4 +50,5 @@ Please refer to the manpage in our "doc" folder, by "man -l PSB.1"
 
 ### BUGS
 
-Please report new issues to the github mainpage or the developer @ andsild@gmail.com
+Please report new issues to the github page https://github.com/andsild/PSB/ or the developer @ andsild@gmail.com
+
