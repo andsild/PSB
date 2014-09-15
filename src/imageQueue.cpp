@@ -271,5 +271,3 @@ void processImage(std::string sFilename, double dNoise, double dTolerance,
     }
     vSolvers.back()->clear(); // XXX: this breaks if multiple solvers are invoked!!
 }
-
-

@@ -1,3 +1,5 @@
+/** Currently deprecated, as such, not commented.
+*/
 #include "loadingbar.hpp"
 
 #include <string>
