@@ -29,10 +29,11 @@ and multigrids are currently avoided for ease of coding.
 "PSB" is a work in progress, so the structure of the code is changed from
 time to time. Do frequent "git pull" if you intend to use it.
 
-#### PSB
+### PSB
 
 * PSB keeps it simple, so **you** can modify the code to your needs.
 
+### LIBRARIES USED
 #### CImg
 
 * Open-source
@@ -57,6 +58,10 @@ Image previews:
 * Arrow DOWN : previous image
 * Arrow LEFT : next solver (if any)
 * Arrow RIGHT : previous solver (if any)
+
+### nice_example
+A set of small images, useful for debugging purposes. They are created
+using src/debug_tools/create_image.py
 
 ### tryPlot.py
 
