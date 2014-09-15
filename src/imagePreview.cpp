@@ -2,7 +2,7 @@
 */
 // To refactor this code, I'd recommend starting from scratch
 // I started out with something small in mind, and the code does not at all scale.
-#include "imageedit.hpp"
+#include "imagePreview.hpp"
 
 #include <iostream>
 #include <string>
@@ -22,7 +22,8 @@ namespace image_display
 {
 
 
-
+/** Class to hold an image and its solved instances.
+*/
 class ImageContainer
 {
     private:

@@ -1,7 +1,7 @@
 #ifndef _IMAGE_H
 #define _IMAGE_H
 
-#define DIVISION_SIZE 1
+#define DIVISION_SIZE 4
 #define BORDER_SIZE 1
 
 #include <string>

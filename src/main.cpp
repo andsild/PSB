@@ -11,7 +11,7 @@
 #include "imageUtil.hpp"
 #include "imageQueue.hpp"
 #include "image_types.hpp"
-#include "imageedit.hpp"
+#include "imagePreview.hpp"
 #include "plot.hpp"
 
 using namespace cimg_library;

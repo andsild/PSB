@@ -11,13 +11,28 @@ using namespace logging;
 namespace solver
 {
 
+/** To avoid small numbers, results are mutliplied by a constant
+*/
 const double MULTIPLIER_CONSTANT = 100.0;
 
+/** After obtaining the difference and another image, 
+  modify the value to make more sense of it.
+  Here, we divide by pixels and multiply by a constant - this means
+  that results are somewhat indepedent of image geometry, and they look nicer.
+
+  @param origVal is the difference in some norm between reconstruction and
+  orignal image
+  @param dPixels is the amount of pixels in the image
+  @return is the new, modified result value
+*/
 inline double getDiff(const double origVal, const double dPixels)
 {
     return ((origVal / dPixels) * MULTIPLIER_CONSTANT);
 }
 
+/** Wipe the memory, i.e. image, field (and noisedImage) from a solver
+  class (for when after we have used a solver
+*/
 void Solver::clear()
 {
     delete this->origImage;
@@ -25,6 +40,8 @@ void Solver::clear()
     delete this->noisedImage;
 }
 
+/** Default constructor
+*/
 Solver::Solver(const image_fmt *origImg, const image_fmt* const f,
         std::string sFile, std::string sLab,
         bool bMulPart, bool bFin)
@@ -33,6 +50,8 @@ Solver::Solver(const image_fmt *origImg, const image_fmt* const f,
 {
 }
 
+/** Default constructor
+*/
 Solver::Solver(const image_fmt* const origImg, const image_fmt* const noisedImg,
         const image_fmt* const f,
         std::string sFile, std::string sLab,
@@ -44,6 +63,8 @@ Solver::Solver(const image_fmt* const origImg, const image_fmt* const noisedImg,
 Solver::Solver() : origImage(nullptr), noisedImage(nullptr), field(nullptr)
 {}
 
+/** Default constructor
+*/
 IterativeSolver::IterativeSolver(
         const image_fmt* const origImg, const image_fmt* const f,
         const image_fmt* const U, iterative_func func,
@@ -53,9 +74,13 @@ IterativeSolver::IterativeSolver(
         dStopCriterion(dStopCriterion), guess(*U)
 {
 }
+/** Default constructor
+*/
 IterativeSolver::IterativeSolver() : Solver() {}
 
 
+/** Default constructor
+*/
 DirectSolver::DirectSolver(
     const image_fmt* const origImg, const image_fmt* const f, direct_func func,
     std::string sFilename, std::string sLabel,
@@ -66,6 +91,8 @@ DirectSolver::DirectSolver(
 {
 }
 
+/** Default constructor
+*/
 DirectSolver::DirectSolver(
     const image_fmt* const origImg, const image_fmt* const noisedImg,
     const image_fmt* const f, direct_func func,
@@ -77,8 +104,15 @@ DirectSolver::DirectSolver(
 {
 }
 
+/** Default constructor
+*/
 DirectSolver::DirectSolver() : Solver(), isDirichet(false) {}
 
+/** Execute an iterative solver
+  @param vresults is a vector of result numbers, to be returned
+  @param vtimes holds the time in ms for each iteration
+  @return is the reconstructed image
+*/
 image_fmt IterativeSolver::solve(rawdata_fmt &vResults, rawdata_fmt &vTimes)
 {
     int iIter = 0;
@@ -89,11 +123,12 @@ image_fmt IterativeSolver::solve(rawdata_fmt &vResults, rawdata_fmt &vTimes)
     const double iNumPixels = guess.size();
     unsigned long lTime = 0;
 
+    /* While stop criterion is not reached */
     for(iIter = 0; this->dStopCriterion < dIterationDiff; iIter++)
     {
-        cimg_library::cimg::tic();
+        cimg_library::cimg::tic(); /* Time each iteration */
         this->func(*(this->field), guess, dIterationDiff, iWidth, iHeight);
-        lTime = cimg_library::cimg::toc();
+        lTime = cimg_library::cimg::toc(); /* Stop timer */
         double dDiff = getDiff(this->origImage->MSE(guess), iNumPixels);
                        
         vResults.push_back(dDiff);
@@ -103,23 +138,40 @@ image_fmt IterativeSolver::solve(rawdata_fmt &vResults, rawdata_fmt &vTimes)
     return guess;
 }
 
+/** Log a message to a file made for the solver instance alone
+  @param iLevel is the verbosity level
+  @param sMsg is the message to log
+*/
 void Solver::log(int iLevel, std::string sMsg)
 {
     this->logInst.print<severity_type::extensive>(sMsg);
 }
 
+/** Say whether or not the image was divided into subregions
+*/
 bool Solver::isMultipart() { return this->bMultipart; }
+/** Say whether this image instance is the final part of a divided image
+*/
 bool Solver::isFinal() { return this->bFinal; }
+/** Get the filename for a solver image
+*/
 std::string Solver::getFilename() { return this->sFilename; }
+/** Get the label for a solver instance
+*/
 std::string Solver::getLabel() { return this->sLabel; }
 
+/** Reconstruct an image using a direct method
+  @param vresults is a vector of result numbers, to be returned
+  @param vtimes holds the time in ms for each iteration
+  @return is the reconstructed image
+*/
 image_fmt DirectSolver::solve(rawdata_fmt &vResults, rawdata_fmt &vTimes)
 {
     // const int iPixels = (this->origImage->width() - 2) * (this->origImage->height() - 2);
     image_fmt ret(*(this->origImage), "xyz", 0);
     image_fmt useField;
     unsigned long time = 0;
-    if(this->isDirichet == false)
+    if(this->isDirichet == false) /* Need to trim away borders afterward */
     {
         MLOG(severity_type::debug, "\n", image_util::printImageAligned(*(field)));
 

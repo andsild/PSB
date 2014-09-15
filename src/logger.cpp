@@ -12,6 +12,10 @@
 namespace logging
 {
 
+/** Initialize a logger.
+
+  @param name is the output to log to
+*/
 void FileLogPolicy::open_ostream(const std::string& name)
 {
     std::string sLog = LOG_DIR;
@@ -24,12 +28,16 @@ void FileLogPolicy::open_ostream(const std::string& name)
     }
 }
 
+/** Force-flush the output-stream
+*/
 void FileLogPolicy::flush()
 {
    if(out_stream)
         out_stream->flush();
 }
 
+/** Close a logger gracefully
+*/
 void FileLogPolicy::close_ostream()
 {
     if( out_stream )
@@ -38,11 +46,16 @@ void FileLogPolicy::close_ostream()
     }
 }
 
+/** Write something to file
+  @param msg is the content to write
+*/
 void FileLogPolicy::write(const std::string& msg)
 {
     (*out_stream)<<msg<<std::endl;
 }
 
+/** Destructor. Make sure out_stream is closed.
+*/
 FileLogPolicy::~FileLogPolicy()
 {
     if( out_stream )

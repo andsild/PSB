@@ -29,6 +29,12 @@ void renderImage(CImgDisplay disp)
     disp.close();
 }
 
+/** Pad an image with zeroes along the boundary
+  @param iNewWidth is the new width of the image (in pixels)
+  @param iNewHeight is the new height of the image (in pixels)
+  @param input if the image to pad
+  @return is the new, zero-padded image.
+*/
 image_fmt padCore(int iNewWidth, int iNewHeight, const image_fmt &input)
 {
     int iStartX = iNewWidth  / 2 - input.width()  / 2,
@@ -38,8 +44,12 @@ image_fmt padCore(int iNewWidth, int iNewHeight, const image_fmt &input)
     return ret;
 }
 
+/** Comput the solver domain for iterative methods. This means
+  zero-initializing an image and copying its border (Dirichlet)
 
-
+  @param input is the original image to extract from
+  @param ret is the returned solver domain.
+*/
 void makeInitialGuess(const image_fmt &input, image_fmt &ret)
 {
     if(input.size() < 1)
@@ -51,8 +61,10 @@ void makeInitialGuess(const image_fmt &input, image_fmt &ret)
     }
 
     const int DEFAULT_GUESS_VAL = 0;
+    /* Put DEFAULT_GUESS_VAL for all pixels */
     ret.assign(input, "xyz", DEFAULT_GUESS_VAL);
 
+    /* Copy the border */
     cimg_for_borderXY(input,x,y,BORDER_SIZE)
     {
         ret(x,y) = input(x,y);
@@ -98,7 +110,8 @@ image_fmt padImage(const image_fmt &input, const int iPadLength)
     return padded;
 }
 
-/** Average the result from a nested set of vectors
+/** DEPRECATED: Currently not in use.
+  Average the result from a nested set of vectors
   If vector i is longer than vector j, then the average will
   calculate the average between i and j for as long as j has elements.
   After j is empty, the average will continue, calculating average of the
@@ -223,25 +236,6 @@ std::string printImageAligned(const image_fmt image, int iCols)
     return ss.str();
 }
 
-std::string printCore(const image_fmt image, const int iBorderSize)
-{
-    std::stringstream ss;
-    int iIndex = 0;
-    char sign = ' ';
-    cimg_for_insideXY(image, x,y, iBorderSize)
-    {
-        if( ((iIndex) % image.width()) == 0 && iIndex > 0) ss << "\n";
-        if(image(x,y) < 0)
-            sign = '-';
-        else
-            sign = ' ';
-        ss << format("%c%-8.4f", sign, cimg::abs(image(x,y)));
-        iIndex++;
-    }
-
-    return ss.str();
-}
-
 /** Convert an image to grayscale
 */
 //TODO: ensure that image handles all formats (no errors for specific color channels)
@@ -318,6 +312,7 @@ void divide(image_fmt* const origImage, image_fmt* const rho,
             std::vector<image_fmt *> &rhoList,
             std::vector<image_fmt *> &guessList)
 {
+    /* If we are not supposed to divide the image */
     if(DIVISION_SIZE == 1 || DIVISION_SIZE == 0)
     {
         origImageList.push_back(origImage);
@@ -328,6 +323,7 @@ void divide(image_fmt* const origImage, image_fmt* const rho,
         return;
     }
 
+    /* Simple division, horizontally in the middle */
     if(DIVISION_SIZE == 2)
     {
         int w = origImage->width(); int h = origImage->height();
@@ -359,14 +355,16 @@ void divide(image_fmt* const origImage, image_fmt* const rho,
     const int WIDHT_REGION = (iWidth / (DIVISION_SIZE / 2));
     const int HEIGHT_REGION = (iHeight / (DIVISION_SIZE / 2));
 #pragma GCC diagnostic pop
-    std::cerr << DIVISION_SIZE << std::endl;
-    exit(EXIT_FAILURE);
+    // std::cerr << DIVISION_SIZE << std::endl;
+    // exit(EXIT_FAILURE);
     image_fmt* ptr;
     imageList_fmt tmpOrigList, tmpRhoList, tmpGuessList;
 
     /* Since the code pushes back pointers, we need two iterations: one to
        allocate the images, and one to push back their addresses. Otherwise,
        all the pointers would point to same address.
+
+       The for loop begins top left, then bottom left, so on..
     */
     for(int xSlice = 0; xSlice < DIVISION_SIZE / 2; xSlice++)
     {
@@ -404,6 +402,7 @@ void divide(image_fmt* const origImage, image_fmt* const rho,
             tmpGuessList.push_back(retRegion);
         }
     }
+    /* We made image regions; now get their memory addresses */
     for(int iPos = 0; iPos < tmpOrigList.size(); iPos++)
     {
         image_fmt* origImg  =  new image_fmt(),

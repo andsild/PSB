@@ -1,13 +1,12 @@
 #!/usr/bin/python
 
 import sys
-from os.path import join
 from itertools import product
 from subprocess import call
 
 def main(path):
     cmdArgs = [
-        ("-f", [ path + s for s in \
+        ("-f", [path + s for s in \
                         ["105400.jpg", "121701.jpg", "121901.jpg", "146001.jpg",
                         "136006.jpg", "123400.jpg", "110000.jpg", "117102.jpg",
                         "100000.jpg", "1113000.jpg"]]),
@@ -20,11 +19,13 @@ def main(path):
     exeArgs = [""]
 
 
-    for (param,arg) in cmdArgs:
+    # Generate cartesian product of possible combinations of cmdArgs
+    for (param, arg) in cmdArgs:
         sep = " "
-        if param == "--": sep = ""
-        tmpHist = [ ' '.join(item) for item in \
-                   (product(exeArgs, [ param + sep + val for val in arg ]))]
+        if param == "--":
+            sep = ""
+        tmpHist = [' '.join(item) for item in \
+                   product(exeArgs, [param + sep + val for val in arg ])]
         exeArgs = tmpHist
 
     for cmd in exeArgs:
